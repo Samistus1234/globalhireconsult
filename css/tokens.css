@@ -1,0 +1,146 @@
+/* ============================================
+   GLOBALHIRE@ELAB — Design Tokens
+   Neural Lattice Design System v1.0
+   ============================================ */
+
+:root {
+  /* ── Color: Backgrounds ── */
+  --bg-void: #04050a;
+  --bg-deep: #08090d;
+  --bg-base: #0c0e14;
+  --bg-surface: #11131b;
+  --bg-elevated: #181b24;
+  --bg-card: #1c1f2b;
+  --bg-hover: #232736;
+
+  /* ── Color: Primary (Electric Mint) ── */
+  --primary: #00e89d;
+  --primary-light: #33edaf;
+  --primary-dark: #00c484;
+  --primary-muted: #00e89d33;
+  --primary-glow: 0 0 30px rgba(0, 232, 157, 0.25);
+  --primary-glow-strong: 0 0 60px rgba(0, 232, 157, 0.35);
+
+  /* ── Color: Secondary (Ultraviolet) ── */
+  --secondary: #7c5cff;
+  --secondary-light: #9b82ff;
+  --secondary-dark: #5a3dd6;
+  --secondary-muted: #7c5cff22;
+  --secondary-glow: 0 0 30px rgba(124, 92, 255, 0.2);
+
+  /* ── Color: Accents ── */
+  --accent-coral: #ff5c5c;
+  --accent-amber: #ffb020;
+  --accent-cyan: #00d4ff;
+  --accent-rose: #ff4da6;
+
+  /* ── Color: Semantic ── */
+  --success: #00e89d;
+  --warning: #ffb020;
+  --error: #ff5c5c;
+  --info: #00d4ff;
+
+  /* ── Color: Text ── */
+  --text-primary: #eef0f6;
+  --text-secondary: #8b91a8;
+  --text-tertiary: #5a5f73;
+  --text-inverse: #08090d;
+
+  /* ── Color: Borders ── */
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-default: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --border-accent: rgba(0, 232, 157, 0.3);
+
+  /* ── Typography ── */
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.5rem;
+  --text-6xl: 4.5rem;
+  --text-7xl: 6rem;
+
+  --leading-tight: 1.1;
+  --leading-snug: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.05em;
+  --tracking-wider: 0.1em;
+  --tracking-widest: 0.2em;
+
+  /* ── Spacing ── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
+
+  /* ── Radius ── */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.7);
+  --shadow-glow-primary: 0 0 40px rgba(0, 232, 157, 0.15), 0 0 80px rgba(0, 232, 157, 0.05);
+  --shadow-glow-secondary: 0 0 40px rgba(124, 92, 255, 0.15);
+
+  /* ── Glass ── */
+  --glass-bg: rgba(17, 19, 27, 0.6);
+  --glass-bg-strong: rgba(17, 19, 27, 0.85);
+  --glass-blur: blur(20px);
+  --glass-blur-strong: blur(40px);
+
+  /* ── Transitions ── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+  --duration-slower: 600ms;
+
+  /* ── Z-Index ── */
+  --z-base: 1;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  /* ── Layout ── */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1200px;
+  --container-2xl: 1400px;
+  --sidebar-width: 280px;
+  --sidebar-collapsed: 72px;
+  --header-height: 72px;
+}

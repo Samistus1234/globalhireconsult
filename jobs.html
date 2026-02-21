@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Opportunities — GlobalHire@eLab</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/landing.css">
+  <link rel="stylesheet" href="css/jobs.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300e89d'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' font-weight='bold' fill='%23080a0d'>G</text></svg>">
+</head>
+<body>
+
+  <!-- Background -->
+  <div class="page-bg" aria-hidden="true">
+    <div class="dot-grid"></div>
+  </div>
+
+  <!-- ===================== NAVIGATION ===================== -->
+  <nav class="nav" role="navigation">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="logo-icon">G</div>
+        <span>Global<span class="accent">Hire</span></span>
+        <span class="sub">@eLab</span>
+      </a>
+
+      <div class="nav-links hide-mobile">
+        <a href="index.html#platform">Platform</a>
+        <a href="index.html#services">Services</a>
+        <a href="jobs.html" style="color:var(--primary)">Opportunities</a>
+        <a href="index.html#for-talent">For Talent</a>
+        <a href="index.html#employers">Employers</a>
+      </div>
+
+      <div class="nav-actions">
+        <a href="dashboard.html" class="btn btn-ghost btn-sm hide-mobile">Sign In</a>
+        <a href="index.html#get-started" class="btn btn-primary btn-sm">Get Started</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===================== JOBS PAGE ===================== -->
+  <div class="jobs-page">
+    <div class="container container-wide">
+
+      <!-- Search Hero -->
+      <div class="jobs-hero reveal">
+        <div class="label" style="margin-bottom:var(--space-4);">Global Opportunities</div>
+        <h1>Find Your Next <span class="gradient-text">Healthcare Role</span></h1>
+        <p>Browse verified positions from top healthcare institutions across 47 countries.</p>
+
+        <div class="search-bar-large">
+          <div class="search-field">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" placeholder="Job title, specialty, or keyword..." id="job-search">
+          </div>
+          <div class="search-divider"></div>
+          <div class="search-field">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <input type="text" placeholder="Country or city..." id="location-search">
+          </div>
+          <button class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            Search
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Chips -->
+      <div class="filter-row reveal">
+        <span style="font-size:var(--text-sm);color:var(--text-tertiary);white-space:nowrap;">Filter:</span>
+        <button class="filter-chip active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          All Roles
+        </button>
+        <button class="filter-chip">Nursing</button>
+        <button class="filter-chip">Physician</button>
+        <button class="filter-chip">Allied Health</button>
+        <button class="filter-chip">Midwifery</button>
+        <button class="filter-chip">Pharmacy</button>
+        <button class="filter-chip">Visa Sponsored</button>
+        <button class="filter-chip">Remote / Tele</button>
+      </div>
+
+      <!-- Results Header -->
+      <div class="results-header reveal">
+        <div class="results-count"><strong>127</strong> positions found across <strong>23</strong> countries</div>
+        <div class="sort-select">
+          Sort by:
+          <select>
+            <option>Best Match</option>
+            <option>Newest First</option>
+            <option>Salary: High to Low</option>
+            <option>Salary: Low to High</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Job Listings -->
+      <div class="jobs-grid">
+
+        <!-- Job 1 -->
+        <div class="job-card reveal" style="--job-accent: var(--primary)">
+          <div class="urgent-badge">Urgent Hire</div>
+          <div class="job-card-body">
+            <div class="job-card-header">
+              <div class="job-employer-logo" style="background:linear-gradient(135deg,#1a5276,#2e86c1);color:#fff">NH</div>
+              <div>
+                <h3>ICU Nurse — Band 5/6</h3>
+                <div class="job-employer-name">NHS Manchester University Foundation Trust</div>
+              </div>
+            </div>
+            <div class="job-meta">
+              <div class="job-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Manchester, United Kingdom
+              </div>
+              <div class="job-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                Full-time &middot; Permanent
+              </div>
+              <div class="job-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Visa Sponsored
+              </div>
+            </div>
+            <div class="job-tags">
+              <span class="tag">Critical Care</span>
+              <span class="tag">ICU</span>
+              <span class="tag">NMC Registration</span>
+              <span class="tag">Relocation Support</span>
+            </div>
+          </div>
+          <div class="job-card-aside">
+            <div class="job-salary">&pound;34,500 <span>/ year</span></div>
+            <div class="job-match-indicator">
+              <div class="job-match-bar"><div class="job-match-bar-fill" style="width:95%"></div></div>
+              <span class="job-match-label">95% match</span>
+            </div>
+            <span class="job-posted">Posted 2 days ago</span>
+            <div class="job-card-actions">
+              <button class="btn btn-primary btn-sm">Apply Now</button>
+              <button class="btn btn-ghost btn-sm">Save</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Job 2 -->
+        <div class="job-card reveal reveal-delay-1" style="--job-accent: var(--secondary)">
+          <div class="job-card-body">
+            <div class="job-card-header">
+              <div class="job-employer-logo" style="background:linear-gradient(135deg,#8e44ad,#bb8fce);color:#fff">CC</div>
+              <div>
+                <h3>Emergency Medicine Physician</h3>
+                <div class="job-employer-name">Cleveland Clinic Abu Dhabi</div>
+              </div>
+            </div>
+            <div class="job-meta">
+              <div class="job-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Abu Dhabi, UAE
+              </div>
+              <div class="job-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                Full-time &middot; Contract (3yr)
+              </div>
+              <div class="job-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Visa + Housing
+              </div>
+            </div>
+            <div class="job-tags">
+              <span class="tag">Emergency Medicine</span>
+              <span class="tag">Board Certified</span>
+              <span class="tag">Tax-Free</span>
+              <span class="tag">Family Package</span>
+            </div>
+          </div>
+          <div class="job-card-aside">
+            <div class="job-salary">$185,000 <span>/ year</span></div>
+            <div class="job-match-indicator">
+              <div class="job-match-bar"><div class="job-match-bar-fill" style="width:91%;background:var(--secondary)"></div></div>
+              <span class="job-match-label" style="color:var(--secondary)">91% match</span>
+            </div>
+            <span class="job-posted">Posted 5 days ago</span>
+            <div class="job-card-actions">
+              <button class="btn btn-secondary btn-sm">Apply Now</button>
+              <button class="btn btn-ghost btn-sm">Save</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Job 3 -->
+        <div class="job-card reveal reveal-delay-2" style="--job-accent: var(--accent-amber)">
+          <div class="job-card-body">
+            <div class="job-card-header">
+              <div class="job-employer-logo" style="background:linear-gradient(135deg,#1e8449,#2ecc71);color:#fff">KF</div>
+              <div>
+                <h3>Senior Midwife</h3>
+                <div class="job-employer-name">King Faisal Specialist Hospital, Riyadh</div>
+              </div>
+            </div>
+            <div class="job-meta">
+              <div class="job-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Riyadh, Saudi Arabia
+              </div>
+              <div class="job-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                Full-time &middot; Contract (2yr)
+              </div>
+              <div class="job-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Visa + Flights
+              </div>
+            </div>
+            <div class="job-tags">
+              <span class="tag">Midwifery</span>
+              <span class="tag">Labour & Delivery</span>
+              <span class="tag">Tax-Free</span>
+              <span class="tag">Accommodation</span>
+            </div>
+          </div>
+          <div class="job-card-aside">
+            <div class="job-salary">$72,000 <span>/ year</span></div>
+            <div class="job-match-indicator">
+              <div class="job-match-bar"><div class="job-match-bar-fill" style="width:89%;background:var(--accent-amber)"></div></div>
+              <span class="job-match-label" style="color:var(--accent-amber)">89% match</span>
+            </div>
+            <span class="job-posted">Posted 1 week ago</span>
+            <div class="job-card-actions">
+              <button class="btn btn-outline-primary btn-sm">Apply Now</button>
+              <button class="btn btn-ghost btn-sm">Save</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Job 4 -->
+        <div class="job-card reveal reveal-delay-3" style="--job-accent: var(--accent-cyan)">
+          <div class="job-card-body">
+            <div class="job-card-header">
+              <div class="job-employer-logo" style="background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff">TG</div>
+              <div>
+                <h3>Diagnostic Radiographer</h3>
+                <div class="job-employer-name">Toronto General Hospital — UHN</div>
+              </div>
+            </div>
+            <div class="job-meta">
+              <div class="job-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Toronto, Canada
+              </div>
+              <div class="job-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                Full-time &middot; Permanent
+              </div>
+              <div class="job-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                LMIA Support
+              </div>
+            </div>
+            <div class="job-tags">
+              <span class="tag">Radiology</span>
+              <span class="tag">CT / MRI</span>
+              <span class="tag">PR Pathway</span>
+              <span class="tag">Benefits Package</span>
+            </div>
+          </div>
+          <div class="job-card-aside">
+            <div class="job-salary">CAD $82,000 <span>/ year</span></div>
+            <div class="job-match-indicator">
+              <div class="job-match-bar"><div class="job-match-bar-fill" style="width:87%;background:var(--accent-cyan)"></div></div>
+              <span class="job-match-label" style="color:var(--accent-cyan)">87% match</span>
+            </div>
+            <span class="job-posted">Posted 3 days ago</span>
+            <div class="job-card-actions">
+              <button class="btn btn-outline-primary btn-sm">Apply Now</button>
+              <button class="btn btn-ghost btn-sm">Save</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Job 5 -->
+        <div class="job-card reveal reveal-delay-4" style="--job-accent: var(--primary)">
+          <div class="urgent-badge">Urgent Hire</div>
+          <div class="job-card-body">
+            <div class="job-card-header">
+              <div class="job-employer-logo" style="background:linear-gradient(135deg,#2c3e50,#34495e);color:#fff">RA</div>
+              <div>
+                <h3>Paediatric Nurse Specialist</h3>
+                <div class="job-employer-name">Royal Adelaide Hospital</div>
+              </div>
+            </div>
+            <div class="job-meta">
+              <div class="job-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Adelaide, Australia
+              </div>
+              <div class="job-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                Full-time &middot; Permanent
+              </div>
+              <div class="job-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Visa Sponsored
+              </div>
+            </div>
+            <div class="job-tags">
+              <span class="tag">Paediatrics</span>
+              <span class="tag">NICU Experience</span>
+              <span class="tag">AHPRA Registration</span>
+              <span class="tag">Relocation Allowance</span>
+            </div>
+          </div>
+          <div class="job-card-aside">
+            <div class="job-salary">AUD $95,000 <span>/ year</span></div>
+            <div class="job-match-indicator">
+              <div class="job-match-bar"><div class="job-match-bar-fill" style="width:93%"></div></div>
+              <span class="job-match-label">93% match</span>
+            </div>
+            <span class="job-posted">Posted today</span>
+            <div class="job-card-actions">
+              <button class="btn btn-primary btn-sm">Apply Now</button>
+              <button class="btn btn-ghost btn-sm">Save</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination reveal">
+        <button class="page-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">4</button>
+        <span style="color:var(--text-tertiary)">...</span>
+        <button class="page-btn">13</button>
+        <button class="page-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer" style="margin-top:var(--space-16)">
+    <div class="container">
+      <div class="footer-bottom">
+        <span>&copy; 2026 Global Hire Consortium. A subsidiary of eLab Solutions International LLC.</span>
+        <div class="footer-social">
+          <a href="index.html">Home</a>
+          <span style="color:var(--border-default)">&middot;</span>
+          <a href="dashboard.html">Dashboard</a>
+          <span style="color:var(--border-default)">&middot;</span>
+          <a href="#">Privacy</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/core.js"></script>
+  <script>
+    // Filter chip toggle
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        if (chip.textContent.trim() === 'All Roles') {
+          document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+        } else {
+          document.querySelector('.filter-chip.active')?.classList.remove('active');
+          chip.classList.toggle('active');
+        }
+      });
+    });
+
+    // Pagination
+    document.querySelectorAll('.page-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+        if (btn.textContent.trim() && !isNaN(btn.textContent.trim())) {
+          btn.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
