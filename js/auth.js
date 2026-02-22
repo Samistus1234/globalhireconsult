@@ -3,9 +3,14 @@
    Login/Signup form logic, multi-step stepper
    ============================================ */
 
-'use strict';
-
 document.addEventListener('DOMContentLoaded', () => {
+
+  // Ensure supabase client is available
+  var sb = window.ghSupabase;
+  if (!sb || !sb.auth) {
+    console.error('Supabase client not initialized. sb=', sb);
+    return;
+  }
 
   // ── LOGIN FORM ──
   const loginForm = document.getElementById('login-form');
@@ -24,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const email = emailInput.value.trim();
       const password = passInput.value;
 
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
 
       if (error) {
         alertBox.textContent = error.message;
@@ -35,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Fetch role for redirect
-      const { data: profile } = await supabase
+      const { data: profile } = await sb
         .from('profiles')
         .select('role')
         .eq('id', data.user.id)
@@ -127,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       try {
         // Sign up
-        const { data, error } = await supabase.auth.signUp({
+        const { data, error } = await sb.auth.signUp({
           email,
           password,
           options: {
@@ -198,15 +203,13 @@ document.addEventListener('DOMContentLoaded', () => {
           profile_completed: !!(specialty && country && phone)
         };
 
-        // Use supabase.from() directly (schema set in client init)
-        const { error: profileError } = await supabase
+        const { error: profileError } = await sb
           .from('profiles')
           .update(profileData)
           .eq('id', data.user.id);
 
         if (profileError) {
           console.error('Profile update error:', profileError);
-          // Don't block redirect — profile can be updated later in portal
         }
 
         window.location.href = 'portal.html';
@@ -245,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.disabled = true;
       btn.textContent = 'Sending...';
 
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      const { error } = await sb.auth.resetPasswordForEmail(email, {
         redirectTo: window.location.origin + '/login.html'
       });
 

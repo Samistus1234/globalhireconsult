@@ -4,9 +4,8 @@
    Loaded after dashboard.js on dashboard.html
    ============================================ */
 
-'use strict';
-
 (function () {
+  var sb = window.ghSupabase;
   let adminProfile = null;
 
   window.addEventListener('gh:auth-ready', async (e) => {
@@ -24,7 +23,7 @@
     if (roleEl) roleEl.textContent = 'Platform Admin';
     if (avatarEl) {
       avatarEl.textContent = adminProfile.avatar_initials || 'A';
-      const colors = GHE.avatarColors[adminProfile.avatar_color_index || 0];
+      var colors = GHE.avatarColors[adminProfile.avatar_color_index || 0];
       avatarEl.style.background = colors[0];
       avatarEl.style.color = colors[1];
     }
@@ -47,8 +46,8 @@
 
   // ── KPI Cards ──
   async function loadKPIs() {
-    const { data: applicants } = await ghQuery('admin_applicant_overview').select('id, pipeline_status');
-    const { data: pendingDocs } = await ghQuery('documents').select('id').eq('status', 'pending');
+    const { data: applicants } = await sb.from('admin_applicant_overview').select('id, pipeline_status');
+    const { data: pendingDocs } = await sb.from('documents').select('id').eq('status', 'pending');
 
     const totalApplicants = applicants ? applicants.length : 0;
     const pendingCount = pendingDocs ? pendingDocs.length : 0;
@@ -64,7 +63,7 @@
     const tbody = document.getElementById('applicant-tbody');
     if (!tbody) return;
 
-    const { data, error } = await ghQuery('admin_applicant_overview')
+    const { data, error } = await sb.from('admin_applicant_overview')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(10);
@@ -78,7 +77,7 @@
     }
 
     tbody.innerHTML = data.map(a => {
-      const colors = GHE.avatarColors[a.avatar_color_index || 0];
+      var colors = GHE.avatarColors[a.avatar_color_index || 0];
       const statusMap = {
         applied: { badge: 'badge-info', label: 'Applied' },
         screening: { badge: 'badge-warning', label: 'Screening' },
@@ -112,8 +111,7 @@
     const queue = document.getElementById('verif-queue');
     if (!queue) return;
 
-    // Fetch pending/in_review documents with applicant info
-    const { data: docs, error } = await ghQuery('documents')
+    const { data: docs, error } = await sb.from('documents')
       .select('id, doc_type, file_name, status, applicant_id')
       .in('status', ['pending', 'in_review'])
       .order('uploaded_at', { ascending: false })
@@ -124,7 +122,6 @@
         <div style="padding:var(--space-8);text-align:center;color:var(--text-tertiary);">
           No documents pending verification.
         </div>`;
-      // Update badge
       const badge = document.getElementById('verif-count-badge');
       if (badge) badge.textContent = '0 pending';
       return;
@@ -132,7 +129,7 @@
 
     // Get applicant names
     const applicantIds = [...new Set(docs.map(d => d.applicant_id))];
-    const { data: profiles } = await ghQuery('profiles')
+    const { data: profiles } = await sb.from('profiles')
       .select('id, full_name')
       .in('id', applicantIds);
 
@@ -164,7 +161,6 @@
       </div>
     `).join('');
 
-    // Update badge
     const badge = document.getElementById('verif-count-badge');
     if (badge) badge.textContent = docs.length + ' pending';
 
@@ -178,7 +174,7 @@
   }
 
   async function updateDocStatus(docId, newStatus) {
-    const { error } = await ghQuery('documents')
+    const { error } = await sb.from('documents')
       .update({ status: newStatus, reviewed_at: new Date().toISOString() })
       .eq('id', docId);
 
@@ -194,7 +190,7 @@
 
   // ── Pipeline counts ──
   async function loadPipelineCounts() {
-    const { data } = await ghQuery('admin_applicant_overview').select('pipeline_status');
+    const { data } = await sb.from('admin_applicant_overview').select('pipeline_status');
     if (!data) return;
 
     const counts = { applied: 0, screening: 0, verifying: 0, verified: 0 };
@@ -214,7 +210,7 @@
 
   // ── Realtime subscription ──
   function subscribeRealtime() {
-    supabase.channel('gh-admin-live')
+    sb.channel('gh-admin-live')
       .on('postgres_changes', {
         event: '*',
         schema: 'globalhire',

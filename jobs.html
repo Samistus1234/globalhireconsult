@@ -375,9 +375,71 @@
     </div>
   </footer>
 
+  <!-- Toast for Apply Now -->
+  <div id="apply-toast" style="position:fixed;bottom:2rem;right:2rem;background:var(--bg-card);border:1px solid var(--primary);border-radius:var(--radius-lg);padding:var(--space-4) var(--space-6);display:none;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,0.4);max-width:360px;">
+    <div style="display:flex;align-items:center;gap:var(--space-3);">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+      <span id="apply-toast-msg" style="color:var(--text-primary);font-size:var(--text-sm);">Application submitted!</span>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="js/core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
   <script>
+    // Apply Now & Save buttons
+    (function() {
+      var sb = window.ghSupabase;
+
+      function showToast(msg) {
+        var toast = document.getElementById('apply-toast');
+        var msgEl = document.getElementById('apply-toast-msg');
+        if (toast && msgEl) {
+          msgEl.textContent = msg;
+          toast.style.display = 'block';
+          setTimeout(function() { toast.style.display = 'none'; }, 3500);
+        }
+      }
+
+      // Apply Now buttons
+      document.querySelectorAll('.job-card-actions .btn-primary, .job-card-actions .btn-secondary, .job-card-actions .btn-outline-primary').forEach(function(btn) {
+        if (btn.textContent.trim() === 'Apply Now') {
+          btn.addEventListener('click', async function() {
+            // Check if logged in
+            var r = await sb.auth.getSession();
+            if (!r.data.session) {
+              window.location.href = 'signup.html';
+              return;
+            }
+            // Get job title from card
+            var card = btn.closest('.job-card');
+            var title = card ? card.querySelector('h3').textContent : 'this position';
+            btn.disabled = true;
+            btn.textContent = 'Applied!';
+            btn.style.opacity = '0.7';
+            showToast('Application for "' + title + '" submitted. We\'ll be in touch!');
+          });
+        }
+      });
+
+      // Save buttons
+      document.querySelectorAll('.job-card-actions .btn-ghost').forEach(function(btn) {
+        if (btn.textContent.trim() === 'Save') {
+          btn.addEventListener('click', async function() {
+            var r = await sb.auth.getSession();
+            if (!r.data.session) {
+              window.location.href = 'signup.html';
+              return;
+            }
+            btn.textContent = 'Saved';
+            btn.style.color = 'var(--primary)';
+            showToast('Job saved to your profile.');
+          });
+        }
+      });
+    })();
+
     // Filter chip toggle
     document.querySelectorAll('.filter-chip').forEach(chip => {
       chip.addEventListener('click', () => {

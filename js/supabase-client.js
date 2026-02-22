@@ -4,12 +4,11 @@
    Schema: globalhire (isolated from public.*)
    ============================================ */
 
-'use strict';
+var SUPABASE_URL = 'https://evzhnsugmvtqgmvzwyix.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2emhuc3VnbXZ0cWdtdnp3eWl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NTcyNzcsImV4cCI6MjA4NzEzMzI3N30.JSjwHLHudUWlgXkaAam8xxXQbpCmbOLcBGenkFW3qNk';
 
-const SUPABASE_URL = 'https://evzhnsugmvtqgmvzwyix.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2emhuc3VnbXZ0cWdtdnp3eWl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NTcyNzcsImV4cCI6MjA4NzEzMzI3N30.JSjwHLHudUWlgXkaAam8xxXQbpCmbOLcBGenkFW3qNk';
-
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+// Supabase CDN exposes window.supabase with createClient
+var _sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   db: { schema: 'globalhire' },
   auth: {
     autoRefreshToken: true,
@@ -18,49 +17,57 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   }
 });
 
-// Helper to query the globalhire schema explicitly
-// Falls back to supabase.from() since schema is set in client init
-function ghQuery(table) {
-  try {
-    return supabase.schema('globalhire').from(table);
-  } catch (e) {
-    return supabase.from(table);
-  }
+// Expose on window for reliable cross-script access
+window.ghSupabase = _sbClient;
+
+// GHE is defined in core.js — ensure it exists for pages that don't load core.js
+if (typeof GHE === 'undefined') {
+  var GHE = {
+    avatarColors: [
+      ['#00e89d', '#080a0d'],
+      ['#7c5cff', '#ffffff'],
+      ['#ff5c5c', '#ffffff'],
+      ['#ffb020', '#080a0d'],
+      ['#00d4ff', '#080a0d'],
+      ['#ff6ec7', '#080a0d']
+    ]
+  };
 }
 
-const GHAuth = {
+var GHAuth = {
   async getSession() {
-    const { data, error } = await supabase.auth.getSession();
-    if (error) { console.error('Session error:', error); return null; }
-    return data.session;
+    var sb = window.ghSupabase;
+    var r = await sb.auth.getSession();
+    if (r.error) { console.error('Session error:', r.error); return null; }
+    return r.data.session;
   },
 
   async getUser() {
-    const { data, error } = await supabase.auth.getUser();
-    if (error) { console.error('User error:', error); return null; }
-    return data.user;
+    var sb = window.ghSupabase;
+    var r = await sb.auth.getUser();
+    if (r.error) { console.error('User error:', r.error); return null; }
+    return r.data.user;
   },
 
   async getProfile() {
-    const user = await this.getUser();
+    var sb = window.ghSupabase;
+    var user = await this.getUser();
     if (!user) return null;
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single();
-    if (error) { console.error('Profile error:', error); return null; }
-    return data;
+    var r = await sb.from('profiles').select('*').eq('id', user.id).single();
+    if (r.error) { console.error('Profile error:', r.error); return null; }
+    return r.data;
   },
 
   async signOut() {
-    const { error } = await supabase.auth.signOut();
-    if (error) console.error('Sign out error:', error);
+    var sb = window.ghSupabase;
+    var r = await sb.auth.signOut();
+    if (r.error) console.error('Sign out error:', r.error);
     window.location.href = 'login.html';
   },
 
   onAuthStateChange(callback) {
-    return supabase.auth.onAuthStateChange((event, session) => {
+    var sb = window.ghSupabase;
+    return sb.auth.onAuthStateChange(function(event, session) {
       callback(event, session);
     });
   }

@@ -3,20 +3,27 @@
    Profile editing, document upload, status
    ============================================ */
 
-'use strict';
-
 (function () {
+  var sb = window.ghSupabase;
   let currentProfile = null;
   let currentUser = null;
+
+  // Init tabs immediately so navigation works even before auth-ready
+  initTabs();
 
   window.addEventListener('gh:auth-ready', async (e) => {
     currentProfile = e.detail.profile;
     currentUser = e.detail.session.user;
     initSidebar();
-    initTabs();
-    await loadDashboard();
-    await loadProfile();
-    await loadDocuments();
+    try {
+      await loadDashboard();
+    } catch (err) { console.error('Dashboard load error:', err); }
+    try {
+      await loadProfile();
+    } catch (err) { console.error('Profile load error:', err); }
+    try {
+      await loadDocuments();
+    } catch (err) { console.error('Documents load error:', err); }
   });
 
   // ── Sidebar nav ──
@@ -29,7 +36,7 @@
     if (userRoleEl) userRoleEl.textContent = 'Healthcare Applicant';
     if (userAvatarEl) {
       userAvatarEl.textContent = currentProfile.avatar_initials || 'U';
-      const colors = GHE.avatarColors[currentProfile.avatar_color_index || 0];
+      var colors = GHE.avatarColors[currentProfile.avatar_color_index || 0];
       userAvatarEl.style.background = colors[0];
       userAvatarEl.style.color = colors[1];
     }
@@ -67,7 +74,8 @@
       license: false, degree: false, passport: false, cv: false
     };
 
-    const { data: docs } = await ghQuery('documents')
+    const { data: docs } = await sb
+      .from('documents')
       .select('doc_type, status')
       .eq('applicant_id', currentUser.id);
 
@@ -175,7 +183,8 @@
       const nameParts = updates.full_name.split(' ');
       updates.avatar_initials = nameParts.map(w => w[0]).join('').toUpperCase().substring(0, 2);
 
-      const { error } = await ghQuery('profiles')
+      const { error } = await sb
+        .from('profiles')
         .update(updates)
         .eq('id', currentUser.id);
 
@@ -205,7 +214,8 @@
       { type: 'cv', label: 'CV / Resume', icon: 'file-text' }
     ];
 
-    const { data: docs } = await ghQuery('documents')
+    const { data: docs } = await sb
+      .from('documents')
       .select('*')
       .eq('applicant_id', currentUser.id);
 
@@ -304,7 +314,6 @@
         input.accept = '.pdf,.jpg,.jpeg,.png,.webp';
         input.addEventListener('change', async () => {
           if (!input.files[0]) return;
-          // Remove old file first
           await removeDocument(btn.dataset.docId, btn.dataset.path);
           await uploadFile(btn.dataset.type, input.files[0]);
         });
@@ -352,7 +361,7 @@
     const filePath = `${currentUser.id}/${docType}/${Date.now()}.${ext}`;
 
     // Upload to storage
-    const { error: storageError } = await supabase.storage
+    const { error: storageError } = await sb.storage
       .from('gh-applicant-documents')
       .upload(filePath, file, { upsert: true });
 
@@ -363,7 +372,8 @@
     }
 
     // Insert document record
-    const { error: dbError } = await ghQuery('documents')
+    const { error: dbError } = await sb
+      .from('documents')
       .insert({
         applicant_id: currentUser.id,
         doc_type: docType,
@@ -382,10 +392,8 @@
   }
 
   async function removeDocument(docId, filePath) {
-    // Delete from storage
-    await supabase.storage.from('gh-applicant-documents').remove([filePath]);
-    // Delete record
-    await ghQuery('documents').delete().eq('id', docId);
+    await sb.storage.from('gh-applicant-documents').remove([filePath]);
+    await sb.from('documents').delete().eq('id', docId);
   }
 
   function formatBytes(bytes) {
