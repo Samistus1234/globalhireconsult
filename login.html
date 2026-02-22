@@ -97,15 +97,24 @@
 
   <!-- Auto-redirect if already logged in -->
   <script>
-    (async () => {
-      const session = await GHAuth.getSession();
-      if (session) {
-        const profile = await GHAuth.getProfile();
-        if (profile && profile.role === 'admin') {
-          window.location.href = 'dashboard.html';
-        } else if (profile) {
-          window.location.href = 'portal.html';
+    (async function() {
+      try {
+        var sb = window.ghSupabase;
+        if (!sb) return;
+        var r = await sb.auth.getSession();
+        if (!r.data || !r.data.session) return;
+        var session = r.data.session;
+        // Only redirect if we can also fetch the profile successfully
+        var p = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+        if (p.data && p.data.role === 'admin') {
+          window.location.replace('dashboard.html');
+        } else if (p.data) {
+          window.location.replace('portal.html');
         }
+        // If profile fetch failed, just stay on login page — no loop
+      } catch (e) {
+        console.warn('Auto-redirect check failed:', e);
+        // Stay on login page
       }
     })();
   </script>

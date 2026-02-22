@@ -4,71 +4,80 @@
    ============================================ */
 
 (function () {
-  var requiredRole = document.body.dataset.authRole; // 'admin' | 'applicant' | undefined
+  var requiredRole = document.body.dataset.authRole;
 
   async function guard() {
+    var sb = window.ghSupabase;
+    if (!sb) { console.error('Auth guard: Supabase not ready'); return; }
+
+    // Check session
+    var sessionResult;
     try {
-      var session = await GHAuth.getSession();
-
-      // No session → login
-      if (!session) {
-        window.location.replace('login.html');
-        return;
-      }
-
-      var profile = await GHAuth.getProfile();
-
-      if (!profile) {
-        // Profile might not exist yet (race condition after signup) — wait and retry
-        await new Promise(function(r) { setTimeout(r, 2000); });
-        profile = await GHAuth.getProfile();
-      }
-
-      if (!profile) {
-        // Still no profile — dispatch with minimal data so the page still works
-        console.warn('Auth guard: No profile found, dispatching with session only');
-        dispatchReady({ role: 'applicant', full_name: session.user.email }, session);
-        return;
-      }
-
-      // Role check
-      if (requiredRole && profile.role !== requiredRole) {
-        if (profile.role === 'admin') {
-          window.location.replace('dashboard.html');
-        } else {
-          window.location.replace('portal.html');
-        }
-        return;
-      }
-
-      dispatchReady(profile, session);
-
-    } catch (err) {
-      console.error('Auth guard error:', err);
-      // Don't redirect to login on error — dispatch with whatever we have
-      try {
-        var sb = window.ghSupabase;
-        var r = await sb.auth.getSession();
-        if (r.data.session) {
-          dispatchReady(
-            { role: 'applicant', full_name: r.data.session.user.email },
-            r.data.session
-          );
-          return;
-        }
-      } catch (e) { /* ignore */ }
+      sessionResult = await sb.auth.getSession();
+    } catch (e) {
+      console.error('Auth guard: getSession failed', e);
       window.location.replace('login.html');
+      return;
     }
-  }
 
-  function dispatchReady(profile, session) {
+    var session = sessionResult.data ? sessionResult.data.session : null;
+
+    // No session at all → must log in
+    if (!session) {
+      window.location.replace('login.html');
+      return;
+    }
+
+    // We have a session. Try to get the profile.
+    var profile = null;
+    try {
+      var r = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+      profile = r.data;
+    } catch (e) {
+      console.warn('Auth guard: profile fetch threw', e);
+    }
+
+    // If no profile, retry once after a short delay (trigger may still be running)
+    if (!profile) {
+      await new Promise(function(resolve) { setTimeout(resolve, 2000); });
+      try {
+        var r2 = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+        profile = r2.data;
+      } catch (e) {
+        console.warn('Auth guard: profile retry threw', e);
+      }
+    }
+
+    // If STILL no profile, don't redirect to login (session is valid).
+    // Just use fallback data so the page works.
+    if (!profile) {
+      profile = {
+        role: 'applicant',
+        full_name: session.user.user_metadata && session.user.user_metadata.full_name
+          ? session.user.user_metadata.full_name
+          : session.user.email,
+        avatar_initials: '??',
+        avatar_color_index: 0
+      };
+    }
+
+    // Role check — only redirect if role doesn't match
+    if (requiredRole && profile.role !== requiredRole) {
+      if (profile.role === 'admin') {
+        window.location.replace('dashboard.html');
+      } else {
+        window.location.replace('portal.html');
+      }
+      return;
+    }
+
+    // All good — dispatch event
     document.body.classList.add('auth-ready');
     window.dispatchEvent(new CustomEvent('gh:auth-ready', {
       detail: { profile: profile, session: session }
     }));
   }
 
-  // Run guard on load
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', guard);
   } else {
