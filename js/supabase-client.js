@@ -25,9 +25,9 @@ function ghFrom(table) {
 }
 window.ghFrom = ghFrom;
 
-// GHE is defined in core.js — ensure it exists for pages that don't load core.js
+// GHE is defined in core.js with const — provide fallback for pages that don't load core.js
 if (typeof GHE === 'undefined') {
-  var GHE = {
+  window.GHE = {
     avatarColors: [
       ['#00e89d', '#080a0d'],
       ['#7c5cff', '#ffffff'],
