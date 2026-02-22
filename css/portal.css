@@ -1,0 +1,380 @@
+/* ============================================
+   GLOBALHIRE@ELAB — Applicant Portal Styles
+   Upload zones, completion tracker, tabs
+   ============================================ */
+
+/* ── Portal uses dashboard-shell layout ── */
+
+/* ── Portal Nav ── */
+.portal-nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all var(--duration-fast);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.portal-nav-item:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.portal-nav-item.active {
+  background: var(--primary-muted);
+  color: var(--primary);
+}
+
+.portal-nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 3px;
+  height: 20px;
+  background: var(--primary);
+  border-radius: 0 2px 2px 0;
+}
+
+.portal-nav-item svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.portal-nav-item.active svg {
+  opacity: 1;
+}
+
+/* ── Tabs ── */
+.portal-tab {
+  display: none;
+}
+
+.portal-tab.active {
+  display: block;
+  animation: fadeIn 0.3s var(--ease-out);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Completion Card ── */
+.completion-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.completion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.completion-header h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.completion-pct {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.completion-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: var(--space-5);
+}
+
+.completion-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+  border-radius: var(--radius-full);
+  transition: width 0.8s var(--ease-out);
+}
+
+/* ── Checklist ── */
+.checklist-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+}
+
+.checklist-item svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.checklist-item.done {
+  color: var(--primary);
+}
+
+.checklist-item.done svg {
+  color: var(--primary);
+}
+
+/* ── Status Pipeline ── */
+.status-pipeline {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: var(--space-6);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-6);
+  overflow-x: auto;
+}
+
+.pipeline-step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+
+.pipeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  border: 2px solid var(--border-default);
+  flex-shrink: 0;
+  transition: all var(--duration-base);
+}
+
+.pipeline-step.active .pipeline-dot {
+  background: var(--primary-muted);
+  border-color: var(--primary);
+}
+
+.pipeline-step.current .pipeline-dot {
+  background: var(--primary);
+  border-color: var(--primary);
+  box-shadow: var(--primary-glow);
+}
+
+.pipeline-step span {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+.pipeline-step.active span {
+  color: var(--text-secondary);
+}
+
+.pipeline-step.current span {
+  color: var(--primary);
+}
+
+.pipeline-line {
+  flex: 1;
+  min-width: 24px;
+  height: 2px;
+  background: var(--border-default);
+  margin: 0 var(--space-2);
+}
+
+/* ── Document Cards Grid ── */
+.docs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-5);
+}
+
+.doc-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  transition: all var(--duration-base);
+}
+
+.doc-card:hover {
+  border-color: var(--border-default);
+}
+
+.doc-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.doc-card-header svg {
+  width: 22px;
+  height: 22px;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.doc-card-header h4 {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 700;
+}
+
+/* ── Drop Zone ── */
+.doc-dropzone {
+  border: 2px dashed var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--duration-base);
+}
+
+.doc-dropzone:hover,
+.doc-dropzone.dragover {
+  border-color: var(--primary);
+  background: rgba(0, 232, 157, 0.03);
+}
+
+.doc-dropzone svg {
+  width: 32px;
+  height: 32px;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-3);
+}
+
+.doc-dropzone p {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-1);
+}
+
+.doc-dropzone .link {
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.doc-hint {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+/* ── Uploaded file info ── */
+.doc-file-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-3);
+}
+
+.doc-filename {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 70%;
+}
+
+.doc-filesize {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+.doc-notes {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  font-style: italic;
+  margin-top: var(--space-2);
+}
+
+.doc-actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+/* ── Uploading state ── */
+.doc-uploading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  gap: var(--space-3);
+}
+
+.doc-uploading p {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+/* ── Profile Form ── */
+.profile-form .form-group {
+  margin-bottom: var(--space-5);
+}
+
+.profile-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.profile-message {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  display: none;
+  margin-bottom: var(--space-4);
+}
+
+/* ── Portal Loading ── */
+body:not(.auth-ready) .dash-content {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+body.auth-ready .dash-content {
+  opacity: 1;
+  transition: opacity var(--duration-base);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .docs-grid {
+    grid-template-columns: 1fr;
+  }
+  .profile-form .form-row {
+    grid-template-columns: 1fr;
+  }
+  .status-pipeline {
+    flex-wrap: wrap;
+  }
+}

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — GlobalHire@eLab</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/auth.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300e89d'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' font-weight='bold' fill='%23080a0d'>G</text></svg>">
+</head>
+<body>
+
+  <div class="auth-page">
+    <div class="auth-card">
+      <!-- Logo -->
+      <div class="auth-logo">
+        <div class="logo-mark">G</div>
+        <span>Global<span class="accent">Hire</span></span>
+      </div>
+
+      <h1 class="auth-title">Welcome Back</h1>
+      <p class="auth-subtitle">Sign in to your GlobalHire account</p>
+
+      <!-- Alert -->
+      <div class="auth-alert" id="login-alert"></div>
+
+      <!-- Login Form -->
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email Address</label>
+          <div class="form-input-icon">
+            <span class="input-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            </span>
+            <input type="email" class="form-input" id="login-email" placeholder="you@example.com" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="login-password">Password</label>
+          <div class="form-input-icon">
+            <span class="input-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </span>
+            <input type="password" class="form-input" id="login-password" placeholder="Enter your password" required>
+          </div>
+        </div>
+
+        <div style="text-align:right;margin-bottom:var(--space-4);">
+          <a href="#" id="forgot-password-link" style="font-size:var(--text-xs);color:var(--primary);">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;">Sign In</button>
+      </form>
+
+      <div class="auth-footer">
+        Don't have an account? <a href="signup.html">Create one</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div class="forgot-modal" id="forgot-modal">
+    <div class="forgot-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-2);">
+        <h3>Reset Password</h3>
+        <button class="btn btn-icon btn-ghost" id="forgot-close" style="width:32px;height:32px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <p>Enter your email and we'll send you a reset link.</p>
+      <form id="forgot-form">
+        <div class="form-group">
+          <input type="email" class="form-input" id="forgot-email" placeholder="you@example.com" required>
+        </div>
+        <div id="forgot-message" style="font-size:var(--text-sm);margin-bottom:var(--space-3);display:none;"></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Send Reset Link</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+
+  <!-- Auto-redirect if already logged in -->
+  <script>
+    (async () => {
+      const session = await GHAuth.getSession();
+      if (session) {
+        const profile = await GHAuth.getProfile();
+        if (profile && profile.role === 'admin') {
+          window.location.href = 'dashboard.html';
+        } else if (profile) {
+          window.location.href = 'portal.html';
+        }
+      }
+    })();
+  </script>
+</body>
+</html>

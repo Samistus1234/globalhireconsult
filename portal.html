@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Portal — GlobalHire@eLab</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/portal.css">
+  <link rel="stylesheet" href="css/auth.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300e89d'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' font-weight='bold' fill='%23080a0d'>G</text></svg>">
+</head>
+<body data-auth-role="applicant">
+  <div class="dashboard-shell">
+
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-logo">
+          <div class="logo-mark">G</div>
+          <span>Global<span class="accent">Hire</span></span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">My Account</div>
+
+        <a class="portal-nav-item active" data-tab="tab-dashboard" style="position:relative;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          My Dashboard
+        </a>
+
+        <a class="portal-nav-item" data-tab="tab-profile" style="position:relative;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          My Profile
+        </a>
+
+        <a class="portal-nav-item" data-tab="tab-documents" style="position:relative;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+          My Documents
+        </a>
+
+        <div class="nav-section-label">Explore</div>
+
+        <a class="portal-nav-item" href="jobs.html" style="position:relative;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          Browse Jobs
+        </a>
+
+        <div class="nav-section-label">Account</div>
+
+        <a class="portal-nav-item" id="portal-signout" href="#" style="position:relative;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign Out
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="avatar" id="portal-user-avatar" style="background:var(--primary);color:var(--bg-deep)">...</div>
+          <div class="user-info">
+            <div class="user-name" id="portal-user-name">Loading...</div>
+            <div class="user-role" id="portal-user-role">Applicant</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===================== MAIN CONTENT ===================== -->
+    <main class="dashboard-main">
+
+      <!-- Header -->
+      <header class="dash-header">
+        <div class="dash-header-left">
+          <button class="btn btn-icon" onclick="document.getElementById('sidebar').classList.toggle('open')" style="display:none;" id="sidebar-toggle">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+          </button>
+          <div>
+            <div class="breadcrumb">GlobalHire <span>/</span> My Portal</div>
+            <h1>Applicant Portal</h1>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard Content -->
+      <div class="dash-content">
+
+        <!-- ═══ TAB: My Dashboard ═══ -->
+        <div class="portal-tab active" id="tab-dashboard">
+          <!-- Completion Card -->
+          <div class="completion-card">
+            <div class="completion-header">
+              <h3>Profile Completion</h3>
+              <span class="completion-pct" id="completion-pct">0%</span>
+            </div>
+            <div class="completion-bar">
+              <div class="completion-bar-fill" id="completion-fill" style="width:0%"></div>
+            </div>
+            <div id="completion-checklist">
+              <!-- Dynamically filled -->
+            </div>
+          </div>
+
+          <!-- Status Pipeline -->
+          <div class="panel" style="margin-bottom:var(--space-6);">
+            <div class="panel-header">
+              <span class="panel-title">Application Status</span>
+            </div>
+            <div class="status-pipeline" id="status-pipeline">
+              <!-- Dynamically filled -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ TAB: My Profile ═══ -->
+        <div class="portal-tab" id="tab-profile">
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Professional Profile</span>
+            </div>
+            <div class="panel-body">
+              <div id="profile-message" class="profile-message"></div>
+
+              <form id="profile-form" class="profile-form">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" name="full_name" placeholder="Your full name">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" class="form-input" name="phone" placeholder="+234 800 000 0000">
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Specialty</label>
+                    <select class="form-input" name="specialty">
+                      <option value="">Select specialty...</option>
+                      <option>General Nursing</option>
+                      <option>ICU / Critical Care Nursing</option>
+                      <option>Emergency Nursing</option>
+                      <option>Paediatric Nursing</option>
+                      <option>Midwifery</option>
+                      <option>General Medicine</option>
+                      <option>General Surgery</option>
+                      <option>Emergency Medicine</option>
+                      <option>Radiology / Radiography</option>
+                      <option>Pharmacy</option>
+                      <option>Physiotherapy</option>
+                      <option>Laboratory Science</option>
+                      <option>Dentistry</option>
+                      <option>Other</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Country of Origin</label>
+                    <select class="form-input" name="country_of_origin">
+                      <option value="">Select country...</option>
+                      <option>Nigeria</option>
+                      <option>Ghana</option>
+                      <option>Kenya</option>
+                      <option>South Africa</option>
+                      <option>India</option>
+                      <option>Philippines</option>
+                      <option>Egypt</option>
+                      <option>Pakistan</option>
+                      <option>Colombia</option>
+                      <option>Jamaica</option>
+                      <option>Zimbabwe</option>
+                      <option>Uganda</option>
+                      <option>Tanzania</option>
+                      <option>Ethiopia</option>
+                      <option>Senegal</option>
+                      <option>Ivory Coast</option>
+                      <option>Mali</option>
+                      <option>Guinea</option>
+                      <option>Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Years of Experience</label>
+                    <input type="number" class="form-input" name="years_of_experience" min="0" max="50" placeholder="e.g. 5">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">License / Registration No.</label>
+                    <input type="text" class="form-input" name="license_number" placeholder="e.g. NMC12345">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Preferred Destinations</label>
+                  <div class="dest-grid">
+                    <label class="dest-option">
+                      <input type="checkbox" class="dest-checkbox" value="Saudi Arabia">
+                      <span>Saudi Arabia</span>
+                    </label>
+                    <label class="dest-option">
+                      <input type="checkbox" class="dest-checkbox" value="Qatar">
+                      <span>Qatar</span>
+                    </label>
+                    <label class="dest-option">
+                      <input type="checkbox" class="dest-checkbox" value="Kuwait">
+                      <span>Kuwait</span>
+                    </label>
+                    <label class="dest-option">
+                      <input type="checkbox" class="dest-checkbox" value="UAE">
+                      <span>UAE</span>
+                    </label>
+                    <label class="dest-option">
+                      <input type="checkbox" class="dest-checkbox" value="Oman">
+                      <span>Oman</span>
+                    </label>
+                    <label class="dest-option">
+                      <input type="checkbox" class="dest-checkbox" value="Bahrain">
+                      <span>Bahrain</span>
+                    </label>
+                    <label class="dest-option">
+                      <input type="checkbox" class="dest-checkbox" value="United Kingdom">
+                      <span>United Kingdom</span>
+                    </label>
+                    <label class="dest-option">
+                      <input type="checkbox" class="dest-checkbox" value="USA">
+                      <span>USA</span>
+                    </label>
+                    <label class="dest-option">
+                      <input type="checkbox" class="dest-checkbox" value="Canada">
+                      <span>Canada</span>
+                    </label>
+                    <label class="dest-option">
+                      <input type="checkbox" class="dest-checkbox" value="Germany">
+                      <span>Germany</span>
+                    </label>
+                    <label class="dest-option">
+                      <input type="checkbox" class="dest-checkbox" value="Australia">
+                      <span>Australia</span>
+                    </label>
+                    <label class="dest-option">
+                      <input type="checkbox" class="dest-checkbox" value="Other">
+                      <span>Other</span>
+                    </label>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="margin-top:var(--space-4);">Save Profile</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ TAB: My Documents ═══ -->
+        <div class="portal-tab" id="tab-documents">
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Upload Documents</span>
+              <span class="badge badge-info badge-dot">PDF, JPEG, PNG up to 10MB</span>
+            </div>
+            <div class="panel-body">
+              <div class="docs-grid" id="docs-grid">
+                <!-- Dynamically filled by portal.js -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth-guard.js"></script>
+  <script src="js/portal.js"></script>
+</body>
+</html>

@@ -19,7 +19,7 @@
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300e89d'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' font-weight='bold' fill='%23080a0d'>G</text></svg>">
 </head>
-<body>
+<body data-auth-role="admin">
   <div class="dashboard-shell">
 
     <!-- ===================== SIDEBAR ===================== -->
@@ -86,12 +86,14 @@
 
       <div class="sidebar-footer">
         <div class="sidebar-user">
-          <div class="avatar" style="background:var(--primary);color:var(--bg-deep)">SO</div>
+          <div class="avatar" id="admin-user-avatar" style="background:var(--primary);color:var(--bg-deep)">SO</div>
           <div class="user-info">
-            <div class="user-name">Samuel Owusu</div>
-            <div class="user-role">Platform Admin</div>
+            <div class="user-name" id="admin-user-name">Samuel Owusu</div>
+            <div class="user-role" id="admin-user-role">Platform Admin</div>
           </div>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2" stroke-linecap="round"><path d="M7 15l5 5 5-5M7 9l5-5 5 5"/></svg>
+          <a href="#" id="admin-signout" title="Sign Out" style="display:flex;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </a>
         </div>
       </div>
     </aside>
@@ -141,7 +143,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
               </div>
             </div>
-            <div class="kpi-value" data-count="1247">0</div>
+            <div class="kpi-value" id="kpi-pipeline" data-count="1247">0</div>
             <span class="kpi-change up">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
               +14.2% this month
@@ -171,7 +173,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               </div>
             </div>
-            <div class="kpi-value" data-count="38">0</div>
+            <div class="kpi-value" id="kpi-pending" data-count="38">0</div>
             <span class="kpi-change down">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
               -6 from yesterday
@@ -203,30 +205,25 @@
               <button class="btn btn-ghost btn-sm">View All</button>
             </div>
             <div class="pipeline">
-              <div class="pipeline-stage">
-                <div class="stage-count">423</div>
+              <div class="pipeline-stage" data-stage="applied">
+                <div class="stage-count">0</div>
                 <div class="stage-label">Applied</div>
                 <div class="stage-bar"><div class="stage-fill" style="width:100%"></div></div>
               </div>
-              <div class="pipeline-stage">
-                <div class="stage-count">287</div>
+              <div class="pipeline-stage" data-stage="screening">
+                <div class="stage-count">0</div>
                 <div class="stage-label">Screening</div>
                 <div class="stage-bar"><div class="stage-fill" style="width:68%"></div></div>
               </div>
-              <div class="pipeline-stage">
-                <div class="stage-count">156</div>
-                <div class="stage-label">Verified</div>
+              <div class="pipeline-stage" data-stage="verifying">
+                <div class="stage-count">0</div>
+                <div class="stage-label">Verifying</div>
                 <div class="stage-bar"><div class="stage-fill" style="width:37%"></div></div>
               </div>
-              <div class="pipeline-stage">
-                <div class="stage-count">89</div>
-                <div class="stage-label">Matched</div>
+              <div class="pipeline-stage" data-stage="verified">
+                <div class="stage-count">0</div>
+                <div class="stage-label">Verified</div>
                 <div class="stage-bar"><div class="stage-fill" style="width:21%"></div></div>
-              </div>
-              <div class="pipeline-stage">
-                <div class="stage-count">42</div>
-                <div class="stage-label">Placed</div>
-                <div class="stage-bar"><div class="stage-fill" style="width:10%"></div></div>
               </div>
             </div>
           </div>
@@ -282,152 +279,18 @@
                   <tr>
                     <th>Candidate</th>
                     <th>Specialty</th>
-                    <th>Location</th>
-                    <th>Match</th>
+                    <th>Origin</th>
+                    <th>Docs</th>
                     <th>Status</th>
                     <th>Action</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="applicant-tbody">
                   <tr>
-                    <td>
-                      <div class="applicant-row">
-                        <div class="avatar avatar-sm" style="background:#00e89d;color:#080a0d">AK</div>
-                        <div class="applicant-info">
-                          <div class="applicant-name">Amara Kone</div>
-                          <div class="applicant-detail">amara.k@email.com</div>
-                        </div>
-                      </div>
+                    <td colspan="6" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">
+                      <div class="skeleton" style="height:20px;width:60%;margin:0 auto var(--space-3);"></div>
+                      <div class="skeleton" style="height:14px;width:40%;margin:0 auto;"></div>
                     </td>
-                    <td>ICU Nursing</td>
-                    <td>
-                      <span class="tag">Abidjan, CI</span>
-                    </td>
-                    <td>
-                      <div class="match-score">
-                        <div class="match-ring">
-                          <svg viewBox="0 0 36 36">
-                            <circle class="ring-bg" cx="18" cy="18" r="15.9"/>
-                            <circle class="ring-fill" cx="18" cy="18" r="15.9" stroke-dashoffset="5" style="stroke:var(--primary)"/>
-                          </svg>
-                          <span class="ring-value">95</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td><span class="badge badge-primary badge-dot">Verified</span></td>
-                    <td><button class="btn btn-outline-primary btn-sm">Match</button></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="applicant-row">
-                        <div class="avatar avatar-sm" style="background:#7c5cff;color:#fff">JD</div>
-                        <div class="applicant-info">
-                          <div class="applicant-name">Dr. James Diallo</div>
-                          <div class="applicant-detail">j.diallo@email.com</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>General Surgery</td>
-                    <td>
-                      <span class="tag">Dakar, SN</span>
-                    </td>
-                    <td>
-                      <div class="match-score">
-                        <div class="match-ring">
-                          <svg viewBox="0 0 36 36">
-                            <circle class="ring-bg" cx="18" cy="18" r="15.9"/>
-                            <circle class="ring-fill" cx="18" cy="18" r="15.9" stroke-dashoffset="12" style="stroke:var(--secondary)"/>
-                          </svg>
-                          <span class="ring-value">88</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td><span class="badge badge-warning badge-dot">Verifying</span></td>
-                    <td><button class="btn btn-ghost btn-sm">Review</button></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="applicant-row">
-                        <div class="avatar avatar-sm" style="background:#ff5c5c;color:#fff">MR</div>
-                        <div class="applicant-info">
-                          <div class="applicant-name">Maria Reyes</div>
-                          <div class="applicant-detail">m.reyes@email.com</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>Midwifery</td>
-                    <td>
-                      <span class="tag">Manila, PH</span>
-                    </td>
-                    <td>
-                      <div class="match-score">
-                        <div class="match-ring">
-                          <svg viewBox="0 0 36 36">
-                            <circle class="ring-bg" cx="18" cy="18" r="15.9"/>
-                            <circle class="ring-fill" cx="18" cy="18" r="15.9" stroke-dashoffset="8" style="stroke:var(--primary)"/>
-                          </svg>
-                          <span class="ring-value">92</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td><span class="badge badge-primary badge-dot">Verified</span></td>
-                    <td><button class="btn btn-outline-primary btn-sm">Match</button></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="applicant-row">
-                        <div class="avatar avatar-sm" style="background:#ffb020;color:#080a0d">KO</div>
-                        <div class="applicant-info">
-                          <div class="applicant-name">Kwame Owusu</div>
-                          <div class="applicant-detail">k.owusu@email.com</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>Emergency Med</td>
-                    <td>
-                      <span class="tag">Accra, GH</span>
-                    </td>
-                    <td>
-                      <div class="match-score">
-                        <div class="match-ring">
-                          <svg viewBox="0 0 36 36">
-                            <circle class="ring-bg" cx="18" cy="18" r="15.9"/>
-                            <circle class="ring-fill" cx="18" cy="18" r="15.9" stroke-dashoffset="20" style="stroke:var(--accent-amber)"/>
-                          </svg>
-                          <span class="ring-value">80</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td><span class="badge badge-info badge-dot">Screening</span></td>
-                    <td><button class="btn btn-ghost btn-sm">Review</button></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="applicant-row">
-                        <div class="avatar avatar-sm" style="background:#00d4ff;color:#080a0d">FN</div>
-                        <div class="applicant-info">
-                          <div class="applicant-name">Fatima Ndiaye</div>
-                          <div class="applicant-detail">f.ndiaye@email.com</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>Paediatrics</td>
-                    <td>
-                      <span class="tag">Bamako, ML</span>
-                    </td>
-                    <td>
-                      <div class="match-score">
-                        <div class="match-ring">
-                          <svg viewBox="0 0 36 36">
-                            <circle class="ring-bg" cx="18" cy="18" r="15.9"/>
-                            <circle class="ring-fill" cx="18" cy="18" r="15.9" stroke-dashoffset="3" style="stroke:var(--primary)"/>
-                          </svg>
-                          <span class="ring-value">97</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td><span class="badge badge-primary badge-dot">Verified</span></td>
-                    <td><button class="btn btn-outline-primary btn-sm">Match</button></td>
                   </tr>
                 </tbody>
               </table>
@@ -438,58 +301,12 @@
           <div class="panel">
             <div class="panel-header">
               <span class="panel-title">Verification Queue</span>
-              <span class="badge badge-warning badge-dot">8 pending</span>
+              <span class="badge badge-warning badge-dot" id="verif-count-badge">Loading...</span>
             </div>
-            <div class="panel-body-flush">
-              <div class="verif-item">
-                <div class="status-dot status-dot-pending"></div>
-                <div class="verif-info">
-                  <div class="verif-name">Ibrahim Sow</div>
-                  <div class="verif-detail">Nursing License &middot; Guinea</div>
-                </div>
-                <div class="verif-actions">
-                  <button class="btn btn-sm btn-primary">Verify</button>
-                </div>
-              </div>
-              <div class="verif-item">
-                <div class="status-dot status-dot-pending"></div>
-                <div class="verif-info">
-                  <div class="verif-name">Grace Adeyemi</div>
-                  <div class="verif-detail">MBBS Degree &middot; Nigeria</div>
-                </div>
-                <div class="verif-actions">
-                  <button class="btn btn-sm btn-primary">Verify</button>
-                </div>
-              </div>
-              <div class="verif-item">
-                <div class="status-dot status-dot-pending"></div>
-                <div class="verif-info">
-                  <div class="verif-name">Priya Sharma</div>
-                  <div class="verif-detail">Pharmacy License &middot; India</div>
-                </div>
-                <div class="verif-actions">
-                  <button class="btn btn-sm btn-primary">Verify</button>
-                </div>
-              </div>
-              <div class="verif-item">
-                <div class="status-dot status-dot-active"></div>
-                <div class="verif-info">
-                  <div class="verif-name">Carlos Mendez</div>
-                  <div class="verif-detail">Medical Degree &middot; Colombia</div>
-                </div>
-                <div class="verif-actions">
-                  <span class="badge badge-info">In Progress</span>
-                </div>
-              </div>
-              <div class="verif-item">
-                <div class="status-dot status-dot-pending"></div>
-                <div class="verif-info">
-                  <div class="verif-name">Aisha Mohammed</div>
-                  <div class="verif-detail">Nursing Cert &middot; Kenya</div>
-                </div>
-                <div class="verif-actions">
-                  <button class="btn btn-sm btn-primary">Verify</button>
-                </div>
+            <div class="panel-body-flush" id="verif-queue">
+              <div style="padding:var(--space-8);text-align:center;">
+                <div class="skeleton" style="height:20px;width:70%;margin:0 auto var(--space-3);"></div>
+                <div class="skeleton" style="height:14px;width:50%;margin:0 auto;"></div>
               </div>
             </div>
           </div>
@@ -789,5 +606,10 @@
   <!-- Scripts -->
   <script src="js/core.js"></script>
   <script src="js/dashboard.js"></script>
+  <!-- Supabase + Auth + Live Data -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth-guard.js"></script>
+  <script src="js/dashboard-live.js"></script>
 </body>
 </html>

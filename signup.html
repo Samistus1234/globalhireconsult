@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — GlobalHire@eLab</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/auth.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300e89d'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' font-weight='bold' fill='%23080a0d'>G</text></svg>">
+</head>
+<body>
+
+  <div class="auth-page">
+    <div class="auth-card auth-card-wide">
+      <!-- Logo -->
+      <div class="auth-logo">
+        <div class="logo-mark">G</div>
+        <span>Global<span class="accent">Hire</span></span>
+      </div>
+
+      <h1 class="auth-title">Join GlobalHire</h1>
+      <p class="auth-subtitle">Create your healthcare professional profile</p>
+
+      <!-- Stepper -->
+      <div class="stepper">
+        <div class="step-indicator active">
+          <div class="step-dot">1</div>
+          <span class="step-label">Account</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-indicator">
+          <div class="step-dot">2</div>
+          <span class="step-label">Professional</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-indicator">
+          <div class="step-dot">3</div>
+          <span class="step-label">Preferences</span>
+        </div>
+      </div>
+
+      <!-- Alert -->
+      <div class="auth-alert" id="signup-alert"></div>
+
+      <!-- Signup Form -->
+      <form id="signup-form">
+
+        <!-- Step 1: Account -->
+        <div class="step-content active" data-step="0">
+          <div class="form-group">
+            <label class="form-label" for="signup-name">Full Name *</label>
+            <input type="text" class="form-input" id="signup-name" placeholder="e.g. Amara Kone" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="signup-email">Email Address *</label>
+            <input type="email" class="form-input" id="signup-email" placeholder="you@example.com" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="signup-password">Password *</label>
+            <input type="password" class="form-input" id="signup-password" placeholder="Minimum 6 characters" required minlength="6">
+          </div>
+
+          <div class="auth-actions">
+            <a href="login.html" class="btn btn-ghost">Already have an account?</a>
+            <button type="button" class="btn btn-primary btn-next">
+              Continue
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Professional Info -->
+        <div class="step-content" data-step="1">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="signup-specialty">Specialty *</label>
+              <select class="form-input" id="signup-specialty" required>
+                <option value="">Select specialty...</option>
+                <option>General Nursing</option>
+                <option>ICU / Critical Care Nursing</option>
+                <option>Emergency Nursing</option>
+                <option>Paediatric Nursing</option>
+                <option>Midwifery</option>
+                <option>General Medicine</option>
+                <option>General Surgery</option>
+                <option>Emergency Medicine</option>
+                <option>Radiology / Radiography</option>
+                <option>Pharmacy</option>
+                <option>Physiotherapy</option>
+                <option>Laboratory Science</option>
+                <option>Dentistry</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="signup-country">Country of Origin *</label>
+              <select class="form-input" id="signup-country" required>
+                <option value="">Select country...</option>
+                <option>Nigeria</option>
+                <option>Ghana</option>
+                <option>Kenya</option>
+                <option>South Africa</option>
+                <option>India</option>
+                <option>Philippines</option>
+                <option>Egypt</option>
+                <option>Pakistan</option>
+                <option>Colombia</option>
+                <option>Jamaica</option>
+                <option>Zimbabwe</option>
+                <option>Uganda</option>
+                <option>Tanzania</option>
+                <option>Ethiopia</option>
+                <option>Senegal</option>
+                <option>Ivory Coast</option>
+                <option>Mali</option>
+                <option>Guinea</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="signup-experience">Years of Experience</label>
+              <input type="number" class="form-input" id="signup-experience" min="0" max="50" placeholder="e.g. 5">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="signup-license">License / Registration No.</label>
+              <input type="text" class="form-input" id="signup-license" placeholder="e.g. NMC12345">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="signup-phone">Phone Number</label>
+            <input type="tel" class="form-input" id="signup-phone" placeholder="+234 800 000 0000">
+          </div>
+
+          <div class="auth-actions">
+            <button type="button" class="btn btn-ghost btn-back">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              Back
+            </button>
+            <button type="button" class="btn btn-primary btn-next">
+              Continue
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Preferences -->
+        <div class="step-content" data-step="2">
+          <div class="form-group">
+            <label class="form-label">Preferred Destination Countries</label>
+            <p style="font-size:var(--text-xs);color:var(--text-tertiary);margin-bottom:var(--space-3);">Select all that interest you.</p>
+            <div class="dest-grid">
+              <label class="dest-option">
+                <input type="checkbox" class="dest-checkbox" value="Saudi Arabia">
+                <span class="dest-label">Saudi Arabia</span>
+              </label>
+              <label class="dest-option">
+                <input type="checkbox" class="dest-checkbox" value="Qatar">
+                <span class="dest-label">Qatar</span>
+              </label>
+              <label class="dest-option">
+                <input type="checkbox" class="dest-checkbox" value="Kuwait">
+                <span class="dest-label">Kuwait</span>
+              </label>
+              <label class="dest-option">
+                <input type="checkbox" class="dest-checkbox" value="UAE">
+                <span class="dest-label">UAE</span>
+              </label>
+              <label class="dest-option">
+                <input type="checkbox" class="dest-checkbox" value="Oman">
+                <span class="dest-label">Oman</span>
+              </label>
+              <label class="dest-option">
+                <input type="checkbox" class="dest-checkbox" value="Bahrain">
+                <span class="dest-label">Bahrain</span>
+              </label>
+              <label class="dest-option">
+                <input type="checkbox" class="dest-checkbox" value="United Kingdom">
+                <span class="dest-label">United Kingdom</span>
+              </label>
+              <label class="dest-option">
+                <input type="checkbox" class="dest-checkbox" value="USA">
+                <span class="dest-label">USA</span>
+              </label>
+              <label class="dest-option">
+                <input type="checkbox" class="dest-checkbox" value="Canada">
+                <span class="dest-label">Canada</span>
+              </label>
+              <label class="dest-option">
+                <input type="checkbox" class="dest-checkbox" value="Germany">
+                <span class="dest-label">Germany</span>
+              </label>
+              <label class="dest-option">
+                <input type="checkbox" class="dest-checkbox" value="Australia">
+                <span class="dest-label">Australia</span>
+              </label>
+              <label class="dest-option">
+                <input type="checkbox" class="dest-checkbox" value="Other">
+                <span class="dest-label">Other</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="auth-actions">
+            <button type="button" class="btn btn-ghost btn-back">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              Back
+            </button>
+            <button type="submit" class="btn btn-primary">
+              Create Account
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+
+  <!-- Auto-redirect if already logged in -->
+  <script>
+    (async () => {
+      const session = await GHAuth.getSession();
+      if (session) window.location.href = 'portal.html';
+    })();
+  </script>
+</body>
+</html>
