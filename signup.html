@@ -246,7 +246,7 @@
         if (!sb) return;
         var r = await sb.auth.getSession();
         if (r.data && r.data.session) {
-          var p = await sb.from('profiles').select('role').eq('id', r.data.session.user.id).single();
+          var p = await ghFrom('profiles').select('role').eq('id', r.data.session.user.id).single();
           if (p.data) window.location.replace('portal.html');
         }
       } catch (e) { /* stay on signup */ }

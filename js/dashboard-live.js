@@ -46,8 +46,8 @@
 
   // ── KPI Cards ──
   async function loadKPIs() {
-    const { data: applicants } = await sb.from('admin_applicant_overview').select('id, pipeline_status');
-    const { data: pendingDocs } = await sb.from('documents').select('id').eq('status', 'pending');
+    const { data: applicants } = await ghFrom('admin_applicant_overview').select('id, pipeline_status');
+    const { data: pendingDocs } = await ghFrom('documents').select('id').eq('status', 'pending');
 
     const totalApplicants = applicants ? applicants.length : 0;
     const pendingCount = pendingDocs ? pendingDocs.length : 0;
@@ -63,7 +63,7 @@
     const tbody = document.getElementById('applicant-tbody');
     if (!tbody) return;
 
-    const { data, error } = await sb.from('admin_applicant_overview')
+    const { data, error } = await ghFrom('admin_applicant_overview')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(10);
@@ -111,7 +111,7 @@
     const queue = document.getElementById('verif-queue');
     if (!queue) return;
 
-    const { data: docs, error } = await sb.from('documents')
+    const { data: docs, error } = await ghFrom('documents')
       .select('id, doc_type, file_name, status, applicant_id')
       .in('status', ['pending', 'in_review'])
       .order('uploaded_at', { ascending: false })
@@ -129,7 +129,7 @@
 
     // Get applicant names
     const applicantIds = [...new Set(docs.map(d => d.applicant_id))];
-    const { data: profiles } = await sb.from('profiles')
+    const { data: profiles } = await ghFrom('profiles')
       .select('id, full_name')
       .in('id', applicantIds);
 
@@ -174,7 +174,7 @@
   }
 
   async function updateDocStatus(docId, newStatus) {
-    const { error } = await sb.from('documents')
+    const { error } = await ghFrom('documents')
       .update({ status: newStatus, reviewed_at: new Date().toISOString() })
       .eq('id', docId);
 
@@ -190,7 +190,7 @@
 
   // ── Pipeline counts ──
   async function loadPipelineCounts() {
-    const { data } = await sb.from('admin_applicant_overview').select('pipeline_status');
+    const { data } = await ghFrom('admin_applicant_overview').select('pipeline_status');
     if (!data) return;
 
     const counts = { applied: 0, screening: 0, verifying: 0, verified: 0 };

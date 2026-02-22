@@ -31,7 +31,7 @@
     // We have a session. Try to get the profile.
     var profile = null;
     try {
-      var r = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+      var r = await ghFrom('profiles').select('*').eq('id', session.user.id).single();
       profile = r.data;
     } catch (e) {
       console.warn('Auth guard: profile fetch threw', e);
@@ -41,7 +41,7 @@
     if (!profile) {
       await new Promise(function(resolve) { setTimeout(resolve, 2000); });
       try {
-        var r2 = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+        var r2 = await ghFrom('profiles').select('*').eq('id', session.user.id).single();
         profile = r2.data;
       } catch (e) {
         console.warn('Auth guard: profile retry threw', e);

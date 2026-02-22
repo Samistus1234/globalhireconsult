@@ -105,7 +105,7 @@
         if (!r.data || !r.data.session) return;
         var session = r.data.session;
         // Only redirect if we can also fetch the profile successfully
-        var p = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+        var p = await ghFrom('profiles').select('role').eq('id', session.user.id).single();
         if (p.data && p.data.role === 'admin') {
           window.location.replace('dashboard.html');
         } else if (p.data) {

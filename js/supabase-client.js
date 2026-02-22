@@ -7,7 +7,6 @@
 var SUPABASE_URL = 'https://evzhnsugmvtqgmvzwyix.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2emhuc3VnbXZ0cWdtdnp3eWl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NTcyNzcsImV4cCI6MjA4NzEzMzI3N30.JSjwHLHudUWlgXkaAam8xxXQbpCmbOLcBGenkFW3qNk';
 
-// Supabase CDN exposes window.supabase with createClient
 var _sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   db: { schema: 'globalhire' },
   auth: {
@@ -17,8 +16,15 @@ var _sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   }
 });
 
-// Expose on window for reliable cross-script access
+// Expose on window
 window.ghSupabase = _sbClient;
+
+// CRITICAL: The db.schema config doesn't always send Accept-Profile header.
+// This function explicitly sets the schema on every PostgREST query.
+function ghFrom(table) {
+  return _sbClient.schema('globalhire').from(table);
+}
+window.ghFrom = ghFrom;
 
 // GHE is defined in core.js — ensure it exists for pages that don't load core.js
 if (typeof GHE === 'undefined') {
@@ -36,38 +42,33 @@ if (typeof GHE === 'undefined') {
 
 var GHAuth = {
   async getSession() {
-    var sb = window.ghSupabase;
-    var r = await sb.auth.getSession();
+    var r = await _sbClient.auth.getSession();
     if (r.error) { console.error('Session error:', r.error); return null; }
     return r.data.session;
   },
 
   async getUser() {
-    var sb = window.ghSupabase;
-    var r = await sb.auth.getUser();
+    var r = await _sbClient.auth.getUser();
     if (r.error) { console.error('User error:', r.error); return null; }
     return r.data.user;
   },
 
   async getProfile() {
-    var sb = window.ghSupabase;
     var user = await this.getUser();
     if (!user) return null;
-    var r = await sb.from('profiles').select('*').eq('id', user.id).single();
+    var r = await ghFrom('profiles').select('*').eq('id', user.id).single();
     if (r.error) { console.error('Profile error:', r.error); return null; }
     return r.data;
   },
 
   async signOut() {
-    var sb = window.ghSupabase;
-    var r = await sb.auth.signOut();
+    var r = await _sbClient.auth.signOut();
     if (r.error) console.error('Sign out error:', r.error);
     window.location.href = 'login.html';
   },
 
   onAuthStateChange(callback) {
-    var sb = window.ghSupabase;
-    return sb.auth.onAuthStateChange(function(event, session) {
+    return _sbClient.auth.onAuthStateChange(function(event, session) {
       callback(event, session);
     });
   }

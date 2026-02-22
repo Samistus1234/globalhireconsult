@@ -74,8 +74,7 @@
       license: false, degree: false, passport: false, cv: false
     };
 
-    const { data: docs } = await sb
-      .from('documents')
+    const { data: docs } = await ghFrom('documents')
       .select('doc_type, status')
       .eq('applicant_id', currentUser.id);
 
@@ -183,8 +182,7 @@
       const nameParts = updates.full_name.split(' ');
       updates.avatar_initials = nameParts.map(w => w[0]).join('').toUpperCase().substring(0, 2);
 
-      const { error } = await sb
-        .from('profiles')
+      const { error } = await ghFrom('profiles')
         .update(updates)
         .eq('id', currentUser.id);
 
@@ -214,8 +212,7 @@
       { type: 'cv', label: 'CV / Resume', icon: 'file-text' }
     ];
 
-    const { data: docs } = await sb
-      .from('documents')
+    const { data: docs } = await ghFrom('documents')
       .select('*')
       .eq('applicant_id', currentUser.id);
 
@@ -372,8 +369,7 @@
     }
 
     // Insert document record
-    const { error: dbError } = await sb
-      .from('documents')
+    const { error: dbError } = await ghFrom('documents')
       .insert({
         applicant_id: currentUser.id,
         doc_type: docType,
@@ -393,7 +389,7 @@
 
   async function removeDocument(docId, filePath) {
     await sb.storage.from('gh-applicant-documents').remove([filePath]);
-    await sb.from('documents').delete().eq('id', docId);
+    await ghFrom('documents').delete().eq('id', docId);
   }
 
   function formatBytes(bytes) {

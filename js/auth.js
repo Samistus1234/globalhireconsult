@@ -40,8 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Fetch role for redirect
-      const { data: profile } = await sb
-        .from('profiles')
+      const { data: profile } = await ghFrom('profiles')
         .select('role')
         .eq('id', data.user.id)
         .single();
@@ -203,8 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
           profile_completed: !!(specialty && country && phone)
         };
 
-        const { error: profileError } = await sb
-          .from('profiles')
+        const { error: profileError } = await ghFrom('profiles')
           .update(profileData)
           .eq('id', data.user.id);
 
