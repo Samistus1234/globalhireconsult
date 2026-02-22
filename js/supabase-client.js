@@ -8,7 +8,6 @@ var SUPABASE_URL = 'https://evzhnsugmvtqgmvzwyix.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2emhuc3VnbXZ0cWdtdnp3eWl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NTcyNzcsImV4cCI6MjA4NzEzMzI3N30.JSjwHLHudUWlgXkaAam8xxXQbpCmbOLcBGenkFW3qNk';
 
 var _sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  db: { schema: 'globalhire' },
   auth: {
     autoRefreshToken: true,
     persistSession: true,
@@ -19,10 +18,10 @@ var _sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 // Expose on window
 window.ghSupabase = _sbClient;
 
-// CRITICAL: The db.schema config doesn't always send Accept-Profile header.
-// This function explicitly sets the schema on every PostgREST query.
+// Routes queries through public.gh_* wrapper views that proxy to globalhire.* tables.
+// This avoids schema header issues entirely — no Accept-Profile header needed.
 function ghFrom(table) {
-  return _sbClient.schema('globalhire').from(table);
+  return _sbClient.from('gh_' + table);
 }
 window.ghFrom = ghFrom;
 
