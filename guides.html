@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knowledge Hub — GlobalHire@eLab</title>
+  <meta name="description" content="Your comprehensive resource library for global healthcare careers. Country guides, licensing info, relocation tips, and more.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/nav-global.css">
+  <link rel="stylesheet" href="css/guides.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300e89d'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' font-weight='bold' fill='%23080a0d'>G</text></svg>">
+</head>
+<body>
+
+  <!-- Global Navigation -->
+  <div id="gnav-placeholder"></div>
+
+  <!-- Background -->
+  <div class="page-bg" aria-hidden="true">
+    <div class="dot-grid"></div>
+    <div class="gradient-blob blob-1"></div>
+    <div class="gradient-blob blob-2"></div>
+  </div>
+
+
+  <!-- ===================== HERO ===================== -->
+  <section class="guides-hero" id="guides-hero">
+    <div class="container">
+      <div class="guides-hero-content reveal">
+        <div class="label" style="margin-bottom:var(--space-4);">Knowledge Hub</div>
+        <h1>Your Guide to Global <span class="gradient-text">Healthcare Careers</span></h1>
+        <p class="guides-hero-subtitle">
+          Everything you need to navigate international licensing, relocation, and career growth
+          across 47 countries &mdash; curated by recruitment experts and healthcare professionals.
+        </p>
+
+        <!-- Search Bar -->
+        <div class="guides-search-bar">
+          <div class="guides-search-field">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="20" height="20">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input type="text" placeholder="Search guides, countries, licensing bodies..." id="guides-search-input">
+          </div>
+        </div>
+
+        <!-- Category Filter Chips -->
+        <div class="guides-filter-chips" id="guides-filter-chips">
+          <button class="filter-chip active" data-category="all">All</button>
+          <button class="filter-chip" data-category="country">Country Guides</button>
+          <button class="filter-chip" data-category="licensing">Licensing</button>
+          <button class="filter-chip" data-category="relocation">Relocation</button>
+          <button class="filter-chip" data-category="job-hunting">Job Hunting</button>
+          <button class="filter-chip" data-category="settling-in">Settling In</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== FEATURED GUIDE ===================== -->
+  <section class="guides-section" data-category="licensing" id="section-featured">
+    <div class="container">
+      <div class="featured-guide reveal" id="featured-guide">
+        <div class="featured-guide-bg" aria-hidden="true"></div>
+        <div class="featured-guide-content">
+          <span class="featured-badge">FEATURED</span>
+          <h2 class="featured-title">The Complete Guide to UK NMC Registration 2026</h2>
+          <p class="featured-desc">
+            A step-by-step walkthrough of the Nursing and Midwifery Council registration process
+            for internationally educated nurses. Covers CBT prep, OSCE guidance, document
+            requirements, timeline expectations, and insider tips from nurses who have been
+            through the journey.
+          </p>
+          <a href="licensing.html?body=nmc" class="btn btn-primary btn-lg">
+            Read Guide
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+        <div class="featured-guide-visual" aria-hidden="true">
+          <div class="featured-icon-ring">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+              <path d="M8 7h8"/><path d="M8 11h6"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== COUNTRY GUIDES CAROUSEL ===================== -->
+  <section class="guides-section" data-category="country" id="section-country">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-header-left">
+          <h2>Explore by Country</h2>
+          <p>In-depth guides to healthcare careers, salaries, and lifestyle in every destination.</p>
+        </div>
+        <span class="section-badge">47 countries</span>
+      </div>
+
+      <div class="carousel-wrapper reveal">
+        <button class="carousel-arrow carousel-arrow-left" data-carousel="country-carousel" aria-label="Scroll left">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+
+        <div class="carousel" id="country-carousel">
+
+          <!-- United Kingdom -->
+          <a href="country-detail.html?code=gb" class="country-card" data-search="united kingdom uk england britain nursing nhs">
+            <div class="country-flag">&#127468;&#127463;</div>
+            <h4 class="country-name">United Kingdom</h4>
+            <div class="country-meta">
+              <div class="meta-row">
+                <span class="meta-label">Salary Range</span>
+                <span class="meta-value">&pound;28,000 &ndash; &pound;55,000</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Licensing Body</span>
+                <span class="meta-value">NMC</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Visa Difficulty</span>
+                <span class="visa-dots" data-level="3">
+                  <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span>
+                </span>
+              </div>
+            </div>
+            <span class="country-cta">Explore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+          </a>
+
+          <!-- United States -->
+          <a href="country-detail.html?code=us" class="country-card" data-search="united states usa america nclex nursing rn">
+            <div class="country-flag">&#127482;&#127480;</div>
+            <h4 class="country-name">United States</h4>
+            <div class="country-meta">
+              <div class="meta-row">
+                <span class="meta-label">Salary Range</span>
+                <span class="meta-value">$60,000 &ndash; $120,000</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Licensing Body</span>
+                <span class="meta-value">NCSBN (NCLEX)</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Visa Difficulty</span>
+                <span class="visa-dots" data-level="4">
+                  <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span>
+                </span>
+              </div>
+            </div>
+            <span class="country-cta">Explore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+          </a>
+
+          <!-- UAE -->
+          <a href="country-detail.html?code=ae" class="country-card" data-search="uae united arab emirates dubai abu dhabi dha nursing">
+            <div class="country-flag">&#127462;&#127466;</div>
+            <h4 class="country-name">UAE</h4>
+            <div class="country-meta">
+              <div class="meta-row">
+                <span class="meta-label">Salary Range</span>
+                <span class="meta-value">AED 8,000 &ndash; AED 20,000/mo</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Licensing Body</span>
+                <span class="meta-value">DHA / HAAD / MOH</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Visa Difficulty</span>
+                <span class="visa-dots" data-level="2">
+                  <span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </span>
+              </div>
+            </div>
+            <span class="country-cta">Explore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+          </a>
+
+          <!-- Saudi Arabia -->
+          <a href="country-detail.html?code=sa" class="country-card" data-search="saudi arabia ksa riyadh jeddah moh scfhs nursing">
+            <div class="country-flag">&#127480;&#127462;</div>
+            <h4 class="country-name">Saudi Arabia</h4>
+            <div class="country-meta">
+              <div class="meta-row">
+                <span class="meta-label">Salary Range</span>
+                <span class="meta-value">SAR 7,000 &ndash; SAR 18,000/mo</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Licensing Body</span>
+                <span class="meta-value">MOH / SCFHS</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Visa Difficulty</span>
+                <span class="visa-dots" data-level="2">
+                  <span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </span>
+              </div>
+            </div>
+            <span class="country-cta">Explore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+          </a>
+
+          <!-- Canada -->
+          <a href="country-detail.html?code=ca" class="country-card" data-search="canada toronto vancouver nursing carna nnas">
+            <div class="country-flag">&#127464;&#127462;</div>
+            <h4 class="country-name">Canada</h4>
+            <div class="country-meta">
+              <div class="meta-row">
+                <span class="meta-label">Salary Range</span>
+                <span class="meta-value">CAD 65,000 &ndash; CAD 100,000</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Licensing Body</span>
+                <span class="meta-value">CARNA / NNAS</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Visa Difficulty</span>
+                <span class="visa-dots" data-level="3">
+                  <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span>
+                </span>
+              </div>
+            </div>
+            <span class="country-cta">Explore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+          </a>
+
+          <!-- Australia -->
+          <a href="country-detail.html?code=au" class="country-card" data-search="australia sydney melbourne nursing ahpra">
+            <div class="country-flag">&#127462;&#127482;</div>
+            <h4 class="country-name">Australia</h4>
+            <div class="country-meta">
+              <div class="meta-row">
+                <span class="meta-label">Salary Range</span>
+                <span class="meta-value">AUD 70,000 &ndash; AUD 110,000</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Licensing Body</span>
+                <span class="meta-value">AHPRA</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Visa Difficulty</span>
+                <span class="visa-dots" data-level="3">
+                  <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span>
+                </span>
+              </div>
+            </div>
+            <span class="country-cta">Explore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+          </a>
+
+          <!-- Germany -->
+          <a href="country-detail.html?code=de" class="country-card" data-search="germany berlin munich nursing approbation kenntnisprufung">
+            <div class="country-flag">&#127465;&#127466;</div>
+            <h4 class="country-name">Germany</h4>
+            <div class="country-meta">
+              <div class="meta-row">
+                <span class="meta-label">Salary Range</span>
+                <span class="meta-value">&euro;36,000 &ndash; &euro;58,000</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Licensing Body</span>
+                <span class="meta-value">Approbation (State)</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Visa Difficulty</span>
+                <span class="visa-dots" data-level="3">
+                  <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span>
+                </span>
+              </div>
+            </div>
+            <span class="country-cta">Explore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+          </a>
+
+          <!-- Qatar -->
+          <a href="country-detail.html?code=qa" class="country-card" data-search="qatar doha nursing moph schfs">
+            <div class="country-flag">&#127478;&#127462;</div>
+            <h4 class="country-name">Qatar</h4>
+            <div class="country-meta">
+              <div class="meta-row">
+                <span class="meta-label">Salary Range</span>
+                <span class="meta-value">QAR 8,000 &ndash; QAR 22,000/mo</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Licensing Body</span>
+                <span class="meta-value">MOPH / QCHP</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Visa Difficulty</span>
+                <span class="visa-dots" data-level="2">
+                  <span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </span>
+              </div>
+            </div>
+            <span class="country-cta">Explore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+          </a>
+
+          <!-- Ireland -->
+          <a href="country-detail.html?code=ie" class="country-card" data-search="ireland dublin nursing nmbi">
+            <div class="country-flag">&#127470;&#127466;</div>
+            <h4 class="country-name">Ireland</h4>
+            <div class="country-meta">
+              <div class="meta-row">
+                <span class="meta-label">Salary Range</span>
+                <span class="meta-value">&euro;33,000 &ndash; &euro;55,000</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Licensing Body</span>
+                <span class="meta-value">NMBI</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Visa Difficulty</span>
+                <span class="visa-dots" data-level="2">
+                  <span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </span>
+              </div>
+            </div>
+            <span class="country-cta">Explore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+          </a>
+
+          <!-- New Zealand -->
+          <a href="country-detail.html?code=nz" class="country-card" data-search="new zealand auckland wellington nursing ncnz">
+            <div class="country-flag">&#127475;&#127487;</div>
+            <h4 class="country-name">New Zealand</h4>
+            <div class="country-meta">
+              <div class="meta-row">
+                <span class="meta-label">Salary Range</span>
+                <span class="meta-value">NZD 60,000 &ndash; NZD 90,000</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Licensing Body</span>
+                <span class="meta-value">NCNZ</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Visa Difficulty</span>
+                <span class="visa-dots" data-level="2">
+                  <span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </span>
+              </div>
+            </div>
+            <span class="country-cta">Explore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+          </a>
+
+          <!-- Singapore -->
+          <a href="country-detail.html?code=sg" class="country-card" data-search="singapore nursing snb snmc">
+            <div class="country-flag">&#127480;&#127468;</div>
+            <h4 class="country-name">Singapore</h4>
+            <div class="country-meta">
+              <div class="meta-row">
+                <span class="meta-label">Salary Range</span>
+                <span class="meta-value">SGD 36,000 &ndash; SGD 72,000</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Licensing Body</span>
+                <span class="meta-value">SNB</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Visa Difficulty</span>
+                <span class="visa-dots" data-level="3">
+                  <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span>
+                </span>
+              </div>
+            </div>
+            <span class="country-cta">Explore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+          </a>
+
+          <!-- Kuwait -->
+          <a href="country-detail.html?code=kw" class="country-card" data-search="kuwait nursing moh kmoh">
+            <div class="country-flag">&#127472;&#127484;</div>
+            <h4 class="country-name">Kuwait</h4>
+            <div class="country-meta">
+              <div class="meta-row">
+                <span class="meta-label">Salary Range</span>
+                <span class="meta-value">KWD 500 &ndash; KWD 1,400/mo</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Licensing Body</span>
+                <span class="meta-value">KMOH</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Visa Difficulty</span>
+                <span class="visa-dots" data-level="2">
+                  <span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </span>
+              </div>
+            </div>
+            <span class="country-cta">Explore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+          </a>
+
+        </div>
+
+        <button class="carousel-arrow carousel-arrow-right" data-carousel="country-carousel" aria-label="Scroll right">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== LICENSING & CREDENTIALS CAROUSEL ===================== -->
+  <section class="guides-section" data-category="licensing" id="section-licensing">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-header-left">
+          <h2>Licensing &amp; Credentials</h2>
+          <p>Understand every exam, credential, and registration pathway before you apply.</p>
+        </div>
+      </div>
+
+      <div class="carousel-wrapper reveal">
+        <button class="carousel-arrow carousel-arrow-left" data-carousel="licensing-carousel" aria-label="Scroll left">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+
+        <div class="carousel" id="licensing-carousel">
+
+          <!-- NMC (UK) -->
+          <div class="guide-card" data-search="nmc nursing midwifery council united kingdom uk cbt osce registration">
+            <div class="guide-card-badge badge-licensing">Licensing</div>
+            <div class="guide-card-icon" style="background:rgba(0,232,157,0.1);color:var(--primary);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <h4 class="guide-card-title">NMC Registration</h4>
+            <span class="guide-card-country">United Kingdom</span>
+            <p class="guide-card-desc">Complete guide to CBT exam, OSCE preparation, document verification, and NMC PIN application for international nurses.</p>
+            <div class="guide-card-footer">
+              <span class="guide-read-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                15 min read
+              </span>
+              <a href="licensing.html?body=nmc" class="guide-card-link">
+                Learn More
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- NCLEX (USA) -->
+          <div class="guide-card" data-search="nclex ncsbn united states usa nursing rn licensure exam">
+            <div class="guide-card-badge badge-licensing">Licensing</div>
+            <div class="guide-card-icon" style="background:rgba(124,92,255,0.1);color:var(--secondary);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <h4 class="guide-card-title">NCLEX-RN Exam</h4>
+            <span class="guide-card-country">United States</span>
+            <p class="guide-card-desc">Everything about the NCLEX-RN: eligibility, CGFNS requirements, study strategies, scoring, and state board endorsement.</p>
+            <div class="guide-card-footer">
+              <span class="guide-read-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                18 min read
+              </span>
+              <a href="licensing.html?body=nclex" class="guide-card-link">
+                Learn More
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- AHPRA (Australia) -->
+          <div class="guide-card" data-search="ahpra australian health practitioner regulation agency australia nursing registration">
+            <div class="guide-card-badge badge-licensing">Licensing</div>
+            <div class="guide-card-icon" style="background:rgba(0,212,255,0.1);color:var(--accent-cyan);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <h4 class="guide-card-title">AHPRA Registration</h4>
+            <span class="guide-card-country">Australia</span>
+            <p class="guide-card-desc">Navigate the AHPRA registration pathway including skills assessment, English proficiency, bridging programs, and visa options.</p>
+            <div class="guide-card-footer">
+              <span class="guide-read-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                14 min read
+              </span>
+              <a href="licensing.html?body=ahpra" class="guide-card-link">
+                Learn More
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- DHA (UAE) -->
+          <div class="guide-card" data-search="dha dubai health authority uae licensing prometric exam">
+            <div class="guide-card-badge badge-licensing">Licensing</div>
+            <div class="guide-card-icon" style="background:rgba(255,176,32,0.1);color:var(--accent-amber);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <h4 class="guide-card-title">DHA Licensing</h4>
+            <span class="guide-card-country">UAE (Dubai)</span>
+            <p class="guide-card-desc">Dubai Health Authority licensing process: eligibility screening, Prometric exam prep, dataflow verification, and license issuance.</p>
+            <div class="guide-card-footer">
+              <span class="guide-read-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                12 min read
+              </span>
+              <a href="licensing.html?body=dha" class="guide-card-link">
+                Learn More
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- MOH (Saudi) -->
+          <div class="guide-card" data-search="moh ministry health saudi arabia prometric exam licensing">
+            <div class="guide-card-badge badge-licensing">Licensing</div>
+            <div class="guide-card-icon" style="background:rgba(255,92,92,0.1);color:var(--accent-coral);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <h4 class="guide-card-title">MOH Licensing</h4>
+            <span class="guide-card-country">Saudi Arabia</span>
+            <p class="guide-card-desc">Ministry of Health licensing for Saudi Arabia: Prometric exam, dataflow PSV, required documents, and processing timelines.</p>
+            <div class="guide-card-footer">
+              <span class="guide-read-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                11 min read
+              </span>
+              <a href="licensing.html?body=moh" class="guide-card-link">
+                Learn More
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- SCFHS (Saudi) -->
+          <div class="guide-card" data-search="scfhs saudi commission health specialties classification saudi arabia">
+            <div class="guide-card-badge badge-licensing">Licensing</div>
+            <div class="guide-card-icon" style="background:rgba(255,92,92,0.1);color:var(--accent-coral);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <h4 class="guide-card-title">SCFHS Classification</h4>
+            <span class="guide-card-country">Saudi Arabia</span>
+            <p class="guide-card-desc">Saudi Commission for Health Specialties classification guide: professional levels, required documentation, and renewal process.</p>
+            <div class="guide-card-footer">
+              <span class="guide-read-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                10 min read
+              </span>
+              <a href="licensing.html?body=scfhs" class="guide-card-link">
+                Learn More
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- German Approbation -->
+          <div class="guide-card" data-search="german approbation germany nursing kenntnisprufung anpassungslehrgang recognition">
+            <div class="guide-card-badge badge-licensing">Licensing</div>
+            <div class="guide-card-icon" style="background:rgba(255,176,32,0.1);color:var(--accent-amber);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <h4 class="guide-card-title">German Approbation</h4>
+            <span class="guide-card-country">Germany</span>
+            <p class="guide-card-desc">Navigate the Approbation process: credential recognition, language requirements (B2), Kenntnisprufung exam, and adaptation courses.</p>
+            <div class="guide-card-footer">
+              <span class="guide-read-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                16 min read
+              </span>
+              <a href="licensing.html?body=approbation" class="guide-card-link">
+                Learn More
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- CARNA (Canada) -->
+          <div class="guide-card" data-search="carna college registered nurses alberta canada nnas nursing">
+            <div class="guide-card-badge badge-licensing">Licensing</div>
+            <div class="guide-card-icon" style="background:rgba(0,212,255,0.1);color:var(--accent-cyan);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <h4 class="guide-card-title">CARNA Registration</h4>
+            <span class="guide-card-country">Canada (Alberta)</span>
+            <p class="guide-card-desc">CARNA pathway for internationally educated nurses: NNAS assessment, bridging programs, NCLEX-RN in Canada, and provincial registration.</p>
+            <div class="guide-card-footer">
+              <span class="guide-read-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                13 min read
+              </span>
+              <a href="licensing.html?body=carna" class="guide-card-link">
+                Learn More
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+        <button class="carousel-arrow carousel-arrow-right" data-carousel="licensing-carousel" aria-label="Scroll right">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== RELOCATION GUIDES CAROUSEL ===================== -->
+  <section class="guides-section" data-category="relocation" id="section-relocation">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-header-left">
+          <h2>Relocation Guides</h2>
+          <p>Practical advice for every stage of your international move.</p>
+        </div>
+      </div>
+
+      <div class="carousel-wrapper reveal">
+        <button class="carousel-arrow carousel-arrow-left" data-carousel="relocation-carousel" aria-label="Scroll left">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+
+        <div class="carousel" id="relocation-carousel">
+
+          <!-- Essential Checklist -->
+          <div class="guide-card" data-search="moving abroad checklist relocation essential planning international">
+            <div class="guide-card-badge badge-relocation">Relocation</div>
+            <div class="guide-card-icon" style="background:rgba(0,232,157,0.1);color:var(--primary);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <h4 class="guide-card-title">Moving Abroad: The Essential Checklist</h4>
+            <p class="guide-card-desc">A comprehensive pre-departure checklist covering documents, finances, housing, healthcare registration, and everything you need before boarding your flight.</p>
+            <div class="guide-card-footer">
+              <span class="guide-read-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                10 min read
+              </span>
+              <a href="#" class="guide-card-link">
+                Read
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- First 90 Days -->
+          <div class="guide-card" data-search="first 90 days settling expectations arrival orientation">
+            <div class="guide-card-badge badge-relocation">Relocation</div>
+            <div class="guide-card-icon" style="background:rgba(124,92,255,0.1);color:var(--secondary);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+            </div>
+            <h4 class="guide-card-title">What to Expect in Your First 90 Days</h4>
+            <p class="guide-card-desc">A week-by-week guide to your first three months abroad: workplace orientation, social integration, admin tasks, and emotional adjustment milestones.</p>
+            <div class="guide-card-footer">
+              <span class="guide-read-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                12 min read
+              </span>
+              <a href="#" class="guide-card-link">
+                Read
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Cultural Adjustment -->
+          <div class="guide-card" data-search="cultural adjustment culture shock healthcare workers international adaptation">
+            <div class="guide-card-badge badge-relocation">Relocation</div>
+            <div class="guide-card-icon" style="background:rgba(0,212,255,0.1);color:var(--accent-cyan);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <h4 class="guide-card-title">Cultural Adjustment for Healthcare Workers</h4>
+            <p class="guide-card-desc">Understanding workplace culture differences, communication styles in clinical settings, building rapport with patients, and managing culture shock effectively.</p>
+            <div class="guide-card-footer">
+              <span class="guide-read-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                9 min read
+              </span>
+              <a href="#" class="guide-card-link">
+                Read
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Managing Finances -->
+          <div class="guide-card" data-search="managing finances expat money remittance banking tax international">
+            <div class="guide-card-badge badge-relocation">Relocation</div>
+            <div class="guide-card-icon" style="background:rgba(255,176,32,0.1);color:var(--accent-amber);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <h4 class="guide-card-title">Managing Finances as an Expat</h4>
+            <p class="guide-card-desc">Smart strategies for managing multiple currencies, international banking, remittance options, tax obligations, savings, and building financial security abroad.</p>
+            <div class="guide-card-footer">
+              <span class="guide-read-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                11 min read
+              </span>
+              <a href="#" class="guide-card-link">
+                Read
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+        <button class="carousel-arrow carousel-arrow-right" data-carousel="relocation-carousel" aria-label="Scroll right">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== JOB HUNTING TIPS CAROUSEL ===================== -->
+  <section class="guides-section" data-category="job-hunting" id="section-job-hunting">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-header-left">
+          <h2>Job Hunting Tips</h2>
+          <p>Stand out in the global healthcare job market with expert strategies.</p>
+        </div>
+      </div>
+
+      <div class="carousel-wrapper reveal">
+        <button class="carousel-arrow carousel-arrow-left" data-carousel="job-hunting-carousel" aria-label="Scroll left">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+
+        <div class="carousel" id="job-hunting-carousel">
+
+          <!-- Healthcare CV -->
+          <div class="guide-card" data-search="cv resume healthcare writing noticed application international">
+            <div class="guide-card-badge badge-job-hunting">Job Hunting</div>
+            <div class="guide-card-icon" style="background:rgba(0,232,157,0.1);color:var(--primary);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+            </div>
+            <h4 class="guide-card-title">Writing a Healthcare CV That Gets Noticed</h4>
+            <p class="guide-card-desc">Tailoring your CV for international healthcare roles: formatting by country, highlighting clinical competencies, and avoiding common pitfalls.</p>
+            <div class="guide-card-footer">
+              <span class="guide-read-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                8 min read
+              </span>
+              <a href="#" class="guide-card-link">
+                Read
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Interview Prep -->
+          <div class="guide-card" data-search="interview preparation international roles healthcare questions tips">
+            <div class="guide-card-badge badge-job-hunting">Job Hunting</div>
+            <div class="guide-card-icon" style="background:rgba(124,92,255,0.1);color:var(--secondary);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <h4 class="guide-card-title">Interview Prep for International Roles</h4>
+            <p class="guide-card-desc">How to ace virtual and in-person healthcare interviews: common clinical scenarios, behavioral questions, and cultural expectations by region.</p>
+            <div class="guide-card-footer">
+              <span class="guide-read-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                10 min read
+              </span>
+              <a href="#" class="guide-card-link">
+                Read
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Salary Negotiation -->
+          <div class="guide-card" data-search="salary negotiation guide compensation benefits package healthcare">
+            <div class="guide-card-badge badge-job-hunting">Job Hunting</div>
+            <div class="guide-card-icon" style="background:rgba(0,212,255,0.1);color:var(--accent-cyan);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <h4 class="guide-card-title">Salary Negotiation Guide</h4>
+            <p class="guide-card-desc">Learn how to research market rates, negotiate packages including housing allowances, evaluate total compensation, and know your worth globally.</p>
+            <div class="guide-card-footer">
+              <span class="guide-read-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                9 min read
+              </span>
+              <a href="#" class="guide-card-link">
+                Read
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Evaluating Offers -->
+          <div class="guide-card" data-search="evaluating job offers across countries comparing benefits healthcare international">
+            <div class="guide-card-badge badge-job-hunting">Job Hunting</div>
+            <div class="guide-card-icon" style="background:rgba(255,176,32,0.1);color:var(--accent-amber);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <h4 class="guide-card-title">Evaluating Job Offers Across Countries</h4>
+            <p class="guide-card-desc">A framework for comparing offers from different countries: cost of living adjustments, benefits analysis, career growth potential, and quality of life factors.</p>
+            <div class="guide-card-footer">
+              <span class="guide-read-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                14 min read
+              </span>
+              <a href="#" class="guide-card-link">
+                Read
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+        <button class="carousel-arrow carousel-arrow-right" data-carousel="job-hunting-carousel" aria-label="Scroll right">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== SETTLING IN CAROUSEL ===================== -->
+  <section class="guides-section" data-category="settling-in" id="section-settling-in">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-header-left">
+          <h2>Settling In</h2>
+          <p>Build your new life with confidence &mdash; from housing to community.</p>
+        </div>
+      </div>
+
+      <div class="carousel-wrapper reveal">
+        <button class="carousel-arrow carousel-arrow-left" data-carousel="settling-carousel" aria-label="Scroll left">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+
+        <div class="carousel" id="settling-carousel">
+
+          <!-- Finding Housing -->
+          <div class="guide-card" data-search="finding housing accommodation rental apartment new country relocation">
+            <div class="guide-card-badge badge-settling-in">Settling In</div>
+            <div class="guide-card-icon" style="background:rgba(0,232,157,0.1);color:var(--primary);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <h4 class="guide-card-title">Finding Housing in a New Country</h4>
+            <p class="guide-card-desc">Where to search, rental expectations by country, avoiding scams, understanding lease agreements, and tips for securing accommodation from abroad.</p>
+            <div class="guide-card-footer">
+              <span class="guide-read-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                11 min read
+              </span>
+              <a href="#" class="guide-card-link">
+                Read
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Banking & Finance -->
+          <div class="guide-card" data-search="banking finance new arrivals account opening international transfers remittance">
+            <div class="guide-card-badge badge-settling-in">Settling In</div>
+            <div class="guide-card-icon" style="background:rgba(124,92,255,0.1);color:var(--secondary);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            </div>
+            <h4 class="guide-card-title">Banking &amp; Finance for New Arrivals</h4>
+            <p class="guide-card-desc">Opening bank accounts as a new arrival, best remittance services, salary account requirements, credit building tips, and managing taxes in two countries.</p>
+            <div class="guide-card-footer">
+              <span class="guide-read-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                10 min read
+              </span>
+              <a href="#" class="guide-card-link">
+                Read
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Schools & Family -->
+          <div class="guide-card" data-search="schools family relocation children education spouse visa dependent">
+            <div class="guide-card-badge badge-settling-in">Settling In</div>
+            <div class="guide-card-icon" style="background:rgba(0,212,255,0.1);color:var(--accent-cyan);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <h4 class="guide-card-title">Schools &amp; Family Relocation</h4>
+            <p class="guide-card-desc">Navigating school enrollment, international vs. local schools, dependent visa processes, spousal work permits, and keeping your family connected.</p>
+            <div class="guide-card-footer">
+              <span class="guide-read-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                13 min read
+              </span>
+              <a href="#" class="guide-card-link">
+                Read
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Professional Network -->
+          <div class="guide-card" data-search="building professional network abroad networking career connections community">
+            <div class="guide-card-badge badge-settling-in">Settling In</div>
+            <div class="guide-card-icon" style="background:rgba(255,176,32,0.1);color:var(--accent-amber);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            </div>
+            <h4 class="guide-card-title">Building Your Professional Network Abroad</h4>
+            <p class="guide-card-desc">Strategies for networking in a new country: joining professional bodies, attending events, leveraging LinkedIn internationally, and finding mentors.</p>
+            <div class="guide-card-footer">
+              <span class="guide-read-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                8 min read
+              </span>
+              <a href="#" class="guide-card-link">
+                Read
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+        <button class="carousel-arrow carousel-arrow-right" data-carousel="settling-carousel" aria-label="Scroll right">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Global Footer -->
+  <div id="gfooter-placeholder"></div>
+
+
+  <!-- Scripts -->
+  <script src="js/core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/nav-global.js"></script>
+  <script src="js/guides.js"></script>
+
+</body>
+</html>

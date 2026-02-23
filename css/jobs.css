@@ -382,7 +382,207 @@
   border-color: rgba(0, 232, 157, 0.2);
 }
 
+/* ── Enhanced Badge System ── */
+.job-badge {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  z-index: 2;
+}
+
+.job-badge-new {
+  background: rgba(0, 212, 255, 0.12);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.job-badge-closing {
+  background: rgba(255, 176, 32, 0.12);
+  color: var(--accent-amber);
+  border: 1px solid rgba(255, 176, 32, 0.2);
+}
+
+.job-badge-urgent {
+  background: rgba(255, 92, 92, 0.12);
+  color: var(--accent-coral);
+  border: 1px solid rgba(255, 92, 92, 0.2);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.job-badge-demand {
+  background: var(--secondary-muted);
+  color: var(--secondary);
+  border: 1px solid rgba(124, 92, 255, 0.2);
+}
+
+/* ── Advanced Filter Sidebar ── */
+.jobs-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: var(--space-8);
+  align-items: start;
+}
+
+.jobs-sidebar {
+  position: sticky;
+  top: calc(var(--header-height) + var(--space-4));
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+}
+
+.sidebar-section {
+  margin-bottom: var(--space-6);
+}
+
+.sidebar-section:last-child {
+  margin-bottom: 0;
+}
+
+.sidebar-section h4 {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  margin-bottom: var(--space-3);
+  color: var(--text-primary);
+}
+
+.sidebar-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sidebar-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.sidebar-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.sidebar-select {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+}
+
+.sidebar-range {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.sidebar-range input[type="number"] {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+}
+
+.sidebar-range span {
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  flex-shrink: 0;
+}
+
+.sidebar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.sidebar-toggle .toggle-label {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--duration-base);
+}
+
+.toggle-switch.active {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  transition: transform var(--duration-base);
+}
+
+.toggle-switch.active::after {
+  transform: translateX(20px);
+  background: var(--bg-deep);
+}
+
+.sidebar-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: var(--space-4) 0;
+}
+
+.btn-clear-filters {
+  width: 100%;
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  text-align: center;
+}
+
+.btn-clear-filters:hover {
+  border-color: var(--accent-coral);
+  color: var(--accent-coral);
+}
+
 /* ── Responsive ── */
+@media (max-width: 1024px) {
+  .jobs-layout { grid-template-columns: 1fr; }
+  .jobs-sidebar { display: none; }
+}
+
 @media (max-width: 768px) {
   .search-bar-large {
     flex-direction: column;

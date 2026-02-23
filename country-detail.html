@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Country Guide — GlobalHire@eLab</title>
+  <meta name="description" content="Detailed healthcare career guide with licensing, jobs, and salary information.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/nav-global.css">
+  <link rel="stylesheet" href="css/country-detail.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300e89d'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' font-weight='bold' fill='%23080a0d'>G</text></svg>">
+</head>
+<body>
+
+  <!-- Global Navigation -->
+  <div id="gnav-placeholder"></div>
+
+  <!-- Background -->
+  <div class="page-bg" aria-hidden="true">
+    <div class="dot-grid"></div>
+  </div>
+
+  <!-- ===================== COUNTRY HERO ===================== -->
+  <section class="country-hero" id="country-hero">
+    <div class="hero-gradient" aria-hidden="true"></div>
+    <div class="hero-gradient-2" aria-hidden="true"></div>
+    <div class="container">
+      <div class="country-hero-content reveal">
+        <div class="country-hero-flag" id="country-flag"></div>
+        <h1 id="country-name">Loading...</h1>
+        <span class="badge badge-primary badge-dot" id="country-region"></span>
+
+        <div class="country-stats-row" id="country-stats">
+          <div class="country-stat">
+            <div class="stat-icon" style="background:var(--primary-muted);color:var(--primary)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div>
+              <div class="stat-label">Average Salary</div>
+              <div class="stat-value" id="stat-salary">—</div>
+            </div>
+          </div>
+          <div class="country-stat">
+            <div class="stat-icon" style="background:var(--secondary-muted);color:var(--secondary)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div>
+              <div class="stat-label">Processing Time</div>
+              <div class="stat-value" id="stat-time">—</div>
+            </div>
+          </div>
+          <div class="country-stat">
+            <div class="stat-icon" style="background:rgba(0,212,255,0.12);color:var(--accent-cyan)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div>
+              <div class="stat-label">Language</div>
+              <div class="stat-value" id="stat-language">—</div>
+            </div>
+          </div>
+          <div class="country-stat">
+            <div class="stat-icon" style="background:rgba(255,176,32,0.12);color:var(--accent-amber)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 21h18M9 8h6M9 12h6M9 16h6M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/></svg>
+            </div>
+            <div>
+              <div class="stat-label">Healthcare System</div>
+              <div class="stat-value" id="stat-system">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== AT A GLANCE ===================== -->
+  <section class="section" id="at-a-glance">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="overline">At a Glance</span>
+        <h2>Key Information</h2>
+      </div>
+
+      <div class="glance-grid reveal">
+        <div class="glance-card" style="--glance-accent: var(--primary)">
+          <div class="glance-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <h4>Healthcare System</h4>
+          <p id="glance-healthcare">Loading...</p>
+        </div>
+
+        <div class="glance-card" style="--glance-accent: var(--secondary)">
+          <div class="glance-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <h4>Language Requirements</h4>
+          <p id="glance-language">Loading...</p>
+        </div>
+
+        <div class="glance-card" style="--glance-accent: var(--accent-amber)">
+          <div class="glance-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <h4>Cost of Living</h4>
+          <p id="glance-cost">Loading...</p>
+        </div>
+
+        <div class="glance-card" style="--glance-accent: var(--accent-cyan)">
+          <div class="glance-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h4>Work-Life Balance</h4>
+          <p id="glance-worklife">Loading...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== LICENSING & REGISTRATION ===================== -->
+  <section class="section" id="licensing" style="background: var(--bg-void);">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="overline">Licensing & Registration</span>
+        <h2>How to Get Licensed</h2>
+      </div>
+
+      <div class="licensing-timeline reveal" id="licensing-steps">
+        <!-- Populated by JS -->
+      </div>
+
+      <div class="required-docs reveal" id="required-docs">
+        <h4>Required Documents</h4>
+        <div class="docs-checklist" id="docs-checklist">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== AVAILABLE JOBS ===================== -->
+  <section class="section" id="country-jobs-section">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="overline">Opportunities</span>
+        <h2>Available Jobs</h2>
+      </div>
+
+      <div class="jobs-grid" id="country-jobs">
+        <!-- Populated by JS -->
+      </div>
+
+      <div class="text-center" style="margin-top:var(--space-8)">
+        <a href="jobs.html" class="btn btn-ghost btn-lg">View All Jobs
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== RELATED GUIDES ===================== -->
+  <section class="section" id="related-guides-section" style="background: var(--bg-void);">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="overline">Resources</span>
+        <h2>Related Guides</h2>
+      </div>
+
+      <div class="carousel reveal" id="related-guides">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SUCCESS STORIES ===================== -->
+  <section class="section" id="success-stories-section">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="overline">Success Stories</span>
+        <h2>Professionals Placed Here</h2>
+      </div>
+
+      <div class="stories-grid" id="success-stories">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CTA ===================== -->
+  <section class="section" style="padding-bottom:var(--space-16);">
+    <div class="container">
+      <div class="country-cta-card reveal">
+        <h3>Ready to Start Your Journey?</h3>
+        <p>Create your free GlobalHire account and get matched with opportunities in this country.</p>
+        <div class="cta-actions">
+          <a href="signup.html" class="btn btn-primary btn-lg">
+            Create Free Account
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="guides.html" class="btn btn-ghost btn-lg">Explore More Countries</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Global Footer -->
+  <div id="gfooter-placeholder"></div>
+
+  <!-- Scripts -->
+  <script src="js/core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/nav-global.js"></script>
+  <script src="js/country-detail.js"></script>
+</body>
+</html>

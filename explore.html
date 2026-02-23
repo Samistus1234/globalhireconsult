@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explore — GlobalHire@eLab</title>
+  <meta name="description" content="Your personalized GlobalHire dashboard. Discover job matches, career insights, and opportunities tailored to your healthcare profile.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/nav-global.css">
+  <link rel="stylesheet" href="css/explore.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300e89d'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' font-weight='bold' fill='%23080a0d'>G</text></svg>">
+
+  <!-- SVG Gradient Defs (used by profile ring) -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <linearGradient id="profileGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#00e89d"/>
+        <stop offset="100%" stop-color="#7c5cff"/>
+      </linearGradient>
+    </defs>
+  </svg>
+</head>
+<body data-auth-role="applicant">
+
+  <!-- Background -->
+  <div class="page-bg" aria-hidden="true">
+    <div class="dot-grid"></div>
+  </div>
+
+  <!-- ===================== GLOBAL NAVIGATION ===================== -->
+  <div id="gnav-placeholder"></div>
+
+  <!-- ===================== MAIN CONTENT ===================== -->
+  <main class="explore-page">
+    <div class="explore-container">
+
+      <!-- ═══════════════════════════════════════════
+           SECTION 1: Personalized Welcome Header
+           ═══════════════════════════════════════════ -->
+      <section class="welcome-header reveal">
+        <div class="welcome-top">
+          <div class="welcome-greeting">
+            <h1 id="explore-greeting">Good morning, Samuel</h1>
+            <p class="welcome-sub">Here is what is happening with your career journey today.</p>
+            <p class="welcome-date" id="explore-date">Sunday, February 23, 2026</p>
+          </div>
+
+          <!-- Profile Completion Ring -->
+          <a href="portal.html#profile" class="profile-ring-wrap">
+            <svg class="profile-ring-svg" viewBox="0 0 56 56">
+              <circle class="profile-ring-bg" cx="28" cy="28" r="22"/>
+              <circle class="profile-ring-fill" id="profile-ring-circle" cx="28" cy="28" r="22"
+                      style="stroke-dasharray: 138.23; stroke-dashoffset: 138.23;"/>
+            </svg>
+            <div>
+              <div class="profile-ring-text" id="profile-ring-pct">0%</div>
+              <div class="profile-ring-label">Profile Complete</div>
+            </div>
+          </a>
+        </div>
+
+        <!-- Quick Stats Row -->
+        <div class="quick-stats">
+          <!-- Active Applications -->
+          <div class="quick-stat-card" style="--stat-accent: var(--primary)">
+            <div class="quick-stat-icon" style="background: var(--primary-muted); color: var(--primary);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+            </div>
+            <div class="quick-stat-value" id="stat-applications">3</div>
+            <div class="quick-stat-label">Active Applications</div>
+          </div>
+
+          <!-- Job Matches -->
+          <div class="quick-stat-card" style="--stat-accent: var(--secondary)">
+            <div class="quick-stat-icon" style="background: var(--secondary-muted); color: var(--secondary);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+            </div>
+            <div class="quick-stat-value" id="stat-matches">27</div>
+            <div class="quick-stat-label">Job Matches</div>
+          </div>
+
+          <!-- Saved Jobs -->
+          <div class="quick-stat-card" style="--stat-accent: var(--accent-amber)">
+            <div class="quick-stat-icon" style="background: rgba(255, 176, 32, 0.12); color: var(--accent-amber);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="quick-stat-value" id="stat-saved">8</div>
+            <div class="quick-stat-label">Saved Jobs</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════
+           SECTION 2: AI Insights Panel
+           ═══════════════════════════════════════════ -->
+      <section class="explore-section reveal reveal-delay-1">
+        <div class="ai-panel">
+          <div class="ai-panel-header">
+            <div class="ai-pulse"></div>
+            <h3>Your Career Advisor</h3>
+            <span class="badge badge-secondary">AI-Powered</span>
+          </div>
+          <div class="ai-insights-list">
+            <!-- Insight 1 -->
+            <div class="ai-insight-item">
+              <div class="ai-insight-icon" style="background: var(--primary-muted); color: var(--primary);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              </div>
+              <div class="ai-insight-text">
+                <p><strong>12 new ICU positions in the UK</strong> posted this week that match your profile. 3 have fast-track visa sponsorship.</p>
+                <span class="insight-meta">Based on your specialty and preferences</span>
+              </div>
+            </div>
+            <!-- Insight 2 -->
+            <div class="ai-insight-item">
+              <div class="ai-insight-icon" style="background: var(--secondary-muted); color: var(--secondary);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+              </div>
+              <div class="ai-insight-text">
+                <p><strong>Your NMC registration is eligible for fast-track</strong> processing. Complete your OSCE prep documents to accelerate your timeline by 6 weeks.</p>
+                <span class="insight-meta">Licensing pathway analysis</span>
+              </div>
+            </div>
+            <!-- Insight 3 -->
+            <div class="ai-insight-item">
+              <div class="ai-insight-icon" style="background: rgba(255, 176, 32, 0.12); color: var(--accent-amber);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              </div>
+              <div class="ai-insight-text">
+                <p><strong>Salary trend alert:</strong> ICU nurse compensation in the Gulf region has increased 18% year-over-year. Consider expanding your preferred destinations.</p>
+                <span class="insight-meta">Market intelligence update</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════
+           SECTION 3: News & Updates Carousel
+           ═══════════════════════════════════════════ -->
+      <section class="explore-section reveal reveal-delay-2">
+        <div class="explore-section-header">
+          <span class="overline">Stay Informed</span>
+          <h2>News & Updates</h2>
+        </div>
+        <div class="carousel" id="news-carousel">
+          <!-- Populated by explore.js -->
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════
+           SECTION 4: Recommended Jobs Carousel
+           ═══════════════════════════════════════════ -->
+      <section class="explore-section reveal reveal-delay-3">
+        <div class="explore-section-header">
+          <span class="overline">Tailored For You</span>
+          <h2>Recommended Jobs</h2>
+        </div>
+        <div class="carousel" id="jobs-carousel">
+          <!-- Populated by explore.js -->
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════
+           SECTION 5: Upcoming Events Row
+           ═══════════════════════════════════════════ -->
+      <section class="explore-section reveal reveal-delay-4">
+        <div class="explore-section-header">
+          <span class="overline">Community</span>
+          <h2>Upcoming Events</h2>
+        </div>
+        <div class="events-row" id="events-row">
+          <!-- Populated by explore.js -->
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════
+           SECTION 6: Quick Actions Grid
+           ═══════════════════════════════════════════ -->
+      <section class="explore-section reveal reveal-delay-5">
+        <div class="explore-section-header">
+          <span class="overline">Navigate</span>
+          <h2>Quick Actions</h2>
+        </div>
+        <div class="quick-actions-grid">
+          <!-- Browse Jobs -->
+          <a href="jobs.html" class="quick-action-tile" style="--tile-accent: rgba(0, 232, 157, 0.08);">
+            <div class="tile-icon" style="background: var(--primary-muted); color: var(--primary);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </div>
+            <span class="tile-label">Browse Jobs</span>
+          </a>
+
+          <!-- My Applications -->
+          <a href="portal.html" class="quick-action-tile" style="--tile-accent: rgba(124, 92, 255, 0.08);">
+            <div class="tile-icon" style="background: var(--secondary-muted); color: var(--secondary);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="m9 15 2 2 4-4"/></svg>
+            </div>
+            <span class="tile-label">My Applications</span>
+          </a>
+
+          <!-- Upload Documents -->
+          <a href="portal.html#documents" class="quick-action-tile" style="--tile-accent: rgba(0, 212, 255, 0.08);">
+            <div class="tile-icon" style="background: rgba(0, 212, 255, 0.12); color: var(--accent-cyan);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <span class="tile-label">Upload Documents</span>
+          </a>
+
+          <!-- Licensing Info -->
+          <a href="licensing.html" class="quick-action-tile" style="--tile-accent: rgba(255, 176, 32, 0.08);">
+            <div class="tile-icon" style="background: rgba(255, 176, 32, 0.12); color: var(--accent-amber);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <span class="tile-label">Licensing Info</span>
+          </a>
+
+          <!-- Country Guides -->
+          <a href="guides.html" class="quick-action-tile" style="--tile-accent: rgba(255, 92, 92, 0.08);">
+            <div class="tile-icon" style="background: rgba(255, 92, 92, 0.12); color: var(--accent-coral);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <span class="tile-label">Country Guides</span>
+          </a>
+
+          <!-- Career Assessment -->
+          <a href="#" class="quick-action-tile" style="--tile-accent: rgba(255, 77, 166, 0.08);">
+            <div class="tile-icon" style="background: rgba(255, 77, 166, 0.12); color: var(--accent-rose);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <span class="tile-label">Career Assessment</span>
+          </a>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ===================== GLOBAL FOOTER ===================== -->
+  <div id="gfooter-placeholder"></div>
+
+  <!-- Scripts -->
+  <script src="js/core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth-guard.js"></script>
+  <script src="js/nav-global.js"></script>
+  <script src="js/explore.js"></script>
+</body>
+</html>

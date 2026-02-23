@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/landing.css">
   <link rel="stylesheet" href="css/jobs.css">
+  <link rel="stylesheet" href="css/nav-global.css">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300e89d'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' font-weight='bold' fill='%23080a0d'>G</text></svg>">
@@ -28,28 +29,7 @@
   </div>
 
   <!-- ===================== NAVIGATION ===================== -->
-  <nav class="nav" role="navigation">
-    <div class="nav-inner">
-      <a href="index.html" class="nav-logo">
-        <div class="logo-icon">G</div>
-        <span>Global<span class="accent">Hire</span></span>
-        <span class="sub">@eLab</span>
-      </a>
-
-      <div class="nav-links hide-mobile">
-        <a href="index.html#platform">Platform</a>
-        <a href="index.html#services">Services</a>
-        <a href="jobs.html" style="color:var(--primary)">Opportunities</a>
-        <a href="index.html#for-talent">For Talent</a>
-        <a href="index.html#employers">Employers</a>
-      </div>
-
-      <div class="nav-actions">
-        <a href="login.html" class="btn btn-ghost btn-sm hide-mobile">Sign In</a>
-        <a href="signup.html" class="btn btn-primary btn-sm">Get Started</a>
-      </div>
-    </div>
-  </nav>
+  <div id="gnav-placeholder"></div>
 
   <!-- ===================== JOBS PAGE ===================== -->
   <div class="jobs-page">
@@ -108,8 +88,90 @@
         </div>
       </div>
 
-      <!-- Job Listings -->
-      <div class="jobs-grid">
+      <!-- Jobs Layout with Sidebar -->
+      <div class="jobs-layout">
+        <!-- Advanced Filter Sidebar -->
+        <aside class="jobs-sidebar reveal">
+          <div class="sidebar-section">
+            <h4>Specialty</h4>
+            <div class="sidebar-checkbox-group">
+              <label class="sidebar-checkbox"><input type="checkbox" checked> Nursing</label>
+              <label class="sidebar-checkbox"><input type="checkbox"> Physician</label>
+              <label class="sidebar-checkbox"><input type="checkbox"> Allied Health</label>
+              <label class="sidebar-checkbox"><input type="checkbox"> Midwifery</label>
+              <label class="sidebar-checkbox"><input type="checkbox"> Pharmacy</label>
+              <label class="sidebar-checkbox"><input type="checkbox"> Radiology</label>
+            </div>
+          </div>
+
+          <div class="sidebar-divider"></div>
+
+          <div class="sidebar-section">
+            <h4>Country</h4>
+            <select class="sidebar-select">
+              <option value="">All Countries</option>
+              <option>United Kingdom</option>
+              <option>United States</option>
+              <option>UAE</option>
+              <option>Saudi Arabia</option>
+              <option>Canada</option>
+              <option>Australia</option>
+              <option>Germany</option>
+              <option>Qatar</option>
+              <option>Ireland</option>
+            </select>
+          </div>
+
+          <div class="sidebar-divider"></div>
+
+          <div class="sidebar-section">
+            <h4>Salary Range (USD)</h4>
+            <div class="sidebar-range">
+              <input type="number" placeholder="Min" min="0" step="5000">
+              <span>&ndash;</span>
+              <input type="number" placeholder="Max" min="0" step="5000">
+            </div>
+          </div>
+
+          <div class="sidebar-divider"></div>
+
+          <div class="sidebar-section">
+            <h4>Experience Level</h4>
+            <div class="sidebar-checkbox-group">
+              <label class="sidebar-checkbox"><input type="checkbox"> Entry Level (0-2 years)</label>
+              <label class="sidebar-checkbox"><input type="checkbox" checked> Mid Level (3-5 years)</label>
+              <label class="sidebar-checkbox"><input type="checkbox"> Senior (6-10 years)</label>
+              <label class="sidebar-checkbox"><input type="checkbox"> Expert (10+ years)</label>
+            </div>
+          </div>
+
+          <div class="sidebar-divider"></div>
+
+          <div class="sidebar-section">
+            <div class="sidebar-toggle">
+              <span class="toggle-label">Visa Sponsorship</span>
+              <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+            </div>
+          </div>
+
+          <div class="sidebar-divider"></div>
+
+          <div class="sidebar-section">
+            <h4>Contract Type</h4>
+            <div class="sidebar-checkbox-group">
+              <label class="sidebar-checkbox"><input type="checkbox" checked> Permanent</label>
+              <label class="sidebar-checkbox"><input type="checkbox" checked> Contract</label>
+              <label class="sidebar-checkbox"><input type="checkbox"> Temporary</label>
+              <label class="sidebar-checkbox"><input type="checkbox"> Locum</label>
+            </div>
+          </div>
+
+          <div class="sidebar-divider"></div>
+          <button class="btn-clear-filters">Clear All Filters</button>
+        </aside>
+
+        <!-- Job Listings -->
+        <div class="jobs-grid">
 
         <!-- Job 1 -->
         <div class="job-card reveal" style="--job-accent: var(--primary)">
@@ -159,6 +221,7 @@
 
         <!-- Job 2 -->
         <div class="job-card reveal reveal-delay-1" style="--job-accent: var(--secondary)">
+          <div class="job-badge job-badge-demand">High Demand</div>
           <div class="job-card-body">
             <div class="job-card-header">
               <div class="job-employer-logo" style="background:linear-gradient(135deg,#8e44ad,#bb8fce);color:#fff">CC</div>
@@ -204,6 +267,7 @@
 
         <!-- Job 3 -->
         <div class="job-card reveal reveal-delay-2" style="--job-accent: var(--accent-amber)">
+          <div class="job-badge job-badge-closing">Closing Soon</div>
           <div class="job-card-body">
             <div class="job-card-header">
               <div class="job-employer-logo" style="background:linear-gradient(135deg,#1e8449,#2ecc71);color:#fff">KF</div>
@@ -249,6 +313,7 @@
 
         <!-- Job 4 -->
         <div class="job-card reveal reveal-delay-3" style="--job-accent: var(--accent-cyan)">
+          <div class="job-badge job-badge-new">New</div>
           <div class="job-card-body">
             <div class="job-card-header">
               <div class="job-employer-logo" style="background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff">TG</div>
@@ -338,6 +403,7 @@
           </div>
         </div>
 
+        </div>
       </div>
 
       <!-- Pagination -->
@@ -360,20 +426,7 @@
   </div>
 
   <!-- ===================== FOOTER ===================== -->
-  <footer class="footer" style="margin-top:var(--space-16)">
-    <div class="container">
-      <div class="footer-bottom">
-        <span>&copy; 2026 Global Hire Consortium. A subsidiary of eLab Solutions International LLC.</span>
-        <div class="footer-social">
-          <a href="index.html">Home</a>
-          <span style="color:var(--border-default)">&middot;</span>
-          <a href="login.html">Dashboard</a>
-          <span style="color:var(--border-default)">&middot;</span>
-          <a href="#">Privacy</a>
-        </div>
-      </div>
-    </div>
-  </footer>
+  <div id="gfooter-placeholder"></div>
 
   <!-- Toast for Apply Now -->
   <div id="apply-toast" style="position:fixed;bottom:2rem;right:2rem;background:var(--bg-card);border:1px solid var(--primary);border-radius:var(--radius-lg);padding:var(--space-4) var(--space-6);display:none;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,0.4);max-width:360px;">
@@ -387,6 +440,10 @@
   <script src="js/core.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/supabase-client.js"></script>
+  <script src="js/nav-global.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() { GHNav.init('careers'); });
+  </script>
   <script>
     // Apply Now & Save buttons
     (function() {
