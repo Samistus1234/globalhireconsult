@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scholarships & Financial Support — GlobalHire@eLab</title>
-  <meta name="description" content="Free scholarships, NCLEX sponsorship, and financial support programs for healthcare professionals relocating internationally. No fees, no paywall.">
+  <title>Healthcare Scholarships — GlobalHire@eLab</title>
+  <meta name="description" content="Browse scholarships and funding opportunities from universities, institutions, and organizations worldwide for healthcare professionals. Filter by field, country, and degree level.">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,592 +38,446 @@
 
     <div class="container">
       <div class="sch-hero-content reveal">
-        <span class="overline">Scholarships & Financial Support</span>
-        <h1>Invest in Your Future — <span class="gradient-text">At Zero Cost</span></h1>
+        <span class="overline">Scholarship Finder</span>
+        <h1>Find Scholarships for Your <span class="gradient-text">Healthcare Career</span></h1>
         <p class="sch-hero-subtitle">
-          GlobalHire funds your journey to an international healthcare career. From NCLEX exam sponsorship to relocation grants, every program is free for qualified candidates.
+          Browse hundreds of scholarships, grants, and funding opportunities from universities, hospitals, governments, and institutions worldwide — all in one place.
         </p>
-        <div class="sch-hero-stats">
-          <div class="hero-stat">
-            <span class="hero-stat-value">$2.4M+</span>
-            <span class="hero-stat-label">Awarded to Date</span>
+
+        <!-- Search Bar -->
+        <div class="sch-search-bar">
+          <div class="sch-search-field">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="sch-search" placeholder="Search by keyword, institution, or field...">
           </div>
-          <div class="hero-stat-divider"></div>
-          <div class="hero-stat">
-            <span class="hero-stat-value">1,200+</span>
-            <span class="hero-stat-label">Recipients</span>
+          <button class="btn btn-primary" id="sch-search-btn">Search</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FILTER + LISTINGS ===================== -->
+  <section class="section" id="listings">
+    <div class="container">
+
+      <!-- Filter Chips -->
+      <div class="sch-filter-row reveal">
+        <span class="sch-filter-label">Filter:</span>
+        <button class="filter-chip active" data-filter="all">All</button>
+        <button class="filter-chip" data-filter="nursing">Nursing</button>
+        <button class="filter-chip" data-filter="medicine">Medicine</button>
+        <button class="filter-chip" data-filter="pharmacy">Pharmacy</button>
+        <button class="filter-chip" data-filter="public-health">Public Health</button>
+        <button class="filter-chip" data-filter="postgrad">Postgraduate</button>
+        <button class="filter-chip" data-filter="undergrad">Undergraduate</button>
+      </div>
+
+      <!-- Layout: Sidebar + Grid -->
+      <div class="sch-layout">
+
+        <!-- Sidebar Filters -->
+        <aside class="sch-sidebar">
+          <div class="sidebar-section">
+            <h4>Country</h4>
+            <select class="sidebar-select" id="filter-country">
+              <option value="">All Countries</option>
+              <option value="UK">United Kingdom</option>
+              <option value="USA">United States</option>
+              <option value="Canada">Canada</option>
+              <option value="Australia">Australia</option>
+              <option value="Germany">Germany</option>
+              <option value="UAE">UAE</option>
+              <option value="Saudi Arabia">Saudi Arabia</option>
+              <option value="Sweden">Sweden</option>
+              <option value="Japan">Japan</option>
+              <option value="South Africa">South Africa</option>
+            </select>
           </div>
-          <div class="hero-stat-divider"></div>
-          <div class="hero-stat">
-            <span class="hero-stat-value">97%</span>
-            <span class="hero-stat-label">NCLEX Pass Rate</span>
+
+          <div class="sidebar-section">
+            <h4>Funding Type</h4>
+            <div class="sidebar-checkbox-group">
+              <label class="sidebar-checkbox"><input type="checkbox" value="full" checked> Full Scholarship</label>
+              <label class="sidebar-checkbox"><input type="checkbox" value="partial" checked> Partial Funding</label>
+              <label class="sidebar-checkbox"><input type="checkbox" value="tuition"> Tuition Only</label>
+              <label class="sidebar-checkbox"><input type="checkbox" value="stipend"> Stipend / Living Costs</label>
+              <label class="sidebar-checkbox"><input type="checkbox" value="research"> Research Grant</label>
+            </div>
           </div>
-          <div class="hero-stat-divider"></div>
-          <div class="hero-stat">
-            <span class="hero-stat-value">47</span>
-            <span class="hero-stat-label">Countries Covered</span>
+
+          <div class="sidebar-section">
+            <h4>Degree Level</h4>
+            <div class="sidebar-checkbox-group">
+              <label class="sidebar-checkbox"><input type="checkbox" value="certificate" checked> Certificate / Diploma</label>
+              <label class="sidebar-checkbox"><input type="checkbox" value="bachelors" checked> Bachelor's</label>
+              <label class="sidebar-checkbox"><input type="checkbox" value="masters" checked> Master's</label>
+              <label class="sidebar-checkbox"><input type="checkbox" value="phd" checked> PhD / Doctoral</label>
+              <label class="sidebar-checkbox"><input type="checkbox" value="fellowship"> Fellowship</label>
+            </div>
+          </div>
+
+          <div class="sidebar-divider"></div>
+
+          <div class="sidebar-section">
+            <div class="sidebar-toggle">
+              <span class="toggle-label">Open to international students</span>
+              <div class="toggle-switch active" id="toggle-international"></div>
+            </div>
+          </div>
+
+          <div class="sidebar-divider"></div>
+
+          <button class="btn-clear-filters" id="clear-filters">Clear All Filters</button>
+        </aside>
+
+        <!-- Scholarship Listings -->
+        <div class="sch-listings">
+
+          <!-- Results Header -->
+          <div class="sch-results-bar">
+            <span class="results-count"><strong id="sch-count">12</strong> scholarships found</span>
+            <div class="sort-select">
+              <span>Sort:</span>
+              <select id="sch-sort">
+                <option value="deadline">Deadline (soonest)</option>
+                <option value="amount">Amount (highest)</option>
+                <option value="recent">Recently Added</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Scholarship Cards -->
+          <div class="sch-cards" id="sch-cards">
+
+            <!-- Card 1 -->
+            <div class="sch-card" data-field="nursing" data-country="UK" data-level="masters" data-funding="full">
+              <div class="sch-card-top">
+                <div class="sch-card-badges">
+                  <span class="sch-badge sch-badge-full">Full Scholarship</span>
+                  <span class="sch-badge sch-badge-closing">Closing Soon</span>
+                </div>
+                <div class="sch-card-inst">
+                  <div class="sch-inst-logo" style="background: var(--primary-muted); color: var(--primary);">KCL</div>
+                  <div>
+                    <h3>King's College London — MSc Nursing</h3>
+                    <span class="sch-card-provider">King's College London</span>
+                  </div>
+                </div>
+              </div>
+              <p class="sch-card-desc">Full tuition fee waiver plus a living stipend for international students pursuing the MSc Advanced Nursing Practice. Covers accommodation support and NHS placement coordination.</p>
+              <div class="sch-card-meta">
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  London, UK
+                </div>
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  Up to &pound;35,000/yr
+                </div>
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  Deadline: 15 Apr 2026
+                </div>
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5"/></svg>
+                  Master's
+                </div>
+              </div>
+              <div class="sch-card-tags">
+                <span class="tag">Nursing</span>
+                <span class="tag">International</span>
+                <span class="tag">Stipend Included</span>
+              </div>
+              <div class="sch-card-actions">
+                <a href="#" class="btn btn-primary btn-sm">View Details</a>
+                <button class="btn btn-ghost btn-sm sch-save-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                  Save
+                </button>
+              </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="sch-card" data-field="medicine" data-country="USA" data-level="phd" data-funding="full">
+              <div class="sch-card-top">
+                <div class="sch-card-badges">
+                  <span class="sch-badge sch-badge-full">Full Scholarship</span>
+                  <span class="sch-badge sch-badge-new">New</span>
+                </div>
+                <div class="sch-card-inst">
+                  <div class="sch-inst-logo" style="background: var(--secondary-muted); color: var(--secondary);">JHU</div>
+                  <div>
+                    <h3>Johns Hopkins Bloomberg School — PhD Global Health</h3>
+                    <span class="sch-card-provider">Johns Hopkins University</span>
+                  </div>
+                </div>
+              </div>
+              <p class="sch-card-desc">Fully funded doctoral fellowship for international healthcare professionals researching global health systems, epidemiology, or health policy. Includes full tuition, health insurance, and $34,000 annual stipend.</p>
+              <div class="sch-card-meta">
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  Baltimore, USA
+                </div>
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  Full Tuition + $34,000/yr
+                </div>
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  Deadline: 01 Jun 2026
+                </div>
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5"/></svg>
+                  PhD
+                </div>
+              </div>
+              <div class="sch-card-tags">
+                <span class="tag">Medicine</span>
+                <span class="tag">Public Health</span>
+                <span class="tag">Research</span>
+              </div>
+              <div class="sch-card-actions">
+                <a href="#" class="btn btn-primary btn-sm">View Details</a>
+                <button class="btn btn-ghost btn-sm sch-save-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                  Save
+                </button>
+              </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="sch-card" data-field="nursing" data-country="Australia" data-level="bachelors" data-funding="partial">
+              <div class="sch-card-top">
+                <div class="sch-card-badges">
+                  <span class="sch-badge sch-badge-partial">Partial Funding</span>
+                </div>
+                <div class="sch-card-inst">
+                  <div class="sch-inst-logo" style="background: rgba(255,176,32,0.12); color: var(--accent-amber);">USyd</div>
+                  <div>
+                    <h3>University of Sydney — Nursing Science Scholarship</h3>
+                    <span class="sch-card-provider">University of Sydney</span>
+                  </div>
+                </div>
+              </div>
+              <p class="sch-card-desc">50% tuition reduction for high-achieving international students enrolled in the Bachelor of Nursing (Advanced Studies). Renewable annually based on academic performance.</p>
+              <div class="sch-card-meta">
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  Sydney, Australia
+                </div>
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  50% Tuition (~A$22,000/yr)
+                </div>
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  Deadline: 30 Sep 2026
+                </div>
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5"/></svg>
+                  Bachelor's
+                </div>
+              </div>
+              <div class="sch-card-tags">
+                <span class="tag">Nursing</span>
+                <span class="tag">Undergraduate</span>
+                <span class="tag">Merit-Based</span>
+              </div>
+              <div class="sch-card-actions">
+                <a href="#" class="btn btn-primary btn-sm">View Details</a>
+                <button class="btn btn-ghost btn-sm sch-save-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                  Save
+                </button>
+              </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="sch-card" data-field="pharmacy" data-country="Canada" data-level="masters" data-funding="full">
+              <div class="sch-card-top">
+                <div class="sch-card-badges">
+                  <span class="sch-badge sch-badge-full">Full Scholarship</span>
+                </div>
+                <div class="sch-card-inst">
+                  <div class="sch-inst-logo" style="background: rgba(0,212,255,0.12); color: var(--accent-cyan);">UofT</div>
+                  <div>
+                    <h3>University of Toronto — Pharmacy Graduate Award</h3>
+                    <span class="sch-card-provider">University of Toronto</span>
+                  </div>
+                </div>
+              </div>
+              <p class="sch-card-desc">Full funding for international pharmacy graduates pursuing MScPhm or PhD at the Leslie Dan Faculty of Pharmacy. Includes tuition, health coverage, and research assistantship.</p>
+              <div class="sch-card-meta">
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  Toronto, Canada
+                </div>
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  Full Tuition + C$28,000/yr
+                </div>
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  Deadline: 15 May 2026
+                </div>
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5"/></svg>
+                  Master's / PhD
+                </div>
+              </div>
+              <div class="sch-card-tags">
+                <span class="tag">Pharmacy</span>
+                <span class="tag">Research</span>
+                <span class="tag">International</span>
+              </div>
+              <div class="sch-card-actions">
+                <a href="#" class="btn btn-primary btn-sm">View Details</a>
+                <button class="btn btn-ghost btn-sm sch-save-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                  Save
+                </button>
+              </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="sch-card" data-field="public-health" data-country="Germany" data-level="masters" data-funding="full">
+              <div class="sch-card-top">
+                <div class="sch-card-badges">
+                  <span class="sch-badge sch-badge-full">Full Scholarship</span>
+                </div>
+                <div class="sch-card-inst">
+                  <div class="sch-inst-logo" style="background: rgba(255,92,92,0.12); color: var(--accent-coral);">DAAD</div>
+                  <div>
+                    <h3>DAAD — International Health Sciences Scholarship</h3>
+                    <span class="sch-card-provider">German Academic Exchange Service (DAAD)</span>
+                  </div>
+                </div>
+              </div>
+              <p class="sch-card-desc">Government-funded scholarship for healthcare professionals from developing countries to pursue master's programs in public health, epidemiology, or tropical medicine at German universities.</p>
+              <div class="sch-card-meta">
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  Various, Germany
+                </div>
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  &euro;1,200/mo + Tuition
+                </div>
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  Deadline: 31 Jul 2026
+                </div>
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5"/></svg>
+                  Master's
+                </div>
+              </div>
+              <div class="sch-card-tags">
+                <span class="tag">Public Health</span>
+                <span class="tag">Government-Funded</span>
+                <span class="tag">Developing Countries</span>
+              </div>
+              <div class="sch-card-actions">
+                <a href="#" class="btn btn-primary btn-sm">View Details</a>
+                <button class="btn btn-ghost btn-sm sch-save-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                  Save
+                </button>
+              </div>
+            </div>
+
+            <!-- Card 6 -->
+            <div class="sch-card" data-field="nursing" data-country="Saudi Arabia" data-level="certificate" data-funding="full">
+              <div class="sch-card-top">
+                <div class="sch-card-badges">
+                  <span class="sch-badge sch-badge-full">Full Scholarship</span>
+                  <span class="sch-badge sch-badge-new">New</span>
+                </div>
+                <div class="sch-card-inst">
+                  <div class="sch-inst-logo" style="background: var(--primary-muted); color: var(--primary);">KFMC</div>
+                  <div>
+                    <h3>King Fahad Medical City — Specialty Nursing Fellowship</h3>
+                    <span class="sch-card-provider">King Fahad Medical City, Riyadh</span>
+                  </div>
+                </div>
+              </div>
+              <p class="sch-card-desc">Fully sponsored fellowship for international nurses seeking specialty certification in critical care, oncology, or perioperative nursing. Includes salary, accommodation, and return flights.</p>
+              <div class="sch-card-meta">
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  Riyadh, Saudi Arabia
+                </div>
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  Full Salary + Housing
+                </div>
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  Deadline: 30 Mar 2026
+                </div>
+                <div class="sch-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5"/></svg>
+                  Fellowship
+                </div>
+              </div>
+              <div class="sch-card-tags">
+                <span class="tag">Nursing</span>
+                <span class="tag">Fellowship</span>
+                <span class="tag">Specialty Certification</span>
+              </div>
+              <div class="sch-card-actions">
+                <a href="#" class="btn btn-primary btn-sm">View Details</a>
+                <button class="btn btn-ghost btn-sm sch-save-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                  Save
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
-        <div class="sch-hero-actions">
-          <a href="#programs" class="btn btn-primary btn-lg">
-            View Programs
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===================== NEED HELP APPLYING? ===================== -->
+  <section class="section" id="assistance" style="background: var(--bg-void);">
+    <div class="container">
+      <div class="sch-assist-card card-glass reveal">
+        <div class="sch-assist-content">
+          <span class="overline">Application Assistance</span>
+          <h2>Need Help With Your Application?</h2>
+          <p>Our team of experts can guide you through the scholarship application process — from choosing the right program to preparing your documents, writing personal statements, and submitting on time. We know what selection committees look for.</p>
+          <div class="sch-assist-features">
+            <div class="sch-assist-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span>Personalized scholarship matching</span>
+            </div>
+            <div class="sch-assist-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span>Personal statement review & editing</span>
+            </div>
+            <div class="sch-assist-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span>Document preparation & verification</span>
+            </div>
+            <div class="sch-assist-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span>Deadline tracking & submission support</span>
+            </div>
+          </div>
+          <a href="signup.html" class="btn btn-primary btn-lg">
+            Get Application Help
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
-          <a href="#eligibility" class="btn btn-ghost btn-lg">Check Eligibility</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== SCHOLARSHIP PROGRAMS ===================== -->
-  <section class="section" id="programs">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="overline">Our Programs</span>
-        <h2>Scholarship & Sponsorship <br>Programs</h2>
-        <p>Comprehensive financial support designed for every stage of your international healthcare career journey.</p>
-      </div>
-
-      <div class="sch-programs-grid reveal">
-
-        <!-- NCLEX Sponsorship -->
-        <div class="sch-card sch-card-featured" data-category="exam">
-          <div class="sch-card-badge sch-badge-popular">Most Popular</div>
-          <div class="sch-card-icon" style="background: var(--primary-muted); color: var(--primary);">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-              <path d="M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5"/>
-            </svg>
-          </div>
-          <h3>NCLEX Exam Sponsorship</h3>
-          <p class="sch-card-desc">Full sponsorship for the NCLEX-RN examination including registration fees, study materials, and virtual training simulations. Our candidates achieve a 97% pass rate.</p>
-          <div class="sch-card-details">
-            <div class="sch-detail">
-              <span class="sch-detail-label">Coverage</span>
-              <span class="sch-detail-value">Up to $5,000</span>
-            </div>
-            <div class="sch-detail">
-              <span class="sch-detail-label">Duration</span>
-              <span class="sch-detail-value">3-6 months</span>
-            </div>
-            <div class="sch-detail">
-              <span class="sch-detail-label">Destinations</span>
-              <span class="sch-detail-value">USA</span>
-            </div>
-          </div>
-          <div class="sch-card-includes">
-            <span class="sch-include-label">Includes:</span>
-            <ul>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                Exam registration fees
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                Study materials & prep courses
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                Virtual clinical simulations
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                1-on-1 mentor support
-              </li>
-            </ul>
-          </div>
-          <a href="#eligibility" class="btn btn-primary" style="width:100%;text-align:center;">Apply Now</a>
-        </div>
-
-        <!-- OET/IELTS Sponsorship -->
-        <div class="sch-card" data-category="exam">
-          <div class="sch-card-icon" style="background: var(--secondary-muted); color: var(--secondary);">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
-            </svg>
-          </div>
-          <h3>English Language Exam Support</h3>
-          <p class="sch-card-desc">Full coverage for OET or IELTS examination fees, plus access to intensive English preparation courses designed for healthcare professionals.</p>
-          <div class="sch-card-details">
-            <div class="sch-detail">
-              <span class="sch-detail-label">Coverage</span>
-              <span class="sch-detail-value">Up to $2,000</span>
-            </div>
-            <div class="sch-detail">
-              <span class="sch-detail-label">Duration</span>
-              <span class="sch-detail-value">2-4 months</span>
-            </div>
-            <div class="sch-detail">
-              <span class="sch-detail-label">Destinations</span>
-              <span class="sch-detail-value">UK, Australia, NZ</span>
-            </div>
-          </div>
-          <div class="sch-card-includes">
-            <span class="sch-include-label">Includes:</span>
-            <ul>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                OET or IELTS exam fees
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                8-week prep course access
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                Practice speaking sessions
-              </li>
-            </ul>
-          </div>
-          <a href="#eligibility" class="btn btn-ghost" style="width:100%;text-align:center;">Apply Now</a>
-        </div>
-
-        <!-- CBT/OSCE Sponsorship -->
-        <div class="sch-card" data-category="exam">
-          <div class="sch-card-icon" style="background: rgba(0,212,255,0.12); color: var(--accent-cyan);">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/>
-            </svg>
-          </div>
-          <h3>CBT & OSCE Exam Sponsorship</h3>
-          <p class="sch-card-desc">Full coverage of NMC Computer-Based Test and Objective Structured Clinical Examination fees for nurses targeting UK placement.</p>
-          <div class="sch-card-details">
-            <div class="sch-detail">
-              <span class="sch-detail-label">Coverage</span>
-              <span class="sch-detail-value">Up to $3,500</span>
-            </div>
-            <div class="sch-detail">
-              <span class="sch-detail-label">Duration</span>
-              <span class="sch-detail-value">2-5 months</span>
-            </div>
-            <div class="sch-detail">
-              <span class="sch-detail-label">Destinations</span>
-              <span class="sch-detail-value">United Kingdom</span>
-            </div>
-          </div>
-          <div class="sch-card-includes">
-            <span class="sch-include-label">Includes:</span>
-            <ul>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                CBT registration & test fee
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                OSCE clinical exam fee
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                NMC application fee
-              </li>
-            </ul>
-          </div>
-          <a href="#eligibility" class="btn btn-ghost" style="width:100%;text-align:center;">Apply Now</a>
-        </div>
-
-        <!-- Relocation Grant -->
-        <div class="sch-card" data-category="relocation">
-          <div class="sch-card-icon" style="background: rgba(255,176,32,0.12); color: var(--accent-amber);">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-            </svg>
-          </div>
-          <h3>Relocation Assistance Grant</h3>
-          <p class="sch-card-desc">Financial support for travel, initial accommodation, and settling-in expenses when relocating to your destination country. Employer-backed with no repayment required.</p>
-          <div class="sch-card-details">
-            <div class="sch-detail">
-              <span class="sch-detail-label">Coverage</span>
-              <span class="sch-detail-value">Up to $8,000</span>
-            </div>
-            <div class="sch-detail">
-              <span class="sch-detail-label">Requirements</span>
-              <span class="sch-detail-value">Job offer secured</span>
-            </div>
-            <div class="sch-detail">
-              <span class="sch-detail-label">Destinations</span>
-              <span class="sch-detail-value">All 47 countries</span>
-            </div>
-          </div>
-          <div class="sch-card-includes">
-            <span class="sch-include-label">Includes:</span>
-            <ul>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                Flight ticket coverage
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                First 2 months accommodation
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                Settling-in stipend
-              </li>
-            </ul>
-          </div>
-          <a href="#eligibility" class="btn btn-ghost" style="width:100%;text-align:center;">Apply Now</a>
-        </div>
-
-        <!-- Continuing Education -->
-        <div class="sch-card" data-category="education">
-          <div class="sch-card-icon" style="background: rgba(255,92,92,0.12); color: var(--accent-coral);">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
-            </svg>
-          </div>
-          <h3>Continuing Education Scholarship</h3>
-          <p class="sch-card-desc">Funding for specialty certifications, advanced nursing courses, and professional development programs to accelerate your career progression abroad.</p>
-          <div class="sch-card-details">
-            <div class="sch-detail">
-              <span class="sch-detail-label">Coverage</span>
-              <span class="sch-detail-value">Up to $4,000</span>
-            </div>
-            <div class="sch-detail">
-              <span class="sch-detail-label">Duration</span>
-              <span class="sch-detail-value">Up to 12 months</span>
-            </div>
-            <div class="sch-detail">
-              <span class="sch-detail-label">Eligible</span>
-              <span class="sch-detail-value">All specialties</span>
-            </div>
-          </div>
-          <div class="sch-card-includes">
-            <span class="sch-include-label">Includes:</span>
-            <ul>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                Specialty certification fees
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                Online course subscriptions
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                CPD/CME credit programs
-              </li>
-            </ul>
-          </div>
-          <a href="#eligibility" class="btn btn-ghost" style="width:100%;text-align:center;">Apply Now</a>
-        </div>
-
-        <!-- Visa & Immigration -->
-        <div class="sch-card" data-category="relocation">
-          <div class="sch-card-icon" style="background: var(--secondary-muted); color: var(--secondary);">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/><path d="M7 15h4"/>
-            </svg>
-          </div>
-          <h3>Visa & Immigration Support</h3>
-          <p class="sch-card-desc">Coverage of visa application fees, immigration legal support, and documentation costs. Includes employer sponsorship coordination for work permits.</p>
-          <div class="sch-card-details">
-            <div class="sch-detail">
-              <span class="sch-detail-label">Coverage</span>
-              <span class="sch-detail-value">Up to $3,000</span>
-            </div>
-            <div class="sch-detail">
-              <span class="sch-detail-label">Requirements</span>
-              <span class="sch-detail-value">Active application</span>
-            </div>
-            <div class="sch-detail">
-              <span class="sch-detail-label">Destinations</span>
-              <span class="sch-detail-value">All 47 countries</span>
-            </div>
-          </div>
-          <div class="sch-card-includes">
-            <span class="sch-include-label">Includes:</span>
-            <ul>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                Visa application fees
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                Immigration legal counsel
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
-                Document attestation fees
-              </li>
-            </ul>
-          </div>
-          <a href="#eligibility" class="btn btn-ghost" style="width:100%;text-align:center;">Apply Now</a>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== HOW IT WORKS ===================== -->
-  <section class="section" id="process" style="background: var(--bg-void);">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="overline">How It Works</span>
-        <h2>From Application to <br><span class="gradient-text">Funded Career</span></h2>
-        <p>A simple, transparent process with no hidden fees or obligations.</p>
-      </div>
-
-      <div class="sch-process reveal">
-        <div class="sch-process-step">
-          <div class="sch-step-num" style="background: var(--primary-muted); color: var(--primary); border-color: rgba(0,232,157,0.3);">1</div>
-          <h4>Create Your Profile</h4>
-          <p>Sign up and complete your professional profile with credentials, experience, and career goals.</p>
-        </div>
-
-        <div class="sch-step-connector" aria-hidden="true">
-          <div class="connector-line"></div>
-          <div class="connector-dot"></div>
-        </div>
-
-        <div class="sch-process-step">
-          <div class="sch-step-num" style="background: var(--secondary-muted); color: var(--secondary); border-color: rgba(124,92,255,0.3);">2</div>
-          <h4>Check Eligibility</h4>
-          <p>Use our eligibility checker to find programs that match your qualifications and destination.</p>
-        </div>
-
-        <div class="sch-step-connector" aria-hidden="true">
-          <div class="connector-line"></div>
-          <div class="connector-dot"></div>
-        </div>
-
-        <div class="sch-process-step">
-          <div class="sch-step-num" style="background: rgba(255,176,32,0.12); color: var(--accent-amber); border-color: rgba(255,176,32,0.3);">3</div>
-          <h4>Apply & Get Approved</h4>
-          <p>Submit your application with required documents. Decisions typically within 5 business days.</p>
-        </div>
-
-        <div class="sch-step-connector" aria-hidden="true">
-          <div class="connector-line"></div>
-          <div class="connector-dot"></div>
-        </div>
-
-        <div class="sch-process-step">
-          <div class="sch-step-num" style="background: rgba(0,212,255,0.12); color: var(--accent-cyan); border-color: rgba(0,212,255,0.3);">4</div>
-          <h4>Receive Funding</h4>
-          <p>Funds are disbursed directly to exam bodies, institutions, or service providers on your behalf.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== ELIGIBILITY CHECKER ===================== -->
-  <section class="section" id="eligibility">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="overline">Eligibility Checker</span>
-        <h2>Find Programs <br>You Qualify For</h2>
-        <p>Answer a few questions to see which scholarship and sponsorship programs match your profile.</p>
-      </div>
-
-      <div class="sch-checker card-glass reveal">
-        <form id="eligibility-form" class="sch-checker-form">
-          <div class="sch-checker-grid">
-            <div class="form-group">
-              <label for="sch-profession">Profession</label>
-              <select id="sch-profession" class="input" required>
-                <option value="">Select your profession</option>
-                <option value="nurse">Registered Nurse</option>
-                <option value="midwife">Midwife</option>
-                <option value="physician">Physician / Doctor</option>
-                <option value="pharmacist">Pharmacist</option>
-                <option value="physiotherapist">Physiotherapist</option>
-                <option value="radiologist">Radiologist / Technician</option>
-                <option value="lab_tech">Laboratory Technician</option>
-                <option value="other">Other Healthcare Professional</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="sch-experience">Years of Experience</label>
-              <select id="sch-experience" class="input" required>
-                <option value="">Select experience</option>
-                <option value="0-1">Less than 1 year</option>
-                <option value="1-3">1 - 3 years</option>
-                <option value="3-5">3 - 5 years</option>
-                <option value="5-10">5 - 10 years</option>
-                <option value="10+">10+ years</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="sch-country">Current Country</label>
-              <select id="sch-country" class="input" required>
-                <option value="">Select your country</option>
-                <option value="Nigeria">Nigeria</option>
-                <option value="Ghana">Ghana</option>
-                <option value="Kenya">Kenya</option>
-                <option value="India">India</option>
-                <option value="Philippines">Philippines</option>
-                <option value="Pakistan">Pakistan</option>
-                <option value="Egypt">Egypt</option>
-                <option value="Jamaica">Jamaica</option>
-                <option value="South Africa">South Africa</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="sch-destination">Desired Destination</label>
-              <select id="sch-destination" class="input" required>
-                <option value="">Select destination</option>
-                <option value="UK">United Kingdom</option>
-                <option value="USA">United States</option>
-                <option value="UAE">UAE</option>
-                <option value="Saudi Arabia">Saudi Arabia</option>
-                <option value="Canada">Canada</option>
-                <option value="Australia">Australia</option>
-                <option value="Germany">Germany</option>
-                <option value="Qatar">Qatar</option>
-                <option value="Ireland">Ireland</option>
-                <option value="New Zealand">New Zealand</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="sch-checker-submit">
-            <button type="submit" class="btn btn-primary btn-lg">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"/>
-                <path d="m21 21-4.35-4.35"/>
-              </svg>
-              Check My Eligibility
-            </button>
-          </div>
-        </form>
-
-        <!-- Results Panel -->
-        <div class="sch-checker-results" id="eligibility-results" style="display:none;">
-          <div class="divider" style="margin: var(--space-8) 0;"></div>
-          <div class="sch-results-header">
-            <h4>Your Eligible Programs</h4>
-            <span class="badge badge-primary badge-dot" id="result-count">3 Programs</span>
-          </div>
-          <div class="sch-results-list" id="results-list">
-            <!-- Populated by JS -->
-          </div>
-          <div class="sch-results-cta">
-            <a href="signup.html" class="btn btn-primary btn-lg">
-              Create Account to Apply
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== SUCCESS STORIES ===================== -->
-  <section class="section" id="stories" style="background: var(--bg-void);">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="overline">Success Stories</span>
-        <h2>Funded Careers, <br>Transformed Lives</h2>
-      </div>
-
-      <div class="sch-stories-grid reveal">
-        <div class="sch-story-card">
-          <div class="sch-story-quote">"GlobalHire covered my entire NCLEX journey — from prep courses to the exam itself. I'm now working as an ICU nurse in Houston, earning three times my previous salary."</div>
-          <div class="sch-story-author">
-            <div class="sch-story-avatar" style="background: var(--primary-muted); color: var(--primary);">AA</div>
-            <div>
-              <span class="sch-story-name">Adaobi A.</span>
-              <span class="sch-story-detail">Nigeria → USA | ICU Nurse</span>
-            </div>
-          </div>
-          <div class="sch-story-program">
-            <span class="tag">NCLEX Sponsorship</span>
-            <span class="tag">Relocation Grant</span>
-          </div>
-        </div>
-
-        <div class="sch-story-card">
-          <div class="sch-story-quote">"I received the OET exam sponsorship and passed on my first attempt. Within 3 months of passing, I had an offer from an NHS hospital in Manchester."</div>
-          <div class="sch-story-author">
-            <div class="sch-story-avatar" style="background: var(--secondary-muted); color: var(--secondary);">RS</div>
-            <div>
-              <span class="sch-story-name">Rajesh S.</span>
-              <span class="sch-story-detail">India → UK | Cardiac Nurse</span>
-            </div>
-          </div>
-          <div class="sch-story-program">
-            <span class="tag">English Exam Support</span>
-            <span class="tag">CBT/OSCE Sponsorship</span>
-          </div>
-        </div>
-
-        <div class="sch-story-card">
-          <div class="sch-story-quote">"The relocation grant covered my flights, first month's rent, and even helped me set up a bank account. I felt supported every step of the way."</div>
-          <div class="sch-story-author">
-            <div class="sch-story-avatar" style="background: rgba(255,176,32,0.12); color: var(--accent-amber);">MK</div>
-            <div>
-              <span class="sch-story-name">Mary K.</span>
-              <span class="sch-story-detail">Kenya → Saudi Arabia | ER Nurse</span>
-            </div>
-          </div>
-          <div class="sch-story-program">
-            <span class="tag">Relocation Grant</span>
-            <span class="tag">Visa Support</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== EMPLOYER-FUNDED SECTION ===================== -->
-  <section class="section" id="employer-funded">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="overline">Employer-Backed</span>
-        <h2>Financial Models That <br>Work for You</h2>
-        <p>Many of our scholarships are funded directly by hiring employers — no repayment, no income deductions, no catch.</p>
-      </div>
-
-      <div class="sch-models-grid reveal">
-        <div class="sch-model-card">
-          <div class="sch-model-icon" style="color: var(--primary);">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-            </svg>
-          </div>
-          <h4>Zero-Cost to Candidates</h4>
-          <p>All scholarship programs are fully funded. You never pay a cent — not now, not later, no repayment clauses.</p>
-        </div>
-
-        <div class="sch-model-card">
-          <div class="sch-model-icon" style="color: var(--secondary);">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-          </div>
-          <h4>Employer-Sponsored</h4>
-          <p>Partnered hospitals and healthcare systems pre-fund your licensing and relocation as part of their recruitment investment.</p>
-        </div>
-
-        <div class="sch-model-card">
-          <div class="sch-model-icon" style="color: var(--accent-amber);">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-          </div>
-          <h4>Service Commitment</h4>
-          <p>In exchange for full sponsorship, candidates commit to a minimum employment period (typically 1-2 years) with the hiring employer.</p>
-        </div>
-
-        <div class="sch-model-card">
-          <div class="sch-model-icon" style="color: var(--accent-cyan);">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-            </svg>
-          </div>
-          <h4>Career Advancement</h4>
-          <p>Many employers offer additional continuing education funding after placement, supporting your long-term career growth.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ===================== FAQ ===================== -->
-  <section class="section" id="faq" style="background: var(--bg-void);">
+  <section class="section" id="faq">
     <div class="container">
       <div class="section-header reveal">
         <span class="overline">FAQ</span>
@@ -633,61 +487,51 @@
       <div class="faq-list reveal">
         <div class="faq-item">
           <button class="faq-question" aria-expanded="false">
-            <span>Are these scholarships really free?</span>
+            <span>Does GlobalHire offer the scholarships directly?</span>
             <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="faq-answer">
-            <p>Yes, 100%. GlobalHire scholarships are funded by our employer partners who invest in recruiting top healthcare talent. There are no hidden fees, no loan repayments, and no income share agreements. The only requirement is a service commitment (typically 1-2 years) to the employer who sponsors your placement.</p>
+            <p>No. GlobalHire aggregates and curates scholarship opportunities from universities, hospitals, government agencies, and institutions worldwide. We help you discover and apply for them, but the scholarships themselves are offered and funded by the respective institutions. Think of us as your scholarship search engine and application advisor.</p>
           </div>
         </div>
 
         <div class="faq-item">
           <button class="faq-question" aria-expanded="false">
-            <span>Who is eligible to apply?</span>
+            <span>How does the application assistance work?</span>
             <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="faq-answer">
-            <p>Any licensed healthcare professional with a valid qualification from their home country can apply. Requirements vary by program: NCLEX sponsorship requires a nursing degree, language exam support requires enrollment in a licensing pathway, and relocation grants require a confirmed job offer through the platform. Use our eligibility checker above for personalized results.</p>
+            <p>When you find a scholarship you're interested in, you can request our application assistance service. Our team will help you understand the requirements, prepare your documents, review your personal statement, and ensure your application is complete and competitive. We've helped hundreds of healthcare professionals secure scholarships globally.</p>
           </div>
         </div>
 
         <div class="faq-item">
           <button class="faq-question" aria-expanded="false">
-            <span>How long does the application process take?</span>
+            <span>Are all scholarships open to international students?</span>
             <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="faq-answer">
-            <p>Most scholarship applications are reviewed within 5 business days. Once approved, funds are typically disbursed within 2 weeks directly to the relevant institution (exam body, training provider, airline, etc.). The entire process from application to funding averages 2-3 weeks.</p>
+            <p>Most scholarships listed on GlobalHire are open to international applicants, but not all. Each listing clearly indicates eligibility requirements including nationality restrictions. You can use the "Open to international students" toggle in the filters to show only scholarships available to international candidates.</p>
           </div>
         </div>
 
         <div class="faq-item">
           <button class="faq-question" aria-expanded="false">
-            <span>Can I apply for multiple scholarships?</span>
+            <span>How often are new scholarships added?</span>
             <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="faq-answer">
-            <p>Absolutely. Many candidates receive a combination of scholarships — for example, an NCLEX exam sponsorship combined with a relocation grant and visa support. Our system automatically identifies all programs you qualify for and allows you to apply to multiple programs simultaneously.</p>
+            <p>Our team continuously monitors universities, hospitals, government programs, and NGOs for new scholarship announcements. New opportunities are added weekly. Create an account and set your preferences to receive email alerts when scholarships matching your profile are posted.</p>
           </div>
         </div>
 
         <div class="faq-item">
           <button class="faq-question" aria-expanded="false">
-            <span>What happens if I don't pass the exam?</span>
+            <span>Can I save scholarships and apply later?</span>
             <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="faq-answer">
-            <p>Our exam sponsorship programs include a retake guarantee. If you don't pass on your first attempt, GlobalHire will fund one additional retake at no extra cost. Our structured prep programs achieve a 97% first-time pass rate for NCLEX and 94% for NMC CBT, so the vast majority of candidates succeed on their first try.</p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question" aria-expanded="false">
-            <span>What is the service commitment?</span>
-            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <div class="faq-answer">
-            <p>Most employer-sponsored scholarships require a commitment to work with the sponsoring employer for 1-2 years. This is standard in international healthcare recruitment. If you leave before the commitment period, a prorated repayment may apply. The exact terms vary by employer and are clearly outlined before you accept any scholarship.</p>
+            <p>Yes. Create a free GlobalHire account to save scholarships to your profile, track deadlines, and get reminders before applications close. You can also track the status of scholarships you've applied to through your portal dashboard.</p>
           </div>
         </div>
       </div>
@@ -699,15 +543,15 @@
     <div class="cta-glow" aria-hidden="true"></div>
     <div class="container">
       <div class="cta-box reveal">
-        <span class="overline" style="margin-bottom:var(--space-4);display:block;">Ready to Get Funded?</span>
-        <h2>Your Career, <span class="gradient-text">Fully Sponsored</span></h2>
-        <p>Join over 1,200 healthcare professionals who have launched their international careers with GlobalHire scholarships.</p>
+        <span class="overline" style="margin-bottom:var(--space-4);display:block;">Stay Updated</span>
+        <h2>Never Miss a <span class="gradient-text">Scholarship Deadline</span></h2>
+        <p>Create a free account to get personalized scholarship alerts, save opportunities, and access our application assistance service.</p>
         <div class="cta-actions">
           <a href="signup.html" class="btn btn-primary btn-lg">
             Create Free Account
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
-          <a href="#eligibility" class="btn btn-ghost btn-lg">Check Eligibility First</a>
+          <a href="#listings" class="btn btn-ghost btn-lg">Browse Scholarships</a>
         </div>
       </div>
     </div>

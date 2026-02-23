@@ -283,76 +283,73 @@ VALUES
 ON CONFLICT (slug) DO NOTHING;
 
 -- ══════════════════════════════════════════════
--- SCHOLARSHIPS & FINANCIAL SUPPORT
+-- SCHOLARSHIPS (External Opportunities Aggregator)
 -- ══════════════════════════════════════════════
 
--- ── Scholarship Programs ──
-CREATE TABLE IF NOT EXISTS globalhire.scholarship_programs (
+-- ── Scholarships (external opportunities from universities, institutions, etc.) ──
+CREATE TABLE IF NOT EXISTS globalhire.scholarships (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  name TEXT NOT NULL,
+  title TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
+  institution TEXT NOT NULL,
+  institution_logo_text TEXT,
   description TEXT,
-  category TEXT NOT NULL CHECK (category IN ('exam_sponsorship', 'language_support', 'relocation', 'continuing_education', 'visa_immigration')),
-  max_amount_usd NUMERIC(10,2),
-  duration_months INTEGER,
-  destinations TEXT[] DEFAULT '{}',
-  eligible_professions TEXT[] DEFAULT '{}',
-  min_experience_years INTEGER DEFAULT 0,
-  includes TEXT[] DEFAULT '{}',
+  country TEXT NOT NULL,
+  city TEXT,
+  field TEXT NOT NULL CHECK (field IN ('nursing', 'medicine', 'pharmacy', 'public-health', 'physiotherapy', 'radiology', 'lab-science', 'other')),
+  degree_level TEXT NOT NULL CHECK (degree_level IN ('certificate', 'bachelors', 'masters', 'phd', 'fellowship', 'any')),
+  funding_type TEXT NOT NULL CHECK (funding_type IN ('full', 'partial', 'tuition', 'stipend', 'research')),
+  amount_description TEXT,
+  deadline DATE,
+  application_url TEXT,
+  eligibility_notes TEXT,
+  open_to_international BOOLEAN DEFAULT true,
+  tags TEXT[] DEFAULT '{}',
   is_active BOOLEAN DEFAULT true,
   is_featured BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_scholarship_programs_category ON globalhire.scholarship_programs(category);
-CREATE INDEX IF NOT EXISTS idx_scholarship_programs_active ON globalhire.scholarship_programs(is_active);
+CREATE INDEX IF NOT EXISTS idx_scholarships_field ON globalhire.scholarships(field);
+CREATE INDEX IF NOT EXISTS idx_scholarships_country ON globalhire.scholarships(country);
+CREATE INDEX IF NOT EXISTS idx_scholarships_deadline ON globalhire.scholarships(deadline);
+CREATE INDEX IF NOT EXISTS idx_scholarships_active ON globalhire.scholarships(is_active);
 
--- ── Scholarship Applications ──
-CREATE TABLE IF NOT EXISTS globalhire.scholarship_applications (
+-- ── Saved Scholarships (user bookmarks) ──
+CREATE TABLE IF NOT EXISTS globalhire.saved_scholarships (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES globalhire.profiles(id) ON DELETE CASCADE,
-  program_id UUID NOT NULL REFERENCES globalhire.scholarship_programs(id) ON DELETE CASCADE,
-  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'under_review', 'approved', 'disbursed', 'rejected', 'withdrawn')),
-  destination_country TEXT,
-  profession TEXT,
-  experience_years TEXT,
-  notes TEXT,
-  reviewed_by UUID,
-  reviewed_at TIMESTAMPTZ,
-  disbursed_amount NUMERIC(10,2),
-  disbursed_at TIMESTAMPTZ,
+  scholarship_id UUID NOT NULL REFERENCES globalhire.scholarships(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now(),
-  UNIQUE(user_id, program_id)
+  UNIQUE(user_id, scholarship_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_scholarship_apps_user ON globalhire.scholarship_applications(user_id);
-CREATE INDEX IF NOT EXISTS idx_scholarship_apps_status ON globalhire.scholarship_applications(status);
+CREATE INDEX IF NOT EXISTS idx_saved_scholarships_user ON globalhire.saved_scholarships(user_id);
 
 -- ── Public Views ──
-CREATE OR REPLACE VIEW public.gh_scholarship_programs AS
-  SELECT * FROM globalhire.scholarship_programs WHERE is_active = true;
+CREATE OR REPLACE VIEW public.gh_scholarships AS
+  SELECT * FROM globalhire.scholarships WHERE is_active = true;
 
-CREATE OR REPLACE VIEW public.gh_scholarship_applications AS
-  SELECT * FROM globalhire.scholarship_applications;
+CREATE OR REPLACE VIEW public.gh_saved_scholarships AS
+  SELECT * FROM globalhire.saved_scholarships;
 
 -- ── RLS Policies ──
-ALTER TABLE globalhire.scholarship_programs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE globalhire.scholarship_applications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE globalhire.scholarships ENABLE ROW LEVEL SECURITY;
+ALTER TABLE globalhire.saved_scholarships ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Public read scholarship programs" ON globalhire.scholarship_programs
+CREATE POLICY "Public read active scholarships" ON globalhire.scholarships
   FOR SELECT USING (is_active = true);
 
-CREATE POLICY "Users manage own scholarship applications" ON globalhire.scholarship_applications
+CREATE POLICY "Users manage own saved scholarships" ON globalhire.saved_scholarships
   FOR ALL USING (auth.uid() = user_id);
 
--- ── Seed Scholarship Programs ──
-INSERT INTO globalhire.scholarship_programs (name, slug, description, category, max_amount_usd, duration_months, destinations, eligible_professions, min_experience_years, includes, is_active, is_featured) VALUES
-  ('NCLEX Exam Sponsorship', 'nclex-sponsorship', 'Full sponsorship for the NCLEX-RN examination including registration fees, study materials, and virtual training simulations.', 'exam_sponsorship', 5000.00, 6, ARRAY['USA'], ARRAY['nurse', 'midwife'], 1, ARRAY['Exam registration fees', 'Study materials & prep courses', 'Virtual clinical simulations', '1-on-1 mentor support'], true, true),
-  ('English Language Exam Support', 'english-exam-support', 'Full coverage for OET or IELTS examination fees plus intensive English preparation courses.', 'language_support', 2000.00, 4, ARRAY['UK', 'Australia', 'New Zealand', 'Ireland', 'Canada'], ARRAY['nurse', 'midwife', 'physician', 'pharmacist', 'physiotherapist', 'radiologist', 'lab_tech'], 0, ARRAY['OET or IELTS exam fees', '8-week prep course access', 'Practice speaking sessions'], true, false),
-  ('CBT & OSCE Exam Sponsorship', 'cbt-osce-sponsorship', 'Full coverage of NMC Computer-Based Test and OSCE clinical exam fees for UK-bound nurses.', 'exam_sponsorship', 3500.00, 5, ARRAY['UK'], ARRAY['nurse', 'midwife'], 1, ARRAY['CBT registration & test fee', 'OSCE clinical exam fee', 'NMC application fee'], true, false),
-  ('Relocation Assistance Grant', 'relocation-grant', 'Financial support for travel, initial accommodation, and settling-in expenses.', 'relocation', 8000.00, NULL, ARRAY['USA', 'UK', 'UAE', 'Saudi Arabia', 'Canada', 'Australia', 'Germany', 'Qatar', 'Ireland', 'New Zealand', 'Singapore', 'Kuwait'], ARRAY['nurse', 'midwife', 'physician', 'pharmacist', 'physiotherapist', 'radiologist', 'lab_tech'], 1, ARRAY['Flight ticket coverage', 'First 2 months accommodation', 'Settling-in stipend'], true, false),
-  ('Continuing Education Scholarship', 'continuing-education', 'Funding for specialty certifications, advanced courses, and professional development.', 'continuing_education', 4000.00, 12, ARRAY['USA', 'UK', 'UAE', 'Saudi Arabia', 'Canada', 'Australia', 'Germany'], ARRAY['nurse', 'midwife', 'physician', 'pharmacist', 'physiotherapist', 'radiologist', 'lab_tech'], 3, ARRAY['Specialty certification fees', 'Online course subscriptions', 'CPD/CME credit programs'], true, false),
-  ('Visa & Immigration Support', 'visa-immigration-support', 'Coverage of visa application fees, immigration legal support, and documentation costs.', 'visa_immigration', 3000.00, NULL, ARRAY['USA', 'UK', 'UAE', 'Saudi Arabia', 'Canada', 'Australia', 'Germany', 'Qatar', 'Ireland', 'New Zealand', 'Singapore', 'Kuwait'], ARRAY['nurse', 'midwife', 'physician', 'pharmacist', 'physiotherapist', 'radiologist', 'lab_tech'], 0, ARRAY['Visa application fees', 'Immigration legal counsel', 'Document attestation fees'], true, false)
+-- ── Seed Scholarships ──
+INSERT INTO globalhire.scholarships (title, slug, institution, institution_logo_text, description, country, city, field, degree_level, funding_type, amount_description, deadline, open_to_international, tags, is_active, is_featured) VALUES
+  ('King''s College London — MSc Nursing', 'kcl-msc-nursing', 'King''s College London', 'KCL', 'Full tuition fee waiver plus a living stipend for international students pursuing the MSc Advanced Nursing Practice. Covers accommodation support and NHS placement coordination.', 'UK', 'London', 'nursing', 'masters', 'full', 'Up to £35,000/yr', '2026-04-15', true, ARRAY['Nursing', 'International', 'Stipend Included'], true, true),
+  ('Johns Hopkins Bloomberg School — PhD Global Health', 'jhu-phd-global-health', 'Johns Hopkins University', 'JHU', 'Fully funded doctoral fellowship for international healthcare professionals researching global health systems, epidemiology, or health policy. Includes full tuition, health insurance, and $34,000 annual stipend.', 'USA', 'Baltimore', 'public-health', 'phd', 'full', 'Full Tuition + $34,000/yr', '2026-06-01', true, ARRAY['Medicine', 'Public Health', 'Research'], true, false),
+  ('University of Sydney — Nursing Science Scholarship', 'usyd-nursing-science', 'University of Sydney', 'USyd', '50% tuition reduction for high-achieving international students enrolled in the Bachelor of Nursing (Advanced Studies). Renewable annually based on academic performance.', 'Australia', 'Sydney', 'nursing', 'bachelors', 'partial', '50% Tuition (~A$22,000/yr)', '2026-09-30', true, ARRAY['Nursing', 'Undergraduate', 'Merit-Based'], true, false),
+  ('University of Toronto — Pharmacy Graduate Award', 'uoft-pharmacy-award', 'University of Toronto', 'UofT', 'Full funding for international pharmacy graduates pursuing MScPhm or PhD at the Leslie Dan Faculty of Pharmacy. Includes tuition, health coverage, and research assistantship.', 'Canada', 'Toronto', 'pharmacy', 'masters', 'full', 'Full Tuition + C$28,000/yr', '2026-05-15', true, ARRAY['Pharmacy', 'Research', 'International'], true, false),
+  ('DAAD — International Health Sciences Scholarship', 'daad-health-sciences', 'German Academic Exchange Service (DAAD)', 'DAAD', 'Government-funded scholarship for healthcare professionals from developing countries to pursue master''s programs in public health, epidemiology, or tropical medicine at German universities.', 'Germany', NULL, 'public-health', 'masters', 'full', '€1,200/mo + Tuition', '2026-07-31', true, ARRAY['Public Health', 'Government-Funded', 'Developing Countries'], true, false),
+  ('King Fahad Medical City — Specialty Nursing Fellowship', 'kfmc-nursing-fellowship', 'King Fahad Medical City, Riyadh', 'KFMC', 'Fully sponsored fellowship for international nurses seeking specialty certification in critical care, oncology, or perioperative nursing. Includes salary, accommodation, and return flights.', 'Saudi Arabia', 'Riyadh', 'nursing', 'fellowship', 'full', 'Full Salary + Housing', '2026-03-30', true, ARRAY['Nursing', 'Fellowship', 'Specialty Certification'], true, false)
 ON CONFLICT (slug) DO NOTHING;

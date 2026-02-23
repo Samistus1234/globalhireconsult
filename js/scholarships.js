@@ -1,6 +1,6 @@
 /* ============================================
-   GLOBALHIRE@ELAB — Scholarships Page JS
-   Eligibility checker, FAQ accordion
+   GLOBALHIRE@ELAB — Scholarships Finder JS
+   Search, filter, save, FAQ accordion
    ============================================ */
 
 (function() {
@@ -9,141 +9,154 @@
   document.addEventListener('DOMContentLoaded', function() {
     if (window.GHNav) GHNav.init('scholarships');
 
-    initEligibilityChecker();
+    initSearch();
+    initFilterChips();
+    initSidebarFilters();
+    initSaveButtons();
     initFAQ();
+    updateCount();
   });
 
-  /* ── Eligibility Checker ── */
-  function initEligibilityChecker() {
-    var form = document.getElementById('eligibility-form');
-    if (!form) return;
+  /* ── Search ── */
+  function initSearch() {
+    var input = document.getElementById('sch-search');
+    var btn = document.getElementById('sch-search-btn');
+    if (!input) return;
 
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
+    function runSearch() {
+      var term = input.value.toLowerCase().trim();
+      var cards = document.querySelectorAll('.sch-card');
+      cards.forEach(function(card) {
+        var text = card.textContent.toLowerCase();
+        var matchesSearch = !term || text.indexOf(term) !== -1;
+        // Combine with current filter visibility
+        if (!matchesSearch) {
+          card.style.display = 'none';
+        } else if (!card.dataset._filtered) {
+          card.style.display = '';
+        }
+      });
+      updateCount();
+    }
 
-      var profession = document.getElementById('sch-profession').value;
-      var experience = document.getElementById('sch-experience').value;
-      var country = document.getElementById('sch-country').value;
-      var destination = document.getElementById('sch-destination').value;
+    input.addEventListener('keyup', function(e) {
+      if (e.key === 'Enter') runSearch();
+    });
+    if (btn) btn.addEventListener('click', runSearch);
+  }
 
-      if (!profession || !experience || !country || !destination) return;
-
-      var programs = getEligiblePrograms(profession, experience, destination);
-      displayResults(programs);
+  /* ── Filter Chips ── */
+  function initFilterChips() {
+    var chips = document.querySelectorAll('.sch-filter-row .filter-chip');
+    chips.forEach(function(chip) {
+      chip.addEventListener('click', function() {
+        chips.forEach(function(c) { c.classList.remove('active'); });
+        chip.classList.add('active');
+        applyFilters();
+      });
     });
   }
 
-  function getEligiblePrograms(profession, experience, destination) {
-    var programs = [];
+  /* ── Sidebar Filters ── */
+  function initSidebarFilters() {
+    var countrySelect = document.getElementById('filter-country');
+    var toggle = document.getElementById('toggle-international');
+    var clearBtn = document.getElementById('clear-filters');
 
-    // NCLEX Sponsorship — nurses targeting USA
-    if ((profession === 'nurse' || profession === 'midwife') && destination === 'USA') {
-      programs.push({
-        name: 'NCLEX Exam Sponsorship',
-        amount: 'Up to $5,000',
-        desc: 'Full NCLEX-RN exam coverage including prep courses and study materials',
-        color: 'primary',
-        icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5"/></svg>'
-      });
+    if (countrySelect) {
+      countrySelect.addEventListener('change', applyFilters);
     }
 
-    // English Language — UK, Australia, NZ, Ireland, Canada
-    if (['UK', 'Australia', 'New Zealand', 'Ireland', 'Canada'].indexOf(destination) !== -1) {
-      programs.push({
-        name: 'English Language Exam Support',
-        amount: 'Up to $2,000',
-        desc: 'OET or IELTS exam fees plus preparation course access',
-        color: 'secondary',
-        icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>'
-      });
-    }
-
-    // CBT/OSCE — nurses targeting UK
-    if ((profession === 'nurse' || profession === 'midwife') && destination === 'UK') {
-      programs.push({
-        name: 'CBT & OSCE Exam Sponsorship',
-        amount: 'Up to $3,500',
-        desc: 'NMC Computer-Based Test and OSCE clinical exam coverage',
-        color: 'cyan',
-        icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>'
-      });
-    }
-
-    // Relocation Grant — everyone with 1+ year experience
-    if (experience !== '0-1') {
-      programs.push({
-        name: 'Relocation Assistance Grant',
-        amount: 'Up to $8,000',
-        desc: 'Flights, initial accommodation, and settling-in expenses',
-        color: 'amber',
-        icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>'
-      });
-    }
-
-    // Continuing Education — experienced professionals
-    if (['3-5', '5-10', '10+'].indexOf(experience) !== -1) {
-      programs.push({
-        name: 'Continuing Education Scholarship',
-        amount: 'Up to $4,000',
-        desc: 'Specialty certifications and professional development funding',
-        color: 'coral',
-        icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>'
-      });
-    }
-
-    // Visa & Immigration — everyone
-    programs.push({
-      name: 'Visa & Immigration Support',
-      amount: 'Up to $3,000',
-      desc: 'Visa fees, immigration legal counsel, and document attestation',
-      color: 'secondary',
-      icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/><path d="M7 15h4"/></svg>'
+    // Checkboxes
+    document.querySelectorAll('.sch-sidebar input[type="checkbox"]').forEach(function(cb) {
+      cb.addEventListener('change', applyFilters);
     });
 
-    return programs;
-  }
-
-  var colorMap = {
-    primary: { bg: 'var(--primary-muted)', fg: 'var(--primary)' },
-    secondary: { bg: 'var(--secondary-muted)', fg: 'var(--secondary)' },
-    amber: { bg: 'rgba(255,176,32,0.12)', fg: 'var(--accent-amber)' },
-    cyan: { bg: 'rgba(0,212,255,0.12)', fg: 'var(--accent-cyan)' },
-    coral: { bg: 'rgba(255,92,92,0.12)', fg: 'var(--accent-coral)' }
-  };
-
-  function displayResults(programs) {
-    var resultsEl = document.getElementById('eligibility-results');
-    var listEl = document.getElementById('results-list');
-    var countEl = document.getElementById('result-count');
-
-    if (!resultsEl || !listEl) return;
-
-    countEl.textContent = programs.length + ' Program' + (programs.length !== 1 ? 's' : '');
-
-    var html = '';
-    for (var i = 0; i < programs.length; i++) {
-      var p = programs[i];
-      var c = colorMap[p.color] || colorMap.primary;
-      html +=
-        '<div class="sch-result-item">' +
-          '<div class="sch-result-icon" style="background:' + c.bg + ';color:' + c.fg + ';">' + p.icon + '</div>' +
-          '<div class="sch-result-info">' +
-            '<h5>' + p.name + '</h5>' +
-            '<p>' + p.desc + '</p>' +
-          '</div>' +
-          '<div class="sch-result-amount">' + p.amount + '</div>' +
-        '</div>';
+    // International toggle
+    if (toggle) {
+      toggle.addEventListener('click', function() {
+        toggle.classList.toggle('active');
+        applyFilters();
+      });
     }
 
-    listEl.innerHTML = html;
-    resultsEl.style.display = 'block';
-    resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Clear
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function() {
+        if (countrySelect) countrySelect.value = '';
+        document.querySelectorAll('.sch-sidebar input[type="checkbox"]').forEach(function(cb) {
+          cb.checked = true;
+        });
+        if (toggle) toggle.classList.add('active');
+        var chips = document.querySelectorAll('.sch-filter-row .filter-chip');
+        chips.forEach(function(c) { c.classList.remove('active'); });
+        if (chips[0]) chips[0].classList.add('active');
+        var searchInput = document.getElementById('sch-search');
+        if (searchInput) searchInput.value = '';
+        applyFilters();
+      });
+    }
+  }
+
+  function applyFilters() {
+    var activeChip = document.querySelector('.sch-filter-row .filter-chip.active');
+    var fieldFilter = activeChip ? activeChip.dataset.filter : 'all';
+    var countryFilter = (document.getElementById('filter-country') || {}).value || '';
+    var searchTerm = (document.getElementById('sch-search') || {}).value.toLowerCase().trim();
+
+    var cards = document.querySelectorAll('.sch-card');
+    cards.forEach(function(card) {
+      var field = card.dataset.field || '';
+      var country = card.dataset.country || '';
+      var text = card.textContent.toLowerCase();
+
+      var matchesField = (fieldFilter === 'all') || (field === fieldFilter);
+      var matchesCountry = !countryFilter || (country === countryFilter);
+      var matchesSearch = !searchTerm || text.indexOf(searchTerm) !== -1;
+
+      if (matchesField && matchesCountry && matchesSearch) {
+        card.style.display = '';
+        delete card.dataset._filtered;
+      } else {
+        card.style.display = 'none';
+        card.dataset._filtered = '1';
+      }
+    });
+    updateCount();
+  }
+
+  function updateCount() {
+    var countEl = document.getElementById('sch-count');
+    if (!countEl) return;
+    var visible = document.querySelectorAll('.sch-card:not([style*="display: none"])').length;
+    countEl.textContent = visible;
+  }
+
+  /* ── Save Buttons ── */
+  function initSaveButtons() {
+    document.querySelectorAll('.sch-save-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var isSaved = btn.classList.toggle('saved');
+        var svg = btn.querySelector('svg');
+        var text = btn.childNodes[btn.childNodes.length - 1];
+        if (isSaved) {
+          if (svg) svg.setAttribute('fill', 'currentColor');
+          if (text && text.nodeType === 3) text.textContent = ' Saved';
+          btn.style.color = 'var(--primary)';
+          btn.style.borderColor = 'var(--primary)';
+        } else {
+          if (svg) svg.setAttribute('fill', 'none');
+          if (text && text.nodeType === 3) text.textContent = ' Save';
+          btn.style.color = '';
+          btn.style.borderColor = '';
+        }
+      });
+    });
   }
 
   /* ── FAQ Accordion ── */
   function initFAQ() {
-    var questions = document.querySelectorAll('.faq-question');
-    questions.forEach(function(btn) {
+    document.querySelectorAll('.faq-question').forEach(function(btn) {
       btn.addEventListener('click', function() {
         var item = btn.closest('.faq-item');
         var answer = item.querySelector('.faq-answer');
