@@ -23,6 +23,7 @@
           '<a href="jobs.html"' + (activePage === 'careers' ? ' class="active"' : '') + '>Careers</a>' +
           '<a href="guides.html"' + (activePage === 'guides' ? ' class="active"' : '') + '>Guides</a>' +
           '<a href="licensing.html"' + (activePage === 'licensing' ? ' class="active"' : '') + '>Licensing</a>' +
+          '<a href="scholarships.html"' + (activePage === 'scholarships' ? ' class="active"' : '') + '>Scholarships</a>' +
           '<a href="events.html"' + (activePage === 'events' ? ' class="active"' : '') + '>Events</a>' +
         '</div>' +
         '<div class="gnav-actions" id="gnav-actions">' +
@@ -55,6 +56,7 @@
             '<ul>' +
               '<li><a href="jobs.html">Browse Careers</a></li>' +
               '<li><a href="licensing.html">Licensing</a></li>' +
+              '<li><a href="scholarships.html">Scholarships</a></li>' +
               '<li><a href="guides.html">Resource Guides</a></li>' +
               '<li><a href="events.html">Events</a></li>' +
             '</ul>' +
@@ -110,6 +112,7 @@
         '<a href="jobs.html"' + (activePage === 'careers' ? ' class="active"' : '') + '>Careers</a>' +
         '<a href="guides.html"' + (activePage === 'guides' ? ' class="active"' : '') + '>Guides</a>' +
         '<a href="licensing.html"' + (activePage === 'licensing' ? ' class="active"' : '') + '>Licensing</a>' +
+        '<a href="scholarships.html"' + (activePage === 'scholarships' ? ' class="active"' : '') + '>Scholarships</a>' +
         '<a href="events.html"' + (activePage === 'events' ? ' class="active"' : '') + '>Events</a>' +
       '</div>' +
       '<div class="mobile-actions">' +
