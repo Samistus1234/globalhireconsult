@@ -56,6 +56,12 @@
           My Applications
         </a>
 
+        <a class="portal-nav-item" data-tab="tab-opportunities" style="position:relative;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Opportunities
+          <span class="nav-badge" id="opportunities-badge" style="display:none">0</span>
+        </a>
+
         <a class="portal-nav-item" data-tab="tab-saved" style="position:relative;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
           Saved Jobs
@@ -382,6 +388,23 @@
                   </div>
                 </div>
 
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ TAB: Opportunities ═══ -->
+        <div class="portal-tab" id="tab-opportunities">
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Matched Opportunities</span>
+              <span class="badge badge-primary badge-dot" id="opp-count-badge">0 opportunities</span>
+            </div>
+            <div class="panel-body">
+              <div id="opportunities-list">
+                <div style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">
+                  <p>No opportunities yet. When recruiters match your profile, opportunities will appear here.</p>
+                </div>
               </div>
             </div>
           </div>

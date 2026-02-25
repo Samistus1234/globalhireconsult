@@ -1,0 +1,355 @@
+/* ============================================
+   GLOBALHIRE@ELAB — Campaign Management Styles
+   Admin campaign creation, matching, outreach
+   ============================================ */
+
+/* ── View Switching ── */
+.campaign-view {
+  display: none;
+}
+.campaign-view.active {
+  display: block;
+  animation: fadeSlideIn 0.3s var(--ease-out);
+}
+
+/* ── Campaign List ── */
+.campaign-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+  gap: var(--space-4);
+}
+
+.campaign-filters {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.filter-tab {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--text-tertiary);
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+}
+
+.filter-tab:hover {
+  border-color: var(--border-default);
+  color: var(--text-secondary);
+}
+
+.filter-tab.active {
+  background: var(--primary-muted);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* ── Campaign Table ── */
+.campaign-table td {
+  vertical-align: middle;
+}
+
+.campaign-title-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.campaign-title-cell .title {
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.campaign-title-cell .title:hover {
+  color: var(--primary);
+}
+
+.campaign-title-cell .meta {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+/* Status badges */
+.status-draft { background: rgba(139,145,168,0.15); color: var(--text-secondary); }
+.status-matching { background: rgba(124,92,255,0.15); color: var(--secondary); }
+.status-review { background: rgba(255,176,32,0.15); color: var(--accent-amber); }
+.status-sending { background: rgba(0,212,255,0.15); color: var(--accent-cyan); }
+.status-active { background: rgba(0,232,157,0.15); color: var(--primary); }
+.status-closed { background: rgba(255,92,92,0.15); color: var(--accent-coral); }
+
+/* ── Campaign Metrics Row ── */
+.campaign-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.metric-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--metric-color, var(--primary));
+}
+
+.metric-value {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+  margin-bottom: var(--space-1);
+}
+
+.metric-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--text-tertiary);
+}
+
+/* ── Campaign Info Header ── */
+.campaign-info-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+}
+
+.campaign-info-header .info-left h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 800;
+  margin-bottom: var(--space-2);
+}
+
+.campaign-info-header .info-tags {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: var(--space-2);
+}
+
+.campaign-info-header .info-actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+/* ── Match Table ── */
+.match-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.match-score-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.score-bar {
+  width: 80px;
+  height: 6px;
+  background: var(--bg-elevated);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.score-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width var(--duration-slow) var(--ease-out);
+}
+
+.score-bar-fill.high { background: linear-gradient(90deg, var(--primary-dark, #00c484), var(--primary)); }
+.score-bar-fill.medium { background: linear-gradient(90deg, #e09800, var(--accent-amber)); }
+.score-bar-fill.low { background: linear-gradient(90deg, var(--accent-coral), #ff8080); }
+
+.score-value {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 28px;
+}
+
+.score-value.high { color: var(--primary); }
+.score-value.medium { color: var(--accent-amber); }
+.score-value.low { color: var(--accent-coral); }
+
+/* Email status badges */
+.email-pending { background: rgba(139,145,168,0.15); color: var(--text-secondary); }
+.email-sending { background: rgba(0,212,255,0.15); color: var(--accent-cyan); }
+.email-sent { background: rgba(0,232,157,0.15); color: var(--primary); }
+.email-failed { background: rgba(255,92,92,0.15); color: var(--accent-coral); }
+
+/* Response badges */
+.response-interested { background: rgba(0,232,157,0.15); color: var(--primary); }
+.response-declined { background: rgba(255,92,92,0.15); color: var(--accent-coral); }
+.response-maybe_later { background: rgba(255,176,32,0.15); color: var(--accent-amber); }
+.response-none { background: rgba(139,145,168,0.1); color: var(--text-tertiary); }
+
+/* ── Campaign Form ── */
+.campaign-form {
+  max-width: 720px;
+}
+
+.campaign-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.campaign-form .form-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.campaign-form textarea.form-input {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.campaign-form .form-actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+/* ── Activity Log Panel ── */
+.activity-log-panel {
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.log-item {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-6);
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: var(--text-sm);
+}
+
+.log-item:last-child { border-bottom: none; }
+
+.log-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.log-dot.created { background: var(--primary); }
+.log-dot.matching_started,
+.log-dot.matching_completed { background: var(--secondary); }
+.log-dot.emails_sending,
+.log-dot.emails_sent { background: var(--accent-cyan); }
+.log-dot.response_received { background: var(--accent-amber); }
+.log-dot.status_changed { background: var(--text-tertiary); }
+.log-dot.closed { background: var(--accent-coral); }
+
+.log-content {
+  flex: 1;
+}
+
+.log-text {
+  color: var(--text-secondary);
+  line-height: var(--leading-normal);
+}
+
+.log-text strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.log-time {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+/* ── Empty state ── */
+.empty-state {
+  text-align: center;
+  padding: var(--space-12) var(--space-8);
+  color: var(--text-tertiary);
+}
+
+.empty-state svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: var(--space-4);
+  opacity: 0.3;
+}
+
+.empty-state h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-2);
+}
+
+.empty-state p {
+  font-size: var(--text-sm);
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* ── Back Button ── */
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  margin-bottom: var(--space-4);
+  transition: color var(--duration-fast);
+}
+
+.btn-back:hover {
+  color: var(--primary);
+}
+
+.btn-back svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1280px) {
+  .campaign-metrics { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .campaign-toolbar { flex-direction: column; align-items: stretch; }
+  .campaign-metrics { grid-template-columns: repeat(2, 1fr); }
+  .campaign-form .form-row,
+  .campaign-form .form-row-3 { grid-template-columns: 1fr; }
+}

@@ -40,7 +40,8 @@
       loadKPIs(),
       loadRecentApplicants(),
       loadVerificationQueue(),
-      loadPipelineCounts()
+      loadPipelineCounts(),
+      loadCampaignBadge()
     ]);
   }
 
@@ -206,6 +207,18 @@
         countEl.textContent = counts[stage];
       }
     });
+  }
+
+  // ── Campaign badge count ──
+  async function loadCampaignBadge() {
+    var badge = document.getElementById('campaigns-badge');
+    if (!badge) return;
+    var { data } = await ghFrom('campaigns')
+      .select('id')
+      .in('status', ['matching', 'review', 'sending', 'active']);
+    var count = data ? data.length : 0;
+    badge.textContent = count;
+    badge.style.display = count > 0 ? '' : 'none';
   }
 
   // ── Realtime subscription ──

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Opportunity — GlobalHire@eLab</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/auth.css">
+
+  <style>
+    .opportunity-card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--glass-bg-strong);
+      backdrop-filter: var(--glass-blur-strong);
+      -webkit-backdrop-filter: var(--glass-blur-strong);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      position: relative;
+      z-index: 1;
+      margin: var(--space-4);
+    }
+
+    .opp-header {
+      text-align: center;
+      margin-bottom: var(--space-6);
+    }
+
+    .opp-title {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 800;
+      margin-bottom: var(--space-2);
+    }
+
+    .opp-subtitle {
+      font-size: var(--text-sm);
+      color: var(--text-tertiary);
+    }
+
+    .opp-details {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      margin-bottom: var(--space-6);
+    }
+
+    .opp-detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-2) 0;
+    }
+
+    .opp-detail-row + .opp-detail-row {
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .opp-detail-label {
+      font-size: var(--text-sm);
+      color: var(--text-tertiary);
+    }
+
+    .opp-detail-value {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .opp-match-score {
+      text-align: center;
+      margin-bottom: var(--space-6);
+    }
+
+    .score-circle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--primary-muted);
+      border: 3px solid var(--primary);
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: var(--space-2);
+    }
+
+    .score-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-wider);
+      color: var(--text-tertiary);
+    }
+
+    .opp-actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .btn-interested {
+      background: linear-gradient(135deg, var(--primary-dark, #00c484), var(--primary));
+      color: var(--bg-deep);
+      font-weight: 700;
+    }
+
+    .btn-interested:hover {
+      opacity: 0.9;
+    }
+
+    .btn-declined {
+      background: transparent;
+      border: 1px solid var(--border-default);
+      color: var(--text-secondary);
+    }
+
+    .btn-declined:hover {
+      border-color: var(--accent-coral);
+      color: var(--accent-coral);
+    }
+
+    .btn-maybe {
+      background: transparent;
+      color: var(--text-tertiary);
+      font-size: var(--text-sm);
+      text-align: center;
+    }
+
+    .btn-maybe:hover {
+      color: var(--accent-amber);
+    }
+
+    .opp-confirmation {
+      text-align: center;
+      padding: var(--space-6) 0;
+    }
+
+    .opp-confirmation svg {
+      width: 48px;
+      height: 48px;
+      color: var(--primary);
+      margin-bottom: var(--space-4);
+    }
+
+    .opp-confirmation h3 {
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      margin-bottom: var(--space-2);
+    }
+
+    .opp-confirmation p {
+      color: var(--text-tertiary);
+      font-size: var(--text-sm);
+      margin-bottom: var(--space-4);
+    }
+
+    .opp-error {
+      text-align: center;
+      padding: var(--space-6) 0;
+    }
+
+    .opp-error svg {
+      width: 48px;
+      height: 48px;
+      color: var(--accent-coral);
+      margin-bottom: var(--space-4);
+    }
+
+    .opp-error h3 {
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      margin-bottom: var(--space-2);
+    }
+
+    .opp-error p {
+      color: var(--text-tertiary);
+      font-size: var(--text-sm);
+    }
+
+    .opp-loading {
+      text-align: center;
+      padding: var(--space-10) 0;
+    }
+  </style>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300e89d'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' font-weight='bold' fill='%23080a0d'>G</text></svg>">
+</head>
+<body>
+
+  <div class="auth-page">
+    <div class="opportunity-card">
+      <!-- Logo -->
+      <div class="auth-logo">
+        <div class="logo-mark">G</div>
+        <span>Global<span class="accent">Hire</span></span>
+      </div>
+
+      <!-- Content container -->
+      <div id="opp-content">
+        <div class="opp-loading">
+          <div class="spinner-lg" style="margin:0 auto var(--space-4);"></div>
+          <p style="color:var(--text-tertiary);font-size:var(--text-sm);">Loading opportunity details...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/opportunity.js"></script>
+</body>
+</html>

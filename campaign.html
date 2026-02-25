@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campaigns — GlobalHire@eLab</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/campaign.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300e89d'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' font-weight='bold' fill='%23080a0d'>G</text></svg>">
+</head>
+<body data-auth-role="admin">
+  <div class="dashboard-shell">
+
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-logo">
+          <div class="logo-mark">G</div>
+          <span>Global<span class="accent">Hire</span></span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Overview</div>
+        <a class="nav-item" href="dashboard.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </a>
+        <a class="nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          Analytics
+        </a>
+
+        <div class="nav-section-label">Recruitment</div>
+        <a class="nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Candidates
+        </a>
+        <a class="nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          Job Postings
+        </a>
+        <a class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Campaigns
+          <span class="nav-badge" id="campaign-nav-badge" style="display:none">0</span>
+        </a>
+        <a class="nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Placements
+        </a>
+
+        <div class="nav-section-label">Operations</div>
+        <a class="nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          Verification
+        </a>
+        <a class="nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+          Documents
+        </a>
+
+        <div class="nav-section-label">System</div>
+        <a class="nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="avatar" id="admin-user-avatar" style="background:var(--primary);color:var(--bg-deep)">SO</div>
+          <div class="user-info">
+            <div class="user-name" id="admin-user-name">Admin</div>
+            <div class="user-role" id="admin-user-role">Platform Admin</div>
+          </div>
+          <a href="#" id="admin-signout" title="Sign Out" style="display:flex;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===================== MAIN CONTENT ===================== -->
+    <main class="dashboard-main">
+
+      <!-- Header -->
+      <header class="dash-header">
+        <div class="dash-header-left">
+          <button class="btn btn-icon" onclick="document.getElementById('sidebar').classList.toggle('open')" style="display:none;" id="sidebar-toggle">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+          </button>
+          <div>
+            <div class="breadcrumb">GlobalHire <span>/</span> Recruitment <span>/</span> <span id="breadcrumb-page">Campaigns</span></div>
+            <h1 id="page-title">Recruitment Campaigns</h1>
+          </div>
+        </div>
+        <div class="dash-header-right">
+          <button class="btn btn-primary btn-sm" id="btn-new-campaign">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            New Campaign
+          </button>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="dash-content">
+
+        <!-- ═══ VIEW: Campaign List ═══ -->
+        <div class="campaign-view active" id="view-list">
+          <div class="campaign-toolbar">
+            <div class="campaign-filters">
+              <button class="filter-tab active" data-filter="all">All</button>
+              <button class="filter-tab" data-filter="draft">Draft</button>
+              <button class="filter-tab" data-filter="active">Active</button>
+              <button class="filter-tab" data-filter="closed">Closed</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-body-flush">
+              <table class="table campaign-table">
+                <thead>
+                  <tr>
+                    <th>Campaign</th>
+                    <th>Status</th>
+                    <th>Matched</th>
+                    <th>Contacted</th>
+                    <th>Interested</th>
+                    <th>Created</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="campaign-tbody">
+                  <tr>
+                    <td colspan="7" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">
+                      <div class="skeleton" style="height:20px;width:60%;margin:0 auto var(--space-3);"></div>
+                      <div class="skeleton" style="height:14px;width:40%;margin:0 auto;"></div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ VIEW: Create / Edit Campaign ═══ -->
+        <div class="campaign-view" id="view-form">
+          <a class="btn-back" id="btn-back-form">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Back to Campaigns
+          </a>
+
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title" id="form-title">New Campaign</span>
+            </div>
+            <div class="panel-body">
+              <form id="campaign-form" class="campaign-form">
+                <div class="form-group">
+                  <label class="form-label">Campaign Title</label>
+                  <input type="text" class="form-input" name="title" placeholder="e.g. ICU Nurses for King Faisal Medical City" required>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Specialty Required</label>
+                    <select class="form-input" name="specialty" required>
+                      <option value="">Select specialty...</option>
+                      <option>General Nursing</option>
+                      <option>ICU / Critical Care Nursing</option>
+                      <option>Emergency Nursing</option>
+                      <option>Paediatric Nursing</option>
+                      <option>Midwifery</option>
+                      <option>General Medicine</option>
+                      <option>General Surgery</option>
+                      <option>Emergency Medicine</option>
+                      <option>Radiology / Radiography</option>
+                      <option>Pharmacy</option>
+                      <option>Physiotherapy</option>
+                      <option>Laboratory Science</option>
+                      <option>Dentistry</option>
+                      <option>Other</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Destination Country</label>
+                    <select class="form-input" name="destination_country" id="dest-country-select" required>
+                      <option value="">Select country...</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-row-3">
+                  <div class="form-group">
+                    <label class="form-label">Min. Experience (years)</label>
+                    <input type="number" class="form-input" name="min_experience" min="0" max="50" placeholder="e.g. 3">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Positions Available</label>
+                    <input type="number" class="form-input" name="positions" min="1" max="500" placeholder="e.g. 15" value="1">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Salary</label>
+                    <input type="text" class="form-input" name="salary_display" placeholder="e.g. SAR 12,000/mo">
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Employer Name</label>
+                    <input type="text" class="form-input" name="employer_name" placeholder="e.g. King Faisal Medical City">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Visa Sponsored</label>
+                    <select class="form-input" name="visa_sponsored">
+                      <option value="false">No</option>
+                      <option value="true">Yes</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Description</label>
+                  <textarea class="form-input" name="description" placeholder="Describe the opportunity, requirements, benefits..."></textarea>
+                </div>
+
+                <div id="form-message" class="profile-message" style="display:none;margin-bottom:var(--space-4);"></div>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary" data-action="draft">Save Draft</button>
+                  <button type="button" class="btn btn-secondary" id="btn-save-match">Save & Run Matching</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ VIEW: Campaign Detail ═══ -->
+        <div class="campaign-view" id="view-detail">
+          <a class="btn-back" id="btn-back-detail">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Back to Campaigns
+          </a>
+
+          <!-- Info Header -->
+          <div class="campaign-info-header">
+            <div class="info-left">
+              <h2 id="detail-title">Campaign Title</h2>
+              <div class="info-tags" id="detail-tags"></div>
+            </div>
+            <div class="info-actions" id="detail-actions"></div>
+          </div>
+
+          <!-- Metrics -->
+          <div class="campaign-metrics" id="detail-metrics">
+            <div class="metric-card" style="--metric-color:var(--secondary)">
+              <div class="metric-value" id="metric-matched">0</div>
+              <div class="metric-label">Matched</div>
+            </div>
+            <div class="metric-card" style="--metric-color:var(--accent-cyan)">
+              <div class="metric-value" id="metric-contacted">0</div>
+              <div class="metric-label">Contacted</div>
+            </div>
+            <div class="metric-card" style="--metric-color:var(--primary)">
+              <div class="metric-value" id="metric-interested">0</div>
+              <div class="metric-label">Interested</div>
+            </div>
+            <div class="metric-card" style="--metric-color:var(--accent-coral)">
+              <div class="metric-value" id="metric-declined">0</div>
+              <div class="metric-label">Declined</div>
+            </div>
+            <div class="metric-card" style="--metric-color:var(--text-tertiary)">
+              <div class="metric-value" id="metric-noresponse">0</div>
+              <div class="metric-label">No Response</div>
+            </div>
+          </div>
+
+          <!-- Matches + Activity -->
+          <div class="dash-grid-3-1">
+            <!-- Match Results Table -->
+            <div class="panel">
+              <div class="panel-header">
+                <span class="panel-title">Match Results</span>
+                <span class="badge badge-info badge-dot" id="match-count-badge">0 matches</span>
+              </div>
+              <div class="panel-body-flush">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Applicant</th>
+                      <th>Specialty</th>
+                      <th>Experience</th>
+                      <th>Match Score</th>
+                      <th>Email</th>
+                      <th>Response</th>
+                    </tr>
+                  </thead>
+                  <tbody id="matches-tbody">
+                    <tr><td colspan="6" class="empty-state"><p>Run matching to find applicants</p></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Activity Log -->
+            <div class="panel">
+              <div class="panel-header">
+                <span class="panel-title">Activity Log</span>
+              </div>
+              <div class="panel-body-flush activity-log-panel" id="activity-log">
+                <div style="padding:var(--space-8);text-align:center;color:var(--text-tertiary);">No activity yet</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth-guard.js"></script>
+  <script src="js/campaign.js"></script>
+</body>
+</html>

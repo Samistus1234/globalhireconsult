@@ -24,6 +24,9 @@
     try {
       await loadDocuments();
     } catch (err) { console.error('Documents load error:', err); }
+    try {
+      await loadOpportunities();
+    } catch (err) { console.error('Opportunities load error:', err); }
   });
 
   // ── Sidebar nav ──
@@ -390,6 +393,95 @@
   async function removeDocument(docId, filePath) {
     await sb.storage.from('gh-applicant-documents').remove([filePath]);
     await ghFrom('documents').delete().eq('id', docId);
+  }
+
+  // ── Opportunities tab ──
+  async function loadOpportunities() {
+    var listEl = document.getElementById('opportunities-list');
+    if (!listEl) return;
+
+    var { data: opps, error } = await ghFrom('my_opportunities')
+      .select('*')
+      .eq('applicant_id', currentUser.id)
+      .order('match_score', { ascending: false });
+
+    // Update badge
+    var badge = document.getElementById('opportunities-badge');
+    var countBadge = document.getElementById('opp-count-badge');
+    var unresponded = opps ? opps.filter(o => !o.response).length : 0;
+
+    if (badge) {
+      badge.textContent = unresponded;
+      badge.style.display = unresponded > 0 ? '' : 'none';
+    }
+    if (countBadge) {
+      countBadge.textContent = (opps?.length || 0) + ' opportunities';
+    }
+
+    if (error || !opps || opps.length === 0) {
+      listEl.innerHTML = '<div style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);"><p>No opportunities yet. When recruiters match your profile, opportunities will appear here.</p></div>';
+      return;
+    }
+
+    listEl.innerHTML = opps.map(function(opp) {
+      var scoreClass = opp.match_score >= 70 ? 'high' : opp.match_score >= 40 ? 'medium' : 'low';
+      var scoreColor = opp.match_score >= 70 ? 'var(--primary)' : opp.match_score >= 40 ? 'var(--accent-amber)' : 'var(--accent-coral)';
+
+      var responseHtml = '';
+      if (opp.response) {
+        var respLabels = { interested: 'Interested', declined: 'Declined', maybe_later: 'Maybe Later' };
+        var respColors = { interested: 'var(--primary)', declined: 'var(--accent-coral)', maybe_later: 'var(--accent-amber)' };
+        responseHtml = '<span class="badge" style="background:' + respColors[opp.response] + '20;color:' + respColors[opp.response] + '">' + (respLabels[opp.response] || opp.response) + '</span>';
+      } else {
+        responseHtml = `
+          <div style="display:flex;gap:var(--space-2);">
+            <button class="btn btn-primary btn-sm btn-opp-respond" data-match="${opp.match_id}" data-response="interested">Interested</button>
+            <button class="btn btn-ghost btn-sm btn-opp-respond" data-match="${opp.match_id}" data-response="declined" style="color:var(--text-tertiary)">Decline</button>
+            <button class="btn btn-ghost btn-sm btn-opp-respond" data-match="${opp.match_id}" data-response="maybe_later" style="color:var(--accent-amber)">Maybe</button>
+          </div>`;
+      }
+
+      return `
+        <div class="application-item" style="margin-bottom:var(--space-4);">
+          <div class="application-header">
+            <div style="display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;background:var(--primary-muted);border:2px solid ${scoreColor};flex-shrink:0;">
+              <span style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:${scoreColor}">${opp.match_score}%</span>
+            </div>
+            <div class="application-info" style="flex:1">
+              <h4>${opp.title || 'Opportunity'}</h4>
+              <span>${opp.employer_name || 'Employer'} &middot; ${opp.destination_country || ''} ${opp.visa_sponsored ? '&middot; Visa Sponsored' : ''}</span>
+            </div>
+            ${opp.salary_display ? '<div class="application-salary">' + opp.salary_display + '</div>' : ''}
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--border-subtle);">
+            <span style="font-size:var(--text-xs);color:var(--text-tertiary);">${opp.positions || ''} positions &middot; ${opp.specialty || ''}</span>
+            ${responseHtml}
+          </div>
+        </div>`;
+    }).join('');
+
+    // Bind response buttons
+    listEl.querySelectorAll('.btn-opp-respond').forEach(function(btn) {
+      btn.addEventListener('click', async function() {
+        var matchId = btn.dataset.match;
+        var response = btn.dataset.response;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>';
+
+        var { error } = await ghFrom('campaign_matches')
+          .update({ response: response, responded_at: new Date().toISOString() })
+          .eq('id', matchId);
+
+        if (error) {
+          alert('Failed to respond: ' + error.message);
+          btn.disabled = false;
+          btn.textContent = btn.dataset.response === 'interested' ? 'Interested' : btn.dataset.response === 'declined' ? 'Decline' : 'Maybe';
+          return;
+        }
+
+        await loadOpportunities();
+      });
+    });
   }
 
   function formatBytes(bytes) {
