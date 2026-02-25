@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Candidates — GlobalHire@eLab</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300e89d'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' font-weight='bold' fill='%23080a0d'>G</text></svg>">
+
+  <style>
+    /* ── Candidates Page Specific ── */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-6);
+    }
+    .filter-bar .search-input {
+      flex: 1;
+      min-width: 220px;
+    }
+    .filter-bar select {
+      padding: var(--space-2) var(--space-4);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      cursor: pointer;
+      transition: border-color var(--duration-base) var(--ease-out);
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238b91a8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+    .filter-bar select:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0,232,157,0.15);
+    }
+    .filter-bar select:hover {
+      border-color: var(--border-strong);
+    }
+
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: var(--space-5) var(--space-4);
+      border-top: 1px solid var(--border-subtle);
+    }
+    .pagination-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      height: 34px;
+      padding: 0 var(--space-2);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--duration-base) var(--ease-out);
+    }
+    .pagination-btn:hover:not(:disabled):not(.active) {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-muted);
+    }
+    .pagination-btn.active {
+      background: var(--primary);
+      color: var(--bg-deep);
+      border-color: var(--primary);
+      font-weight: 700;
+    }
+    .pagination-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+    .pagination-info {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--text-tertiary);
+      margin: 0 var(--space-3);
+    }
+
+    .table td .applicant-detail {
+      font-size: var(--text-xs);
+      color: var(--text-tertiary);
+    }
+
+    .candidates-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+    .candidates-toolbar .filter-bar {
+      flex: 1;
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body data-auth-role="admin">
+  <div class="dashboard-shell">
+
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-logo">
+          <div class="logo-mark">G</div>
+          <span>Global<span class="accent">Hire</span></span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Overview</div>
+        <a class="nav-item" href="dashboard.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </a>
+        <a class="nav-item" href="analytics.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          Analytics
+        </a>
+
+        <div class="nav-section-label">Recruitment</div>
+        <a class="nav-item active" href="candidates.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Candidates
+        </a>
+        <a class="nav-item" href="campaign.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          Campaigns
+        </a>
+        <a class="nav-item" href="campaign.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+          AI Matching
+        </a>
+        <a class="nav-item" href="placements.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Placements
+        </a>
+
+        <div class="nav-section-label">Operations</div>
+        <a class="nav-item" href="verification.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          Verification
+        </a>
+        <a class="nav-item" href="documents.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+          Documents
+        </a>
+        <a class="nav-item" href="messages.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Messages
+        </a>
+
+        <div class="nav-section-label">System</div>
+        <a class="nav-item" href="settings.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="avatar" id="admin-user-avatar" style="background:var(--primary);color:var(--bg-deep)">SO</div>
+          <div class="user-info">
+            <div class="user-name" id="admin-user-name">Samuel Owusu</div>
+            <div class="user-role" id="admin-user-role">Platform Admin</div>
+          </div>
+          <a href="#" id="admin-signout" title="Sign Out" style="display:flex;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===================== MAIN CONTENT ===================== -->
+    <main class="dashboard-main">
+
+      <!-- Header -->
+      <header class="dash-header">
+        <div class="dash-header-left">
+          <button class="btn btn-icon" onclick="document.getElementById('sidebar').classList.toggle('open')" style="display:none;" id="sidebar-toggle">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+          </button>
+          <div>
+            <div class="breadcrumb">GlobalHire <span>/</span> Candidates</div>
+            <h1>Candidate Management</h1>
+          </div>
+        </div>
+        <div class="dash-header-right">
+          <button class="btn btn-ghost btn-sm" id="btn-export">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export
+          </button>
+        </div>
+      </header>
+
+      <!-- Dashboard Content -->
+      <div class="dash-content">
+
+        <!-- Filter Bar -->
+        <div class="candidates-toolbar">
+          <div class="filter-bar">
+            <div class="input-group" style="flex:1;min-width:220px;">
+              <span class="input-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              </span>
+              <input type="text" class="search-input" id="candidates-search" placeholder="Search by name, email, specialty...">
+            </div>
+            <select id="filter-pipeline">
+              <option value="">All Pipeline</option>
+              <option value="applied">Applied</option>
+              <option value="screening">Screening</option>
+              <option value="verifying">Verifying</option>
+              <option value="verified">Verified</option>
+            </select>
+            <select id="filter-availability">
+              <option value="">All Availability</option>
+              <option value="active">Active</option>
+              <option value="paused">Paused</option>
+              <option value="closed">Closed</option>
+            </select>
+            <select id="filter-specialty">
+              <option value="">All Specialties</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+          <!-- KPI 1: Total Candidates -->
+          <div class="kpi-card" style="--kpi-accent: var(--primary)">
+            <div class="kpi-header">
+              <span class="kpi-label">Total Candidates</span>
+              <div class="kpi-icon" style="background:var(--primary-muted);color:var(--primary)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpi-total">0</div>
+            <span class="kpi-change" id="kpi-total-sub" style="color:var(--text-tertiary)">Loading...</span>
+          </div>
+
+          <!-- KPI 2: Active -->
+          <div class="kpi-card" style="--kpi-accent: var(--secondary)">
+            <div class="kpi-header">
+              <span class="kpi-label">Active</span>
+              <div class="kpi-icon" style="background:var(--secondary-muted);color:var(--secondary)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpi-active">0</div>
+            <span class="kpi-change" id="kpi-active-sub" style="color:var(--text-tertiary)">Loading...</span>
+          </div>
+
+          <!-- KPI 3: Paused / Closed -->
+          <div class="kpi-card" style="--kpi-accent: var(--accent-amber)">
+            <div class="kpi-header">
+              <span class="kpi-label">Paused / Closed</span>
+              <div class="kpi-icon" style="background:rgba(255,176,32,0.12);color:var(--accent-amber)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="15" x2="16" y2="15"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpi-paused">0</div>
+            <span class="kpi-change" id="kpi-paused-sub" style="color:var(--text-tertiary)">Loading...</span>
+          </div>
+
+          <!-- KPI 4: Verified -->
+          <div class="kpi-card" style="--kpi-accent: var(--accent-cyan)">
+            <div class="kpi-header">
+              <span class="kpi-label">Verified</span>
+              <div class="kpi-icon" style="background:rgba(0,212,255,0.12);color:var(--accent-cyan)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpi-verified">0</div>
+            <span class="kpi-change" id="kpi-verified-sub" style="color:var(--text-tertiary)">Loading...</span>
+          </div>
+        </div>
+
+        <!-- Full Applicant Table -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">All Candidates</span>
+            <span class="badge badge-neutral" id="results-count">0 results</span>
+          </div>
+          <div class="panel-body-flush">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Candidate</th>
+                  <th>Specialty</th>
+                  <th>Origin</th>
+                  <th>Experience</th>
+                  <th>Docs</th>
+                  <th>Pipeline</th>
+                  <th>Availability</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="candidates-tbody">
+                <tr>
+                  <td colspan="8" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">
+                    <div class="skeleton" style="height:20px;width:60%;margin:0 auto var(--space-3);"></div>
+                    <div class="skeleton" style="height:14px;width:40%;margin:0 auto;"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Pagination -->
+          <div class="pagination" id="pagination-controls"></div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/core.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth-guard.js"></script>
+  <script src="js/candidates.js"></script>
+</body>
+</html>
