@@ -67,6 +67,11 @@
           Saved Jobs
         </a>
 
+        <a class="portal-nav-item" data-tab="tab-settings" style="position:relative;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Account Settings
+        </a>
+
         <div class="nav-section-label">Explore</div>
 
         <a class="portal-nav-item" href="jobs.html" style="position:relative;">
@@ -406,6 +411,56 @@
                   <p>No opportunities yet. When recruiters match your profile, opportunities will appear here.</p>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ TAB: Account Settings ═══ -->
+        <div class="portal-tab" id="tab-settings">
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Availability Status</span>
+              <span class="badge badge-dot" id="settings-status-badge">Loading...</span>
+            </div>
+            <div class="panel-body">
+              <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-5);line-height:1.6;">
+                Control whether recruiters can match you with new opportunities. You can change this at any time.
+              </p>
+
+              <div id="settings-message" style="display:none;padding:var(--space-3);border-radius:var(--radius-md);margin-bottom:var(--space-4);font-size:var(--text-sm);"></div>
+
+              <div style="display:flex;flex-direction:column;gap:var(--space-3);margin-bottom:var(--space-5);">
+                <label class="availability-option" data-status="active" style="display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-4);border:2px solid var(--border-default);border-radius:var(--radius-lg);cursor:pointer;transition:border-color 0.2s;">
+                  <input type="radio" name="availability_status" value="active" style="margin-top:2px;">
+                  <div>
+                    <div style="font-weight:600;color:var(--primary);margin-bottom:2px;">Active</div>
+                    <div style="font-size:var(--text-sm);color:var(--text-tertiary);">I'm looking for opportunities — match me with campaigns</div>
+                  </div>
+                </label>
+
+                <label class="availability-option" data-status="paused" style="display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-4);border:2px solid var(--border-default);border-radius:var(--radius-lg);cursor:pointer;transition:border-color 0.2s;">
+                  <input type="radio" name="availability_status" value="paused" style="margin-top:2px;">
+                  <div>
+                    <div style="font-weight:600;color:var(--accent-amber);margin-bottom:2px;">Paused</div>
+                    <div style="font-size:var(--text-sm);color:var(--text-tertiary);">Not right now, but maybe later — pause outreach temporarily</div>
+                  </div>
+                </label>
+
+                <label class="availability-option" data-status="closed" style="display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-4);border:2px solid var(--border-default);border-radius:var(--radius-lg);cursor:pointer;transition:border-color 0.2s;">
+                  <input type="radio" name="availability_status" value="closed" style="margin-top:2px;">
+                  <div>
+                    <div style="font-weight:600;color:var(--accent-coral);margin-bottom:2px;">Closed</div>
+                    <div style="font-size:var(--text-sm);color:var(--text-tertiary);">I've found a position / no longer interested — stop all outreach</div>
+                  </div>
+                </label>
+              </div>
+
+              <div id="settings-reason-container" style="display:none;margin-bottom:var(--space-4);">
+                <label class="form-label">Reason (optional)</label>
+                <textarea id="settings-reason" class="form-input" rows="2" placeholder="Tell us why you're pausing or closing..." style="width:100%;resize:vertical;"></textarea>
+              </div>
+
+              <button class="btn btn-primary" id="btn-update-availability" style="width:100%;">Update Status</button>
             </div>
           </div>
         </div>

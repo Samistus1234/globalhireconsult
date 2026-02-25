@@ -27,6 +27,9 @@
     try {
       await loadOpportunities();
     } catch (err) { console.error('Opportunities load error:', err); }
+    try {
+      await loadSettings();
+    } catch (err) { console.error('Settings load error:', err); }
   });
 
   // ── Sidebar nav ──
@@ -482,6 +485,128 @@
         await loadOpportunities();
       });
     });
+  }
+
+  // ── Account Settings tab ──
+  async function loadSettings() {
+    var statusBadge = document.getElementById('settings-status-badge');
+    var reasonContainer = document.getElementById('settings-reason-container');
+    var reasonField = document.getElementById('settings-reason');
+
+    var currentStatus = currentProfile.availability_status || 'active';
+    var currentReason = currentProfile.deactivation_reason || '';
+
+    // Set badge
+    var badgeColors = { active: 'badge-primary', paused: 'badge-warning', closed: 'badge-error' };
+    var badgeLabels = { active: 'Active', paused: 'Paused', closed: 'Closed' };
+    if (statusBadge) {
+      statusBadge.className = 'badge badge-dot ' + (badgeColors[currentStatus] || 'badge-primary');
+      statusBadge.textContent = badgeLabels[currentStatus] || 'Active';
+    }
+
+    // Set radio
+    var radio = document.querySelector('input[name="availability_status"][value="' + currentStatus + '"]');
+    if (radio) radio.checked = true;
+
+    // Highlight selected option border
+    updateAvailabilityOptionBorders();
+
+    // Set reason
+    if (reasonField) reasonField.value = currentReason;
+
+    // Show reason field for paused/closed
+    if (reasonContainer) {
+      reasonContainer.style.display = (currentStatus === 'paused' || currentStatus === 'closed') ? '' : 'none';
+    }
+
+    // Bind radio changes
+    document.querySelectorAll('input[name="availability_status"]').forEach(function(r) {
+      r.addEventListener('change', function() {
+        if (reasonContainer) {
+          reasonContainer.style.display = (r.value === 'paused' || r.value === 'closed') ? '' : 'none';
+        }
+        updateAvailabilityOptionBorders();
+      });
+    });
+
+    // Bind update button
+    var btn = document.getElementById('btn-update-availability');
+    if (btn) {
+      btn.addEventListener('click', updateAvailability);
+    }
+  }
+
+  function updateAvailabilityOptionBorders() {
+    var radios = document.querySelectorAll('input[name="availability_status"]');
+    var borderColors = { active: 'var(--primary)', paused: 'var(--accent-amber)', closed: 'var(--accent-coral)' };
+    radios.forEach(function(r) {
+      var label = r.closest('.availability-option');
+      if (label) {
+        label.style.borderColor = r.checked ? (borderColors[r.value] || 'var(--primary)') : 'var(--border-default)';
+      }
+    });
+  }
+
+  async function updateAvailability() {
+    var btn = document.getElementById('btn-update-availability');
+    var msg = document.getElementById('settings-message');
+    var radio = document.querySelector('input[name="availability_status"]:checked');
+    var reason = document.getElementById('settings-reason')?.value?.trim() || null;
+
+    if (!radio) return;
+    var newStatus = radio.value;
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Updating...';
+
+    var updates = {
+      availability_status: newStatus,
+      availability_changed_at: new Date().toISOString()
+    };
+
+    if (newStatus === 'paused' || newStatus === 'closed') {
+      updates.deactivation_reason = reason;
+    } else {
+      updates.deactivation_reason = null;
+    }
+
+    var { error } = await ghFrom('profiles')
+      .update(updates)
+      .eq('id', currentUser.id);
+
+    btn.disabled = false;
+    btn.textContent = 'Update Status';
+
+    if (msg) {
+      if (error) {
+        msg.textContent = 'Failed to update: ' + error.message;
+        msg.style.background = 'rgba(255,92,92,0.1)';
+        msg.style.color = 'var(--accent-coral)';
+      } else {
+        var successMsgs = {
+          active: 'You\'re now active and eligible for new opportunities!',
+          paused: 'Your profile is paused. You won\'t receive new outreach.',
+          closed: 'Your profile is closed. You\'ve been removed from outreach.'
+        };
+        msg.textContent = successMsgs[newStatus] || 'Status updated.';
+        msg.style.background = 'rgba(0,232,157,0.1)';
+        msg.style.color = 'var(--primary)';
+      }
+      msg.style.display = 'block';
+      setTimeout(function() { msg.style.display = 'none'; }, 4000);
+    }
+
+    if (!error) {
+      currentProfile = { ...currentProfile, ...updates };
+      // Update badge
+      var badgeColors = { active: 'badge-primary', paused: 'badge-warning', closed: 'badge-error' };
+      var badgeLabels = { active: 'Active', paused: 'Paused', closed: 'Closed' };
+      var statusBadge = document.getElementById('settings-status-badge');
+      if (statusBadge) {
+        statusBadge.className = 'badge badge-dot ' + (badgeColors[newStatus] || 'badge-primary');
+        statusBadge.textContent = badgeLabels[newStatus] || 'Active';
+      }
+    }
   }
 
   function formatBytes(bytes) {

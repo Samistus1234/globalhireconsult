@@ -78,9 +78,41 @@ Deno.serve(async (req) => {
     }
 
     if (req.method === "POST") {
-      // Submit response (no auth required — token-based)
-      const { token, response, note } = await req.json();
+      const body = await req.json();
+      const { token, action, response, note, status, reason } = body;
 
+      // ── Deactivation flow (opt-out) ──
+      if (action === "deactivate") {
+        if (!token) {
+          return new Response(
+            JSON.stringify({ error: "token is required" }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+          );
+        }
+
+        const { data, error } = await serviceClient.schema("globalhire").rpc("deactivate_via_token", {
+          p_token: token,
+          p_status: status || "closed",
+          p_reason: reason || null,
+        });
+
+        if (error) {
+          return new Response(JSON.stringify({ error: error.message }), {
+            status: 500,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
+        return new Response(JSON.stringify(data), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // ── Standard response flow ──
       if (!token || !response) {
         return new Response(
           JSON.stringify({ error: "token and response are required" }),

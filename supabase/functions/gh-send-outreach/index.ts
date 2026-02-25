@@ -122,6 +122,7 @@ Deno.serve(async (req) => {
 
     let sentCount = 0;
     let failCount = 0;
+    let skipCount = 0;
 
     // Create nodemailer transport (Gmail SMTP)
     const transport = nodemailer.createTransport({
@@ -136,6 +137,21 @@ Deno.serve(async (req) => {
 
     for (const match of matches) {
       try {
+        // Safety guard: check if applicant is still active before sending
+        const { data: profileCheck } = await serviceClient
+          .from("gh_profiles")
+          .select("availability_status")
+          .eq("id", match.applicant_id)
+          .single();
+
+        if (profileCheck?.availability_status !== 'active') {
+          await serviceClient.schema("globalhire").from("campaign_matches")
+            .update({ email_status: "skipped", email_error: `Applicant ${profileCheck?.availability_status || 'unknown'}` })
+            .eq("id", match.id);
+          skipCount++;
+          continue;
+        }
+
         // Mark as sending (write to globalhire schema)
         await serviceClient.schema("globalhire").from("campaign_matches")
           .update({ email_status: "sending" })
@@ -157,6 +173,7 @@ Deno.serve(async (req) => {
         const applicantEmail = authUser.user.email;
         const applicantName = match.full_name || "Healthcare Professional";
         const responseUrl = `${baseUrl}/opportunity.html?token=${match.response_token}`;
+        const unsubscribeUrl = `${baseUrl}/opportunity.html?token=${match.response_token}&action=unsubscribe`;
 
         // Build HTML email
         const htmlBody = buildEmailHtml({
@@ -170,6 +187,7 @@ Deno.serve(async (req) => {
           matchScore: match.match_score,
           description: campaign.description || "",
           responseUrl,
+          unsubscribeUrl,
         });
 
         // Send email via nodemailer
@@ -179,6 +197,10 @@ Deno.serve(async (req) => {
           subject: `New Opportunity: ${campaign.title} — ${campaign.destination_country}`,
           text: `You have been matched with a new opportunity: ${campaign.title}. Visit ${responseUrl} to respond.`,
           html: htmlBody,
+          headers: {
+            'List-Unsubscribe': `<${unsubscribeUrl}>`,
+            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+          },
         });
 
         // Mark as sent (write to globalhire schema)
@@ -209,12 +231,12 @@ Deno.serve(async (req) => {
     await serviceClient.schema("globalhire").from("campaign_activity_log").insert({
       campaign_id,
       event_type: "emails_sent",
-      event_data: { sent: sentCount, failed: failCount },
+      event_data: { sent: sentCount, failed: failCount, skipped: skipCount },
       actor_id: user.id,
     });
 
     return new Response(
-      JSON.stringify({ success: true, sent: sentCount, failed: failCount }),
+      JSON.stringify({ success: true, sent: sentCount, failed: failCount, skipped: skipCount }),
       {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -239,6 +261,7 @@ interface EmailParams {
   matchScore: number;
   description: string;
   responseUrl: string;
+  unsubscribeUrl: string;
 }
 
 function buildEmailHtml(p: EmailParams): string {
@@ -311,6 +334,7 @@ function buildEmailHtml(p: EmailParams): string {
 
   <!-- Footer -->
   <tr><td style="padding:20px 40px;border-top:1px solid #1e2230;text-align:center;">
+    <p style="margin:0 0 8px;font-size:12px;color:#8b91a8;">No longer looking? <a href="${p.unsubscribeUrl}" style="color:#00e89d;text-decoration:underline;">Unsubscribe from future opportunities</a></p>
     <p style="margin:0;font-size:11px;color:#5a5f73;">GlobalHire@eLab &mdash; International Healthcare Recruitment</p>
     <p style="margin:4px 0 0;font-size:11px;color:#5a5f73;">eLab Solutions International LLC</p>
   </td></tr>

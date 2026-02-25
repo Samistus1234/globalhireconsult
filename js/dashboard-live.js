@@ -71,7 +71,7 @@
 
     if (error || !data || data.length === 0) {
       tbody.innerHTML = `
-        <tr><td colspan="6" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">
+        <tr><td colspan="7" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">
           No applicants yet. They will appear here once they sign up.
         </td></tr>`;
       return;
@@ -86,6 +86,20 @@
         verified: { badge: 'badge-primary', label: 'Verified' }
       };
       const st = statusMap[a.pipeline_status] || statusMap.applied;
+
+      // Availability status badge
+      const availStatus = a.availability_status || 'active';
+      const availMap = {
+        active: { badge: 'badge-primary', label: 'Active' },
+        paused: { badge: 'badge-warning', label: 'Paused' },
+        closed: { badge: 'badge-error', label: 'Closed' }
+      };
+      const av = availMap[availStatus] || availMap.active;
+
+      // Show reactivate button for paused/closed
+      const actionHtml = availStatus !== 'active'
+        ? `<button class="btn btn-primary btn-sm btn-reactivate" data-id="${a.id}">Reactivate</button>`
+        : `<button class="btn btn-ghost btn-sm">Review</button>`;
 
       return `
         <tr>
@@ -102,9 +116,33 @@
           <td><span class="tag">${a.country_of_origin || '-'}</span></td>
           <td>${a.total_docs}/4 docs</td>
           <td><span class="badge ${st.badge} badge-dot">${st.label}</span></td>
-          <td><button class="btn btn-ghost btn-sm">Review</button></td>
+          <td><span class="badge ${av.badge} badge-dot">${av.label}</span></td>
+          <td>${actionHtml}</td>
         </tr>`;
     }).join('');
+
+    // Bind reactivate buttons
+    tbody.querySelectorAll('.btn-reactivate').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>';
+        const { error } = await ghFrom('profiles')
+          .update({
+            availability_status: 'active',
+            availability_changed_at: new Date().toISOString(),
+            deactivation_reason: null
+          })
+          .eq('id', btn.dataset.id);
+
+        if (error) {
+          alert('Failed to reactivate: ' + error.message);
+          btn.disabled = false;
+          btn.textContent = 'Reactivate';
+          return;
+        }
+        await loadRecentApplicants();
+      });
+    });
   }
 
   // ── Verification Queue ──
