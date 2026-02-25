@@ -250,6 +250,33 @@
   color: var(--text-primary);
 }
 
+.theme-toggle-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  padding: 0;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.theme-toggle-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
 .notification-btn .notif-dot {
   position: absolute;
   top: 8px;

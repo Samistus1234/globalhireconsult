@@ -193,8 +193,30 @@ const GHE = {
     return `background:${c[0]};color:${c[1]}`;
   },
 
+  // ── Theme Toggle ──
+  initThemeToggle() {
+    const stored = localStorage.getItem('gh-theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = stored || (prefersDark ? 'dark' : 'light');
+    document.documentElement.dataset.theme = theme;
+
+    document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const current = document.documentElement.dataset.theme;
+        const next = current === 'dark' ? 'light' : 'dark';
+
+        document.body.classList.add('theme-transitioning');
+        document.documentElement.dataset.theme = next;
+        localStorage.setItem('gh-theme', next);
+
+        setTimeout(() => document.body.classList.remove('theme-transitioning'), 350);
+      });
+    });
+  },
+
   // ── Initialize all core features ──
   init() {
+    this.initThemeToggle();
     this.initReveal();
     this.animateCounters();
     this.initStickyNav();

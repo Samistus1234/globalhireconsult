@@ -144,3 +144,94 @@
   --sidebar-collapsed: 72px;
   --header-height: 72px;
 }
+
+/* ============================================
+   Light Theme Overrides
+   ============================================ */
+
+[data-theme="light"] {
+  /* ── Color: Backgrounds ── */
+  --bg-void: #f0f1f5;
+  --bg-deep: #f4f5f8;
+  --bg-base: #f8f9fc;
+  --bg-surface: #ffffff;
+  --bg-elevated: #ffffff;
+  --bg-card: #ffffff;
+  --bg-hover: #eef0f5;
+
+  /* ── Color: Primary (Electric Mint) — darkened for contrast on light ── */
+  --primary: #00b87a;
+  --primary-light: #00d48d;
+  --primary-dark: #009964;
+  --primary-muted: rgba(0, 184, 122, 0.12);
+  --primary-glow: 0 0 20px rgba(0, 184, 122, 0.1);
+  --primary-glow-strong: 0 0 40px rgba(0, 184, 122, 0.15);
+
+  /* ── Color: Secondary (Ultraviolet) ── */
+  --secondary: #6a4cdb;
+  --secondary-light: #8570e6;
+  --secondary-dark: #5138b8;
+  --secondary-muted: rgba(106, 76, 219, 0.1);
+  --secondary-glow: 0 0 20px rgba(106, 76, 219, 0.08);
+
+  /* ── Color: Accents ── */
+  --accent-coral: #e84545;
+  --accent-amber: #e69a00;
+  --accent-cyan: #00a8cc;
+  --accent-rose: #e6408f;
+
+  /* ── Color: Semantic ── */
+  --success: #00b87a;
+  --warning: #e69a00;
+  --error: #e84545;
+  --info: #00a8cc;
+
+  /* ── Color: Text ── */
+  --text-primary: #1a1c23;
+  --text-secondary: #4b5068;
+  --text-tertiary: #6b7084;
+  --text-inverse: #f8f9fc;
+
+  /* ── Color: Borders ── */
+  --border-subtle: rgba(0, 0, 0, 0.04);
+  --border-default: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.14);
+  --border-accent: rgba(0, 184, 122, 0.3);
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.12);
+  --shadow-glow-primary: 0 0 40px rgba(0, 184, 122, 0.06), 0 0 80px rgba(0, 184, 122, 0.03);
+  --shadow-glow-secondary: 0 0 40px rgba(106, 76, 219, 0.06);
+
+  /* ── Glass ── */
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-bg-strong: rgba(255, 255, 255, 0.85);
+}
+
+/* ============================================
+   Theme Toggle Icon Visibility
+   ============================================ */
+
+/* Default (dark): show sun, hide moon */
+.theme-icon-moon { display: none; }
+.theme-icon-sun  { display: block; }
+
+[data-theme="light"] .theme-icon-sun  { display: none; }
+[data-theme="light"] .theme-icon-moon { display: block; }
+
+/* ============================================
+   Smooth Theme Transition
+   ============================================ */
+
+body.theme-transitioning,
+body.theme-transitioning *,
+body.theme-transitioning *::before,
+body.theme-transitioning *::after {
+  transition: background-color 0.3s ease,
+              color 0.3s ease,
+              border-color 0.3s ease,
+              box-shadow 0.3s ease !important;
+}
