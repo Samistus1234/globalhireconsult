@@ -207,14 +207,18 @@ $$;
 
 -- ══════════════════════════════════════════════
 -- 5. UPDATE PUBLIC VIEWS — INCLUDE availability_status
+-- Drop and recreate views whose column lists changed
+-- (CREATE OR REPLACE cannot reorder/rename columns)
 -- ══════════════════════════════════════════════
 
--- gh_profiles: include availability_status
-CREATE OR REPLACE VIEW public.gh_profiles AS
+-- gh_profiles: drop + recreate to pick up new columns
+DROP VIEW IF EXISTS public.gh_profiles CASCADE;
+CREATE VIEW public.gh_profiles AS
 SELECT * FROM globalhire.profiles;
 
--- gh_campaign_matches: include availability_status from profile join
-CREATE OR REPLACE VIEW public.gh_campaign_matches AS
+-- gh_campaign_matches: drop + recreate with availability_status
+DROP VIEW IF EXISTS public.gh_campaign_matches CASCADE;
+CREATE VIEW public.gh_campaign_matches AS
 SELECT
   cm.*,
   p.full_name,
@@ -228,20 +232,56 @@ SELECT
 FROM globalhire.campaign_matches cm
 JOIN globalhire.profiles p ON p.id = cm.applicant_id;
 
--- admin_applicant_overview: include availability_status
-CREATE OR REPLACE VIEW public.gh_admin_applicant_overview AS
+-- admin_applicant_overview (globalhire schema): drop + recreate with availability
+DROP VIEW IF EXISTS globalhire.admin_applicant_overview CASCADE;
+CREATE VIEW globalhire.admin_applicant_overview AS
 SELECT
-  p.*,
+  p.id,
+  p.full_name,
+  p.role,
+  p.specialty,
+  p.country_of_origin,
+  p.years_of_experience,
+  p.license_number,
+  p.preferred_destinations,
+  p.profile_completed,
+  p.avatar_initials,
+  p.avatar_color_index,
+  p.phone,
+  p.availability_status,
+  p.availability_changed_at,
+  p.deactivation_reason,
+  p.created_at,
+  p.updated_at,
   u.email,
-  COALESCE(d.total_docs, 0) AS total_docs
+  COALESCE(dc.total_docs, 0) AS total_docs,
+  COALESCE(dc.verified_docs, 0) AS verified_docs,
+  COALESCE(dc.pending_docs, 0) AS pending_docs,
+  CASE
+    WHEN COALESCE(dc.total_docs, 0) = 0 THEN 'applied'
+    WHEN p.profile_completed = FALSE THEN 'screening'
+    WHEN COALESCE(dc.pending_docs, 0) > 0 OR COALESCE(dc.inreview_docs, 0) > 0 THEN 'verifying'
+    WHEN COALESCE(dc.verified_docs, 0) = COALESCE(dc.total_docs, 0) AND dc.total_docs > 0 THEN 'verified'
+    ELSE 'screening'
+  END AS pipeline_status
 FROM globalhire.profiles p
-LEFT JOIN auth.users u ON u.id = p.id
+JOIN auth.users u ON u.id = p.id
 LEFT JOIN (
-  SELECT applicant_id, COUNT(*) AS total_docs
+  SELECT
+    applicant_id,
+    COUNT(*) AS total_docs,
+    COUNT(*) FILTER (WHERE status = 'verified') AS verified_docs,
+    COUNT(*) FILTER (WHERE status = 'pending') AS pending_docs,
+    COUNT(*) FILTER (WHERE status = 'in_review') AS inreview_docs
   FROM globalhire.documents
   GROUP BY applicant_id
-) d ON d.applicant_id = p.id
+) dc ON dc.applicant_id = p.id
 WHERE p.role = 'applicant';
+
+-- gh_admin_applicant_overview (public wrapper): drop + recreate
+DROP VIEW IF EXISTS public.gh_admin_applicant_overview CASCADE;
+CREATE VIEW public.gh_admin_applicant_overview AS
+SELECT * FROM globalhire.admin_applicant_overview;
 
 -- Recreate other views unchanged
 CREATE OR REPLACE VIEW public.gh_campaigns AS
