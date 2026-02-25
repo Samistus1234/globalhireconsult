@@ -12,6 +12,97 @@
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/dashboard.css">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300e89d'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' font-weight='bold' fill='%23080a0d'>G</text></svg>">
+
+  <style>
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-6);
+    }
+    .filter-bar .search-input {
+      flex: 1;
+      min-width: 220px;
+    }
+    .filter-bar select {
+      padding: var(--space-2) var(--space-4);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      cursor: pointer;
+      transition: border-color var(--duration-base) var(--ease-out);
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238b91a8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+    .filter-bar select:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0,232,157,0.15);
+    }
+    .filter-bar select:hover {
+      border-color: var(--border-strong);
+    }
+
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: var(--space-5) var(--space-4);
+      border-top: 1px solid var(--border-subtle);
+    }
+    .pagination-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      height: 34px;
+      padding: 0 var(--space-2);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--duration-base) var(--ease-out);
+    }
+    .pagination-btn:hover:not(:disabled):not(.active) {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-muted);
+    }
+    .pagination-btn.active {
+      background: var(--primary);
+      color: var(--bg-deep);
+      border-color: var(--primary);
+      font-weight: 700;
+    }
+    .pagination-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+    .pagination-info {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--text-tertiary);
+      margin: 0 var(--space-3);
+    }
+
+    .table td .applicant-detail {
+      font-size: var(--text-xs);
+      color: var(--text-tertiary);
+    }
+  </style>
 </head>
 <body data-auth-role="admin">
   <div class="dashboard-shell">
@@ -39,20 +130,119 @@
     <main class="dashboard-main">
       <header class="dash-header"><div class="dash-header-left"><div><div class="breadcrumb">GlobalHire <span>/</span> Messages</div><h1>Communication Hub</h1></div></div></header>
       <div class="dash-content">
-        <!-- Coming Soon -->
-        <div class="panel" style="margin-bottom:var(--space-6);">
-          <div class="panel-body" style="text-align:center;padding:var(--space-12) var(--space-8);">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:var(--space-5);opacity:0.5;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            <h2 style="font-family:var(--font-display);font-weight:700;color:var(--text-primary);margin-bottom:var(--space-3);">Coming Soon</h2>
-            <p style="color:var(--text-secondary);max-width:480px;margin:0 auto;">The messaging center will allow you to communicate directly with applicants and employers. This feature is currently in development.</p>
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card" style="--kpi-accent: var(--primary)">
+            <div class="kpi-header">
+              <span class="kpi-label">Total Sent</span>
+              <div class="kpi-icon" style="background:var(--primary-muted);color:var(--primary)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpi-sent">0</div>
+            <span class="kpi-change" id="kpi-sent-sub" style="color:var(--text-tertiary)">Loading...</span>
+          </div>
+
+          <div class="kpi-card" style="--kpi-accent: var(--accent-coral)">
+            <div class="kpi-header">
+              <span class="kpi-label">Failed / Bounced</span>
+              <div class="kpi-icon" style="background:rgba(255,92,92,0.12);color:var(--accent-coral)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpi-failed">0</div>
+            <span class="kpi-change" id="kpi-failed-sub" style="color:var(--text-tertiary)">Loading...</span>
+          </div>
+
+          <div class="kpi-card" style="--kpi-accent: var(--secondary)">
+            <div class="kpi-header">
+              <span class="kpi-label">Responded</span>
+              <div class="kpi-icon" style="background:var(--secondary-muted);color:var(--secondary)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h8"/><path d="M8 14h4"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpi-responded">0</div>
+            <span class="kpi-change" id="kpi-responded-sub" style="color:var(--text-tertiary)">Loading...</span>
+          </div>
+
+          <div class="kpi-card" style="--kpi-accent: var(--accent-cyan)">
+            <div class="kpi-header">
+              <span class="kpi-label">Response Rate</span>
+              <div class="kpi-icon" style="background:rgba(0,212,255,0.12);color:var(--accent-cyan)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpi-rate">0<span style="font-size:var(--text-xl);color:var(--accent-cyan)">%</span></div>
+            <span class="kpi-change" id="kpi-rate-sub" style="color:var(--text-tertiary)">Loading...</span>
           </div>
         </div>
 
-        <!-- Recent Activity -->
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <div class="input-group" style="flex:1;min-width:220px;">
+            <span class="input-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </span>
+            <input type="text" class="search-input" id="outreach-search" placeholder="Search by applicant name...">
+          </div>
+          <select id="filter-campaign">
+            <option value="">All Campaigns</option>
+          </select>
+          <select id="filter-email-status">
+            <option value="">All Email Status</option>
+            <option value="sent">Sent</option>
+            <option value="failed">Failed</option>
+            <option value="skipped">Skipped</option>
+            <option value="pending">Pending</option>
+          </select>
+          <select id="filter-response">
+            <option value="">All Responses</option>
+            <option value="interested">Interested</option>
+            <option value="declined">Declined</option>
+            <option value="maybe_later">Maybe Later</option>
+            <option value="no_response">No Response</option>
+          </select>
+        </div>
+
+        <!-- Outreach History Table -->
         <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Outreach History</span>
+            <span class="badge badge-neutral" id="results-count">0 results</span>
+          </div>
+          <div class="panel-body-flush">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Applicant</th>
+                  <th>Campaign</th>
+                  <th>Match %</th>
+                  <th>Email Status</th>
+                  <th>Sent</th>
+                  <th>Response</th>
+                  <th>Responded</th>
+                </tr>
+              </thead>
+              <tbody id="outreach-tbody">
+                <tr>
+                  <td colspan="7" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">
+                    <div class="skeleton" style="height:20px;width:60%;margin:0 auto var(--space-3);"></div>
+                    <div class="skeleton" style="height:14px;width:40%;margin:0 auto;"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination" id="pagination-controls"></div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="panel" style="margin-top:var(--space-6);">
           <div class="panel-header"><span class="panel-title">Recent Campaign Activity</span><span class="badge badge-neutral" id="activity-count">Loading...</span></div>
           <div class="panel-body-flush" id="activity-list" style="max-height:500px;overflow-y:auto;"></div>
         </div>
+
       </div>
     </main>
   </div>
