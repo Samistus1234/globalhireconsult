@@ -36,6 +36,7 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    // Read profile from public view
     const { data: profile } = await serviceClient
       .from("gh_profiles")
       .select("role")
@@ -58,8 +59,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Call the PG matching function
-    const { data, error } = await serviceClient.rpc("run_campaign_matching", {
+    // Call the PG matching function (in globalhire schema)
+    const { data, error } = await serviceClient.schema("globalhire").rpc("run_campaign_matching", {
       p_campaign_id: campaign_id,
     });
 

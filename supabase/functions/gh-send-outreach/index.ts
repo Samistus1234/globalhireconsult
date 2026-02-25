@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { SmtpClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
+import nodemailer from "npm:nodemailer@6.9.10";
 import { corsHeaders, handleCors } from "../_shared/cors.ts";
 
 Deno.serve(async (req) => {
@@ -36,6 +36,7 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    // Read profile from public view
     const { data: profile } = await serviceClient
       .from("gh_profiles")
       .select("role")
@@ -57,7 +58,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Get campaign details
+    // Read campaign from public view
     const { data: campaign, error: campError } = await serviceClient
       .from("gh_campaigns")
       .select("*")
@@ -71,7 +72,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Get pending matches
+    // Read pending matches from public view (includes full_name from join)
     const { data: matches, error: matchError } = await serviceClient
       .from("gh_campaign_matches")
       .select("*")
@@ -88,14 +89,14 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Helper: write to globalhire schema directly (bypasses view limitations)
+    const ghWrite = serviceClient.schema("globalhire");
+
     // Update campaign status to sending
-    await serviceClient
-      .from("gh_campaigns")
-      .update({ status: "sending" })
-      .eq("id", campaign_id);
+    await ghWrite.from("campaigns").update({ status: "sending" }).eq("id", campaign_id);
 
     // Log sending start
-    await serviceClient.from("gh_campaign_activity_log").insert({
+    await ghWrite.from("campaign_activity_log").insert({
       campaign_id,
       event_type: "emails_sending",
       event_data: { total: matches.length },
@@ -103,8 +104,8 @@ Deno.serve(async (req) => {
     });
 
     // SMTP config from secrets
-    const smtpUser = Deno.env.get("SMTP_USER") || "support@elabsolution.org";
-    const smtpPass = Deno.env.get("SMTP_PASS");
+    const smtpUser = Deno.env.get("GMAIL_USER") || Deno.env.get("SMTP_USER") || "support@elabsolution.org";
+    const smtpPass = Deno.env.get("GMAIL_APP_PASSWORD") || Deno.env.get("SMTP_PASS");
 
     if (!smtpPass) {
       return new Response(
@@ -122,20 +123,21 @@ Deno.serve(async (req) => {
     let sentCount = 0;
     let failCount = 0;
 
-    // Connect SMTP
-    const client = new SmtpClient();
-    await client.connectTLS({
-      hostname: "smtp.gmail.com",
+    // Create nodemailer transport (Gmail SMTP)
+    const transport = nodemailer.createTransport({
+      host: "smtp.gmail.com",
       port: 465,
-      username: smtpUser,
-      password: smtpPass,
+      secure: true,
+      auth: {
+        user: smtpUser,
+        pass: smtpPass,
+      },
     });
 
     for (const match of matches) {
       try {
-        // Mark as sending
-        await serviceClient
-          .from("gh_campaign_matches")
+        // Mark as sending (write to globalhire schema)
+        await serviceClient.schema("globalhire").from("campaign_matches")
           .update({ email_status: "sending" })
           .eq("id", match.id);
 
@@ -145,8 +147,7 @@ Deno.serve(async (req) => {
         );
 
         if (!authUser?.user?.email) {
-          await serviceClient
-            .from("gh_campaign_matches")
+          await serviceClient.schema("globalhire").from("campaign_matches")
             .update({ email_status: "failed", email_error: "No email found" })
             .eq("id", match.id);
           failCount++;
@@ -171,36 +172,33 @@ Deno.serve(async (req) => {
           responseUrl,
         });
 
-        // Send email
-        await client.send({
-          from: `GlobalHire@eLab <${smtpUser}>`,
+        // Send email via nodemailer
+        await transport.sendMail({
+          from: `"GlobalHire@eLab" <${smtpUser}>`,
           to: applicantEmail,
           subject: `New Opportunity: ${campaign.title} — ${campaign.destination_country}`,
-          content: `You have been matched with a new opportunity: ${campaign.title}. Visit ${responseUrl} to respond.`,
+          text: `You have been matched with a new opportunity: ${campaign.title}. Visit ${responseUrl} to respond.`,
           html: htmlBody,
         });
 
-        // Mark as sent
-        await serviceClient
-          .from("gh_campaign_matches")
+        // Mark as sent (write to globalhire schema)
+        await serviceClient.schema("globalhire").from("campaign_matches")
           .update({ email_status: "sent", email_sent_at: new Date().toISOString() })
           .eq("id", match.id);
 
         sentCount++;
       } catch (emailErr) {
-        await serviceClient
-          .from("gh_campaign_matches")
+        await serviceClient.schema("globalhire").from("campaign_matches")
           .update({ email_status: "failed", email_error: String(emailErr) })
           .eq("id", match.id);
         failCount++;
       }
     }
 
-    await client.close();
+    transport.close();
 
-    // Update campaign counters and status
-    await serviceClient
-      .from("gh_campaigns")
+    // Update campaign counters and status (write to globalhire schema)
+    await serviceClient.schema("globalhire").from("campaigns")
       .update({
         contacted_count: sentCount,
         status: "active",
@@ -208,7 +206,7 @@ Deno.serve(async (req) => {
       .eq("id", campaign_id);
 
     // Log completion
-    await serviceClient.from("gh_campaign_activity_log").insert({
+    await serviceClient.schema("globalhire").from("campaign_activity_log").insert({
       campaign_id,
       event_type: "emails_sent",
       event_data: { sent: sentCount, failed: failCount },

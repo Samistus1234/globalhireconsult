@@ -23,7 +23,7 @@ Deno.serve(async (req) => {
         });
       }
 
-      // Query the match and campaign details
+      // Query match from public view (includes full_name from join)
       const { data: match, error: matchError } = await serviceClient
         .from("gh_campaign_matches")
         .select("id, campaign_id, match_score, match_reasons, response, responded_at, token_expires_at, applicant_id, full_name")
@@ -51,7 +51,7 @@ Deno.serve(async (req) => {
         );
       }
 
-      // Get campaign details
+      // Get campaign details from public view
       const { data: campaign } = await serviceClient
         .from("gh_campaigns")
         .select("title, specialty, destination_country, salary_display, employer_name, visa_sponsored, description, positions")
@@ -91,8 +91,8 @@ Deno.serve(async (req) => {
         );
       }
 
-      // Call the PG function
-      const { data, error } = await serviceClient.rpc("respond_via_token", {
+      // Call the PG function (in globalhire schema)
+      const { data, error } = await serviceClient.schema("globalhire").rpc("respond_via_token", {
         p_token: token,
         p_response: response,
         p_note: note || null,
