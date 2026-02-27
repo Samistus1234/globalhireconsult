@@ -140,9 +140,26 @@
   --container-lg: 1024px;
   --container-xl: 1200px;
   --container-2xl: 1400px;
+  --container-content: 800px;
+  --container-narrow: 640px;
   --sidebar-width: 280px;
   --sidebar-collapsed: 72px;
   --header-height: 72px;
+
+  /* ── Spacing: Extended ── */
+  --space-40: 10rem;
+  --space-48: 12rem;
+
+  /* ── Typography: Display (clamp-based) ── */
+  --display-xl: clamp(3.5rem, 6vw, 6rem);
+  --display-lg: clamp(2.8rem, 5vw, 4.5rem);
+  --display-md: clamp(2.2rem, 4vw, 3.5rem);
+  --display-sm: clamp(1.8rem, 3vw, 2.5rem);
+
+  /* ── Gradients ── */
+  --gradient-primary: linear-gradient(135deg, var(--primary), var(--secondary));
+  --gradient-surface-alt: var(--bg-void);
+  --gradient-divider: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent);
 }
 
 /* ============================================

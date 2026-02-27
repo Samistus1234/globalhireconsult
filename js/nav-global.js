@@ -1,10 +1,12 @@
 /* ============================================
-   GLOBALHIRE@ELAB — Global Navigation v2
-   Handles auth state, dropdowns, mobile menu
+   GLOBALHIRE@ELAB — Global Navigation v3
+   Dropdown groups, auth state, mobile menu
    ============================================ */
 
 (function() {
   'use strict';
+
+  var chevronSVG = '<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>';
 
   /* ── Build Navigation HTML ── */
   function buildGlobalNav(activePage) {
@@ -19,12 +21,77 @@
           '<span class="sub">@eLab</span>' +
         '</a>' +
         '<div class="gnav-links">' +
-          '<a href="explore.html"' + (activePage === 'explore' ? ' class="active"' : '') + '>Explore</a>' +
-          '<a href="jobs.html"' + (activePage === 'careers' ? ' class="active"' : '') + '>Careers</a>' +
-          '<a href="guides.html"' + (activePage === 'guides' ? ' class="active"' : '') + '>Guides</a>' +
-          '<a href="licensing.html"' + (activePage === 'licensing' ? ' class="active"' : '') + '>Licensing</a>' +
-          '<a href="scholarships.html"' + (activePage === 'scholarships' ? ' class="active"' : '') + '>Scholarships</a>' +
-          '<a href="events.html"' + (activePage === 'events' ? ' class="active"' : '') + '>Events</a>' +
+
+          /* For Professionals dropdown */
+          '<div class="gnav-group" data-group="professionals">' +
+            '<button class="gnav-group-trigger">For Professionals ' + chevronSVG + '</button>' +
+            '<div class="gnav-group-menu">' +
+              '<a href="for-candidates.html"' + isActive(activePage, 'for-candidates') + '>' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' +
+                'For Candidates</a>' +
+              '<a href="jobs.html"' + isActive(activePage, 'careers') + '>' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>' +
+                'Browse Careers</a>' +
+              '<a href="explore.html"' + isActive(activePage, 'explore') + '>' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>' +
+                'Explore Countries</a>' +
+              '<a href="licensing.html"' + isActive(activePage, 'licensing') + '>' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="m9 15 2 2 4-4"/></svg>' +
+                'Licensing Pathways</a>' +
+            '</div>' +
+          '</div>' +
+
+          /* For Employers dropdown */
+          '<div class="gnav-group" data-group="employers">' +
+            '<button class="gnav-group-trigger">For Employers ' + chevronSVG + '</button>' +
+            '<div class="gnav-group-menu">' +
+              '<a href="for-employers.html"' + isActive(activePage, 'for-employers') + '>' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M5 20V10l7-7 7 7v10"/><path d="M9 20v-6h6v6"/></svg>' +
+                'For Employers</a>' +
+              '<a href="contact.html"' + isActive(activePage, 'contact') + '>' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/></svg>' +
+                'Post a Role</a>' +
+            '</div>' +
+          '</div>' +
+
+          /* Platform dropdown */
+          '<div class="gnav-group" data-group="platform">' +
+            '<button class="gnav-group-trigger">Platform ' + chevronSVG + '</button>' +
+            '<div class="gnav-group-menu">' +
+              '<a href="platform.html"' + isActive(activePage, 'platform') + '>' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>' +
+                'Platform Overview</a>' +
+              '<a href="guides.html"' + isActive(activePage, 'guides') + '>' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>' +
+                'Resource Guides</a>' +
+              '<a href="events.html"' + isActive(activePage, 'events') + '>' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>' +
+                'Events</a>' +
+              '<a href="compliance.html"' + isActive(activePage, 'compliance') + '>' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>' +
+                'Compliance &amp; Trust</a>' +
+            '</div>' +
+          '</div>' +
+
+          /* About dropdown */
+          '<div class="gnav-group" data-group="about">' +
+            '<button class="gnav-group-trigger">About ' + chevronSVG + '</button>' +
+            '<div class="gnav-group-menu">' +
+              '<a href="about.html"' + isActive(activePage, 'about') + '>' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>' +
+                'About GlobalHire</a>' +
+              '<a href="faq.html"' + isActive(activePage, 'faq') + '>' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>' +
+                'FAQ</a>' +
+              '<a href="contact.html"' + isActive(activePage, 'contact') + '>' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' +
+                'Contact</a>' +
+            '</div>' +
+          '</div>' +
+
+          /* Scholarships — top-level link */
+          '<a href="scholarships.html"' + isActive(activePage, 'scholarships') + '>Scholarships</a>' +
+
         '</div>' +
         '<div class="gnav-actions" id="gnav-actions">' +
           '<!-- Filled by auth state -->' +
@@ -34,6 +101,10 @@
         '</button>' +
       '</div>';
     return nav;
+  }
+
+  function isActive(current, page) {
+    return current === page ? ' class="active"' : '';
   }
 
   /* ── Build Footer HTML ── */
@@ -52,31 +123,31 @@
             '<p>Intelligent healthcare recruitment platform connecting professionals with opportunities across 47 countries. A subsidiary of eLab Solutions International LLC.</p>' +
           '</div>' +
           '<div class="gfooter-col">' +
-            '<h5>Platform</h5>' +
+            '<h5>For Professionals</h5>' +
             '<ul>' +
+              '<li><a href="for-candidates.html">For Candidates</a></li>' +
               '<li><a href="jobs.html">Browse Careers</a></li>' +
-              '<li><a href="licensing.html">Licensing</a></li>' +
+              '<li><a href="explore.html">Explore Countries</a></li>' +
+              '<li><a href="licensing.html">Licensing Pathways</a></li>' +
               '<li><a href="scholarships.html">Scholarships</a></li>' +
-              '<li><a href="guides.html">Resource Guides</a></li>' +
-              '<li><a href="events.html">Events</a></li>' +
             '</ul>' +
           '</div>' +
           '<div class="gfooter-col">' +
-            '<h5>For Talent</h5>' +
+            '<h5>Platform</h5>' +
             '<ul>' +
-              '<li><a href="signup.html">Create Account</a></li>' +
-              '<li><a href="explore.html">Explore</a></li>' +
-              '<li><a href="portal.html">My Portal</a></li>' +
-              '<li><a href="guides.html">Country Guides</a></li>' +
+              '<li><a href="for-employers.html">For Employers</a></li>' +
+              '<li><a href="platform.html">Platform Overview</a></li>' +
+              '<li><a href="guides.html">Resource Guides</a></li>' +
+              '<li><a href="events.html">Events</a></li>' +
+              '<li><a href="compliance.html">Compliance &amp; Trust</a></li>' +
             '</ul>' +
           '</div>' +
           '<div class="gfooter-col">' +
             '<h5>Company</h5>' +
             '<ul>' +
-              '<li><a href="#">About eLab</a></li>' +
-              '<li><a href="#">Partners</a></li>' +
-              '<li><a href="#">Press</a></li>' +
-              '<li><a href="#">Contact</a></li>' +
+              '<li><a href="about.html">About GlobalHire</a></li>' +
+              '<li><a href="faq.html">FAQ</a></li>' +
+              '<li><a href="contact.html">Contact</a></li>' +
             '</ul>' +
           '</div>' +
           '<div class="gfooter-col">' +
@@ -85,7 +156,6 @@
               '<li><a href="#">Privacy Policy</a></li>' +
               '<li><a href="#">Terms of Service</a></li>' +
               '<li><a href="#">Cookie Policy</a></li>' +
-              '<li><a href="#">Compliance</a></li>' +
             '</ul>' +
           '</div>' +
         '</div>' +
@@ -108,12 +178,25 @@
     menu.id = 'gnav-mobile-menu';
     menu.innerHTML =
       '<div class="mobile-links">' +
-        '<a href="explore.html"' + (activePage === 'explore' ? ' class="active"' : '') + '>Explore</a>' +
-        '<a href="jobs.html"' + (activePage === 'careers' ? ' class="active"' : '') + '>Careers</a>' +
-        '<a href="guides.html"' + (activePage === 'guides' ? ' class="active"' : '') + '>Guides</a>' +
-        '<a href="licensing.html"' + (activePage === 'licensing' ? ' class="active"' : '') + '>Licensing</a>' +
-        '<a href="scholarships.html"' + (activePage === 'scholarships' ? ' class="active"' : '') + '>Scholarships</a>' +
-        '<a href="events.html"' + (activePage === 'events' ? ' class="active"' : '') + '>Events</a>' +
+        '<div class="mobile-group-title">For Professionals</div>' +
+        '<a href="for-candidates.html"' + isActive(activePage, 'for-candidates') + '>For Candidates</a>' +
+        '<a href="jobs.html"' + isActive(activePage, 'careers') + '>Browse Careers</a>' +
+        '<a href="explore.html"' + isActive(activePage, 'explore') + '>Explore Countries</a>' +
+        '<a href="licensing.html"' + isActive(activePage, 'licensing') + '>Licensing Pathways</a>' +
+        '<div class="mobile-group-title">For Employers</div>' +
+        '<a href="for-employers.html"' + isActive(activePage, 'for-employers') + '>For Employers</a>' +
+        '<a href="contact.html"' + isActive(activePage, 'contact') + '>Post a Role</a>' +
+        '<div class="mobile-group-title">Platform</div>' +
+        '<a href="platform.html"' + isActive(activePage, 'platform') + '>Platform Overview</a>' +
+        '<a href="guides.html"' + isActive(activePage, 'guides') + '>Resource Guides</a>' +
+        '<a href="events.html"' + isActive(activePage, 'events') + '>Events</a>' +
+        '<a href="compliance.html"' + isActive(activePage, 'compliance') + '>Compliance &amp; Trust</a>' +
+        '<div class="mobile-group-title">About</div>' +
+        '<a href="about.html"' + isActive(activePage, 'about') + '>About GlobalHire</a>' +
+        '<a href="faq.html"' + isActive(activePage, 'faq') + '>FAQ</a>' +
+        '<a href="contact.html"' + isActive(activePage, 'contact') + '>Contact</a>' +
+        '<div class="mobile-group-title">&nbsp;</div>' +
+        '<a href="scholarships.html"' + isActive(activePage, 'scholarships') + '>Scholarships</a>' +
       '</div>' +
       '<div class="mobile-actions">' +
         (isLoggedIn ?
@@ -186,18 +269,20 @@
       });
       nav.classList.toggle('scrolled', window.scrollY > 50);
 
+      // Bind dropdown groups
+      bindNavGroups();
+
       // Check auth state
       var actionsEl = document.getElementById('gnav-actions');
       if (window.ghSupabase) {
         window.ghSupabase.auth.getSession().then(function(result) {
           var session = result.data.session;
           if (session) {
-            // Get profile
             var userName = session.user.user_metadata && session.user.user_metadata.full_name || session.user.email.split('@')[0];
             var userEmail = session.user.email;
             setNavActions(actionsEl, true, userName, userEmail);
             setupMobileMenu(activePage, true);
-            bindDropdown();
+            bindUserDropdown();
             bindSignout();
           } else {
             setNavActions(actionsEl, false);
@@ -224,6 +309,38 @@
     }
   };
 
+  /* ── Bind Nav Group Dropdowns ── */
+  function bindNavGroups() {
+    var groups = document.querySelectorAll('.gnav-group');
+    groups.forEach(function(group) {
+      var trigger = group.querySelector('.gnav-group-trigger');
+      if (!trigger) return;
+
+      trigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var wasOpen = group.classList.contains('open');
+
+        // Close all groups first
+        groups.forEach(function(g) { g.classList.remove('open'); });
+
+        // Toggle clicked group
+        if (!wasOpen) group.classList.add('open');
+      });
+    });
+
+    // Close on outside click
+    document.addEventListener('click', function() {
+      groups.forEach(function(g) { g.classList.remove('open'); });
+    });
+
+    // Prevent closing when clicking inside menu
+    document.querySelectorAll('.gnav-group-menu').forEach(function(menu) {
+      menu.addEventListener('click', function(e) {
+        // Let link clicks propagate normally
+      });
+    });
+  }
+
   function setupMobileMenu(activePage, isLoggedIn) {
     var existing = document.getElementById('gnav-mobile-menu');
     if (existing) existing.remove();
@@ -245,7 +362,7 @@
     }
   }
 
-  function bindDropdown() {
+  function bindUserDropdown() {
     var userEl = document.getElementById('gnav-user');
     var dropdown = document.getElementById('gnav-dropdown');
     if (!userEl || !dropdown) return;

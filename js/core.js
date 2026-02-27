@@ -89,8 +89,8 @@ const GHE = {
     const ctx = canvas.getContext('2d');
     let animId;
     const nodes = [];
-    const nodeCount = 60;
-    const connectionDistance = 180;
+    const nodeCount = 40;
+    const connectionDistance = 160;
 
     function resize() {
       canvas.width = canvas.parentElement.clientWidth;
