@@ -1231,6 +1231,422 @@
 .standing-badge.standing-suspended { background: rgba(255,92,92,0.15); color: var(--error); }
 .standing-badge.standing-not_found { background: var(--bg-elevated); color: var(--text-tertiary); }
 
+/* ── Placement Pipeline Bar ── */
+.placement-pipeline {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-6);
+}
+
+.placement-pipeline .pipeline-tile {
+  text-align: center;
+  padding: var(--space-3) var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+}
+
+.placement-pipeline .pipeline-tile:hover,
+.placement-pipeline .pipeline-tile.active {
+  border-color: var(--primary);
+  background: var(--primary-muted);
+}
+
+.placement-pipeline .pipeline-tile .tile-count {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+  margin-bottom: var(--space-1);
+}
+
+.placement-pipeline .pipeline-tile .tile-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--text-tertiary);
+}
+
+/* ── Placement Info Grid ── */
+.placement-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.placement-info-grid .info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.placement-info-grid .info-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--text-tertiary);
+}
+
+.placement-info-grid .info-value {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* ── Visa Status Tracker ── */
+.visa-tracker {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: var(--space-4) 0;
+  margin-bottom: var(--space-5);
+}
+
+.visa-tracker .visa-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+.visa-tracker .visa-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  border: 2px solid var(--border-default);
+  transition: all var(--duration-fast);
+}
+
+.visa-tracker .visa-step.completed .visa-dot {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.visa-tracker .visa-step.active .visa-dot {
+  background: var(--accent-amber);
+  border-color: var(--accent-amber);
+  box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.2);
+}
+
+.visa-tracker .visa-step.denied .visa-dot {
+  background: var(--error);
+  border-color: var(--error);
+}
+
+.visa-tracker .visa-step-label {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+  text-align: center;
+  max-width: 80px;
+}
+
+.visa-tracker .visa-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border-subtle);
+  min-width: 20px;
+  margin-bottom: var(--space-4);
+}
+
+.visa-tracker .visa-line.completed {
+  background: var(--primary);
+}
+
+/* ── Onboarding Checklist ── */
+.onboarding-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.onboarding-category {
+  margin-bottom: var(--space-4);
+}
+
+.onboarding-category-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-2);
+  padding-bottom: var(--space-1);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.onboarding-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  transition: background var(--duration-fast);
+  cursor: pointer;
+}
+
+.onboarding-item:hover {
+  background: var(--bg-elevated);
+}
+
+.onboarding-item .check-toggle {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--duration-fast);
+  cursor: pointer;
+  background: none;
+  padding: 0;
+}
+
+.onboarding-item.completed .check-toggle {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.onboarding-item .item-text {
+  flex: 1;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.onboarding-item.completed .item-text {
+  text-decoration: line-through;
+  color: var(--text-tertiary);
+}
+
+.onboarding-item .item-due {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+/* ── Contract File List ── */
+.contract-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.contract-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  transition: border-color var(--duration-fast);
+}
+
+.contract-item:hover {
+  border-color: var(--border-default);
+}
+
+.contract-item .contract-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--primary-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--primary);
+}
+
+.contract-item .contract-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.contract-item .contract-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.contract-item .contract-name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.contract-item .contract-meta {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}
+
+/* ── Stage Badges ── */
+.stage-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.stage-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.stage-badge.stage-offer_extended  { background: rgba(139,92,246,0.12); color: #8b5cf6; }
+.stage-badge.stage-offer_extended::before { background: #8b5cf6; }
+
+.stage-badge.stage-offer_accepted  { background: rgba(59,130,246,0.12); color: #3b82f6; }
+.stage-badge.stage-offer_accepted::before { background: #3b82f6; }
+
+.stage-badge.stage-visa_processing { background: rgba(255,176,32,0.12); color: var(--accent-amber); }
+.stage-badge.stage-visa_processing::before { background: var(--accent-amber); }
+
+.stage-badge.stage-contract        { background: rgba(6,182,212,0.12); color: #06b6d4; }
+.stage-badge.stage-contract::before { background: #06b6d4; }
+
+.stage-badge.stage-onboarding      { background: rgba(249,115,22,0.12); color: #f97316; }
+.stage-badge.stage-onboarding::before { background: #f97316; }
+
+.stage-badge.stage-active          { background: rgba(0,232,157,0.12); color: var(--primary); }
+.stage-badge.stage-active::before  { background: var(--primary); }
+
+.stage-badge.stage-completed       { background: rgba(34,197,94,0.12); color: #22c55e; }
+.stage-badge.stage-completed::before { background: #22c55e; }
+
+.stage-badge.stage-terminated      { background: rgba(255,92,92,0.12); color: var(--error); }
+.stage-badge.stage-terminated::before { background: var(--error); }
+
+/* ── Contract Upload Dropzone ── */
+.contract-dropzone {
+  border: 2px dashed var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  text-align: center;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  margin-top: var(--space-3);
+}
+
+.contract-dropzone:hover,
+.contract-dropzone.dragover {
+  border-color: var(--primary);
+  background: var(--primary-muted);
+  color: var(--primary);
+}
+
+.contract-dropzone svg {
+  width: 24px;
+  height: 24px;
+  margin-bottom: var(--space-2);
+}
+
+.contract-dropzone p {
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-1);
+}
+
+.contract-dropzone .link {
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.contract-dropzone .hint {
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+}
+
+/* ── Filter Bar ── */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+.filter-bar .filter-input {
+  flex: 1;
+  min-width: 200px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+}
+
+.filter-bar .filter-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.filter-bar select {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+}
+
+/* ── Placement Pipeline Responsive ── */
+@media (max-width: 1280px) {
+  .placement-pipeline {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .placement-pipeline {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .placement-info-grid {
+    grid-template-columns: 1fr;
+  }
+  .visa-tracker {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .filter-bar .filter-input {
+    min-width: auto;
+  }
+}
+
 /* ── Responsive adjustments for modal ── */
 @media (max-width: 768px) {
   .doc-modal {

@@ -25,6 +25,9 @@
       await loadDocuments();
     } catch (err) { console.error('Documents load error:', err); }
     try {
+      await loadMyPlacements();
+    } catch (err) { console.error('Placements load error:', err); }
+    try {
       await loadOpportunities();
     } catch (err) { console.error('Opportunities load error:', err); }
     try {
@@ -398,6 +401,145 @@
     await ghFrom('documents').delete().eq('id', docId);
   }
 
+  // ── My Placements (loaded before opportunities) ──
+  window._myPlacements = {};
+  window._myChecklist = {};
+
+  async function loadMyPlacements() {
+    var { data: placements } = await ghFrom('gh_my_placements')
+      .select('*')
+      .eq('applicant_id', currentUser.id);
+
+    if (placements) {
+      placements.forEach(function(p) {
+        if (p.match_id) window._myPlacements[p.match_id] = p;
+      });
+    }
+
+    // Load checklist items for active/onboarding placements
+    var activePlacements = (placements || []).filter(function(p) {
+      return p.stage === 'onboarding' || p.stage === 'active';
+    });
+
+    if (activePlacements.length > 0) {
+      var ids = activePlacements.map(function(p) { return p.id; });
+      var { data: checklist } = await ghFrom('gh_placement_checklist')
+        .select('*')
+        .in('placement_id', ids)
+        .order('sort_order', { ascending: true });
+
+      if (checklist) {
+        checklist.forEach(function(item) {
+          if (!window._myChecklist[item.placement_id]) window._myChecklist[item.placement_id] = [];
+          window._myChecklist[item.placement_id].push(item);
+        });
+      }
+    }
+
+    // Render active placement banner
+    renderActivePlacementBanner(placements || []);
+  }
+
+  function renderActivePlacementBanner(placements) {
+    var banner = document.getElementById('active-placement-banner');
+    if (!banner) return;
+
+    var activePlacement = placements.find(function(p) {
+      return ['offer_extended','offer_accepted','visa_processing','contract','onboarding','active'].indexOf(p.stage) >= 0;
+    });
+
+    if (!activePlacement) {
+      banner.style.display = 'none';
+      return;
+    }
+
+    var p = activePlacement;
+    banner.style.display = '';
+    banner.innerHTML = '<div class="panel" style="margin-bottom:var(--space-5);border-color:var(--primary);border-width:2px;">' +
+      '<div class="panel-header" style="background:var(--primary-muted);">' +
+        '<span class="panel-title" style="color:var(--primary);">Active Placement</span>' +
+        '<span class="stage-badge stage-' + p.stage + '">' + getStageLabel(p.stage) + '</span>' +
+      '</div>' +
+      '<div class="panel-body">' +
+        '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-4);">' +
+          '<div><strong>' + (p.position_title || p.campaign_title || 'Placement') + '</strong>' +
+          '<div style="font-size:var(--text-sm);color:var(--text-tertiary);">' + (p.employer_name ? p.employer_name + ' &middot; ' : '') + (p.destination_country || '') + '</div></div>' +
+          (p.salary_display ? '<div style="margin-left:auto;font-family:var(--font-display);font-weight:700;color:var(--primary);">' + p.salary_display + '</div>' : '') +
+        '</div>' +
+        renderPlacementStatus(p) +
+      '</div>' +
+    '</div>';
+  }
+
+  function renderPlacementStatus(placement) {
+    var p = placement;
+    var stages = ['offer_extended','offer_accepted','visa_processing','contract','onboarding','active'];
+    var stageLabels = ['Offer','Visa','Contract','Onboarding','Active','Complete'];
+    var simplifiedMap = { offer_extended: 0, offer_accepted: 0, visa_processing: 1, contract: 2, onboarding: 3, active: 4, completed: 5 };
+    var currentIdx = simplifiedMap[p.stage] !== undefined ? simplifiedMap[p.stage] : -1;
+
+    var pipelineHtml = '<div style="display:flex;align-items:center;gap:0;margin-bottom:var(--space-3);">';
+    stageLabels.forEach(function(label, i) {
+      var cls = i < currentIdx ? 'completed' : i === currentIdx ? 'active' : '';
+      pipelineHtml += '<div class="app-step ' + cls + '"><div class="app-dot"></div><span>' + label + '</span></div>';
+      if (i < stageLabels.length - 1) {
+        var lineCls = i < currentIdx ? 'completed' : i === currentIdx ? 'active' : '';
+        pipelineHtml += '<div class="app-line ' + lineCls + '"></div>';
+      }
+    });
+    pipelineHtml += '</div>';
+
+    // Status labels
+    var statusHtml = '<div style="display:flex;gap:var(--space-4);flex-wrap:wrap;font-size:var(--text-xs);color:var(--text-tertiary);">';
+    if (p.visa_status && p.visa_status !== 'not_started') {
+      var visaColor = p.visa_status === 'approved' ? 'var(--primary)' : p.visa_status === 'denied' ? 'var(--error)' : 'var(--accent-amber)';
+      statusHtml += '<span>Visa: <strong style="color:' + visaColor + '">' + getVisaLabel(p.visa_status) + '</strong></span>';
+    }
+    if (p.contract_status && p.contract_status !== 'not_started') {
+      statusHtml += '<span>Contract: <strong>' + getContractLabel(p.contract_status) + '</strong></span>';
+    }
+    if (p.start_date) {
+      statusHtml += '<span>Start: <strong>' + new Date(p.start_date).toLocaleDateString() + '</strong></span>';
+    }
+    statusHtml += '</div>';
+
+    // Onboarding progress bar
+    var checklistHtml = '';
+    if (p.stage === 'onboarding') {
+      var items = window._myChecklist[p.id] || [];
+      if (items.length > 0) {
+        var done = items.filter(function(i) { return i.is_completed; }).length;
+        var pct = Math.round((done / items.length) * 100);
+        checklistHtml = '<div style="margin-top:var(--space-3);">' +
+          '<div style="display:flex;justify-content:space-between;font-size:var(--text-xs);margin-bottom:4px;">' +
+            '<span style="color:var(--text-tertiary);">Onboarding Progress</span>' +
+            '<span style="color:var(--primary);font-weight:600;">' + pct + '%</span>' +
+          '</div>' +
+          '<div style="height:6px;background:var(--bg-elevated);border-radius:3px;overflow:hidden;">' +
+            '<div style="height:100%;width:' + pct + '%;background:var(--primary);border-radius:3px;transition:width 0.3s;"></div>' +
+          '</div>' +
+        '</div>';
+      }
+    }
+
+    return pipelineHtml + statusHtml + checklistHtml;
+  }
+
+  function getStageLabel(s) {
+    var labels = { offer_extended:'Offer Extended', offer_accepted:'Offer Accepted', visa_processing:'Visa Processing', contract:'Contract', onboarding:'Onboarding', active:'Active', completed:'Completed', terminated:'Terminated' };
+    return labels[s] || s;
+  }
+
+  function getVisaLabel(s) {
+    var labels = { not_started:'Not Started', documents_submitted:'Docs Submitted', in_review:'In Review', approved:'Approved', denied:'Denied', not_required:'Not Required' };
+    return labels[s] || s;
+  }
+
+  function getContractLabel(s) {
+    var labels = { not_started:'Not Started', draft:'Draft', sent:'Sent', signed:'Signed', countersigned:'Countersigned' };
+    return labels[s] || s;
+  }
+
   // ── Opportunities tab ──
   async function loadOpportunities() {
     var listEl = document.getElementById('opportunities-list');
@@ -431,10 +573,18 @@
       var scoreColor = opp.match_score >= 70 ? 'var(--primary)' : opp.match_score >= 40 ? 'var(--accent-amber)' : 'var(--accent-coral)';
 
       var responseHtml = '';
+      var placementHtml = '';
       if (opp.response) {
-        var respLabels = { interested: 'Interested', declined: 'Declined', maybe_later: 'Maybe Later' };
-        var respColors = { interested: 'var(--primary)', declined: 'var(--accent-coral)', maybe_later: 'var(--accent-amber)' };
-        responseHtml = '<span class="badge" style="background:' + respColors[opp.response] + '20;color:' + respColors[opp.response] + '">' + (respLabels[opp.response] || opp.response) + '</span>';
+        // Check if there's a placement for this match
+        var matchPlacement = window._myPlacements[opp.match_id];
+        if (matchPlacement && opp.response === 'interested') {
+          responseHtml = '<span class="stage-badge stage-' + matchPlacement.stage + '">' + getStageLabel(matchPlacement.stage) + '</span>';
+          placementHtml = '<div style="margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--border-subtle);">' + renderPlacementStatus(matchPlacement) + '</div>';
+        } else {
+          var respLabels = { interested: 'Interested', declined: 'Declined', maybe_later: 'Maybe Later' };
+          var respColors = { interested: 'var(--primary)', declined: 'var(--accent-coral)', maybe_later: 'var(--accent-amber)' };
+          responseHtml = '<span class="badge" style="background:' + respColors[opp.response] + '20;color:' + respColors[opp.response] + '">' + (respLabels[opp.response] || opp.response) + '</span>';
+        }
       } else {
         responseHtml = `
           <div style="display:flex;gap:var(--space-2);">
@@ -460,6 +610,7 @@
             <span style="font-size:var(--text-xs);color:var(--text-tertiary);">${opp.positions || ''} positions &middot; ${opp.specialty || ''}</span>
             ${responseHtml}
           </div>
+          ${placementHtml}
         </div>`;
     }).join('');
 

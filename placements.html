@@ -37,26 +37,214 @@
     </aside>
 
     <main class="dashboard-main">
-      <header class="dash-header"><div class="dash-header-left"><div><div class="breadcrumb">GlobalHire <span>/</span> Placements</div><h1>Placement Tracking</h1></div></div><div class="dash-header-right"><button class="theme-toggle-btn" title="Toggle theme"><svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg><svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button></div></header>
+      <header class="dash-header"><div class="dash-header-left"><div><div class="breadcrumb">GlobalHire <span>/</span> Placements</div><h1>Global Placements</h1></div></div><div class="dash-header-right"><button class="theme-toggle-btn" title="Toggle theme"><svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg><svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button></div></header>
+
       <div class="dash-content">
+        <!-- KPI Cards -->
         <div class="kpi-grid">
-          <div class="kpi-card" style="--kpi-accent:var(--primary)"><div class="kpi-header"><span class="kpi-label">Interested</span></div><div class="kpi-value" id="kpi-interested">0</div><span class="kpi-change" style="color:var(--text-tertiary)">Responded positively</span></div>
-          <div class="kpi-card" style="--kpi-accent:var(--accent-amber)"><div class="kpi-header"><span class="kpi-label">Pending Placement</span></div><div class="kpi-value" id="kpi-pending">0</div><span class="kpi-change" style="color:var(--text-tertiary)">Awaiting next step</span></div>
-          <div class="kpi-card" style="--kpi-accent:var(--secondary)"><div class="kpi-header"><span class="kpi-label">Maybe Later</span></div><div class="kpi-value" id="kpi-maybe">0</div><span class="kpi-change" style="color:var(--text-tertiary)">Potential follow-up</span></div>
-          <div class="kpi-card" style="--kpi-accent:var(--accent-cyan)"><div class="kpi-header"><span class="kpi-label">Not Interested</span></div><div class="kpi-value" id="kpi-declined">0</div><span class="kpi-change" style="color:var(--text-tertiary)">Declined opportunity</span></div>
+          <div class="kpi-card" style="--kpi-accent:var(--primary)"><div class="kpi-header"><span class="kpi-label">Active Placements</span></div><div class="kpi-value" id="kpi-active">0</div><span class="kpi-change" style="color:var(--text-tertiary)">Currently placed</span></div>
+          <div class="kpi-card" style="--kpi-accent:var(--secondary)"><div class="kpi-header"><span class="kpi-label">In Pipeline</span></div><div class="kpi-value" id="kpi-pipeline">0</div><span class="kpi-change" style="color:var(--text-tertiary)">Processing stages</span></div>
+          <div class="kpi-card" style="--kpi-accent:var(--accent-amber)"><div class="kpi-header"><span class="kpi-label">Visa Processing</span></div><div class="kpi-value" id="kpi-visa">0</div><span class="kpi-change" style="color:var(--text-tertiary)">Awaiting visa</span></div>
+          <div class="kpi-card" style="--kpi-accent:var(--accent-cyan)"><div class="kpi-header"><span class="kpi-label">Completed</span></div><div class="kpi-value" id="kpi-completed">0</div><span class="kpi-change" style="color:var(--text-tertiary)">Successfully placed</span></div>
         </div>
 
-        <div class="panel">
-          <div class="panel-header"><span class="panel-title">Applicant Responses</span><span class="badge badge-neutral" id="placement-count">Loading...</span></div>
+        <!-- Pipeline Bar -->
+        <div class="panel" style="margin-bottom:var(--space-6);">
+          <div class="panel-header"><span class="panel-title">Placement Pipeline</span></div>
+          <div class="placement-pipeline" id="pipeline-bar">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+
+        <!-- Placements Table -->
+        <div class="panel" style="margin-bottom:var(--space-6);">
+          <div class="panel-header"><span class="panel-title">All Placements</span><span class="badge badge-neutral" id="placements-count">0</span></div>
+          <div class="filter-bar">
+            <input type="text" class="filter-input" id="filter-search" placeholder="Search applicant, campaign, country...">
+            <select id="filter-stage">
+              <option value="">All Stages</option>
+              <option value="offer_extended">Offer Extended</option>
+              <option value="offer_accepted">Offer Accepted</option>
+              <option value="visa_processing">Visa Processing</option>
+              <option value="contract">Contract</option>
+              <option value="onboarding">Onboarding</option>
+              <option value="active">Active</option>
+              <option value="completed">Completed</option>
+              <option value="terminated">Terminated</option>
+            </select>
+            <select id="filter-country">
+              <option value="">All Countries</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" id="filter-reset">Reset</button>
+          </div>
           <div class="panel-body-flush">
             <table class="table">
-              <thead><tr><th>Applicant</th><th>Campaign</th><th>Score</th><th>Response</th><th>Responded</th></tr></thead>
-              <tbody id="placement-tbody"><tr><td colspan="5" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">Loading...</td></tr></tbody>
+              <thead><tr><th>Applicant</th><th>Campaign</th><th>Destination</th><th>Stage</th><th>Visa</th><th>Contract</th><th>Start Date</th><th>Actions</th></tr></thead>
+              <tbody id="placements-tbody"><tr><td colspan="8" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Interested Responses Table -->
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Interested Responses</span><span class="badge badge-primary badge-dot" id="interested-count">0 unplaced</span></div>
+          <div class="panel-body-flush">
+            <table class="table">
+              <thead><tr><th>Applicant</th><th>Campaign</th><th>Country</th><th>Score</th><th>Responded</th><th>Action</th></tr></thead>
+              <tbody id="interested-tbody"><tr><td colspan="6" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">Loading...</td></tr></tbody>
             </table>
           </div>
         </div>
       </div>
     </main>
+  </div>
+
+  <!-- Placement Detail Modal -->
+  <div class="doc-modal-overlay" id="placement-modal-overlay">
+    <div class="doc-modal" style="max-width:1020px;">
+      <div class="doc-modal-header">
+        <h2 id="modal-title">Placement Details</h2>
+        <button class="doc-modal-close" id="modal-close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      </div>
+
+      <div class="modal-tabs" style="padding:0 var(--space-6);">
+        <button class="modal-tab active" data-tab="tab-overview">Overview</button>
+        <button class="modal-tab" data-tab="tab-visa">Visa & Immigration</button>
+        <button class="modal-tab" data-tab="tab-contract">Contracts</button>
+        <button class="modal-tab" data-tab="tab-onboarding">Onboarding</button>
+        <button class="modal-tab" data-tab="tab-activity">Activity Log</button>
+      </div>
+
+      <div class="doc-modal-body">
+        <!-- Overview Tab -->
+        <div class="tab-content active" id="tab-overview">
+          <div class="placement-info-grid" id="overview-grid">
+            <!-- Filled by JS -->
+          </div>
+          <div style="margin-top:var(--space-5);">
+            <label class="form-label" style="font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-tertiary);font-weight:600;">Current Stage</label>
+            <div style="margin-top:var(--space-2);" id="overview-stage-badge"></div>
+          </div>
+        </div>
+
+        <!-- Visa Tab -->
+        <div class="tab-content" id="tab-visa">
+          <div class="visa-tracker" id="visa-tracker">
+            <!-- Filled by JS -->
+          </div>
+          <form id="visa-form" class="registry-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Visa Status</label>
+                <select id="visa-status-select">
+                  <option value="not_started">Not Started</option>
+                  <option value="documents_submitted">Documents Submitted</option>
+                  <option value="in_review">In Review</option>
+                  <option value="approved">Approved</option>
+                  <option value="denied">Denied</option>
+                  <option value="not_required">Not Required</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Visa Type</label>
+                <input type="text" id="visa-type-input" placeholder="e.g. Work Visa, H-1B">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Application Date</label>
+                <input type="date" id="visa-app-date">
+              </div>
+              <div class="form-group">
+                <label>Approval Date</label>
+                <input type="date" id="visa-approval-date">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Visa Notes</label>
+              <textarea id="visa-notes" rows="3" placeholder="Additional visa information..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="align-self:flex-start;">Save Visa Info</button>
+          </form>
+        </div>
+
+        <!-- Contract Tab -->
+        <div class="tab-content" id="tab-contract">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);">
+            <div>
+              <label class="form-label" style="font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-tertiary);font-weight:600;">Contract Status</label>
+              <div style="margin-top:var(--space-1);" id="contract-status-display"></div>
+            </div>
+            <select id="contract-status-select" style="padding:var(--space-2) var(--space-3);border:1px solid var(--border-default);border-radius:var(--radius-md);background:var(--bg-base);color:var(--text-primary);font-size:var(--text-sm);">
+              <option value="not_started">Not Started</option>
+              <option value="draft">Draft</option>
+              <option value="sent">Sent</option>
+              <option value="signed">Signed</option>
+              <option value="countersigned">Countersigned</option>
+            </select>
+          </div>
+          <div class="contract-list" id="contract-list">
+            <!-- Filled by JS -->
+          </div>
+          <div class="contract-dropzone" id="contract-dropzone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p>Drop contract file or <span class="link">browse</span></p>
+            <span class="hint">PDF, DOC, DOCX, JPEG, PNG up to 20MB</span>
+          </div>
+          <input type="file" id="contract-file-input" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" hidden>
+        </div>
+
+        <!-- Onboarding Tab -->
+        <div class="tab-content" id="tab-onboarding">
+          <div id="checklist-container">
+            <!-- Filled by JS -->
+          </div>
+          <div style="margin-top:var(--space-5);padding-top:var(--space-4);border-top:1px solid var(--border-subtle);">
+            <h4 style="font-size:var(--text-sm);font-weight:600;margin-bottom:var(--space-3);">Add Checklist Item</h4>
+            <form id="checklist-form" class="registry-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Title</label>
+                  <input type="text" id="checklist-title" placeholder="e.g. Book flights" required>
+                </div>
+                <div class="form-group">
+                  <label>Category</label>
+                  <select id="checklist-category">
+                    <option value="pre_departure">Pre-Departure</option>
+                    <option value="arrival">Arrival</option>
+                    <option value="documentation">Documentation</option>
+                    <option value="orientation">Orientation</option>
+                    <option value="general">General</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Due Date (optional)</label>
+                  <input type="date" id="checklist-due-date">
+                </div>
+                <div class="form-group" style="justify-content:flex-end;">
+                  <button type="submit" class="btn btn-primary btn-sm">Add Item</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Activity Log Tab -->
+        <div class="tab-content" id="tab-activity">
+          <div class="audit-timeline" id="activity-timeline">
+            <div style="text-align:center;padding:var(--space-6);color:var(--text-tertiary);">Loading activity...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="doc-modal-footer">
+        <span style="flex:1;font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);" id="modal-placement-id"></span>
+        <button class="btn btn-ghost btn-sm" id="btn-terminate" style="color:var(--error);">Terminate</button>
+        <button class="btn btn-primary btn-sm" id="btn-advance">Advance Stage</button>
+      </div>
+    </div>
   </div>
 
   <script src="js/core.js"></script>
