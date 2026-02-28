@@ -49,8 +49,12 @@ CREATE TRIGGER trg_campaign_applications_updated_at
 -- 3. PUBLIC PROXY VIEWS
 -- ══════════════════════════════════════════════
 
--- Admin view: joins applicant profile + campaign details
+-- Direct proxy: enables insert/update/delete via PostgREST
 CREATE OR REPLACE VIEW public.gh_campaign_applications AS
+SELECT * FROM globalhire.campaign_applications;
+
+-- Admin detail view: joins applicant profile + campaign details (read-only)
+CREATE OR REPLACE VIEW public.gh_campaign_applications_detail AS
 SELECT
   ca.*,
   p.full_name       AS applicant_name,
@@ -120,5 +124,6 @@ CREATE POLICY "Applicants insert own applications"
 -- ══════════════════════════════════════════════
 GRANT SELECT, INSERT, UPDATE, DELETE ON globalhire.campaign_applications TO authenticated;
 GRANT ALL ON public.gh_campaign_applications TO authenticated, anon;
+GRANT ALL ON public.gh_campaign_applications_detail TO authenticated, anon;
 GRANT ALL ON public.gh_my_applications TO authenticated, anon;
 GRANT ALL ON globalhire.campaign_applications TO service_role;
