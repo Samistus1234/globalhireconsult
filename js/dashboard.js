@@ -92,54 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ── Simulate live activity feed updates ──
-  const activities = [
-    { color: 'var(--success)', text: '<strong>New applicant</strong> registered: Emmanuel Balogun (Nurse, Nigeria)', time: 'Just now' },
-    { color: 'var(--secondary)', text: '<strong>AI Engine</strong> re-scored 34 candidates for updated role requirements', time: 'Just now' },
-    { color: 'var(--accent-amber)', text: '<strong>Document uploaded</strong>: Professional license — Chioma Eze', time: 'Just now' },
-    { color: 'var(--primary)', text: '<strong>Verification complete</strong>: All credentials confirmed for Samuel Mensah', time: 'Just now' },
-    { color: 'var(--accent-cyan)', text: '<strong>Interview scheduled</strong>: Maria Santos with Royal Adelaide Hospital', time: 'Just now' }
-  ];
-
-  let activityIndex = 0;
-  const activityFeed = document.querySelector('.panel-body-flush[style*="max-height"]');
-
-  if (activityFeed) {
-    setInterval(() => {
-      const activity = activities[activityIndex % activities.length];
-      const item = document.createElement('div');
-      item.className = 'activity-item';
-      item.style.opacity = '0';
-      item.style.transform = 'translateY(-10px)';
-      item.innerHTML = `
-        <div class="activity-dot" style="background:${activity.color}"></div>
-        <div class="activity-content">
-          <div class="activity-text">${activity.text}</div>
-          <div class="activity-time">${activity.time}</div>
-        </div>
-      `;
-
-      activityFeed.insertBefore(item, activityFeed.firstChild);
-
-      // Animate in
-      requestAnimationFrame(() => {
-        item.style.transition = 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
-        item.style.opacity = '1';
-        item.style.transform = 'translateY(0)';
-      });
-
-      // Remove oldest if too many
-      const items = activityFeed.querySelectorAll('.activity-item');
-      if (items.length > 12) {
-        const last = items[items.length - 1];
-        last.style.transition = 'opacity 0.3s';
-        last.style.opacity = '0';
-        setTimeout(() => last.remove(), 300);
-      }
-
-      activityIndex++;
-    }, 15000); // Every 15 seconds
-  }
+  // ── Activity feed ──
+  // Activity feed is now populated by live data from dashboard-live.js
 
   // ── Match ring SVG animation ──
   document.querySelectorAll('.match-ring').forEach(ring => {
