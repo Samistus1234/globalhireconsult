@@ -161,13 +161,29 @@
         <td>${c.contacted_count || 0}</td>
         <td>${c.interested_count || 0}</td>
         <td><span style="font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary)">${formatDate(c.created_at)}</span></td>
-        <td><button class="btn btn-ghost btn-sm btn-view-campaign" data-id="${c.id}">View</button></td>
+        <td style="display:flex;gap:6px;align-items:center;">
+          <button class="btn btn-ghost btn-sm btn-view-campaign" data-id="${c.id}">View</button>
+          ${c.status !== 'draft' && c.status !== 'closed'
+            ? `<button class="btn btn-ghost btn-sm btn-deactivate" data-id="${c.id}" style="color:var(--accent-coral);font-size:11px;">Deactivate</button>`
+            : ''}
+          ${c.status === 'closed'
+            ? `<button class="btn btn-ghost btn-sm btn-reactivate" data-id="${c.id}" style="color:var(--success);font-size:11px;">Reactivate</button>`
+            : ''}
+        </td>
       </tr>
     `).join('');
 
     // Bind click handlers
     tbody.querySelectorAll('.title[data-id], .btn-view-campaign').forEach(el => {
       el.addEventListener('click', () => openCampaignDetail(el.dataset.id));
+    });
+
+    tbody.querySelectorAll('.btn-deactivate').forEach(el => {
+      el.addEventListener('click', () => deactivateCampaign(el.dataset.id));
+    });
+
+    tbody.querySelectorAll('.btn-reactivate').forEach(el => {
+      el.addEventListener('click', () => reactivateCampaign(el.dataset.id));
     });
   }
 
@@ -226,7 +242,11 @@
     }
 
     if (c.status !== 'closed' && c.status !== 'draft') {
-      actions.push(`<button class="btn btn-ghost btn-sm" id="btn-close-campaign" style="color:var(--accent-coral)">Close Campaign</button>`);
+      actions.push(`<button class="btn btn-ghost btn-sm" id="btn-close-campaign" style="color:var(--accent-coral)">Deactivate</button>`);
+    }
+
+    if (c.status === 'closed') {
+      actions.push(`<button class="btn btn-primary btn-sm" id="btn-reactivate-campaign">Reactivate</button>`);
     }
 
     actionsEl.innerHTML = actions.join('');
@@ -234,7 +254,8 @@
     // Bind action buttons
     document.getElementById('btn-run-matching')?.addEventListener('click', () => runMatching(campaignId));
     document.getElementById('btn-send-outreach')?.addEventListener('click', () => sendOutreach(campaignId));
-    document.getElementById('btn-close-campaign')?.addEventListener('click', () => closeCampaign(campaignId));
+    document.getElementById('btn-close-campaign')?.addEventListener('click', () => deactivateCampaign(campaignId));
+    document.getElementById('btn-reactivate-campaign')?.addEventListener('click', () => reactivateCampaign(campaignId));
   }
 
   // ── Load matches ──
@@ -483,6 +504,41 @@
 
     await loadCampaignDetail(campaignId);
     await loadActivityLog(campaignId);
+  }
+
+  // ── Deactivate Campaign (hide from public jobs page) ──
+  async function deactivateCampaign(campaignId) {
+    if (!confirm('Deactivate this campaign? It will be hidden from the public jobs page.')) return;
+
+    await ghFrom('campaigns').update({ status: 'closed' }).eq('id', campaignId);
+    await ghFrom('campaign_activity_log').insert({
+      campaign_id: campaignId,
+      event_type: 'closed',
+      event_data: { reason: 'deactivated' },
+      actor_id: currentSession.user.id
+    });
+
+    await loadCampaigns();
+    if (currentCampaignId === campaignId) {
+      await loadCampaignDetail(campaignId);
+      await loadActivityLog(campaignId);
+    }
+  }
+
+  // ── Reactivate Campaign (show on public jobs page again) ──
+  async function reactivateCampaign(campaignId) {
+    await ghFrom('campaigns').update({ status: 'active' }).eq('id', campaignId);
+    await ghFrom('campaign_activity_log').insert({
+      campaign_id: campaignId,
+      event_type: 'reopened',
+      actor_id: currentSession.user.id
+    });
+
+    await loadCampaigns();
+    if (currentCampaignId === campaignId) {
+      await loadCampaignDetail(campaignId);
+      await loadActivityLog(campaignId);
+    }
   }
 
   // ── Reset form ──
