@@ -89,7 +89,7 @@
   /* ---------- Empty state ---------- */
   function showEmpty() {
     container.innerHTML =
-      '<div class="reveal" style="grid-column:1/-1;text-align:center;padding:var(--space-16) var(--space-8);">' +
+      '<div style="grid-column:1/-1;text-align:center;padding:var(--space-16) var(--space-8);">' +
         '<div style="margin-bottom:var(--space-4);">' +
           '<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;">' +
             '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>' +
@@ -99,7 +99,6 @@
         '<p style="color:var(--text-tertiary);max-width:400px;margin:0 auto var(--space-6);">We are actively working with employers to bring you verified healthcare opportunities. Check back soon or create a profile to be notified when new roles are posted.</p>' +
         '<a href="signup.html" class="btn btn-primary">Create Your Profile</a>' +
       '</div>';
-    if (window.GHE) GHE.initReveal();
   }
 
   /* ---------- Build card HTML ---------- */
@@ -115,7 +114,7 @@
       : '';
 
     return (
-      '<div class="job-card reveal" data-id="' + c.id + '">' +
+      '<div class="job-card" data-id="' + c.id + '">' +
         badge +
         '<div class="job-card-body">' +
           '<div class="job-card-header">' +
@@ -166,7 +165,6 @@
     if (!filtered.length) { showEmpty(); }
     else {
       container.innerHTML = filtered.map(cardHtml).join('');
-      if (window.GHE) GHE.initReveal();
     }
     countEl.textContent = 'Showing ' + filtered.length + ' position' + (filtered.length !== 1 ? 's' : '');
   }
