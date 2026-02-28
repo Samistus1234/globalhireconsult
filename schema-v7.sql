@@ -54,7 +54,6 @@ CREATE OR REPLACE VIEW public.gh_campaign_applications AS
 SELECT
   ca.*,
   p.full_name       AS applicant_name,
-  p.email           AS applicant_email,
   p.specialty        AS applicant_specialty,
   p.country_of_origin AS applicant_country,
   p.avatar_initials,
