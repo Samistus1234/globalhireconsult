@@ -76,7 +76,7 @@
 
       <!-- Results Header -->
       <div class="results-header reveal">
-        <div class="results-count">Positions will be listed here as they become available</div>
+        <div class="results-count" id="results-count">Positions will be listed here as they become available</div>
         <div class="sort-select">
           Sort by:
           <select>
@@ -95,7 +95,7 @@
           <div class="sidebar-section">
             <h4>Specialty</h4>
             <div class="sidebar-checkbox-group">
-              <label class="sidebar-checkbox"><input type="checkbox" checked> Nursing</label>
+              <label class="sidebar-checkbox"><input type="checkbox"> Nursing</label>
               <label class="sidebar-checkbox"><input type="checkbox"> Physician</label>
               <label class="sidebar-checkbox"><input type="checkbox"> Allied Health</label>
               <label class="sidebar-checkbox"><input type="checkbox"> Midwifery</label>
@@ -139,7 +139,7 @@
             <h4>Experience Level</h4>
             <div class="sidebar-checkbox-group">
               <label class="sidebar-checkbox"><input type="checkbox"> Entry Level (0-2 years)</label>
-              <label class="sidebar-checkbox"><input type="checkbox" checked> Mid Level (3-5 years)</label>
+              <label class="sidebar-checkbox"><input type="checkbox"> Mid Level (3-5 years)</label>
               <label class="sidebar-checkbox"><input type="checkbox"> Senior (6-10 years)</label>
               <label class="sidebar-checkbox"><input type="checkbox"> Expert (10+ years)</label>
             </div>
@@ -150,7 +150,7 @@
           <div class="sidebar-section">
             <div class="sidebar-toggle">
               <span class="toggle-label">Visa Sponsorship</span>
-              <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+              <div class="toggle-switch"></div>
             </div>
           </div>
 
@@ -159,8 +159,8 @@
           <div class="sidebar-section">
             <h4>Contract Type</h4>
             <div class="sidebar-checkbox-group">
-              <label class="sidebar-checkbox"><input type="checkbox" checked> Permanent</label>
-              <label class="sidebar-checkbox"><input type="checkbox" checked> Contract</label>
+              <label class="sidebar-checkbox"><input type="checkbox"> Permanent</label>
+              <label class="sidebar-checkbox"><input type="checkbox"> Contract</label>
               <label class="sidebar-checkbox"><input type="checkbox"> Temporary</label>
               <label class="sidebar-checkbox"><input type="checkbox"> Locum</label>
             </div>
@@ -171,20 +171,8 @@
         </aside>
 
         <!-- Job Listings -->
-        <div class="jobs-grid">
-
-          <!-- Empty State -->
-          <div class="reveal" style="grid-column: 1 / -1; text-align: center; padding: var(--space-16) var(--space-8);">
-            <div style="margin-bottom: var(--space-4);">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;">
-                <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
-              </svg>
-            </div>
-            <h3 style="color: var(--text-secondary); margin-bottom: var(--space-2);">No positions currently listed</h3>
-            <p style="color: var(--text-tertiary); max-width: 400px; margin: 0 auto var(--space-6);">We are actively working with employers to bring you verified healthcare opportunities. Check back soon or create a profile to be notified when new roles are posted.</p>
-            <a href="signup.html" class="btn btn-primary">Create Your Profile</a>
-          </div>
-
+        <div class="jobs-grid" id="jobs-container">
+          <!-- Populated dynamically by js/jobs.js -->
         </div>
       </div>
 
@@ -210,19 +198,6 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() { GHNav.init('careers'); });
   </script>
-  <script>
-    // Filter chip toggle (kept for when real jobs are added)
-    document.querySelectorAll('.filter-chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        if (chip.textContent.trim() === 'All Roles') {
-          document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-          chip.classList.add('active');
-        } else {
-          document.querySelector('.filter-chip.active')?.classList.remove('active');
-          chip.classList.toggle('active');
-        }
-      });
-    });
-  </script>
+  <script src="js/jobs.js"></script>
 </body>
 </html>
