@@ -323,76 +323,7 @@
             </div>
             <div class="panel-body">
               <div class="applications-list" id="applications-list">
-
-                <!-- Sample Application 1 -->
-                <div class="application-item">
-                  <div class="application-header">
-                    <div class="job-employer-logo" style="background:linear-gradient(135deg,#1a5276,#2e86c1);color:#fff;width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0">NH</div>
-                    <div class="application-info">
-                      <h4>ICU Nurse — Band 5/6</h4>
-                      <span>NHS Manchester &middot; Manchester, UK &middot; Applied Feb 18, 2026</span>
-                    </div>
-                    <div class="application-salary">&pound;34,500<small>/yr</small></div>
-                  </div>
-                  <div class="application-pipeline">
-                    <div class="app-step completed"><div class="app-dot"></div><span>Applied</span></div>
-                    <div class="app-line completed"></div>
-                    <div class="app-step completed"><div class="app-dot"></div><span>Screening</span></div>
-                    <div class="app-line active"></div>
-                    <div class="app-step active"><div class="app-dot"></div><span>Interview</span></div>
-                    <div class="app-line"></div>
-                    <div class="app-step"><div class="app-dot"></div><span>Offer</span></div>
-                    <div class="app-line"></div>
-                    <div class="app-step"><div class="app-dot"></div><span>Placed</span></div>
-                  </div>
-                </div>
-
-                <!-- Sample Application 2 -->
-                <div class="application-item">
-                  <div class="application-header">
-                    <div class="job-employer-logo" style="background:linear-gradient(135deg,#8e44ad,#bb8fce);color:#fff;width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0">CC</div>
-                    <div class="application-info">
-                      <h4>Emergency Medicine Physician</h4>
-                      <span>Cleveland Clinic Abu Dhabi &middot; UAE &middot; Applied Feb 12, 2026</span>
-                    </div>
-                    <div class="application-salary">$185,000<small>/yr</small></div>
-                  </div>
-                  <div class="application-pipeline">
-                    <div class="app-step completed"><div class="app-dot"></div><span>Applied</span></div>
-                    <div class="app-line completed"></div>
-                    <div class="app-step active"><div class="app-dot"></div><span>Screening</span></div>
-                    <div class="app-line"></div>
-                    <div class="app-step"><div class="app-dot"></div><span>Interview</span></div>
-                    <div class="app-line"></div>
-                    <div class="app-step"><div class="app-dot"></div><span>Offer</span></div>
-                    <div class="app-line"></div>
-                    <div class="app-step"><div class="app-dot"></div><span>Placed</span></div>
-                  </div>
-                </div>
-
-                <!-- Sample Application 3 -->
-                <div class="application-item">
-                  <div class="application-header">
-                    <div class="job-employer-logo" style="background:linear-gradient(135deg,#2c3e50,#34495e);color:#fff;width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0">RA</div>
-                    <div class="application-info">
-                      <h4>Paediatric Nurse Specialist</h4>
-                      <span>Royal Adelaide Hospital &middot; Australia &middot; Applied Feb 5, 2026</span>
-                    </div>
-                    <div class="application-salary">AUD $95,000<small>/yr</small></div>
-                  </div>
-                  <div class="application-pipeline">
-                    <div class="app-step completed"><div class="app-dot"></div><span>Applied</span></div>
-                    <div class="app-line completed"></div>
-                    <div class="app-step completed"><div class="app-dot"></div><span>Screening</span></div>
-                    <div class="app-line completed"></div>
-                    <div class="app-step completed"><div class="app-dot"></div><span>Interview</span></div>
-                    <div class="app-line active"></div>
-                    <div class="app-step active"><div class="app-dot"></div><span>Offer</span></div>
-                    <div class="app-line"></div>
-                    <div class="app-step"><div class="app-dot"></div><span>Placed</span></div>
-                  </div>
-                </div>
-
+                <!-- Dynamically filled by portal.js loadMyApplications() -->
               </div>
             </div>
           </div>
@@ -531,6 +462,14 @@
 
       </div>
     </main>
+  </div>
+
+  <!-- Portal Toast -->
+  <div id="portal-toast" style="position:fixed;bottom:2rem;right:2rem;background:var(--bg-card);border:1px solid var(--primary);border-radius:var(--radius-lg);padding:var(--space-4) var(--space-6);display:none;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,0.4);max-width:360px;">
+    <div style="display:flex;align-items:center;gap:var(--space-3);">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+      <span id="portal-toast-msg" style="color:var(--text-primary);font-size:var(--text-sm);">Done!</span>
+    </div>
   </div>
 
   <!-- Scripts -->

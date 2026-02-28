@@ -45,8 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
         .eq('id', data.user.id)
         .single();
 
+      var redirectParam = new URLSearchParams(window.location.search).get('redirect');
       if (profile && profile.role === 'admin') {
         window.location.href = 'dashboard.html';
+      } else if (redirectParam) {
+        window.location.href = redirectParam;
       } else {
         window.location.href = 'portal.html';
       }
@@ -210,7 +213,8 @@ document.addEventListener('DOMContentLoaded', () => {
           console.error('Profile update error:', profileError);
         }
 
-        window.location.href = 'portal.html';
+        var redirectParam = new URLSearchParams(window.location.search).get('redirect');
+        window.location.href = redirectParam || 'portal.html';
 
       } catch (err) {
         console.error('Signup error:', err);

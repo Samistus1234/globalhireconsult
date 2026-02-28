@@ -65,7 +65,7 @@
       </form>
 
       <div class="auth-footer">
-        Don't have an account? <a href="signup.html">Create one</a>
+        Don't have an account? <a href="signup.html" id="signup-link">Create one</a>
       </div>
     </div>
   </div>
@@ -95,8 +95,19 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
 
-  <!-- Auto-redirect if already logged in -->
+  <!-- Auto-redirect if already logged in + propagate ?redirect= -->
   <script>
+    (function() {
+      var params = new URLSearchParams(window.location.search);
+      var redirectParam = params.get('redirect');
+
+      // Propagate redirect param to signup link
+      if (redirectParam) {
+        var signupLink = document.getElementById('signup-link');
+        if (signupLink) signupLink.href = 'signup.html?redirect=' + encodeURIComponent(redirectParam);
+      }
+    })();
+
     (async function() {
       try {
         var sb = window.ghSupabase;
@@ -104,10 +115,14 @@
         var r = await sb.auth.getSession();
         if (!r.data || !r.data.session) return;
         var session = r.data.session;
+        var params = new URLSearchParams(window.location.search);
+        var redirectParam = params.get('redirect');
         // Only redirect if we can also fetch the profile successfully
         var p = await ghFrom('profiles').select('role').eq('id', session.user.id).single();
         if (p.data && p.data.role === 'admin') {
           window.location.replace('dashboard.html');
+        } else if (p.data && redirectParam) {
+          window.location.replace(redirectParam);
         } else if (p.data) {
           window.location.replace('portal.html');
         }

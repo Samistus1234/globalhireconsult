@@ -31,8 +31,15 @@
       await loadOpportunities();
     } catch (err) { console.error('Opportunities load error:', err); }
     try {
+      await loadMyApplications();
+    } catch (err) { console.error('Applications load error:', err); }
+    try {
       await loadSettings();
     } catch (err) { console.error('Settings load error:', err); }
+    // Check for ?apply= param after everything is loaded
+    try {
+      await checkApplyParam();
+    } catch (err) { console.error('Apply param check error:', err); }
   });
 
   // ── Sidebar nav ──
@@ -766,5 +773,296 @@
     const sizes = ['B', 'KB', 'MB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  }
+
+  // ── Helper: switch to tab ──
+  function switchToTab(tabId) {
+    var navItems = document.querySelectorAll('.portal-nav-item[data-tab]');
+    var tabs = document.querySelectorAll('.portal-tab');
+    navItems.forEach(function(n) {
+      n.classList.toggle('active', n.dataset.tab === tabId);
+    });
+    tabs.forEach(function(t) {
+      t.classList.toggle('active', t.id === tabId);
+    });
+  }
+
+  // ── Helper: show portal toast ──
+  function showPortalToast(msg) {
+    var toast = document.getElementById('portal-toast');
+    var msgEl = document.getElementById('portal-toast-msg');
+    if (!toast || !msgEl) return;
+    msgEl.textContent = msg;
+    toast.style.display = 'block';
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(function() { toast.style.display = 'none'; }, 4000);
+  }
+
+  // ── Helper: close apply modal ──
+  function closeApplyModal() {
+    var modal = document.getElementById('apply-modal-overlay');
+    if (modal) modal.remove();
+  }
+
+  // ── Check ?apply= URL param ──
+  async function checkApplyParam() {
+    var params = new URLSearchParams(window.location.search);
+    var campaignId = params.get('apply');
+    if (!campaignId) return;
+
+    // Clean URL immediately
+    history.replaceState(null, '', window.location.pathname);
+
+    // Check if already applied
+    var { data: existing } = await ghFrom('my_applications')
+      .select('id')
+      .eq('applicant_id', currentUser.id)
+      .eq('campaign_id', campaignId);
+
+    if (existing && existing.length > 0) {
+      showPortalToast('You have already applied to this position.');
+      switchToTab('tab-applications');
+      return;
+    }
+
+    // Fetch campaign details
+    var { data: campaign, error } = await ghFrom('campaigns')
+      .select('*')
+      .eq('id', campaignId)
+      .single();
+
+    if (error || !campaign) {
+      showPortalToast('This position is no longer available.');
+      return;
+    }
+
+    showApplyModal(campaign);
+  }
+
+  // ── Application Modal ──
+  function showApplyModal(campaign) {
+    // Remove existing modal if any
+    closeApplyModal();
+
+    var initial = (campaign.employer_name || '?').charAt(0).toUpperCase();
+
+    // Profile readiness
+    var profileComplete = currentProfile.profile_completed;
+    var hasDocs = false; // We check from dashboard checklist data
+    var docsEl = document.querySelectorAll('.checklist-item.done');
+    var totalDocs = docsEl ? docsEl.length : 0;
+
+    var readinessHtml = '';
+    if (!profileComplete) {
+      readinessHtml = '<div style="background:rgba(255,176,32,0.1);border:1px solid var(--accent-amber);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);margin-bottom:var(--space-4);font-size:var(--text-sm);">' +
+        '<div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2);">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-amber)" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' +
+          '<strong style="color:var(--accent-amber);">Profile Incomplete</strong>' +
+        '</div>' +
+        '<p style="color:var(--text-secondary);margin-bottom:var(--space-2);">Your profile is not yet complete. We recommend completing it before applying for the best chances.</p>' +
+        '<button class="btn btn-ghost btn-sm" id="apply-modal-complete-profile" style="color:var(--accent-amber);border-color:var(--accent-amber);">Complete Profile</button>' +
+      '</div>';
+    }
+
+    var overlay = document.createElement('div');
+    overlay.id = 'apply-modal-overlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:var(--space-4);';
+
+    overlay.innerHTML =
+      '<div style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);max-width:520px;width:100%;max-height:90vh;overflow-y:auto;padding:var(--space-6);" id="apply-modal-card">' +
+        // Header
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-5);">' +
+          '<div>' +
+            '<h2 style="font-family:var(--font-display);font-size:var(--text-xl);font-weight:800;margin-bottom:var(--space-1);">Apply to Position</h2>' +
+            '<p style="font-size:var(--text-sm);color:var(--text-tertiary);">Review the details and confirm your application.</p>' +
+          '</div>' +
+          '<button class="btn btn-icon btn-ghost" id="apply-modal-close" style="width:32px;height:32px;flex-shrink:0;">' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>' +
+          '</button>' +
+        '</div>' +
+
+        // Campaign summary
+        '<div style="background:var(--bg-elevated);border-radius:var(--radius-lg);padding:var(--space-4);margin-bottom:var(--space-4);">' +
+          '<div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3);">' +
+            '<div style="background:var(--primary-muted);color:var(--primary);width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0;">' + initial + '</div>' +
+            '<div>' +
+              '<h3 style="font-size:var(--text-base);font-weight:700;">' + escapeHtml(campaign.title) + '</h3>' +
+              '<span style="font-size:var(--text-sm);color:var(--text-tertiary);">' + escapeHtml(campaign.employer_name || '') + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<div style="display:flex;flex-wrap:wrap;gap:var(--space-3);font-size:var(--text-xs);color:var(--text-tertiary);">' +
+            (campaign.destination_country ? '<span>&#127758; ' + escapeHtml(campaign.destination_country) + '</span>' : '') +
+            (campaign.salary_display ? '<span>&#128176; ' + escapeHtml(campaign.salary_display) + '</span>' : '') +
+            (campaign.visa_sponsored ? '<span style="color:var(--primary);">&#9989; Visa Sponsored</span>' : '') +
+            (campaign.specialty ? '<span>&#127973; ' + escapeHtml(campaign.specialty) + '</span>' : '') +
+          '</div>' +
+        '</div>' +
+
+        // Readiness warning
+        readinessHtml +
+
+        // Cover note
+        '<div style="margin-bottom:var(--space-4);">' +
+          '<label style="font-size:var(--text-sm);font-weight:600;color:var(--text-secondary);display:block;margin-bottom:var(--space-2);">Cover Note (optional)</label>' +
+          '<textarea id="apply-cover-note" class="form-input" rows="3" placeholder="Introduce yourself or add a note to the employer..." style="width:100%;resize:vertical;"></textarea>' +
+        '</div>' +
+
+        // Submit button
+        '<button class="btn btn-primary" id="apply-modal-submit" style="width:100%;">' +
+          'Confirm Application' +
+        '</button>' +
+      '</div>';
+
+    document.body.appendChild(overlay);
+
+    // Bind events
+    document.getElementById('apply-modal-close').addEventListener('click', closeApplyModal);
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) closeApplyModal();
+    });
+
+    var completeBtn = document.getElementById('apply-modal-complete-profile');
+    if (completeBtn) {
+      completeBtn.addEventListener('click', function() {
+        closeApplyModal();
+        switchToTab('tab-profile');
+      });
+    }
+
+    document.getElementById('apply-modal-submit').addEventListener('click', function() {
+      submitApplication(campaign.id);
+    });
+  }
+
+  // ── Submit Application ──
+  async function submitApplication(campaignId) {
+    var btn = document.getElementById('apply-modal-submit');
+    var coverNote = (document.getElementById('apply-cover-note')?.value || '').trim();
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Submitting...';
+
+    var insertData = {
+      campaign_id: campaignId,
+      applicant_id: currentUser.id
+    };
+    if (coverNote) insertData.cover_note = coverNote;
+
+    var { error } = await ghFrom('campaign_applications')
+      .insert(insertData);
+
+    if (error) {
+      // Handle duplicate (unique constraint violation)
+      if (error.code === '23505') {
+        closeApplyModal();
+        showPortalToast('You have already applied to this position.');
+        switchToTab('tab-applications');
+        return;
+      }
+      btn.disabled = false;
+      btn.textContent = 'Confirm Application';
+      showPortalToast('Failed to submit: ' + error.message);
+      return;
+    }
+
+    closeApplyModal();
+    showPortalToast('Application submitted successfully!');
+    await loadMyApplications();
+    switchToTab('tab-applications');
+  }
+
+  // ── Load My Applications ──
+  async function loadMyApplications() {
+    var listEl = document.getElementById('applications-list');
+    if (!listEl) return;
+
+    var { data: apps, error } = await ghFrom('my_applications')
+      .select('*')
+      .eq('applicant_id', currentUser.id)
+      .order('applied_at', { ascending: false });
+
+    // Update count badge
+    var countBadge = document.getElementById('applications-count');
+    var activeCount = apps ? apps.filter(function(a) {
+      return a.status !== 'rejected' && a.status !== 'withdrawn';
+    }).length : 0;
+
+    if (countBadge) {
+      countBadge.textContent = activeCount + ' active';
+    }
+
+    if (error || !apps || apps.length === 0) {
+      listEl.innerHTML =
+        '<div style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">' +
+          '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="opacity:0.4;margin-bottom:var(--space-3);">' +
+            '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/>' +
+          '</svg>' +
+          '<p style="margin-bottom:var(--space-3);">No applications yet.</p>' +
+          '<a href="jobs.html" class="btn btn-primary btn-sm">Browse Jobs</a>' +
+        '</div>';
+      return;
+    }
+
+    var stages = ['applied', 'screening', 'interview', 'offer', 'placed'];
+    var stageLabels = ['Applied', 'Screening', 'Interview', 'Offer', 'Placed'];
+
+    listEl.innerHTML = apps.map(function(app) {
+      var initial = (app.employer_name || '?').charAt(0).toUpperCase();
+      var appliedDate = new Date(app.applied_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      var currentStageIdx = stages.indexOf(app.status);
+      if (currentStageIdx === -1) currentStageIdx = 0; // fallback for rejected/withdrawn
+
+      var isTerminal = app.status === 'rejected' || app.status === 'withdrawn';
+
+      // Build pipeline
+      var pipelineHtml = '<div class="application-pipeline">';
+      stages.forEach(function(stage, i) {
+        var cls = '';
+        if (!isTerminal) {
+          if (i < currentStageIdx) cls = 'completed';
+          else if (i === currentStageIdx) cls = 'active';
+        } else {
+          if (i === 0) cls = 'completed'; // At least applied
+        }
+        pipelineHtml += '<div class="app-step ' + cls + '"><div class="app-dot"></div><span>' + stageLabels[i] + '</span></div>';
+        if (i < stages.length - 1) {
+          var lineCls = '';
+          if (!isTerminal) {
+            if (i < currentStageIdx) lineCls = 'completed';
+            else if (i === currentStageIdx) lineCls = 'active';
+          }
+          pipelineHtml += '<div class="app-line ' + lineCls + '"></div>';
+        }
+      });
+      pipelineHtml += '</div>';
+
+      // Status badge for rejected/withdrawn
+      var statusBadge = '';
+      if (isTerminal) {
+        var badgeColor = app.status === 'rejected' ? 'var(--accent-coral)' : 'var(--accent-amber)';
+        var badgeLabel = app.status === 'rejected' ? 'Rejected' : 'Withdrawn';
+        statusBadge = '<span style="font-size:var(--text-xs);padding:2px 8px;border-radius:var(--radius-sm);background:' + badgeColor + '20;color:' + badgeColor + ';font-weight:600;">' + badgeLabel + '</span>';
+      }
+
+      return '<div class="application-item">' +
+        '<div class="application-header">' +
+          '<div class="job-employer-logo" style="background:var(--primary-muted);color:var(--primary);width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0">' + initial + '</div>' +
+          '<div class="application-info">' +
+            '<h4>' + escapeHtml(app.campaign_title || 'Position') + '</h4>' +
+            '<span>' + escapeHtml(app.employer_name || '') + (app.destination_country ? ' &middot; ' + escapeHtml(app.destination_country) : '') + ' &middot; Applied ' + appliedDate + '</span>' +
+          '</div>' +
+          (app.salary_display ? '<div class="application-salary">' + escapeHtml(app.salary_display) + '</div>' : '') +
+          statusBadge +
+        '</div>' +
+        pipelineHtml +
+      '</div>';
+    }).join('');
+  }
+
+  // ── HTML escape helper ──
+  function escapeHtml(str) {
+    var d = document.createElement('div');
+    d.textContent = str || '';
+    return d.innerHTML;
   }
 })();

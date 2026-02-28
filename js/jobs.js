@@ -339,15 +339,27 @@
     }
   }
 
-  /* ---------- Apply toast ---------- */
-  function showApplyToast(campaignId, title) {
-    var toast = document.getElementById('apply-toast');
-    var msg   = document.getElementById('apply-toast-msg');
-    if (!toast || !msg) return;
-    msg.textContent = 'Interest submitted for "' + title + '". We\'ll be in touch!';
-    toast.style.display = 'block';
-    clearTimeout(toast._timer);
-    toast._timer = setTimeout(function () { toast.style.display = 'none'; }, 4000);
+  /* ---------- Apply: auth-aware redirect ---------- */
+  async function handleApply(campaignId, title) {
+    var sb = window.ghSupabase;
+    if (!sb) return;
+
+    try {
+      var res = await sb.auth.getSession();
+      var session = res.data && res.data.session;
+      var portalUrl = 'portal.html?apply=' + encodeURIComponent(campaignId);
+
+      if (!session) {
+        // Not logged in — redirect to login with return URL
+        window.location.href = 'login.html?redirect=' + encodeURIComponent(portalUrl);
+      } else {
+        // Logged in — go straight to portal
+        window.location.href = portalUrl;
+      }
+    } catch (e) {
+      console.error('Apply check failed:', e);
+      window.location.href = 'login.html?redirect=' + encodeURIComponent('portal.html?apply=' + encodeURIComponent(campaignId));
+    }
   }
 
   /* ---------- Fetch & Init ---------- */
@@ -380,7 +392,7 @@
   }
 
   /* ---------- Public API ---------- */
-  window.JobsPage = { apply: showApplyToast };
+  window.JobsPage = { apply: handleApply };
 
   document.addEventListener('DOMContentLoaded', init);
 })();
