@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Hunting Tips — GlobalHire@eLab</title>
+  <meta name="description" content="Expert job hunting guides for healthcare professionals. CV writing, interview prep, salary negotiation, and evaluating international offers.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/nav-global.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300e89d'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' font-weight='bold' fill='%23080a0d'>G</text></svg>">
+
+  <style>
+    /* ── Hero ── */
+    .jh-hero {
+      position: relative;
+      padding: var(--space-20) 0 var(--space-12);
+      text-align: center;
+      overflow: hidden;
+    }
+    .jh-hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: var(--space-4);
+    }
+    .jh-hero-subtitle {
+      font-size: var(--text-lg);
+      color: var(--text-secondary);
+      max-width: 680px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ── Guide nav ── */
+    .guide-nav {
+      display: flex;
+      gap: var(--space-3);
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: var(--space-8);
+    }
+    .guide-nav a {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-pill);
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .guide-nav a:hover {
+      background: var(--primary-muted);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* ── Back link ── */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      color: var(--text-muted);
+      font-size: var(--text-sm);
+      text-decoration: none;
+      margin-bottom: var(--space-4);
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--primary); }
+
+    /* ── Article sections ── */
+    .guide-article {
+      padding: var(--space-16) 0;
+      border-top: 1px solid var(--border-subtle);
+    }
+    .guide-article:nth-child(even) {
+      background: var(--bg-void);
+    }
+    .article-header {
+      margin-bottom: var(--space-10);
+    }
+    .article-header .overline {
+      margin-bottom: var(--space-3);
+    }
+    .article-header h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: var(--space-4);
+    }
+    .article-header > p {
+      color: var(--text-secondary);
+      font-size: var(--text-base);
+      max-width: 640px;
+      line-height: 1.7;
+    }
+    .article-meta {
+      display: flex;
+      gap: var(--space-4);
+      margin-top: var(--space-4);
+      flex-wrap: wrap;
+    }
+    .article-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+    }
+
+    /* ── Content blocks ── */
+    .content-blocks {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-8);
+    }
+    .content-block {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6) var(--space-8);
+    }
+    .content-block h3 {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 700;
+      margin-bottom: var(--space-4);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .content-block h3 .block-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .content-block p {
+      color: var(--text-secondary);
+      font-size: var(--text-sm);
+      line-height: 1.75;
+      margin-bottom: var(--space-4);
+    }
+    .content-block p:last-child { margin-bottom: 0; }
+
+    /* ── Tip lists ── */
+    .tip-list {
+      list-style: none;
+      padding: 0;
+      margin: var(--space-4) 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    .tip-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+    .tip-list li svg {
+      flex-shrink: 0;
+      margin-top: 2px;
+      color: var(--primary);
+    }
+    .tip-list li strong {
+      color: var(--text-primary);
+    }
+
+    /* ── Comparison grid ── */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-4);
+    }
+    .compare-card {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5);
+      transition: border-color 0.2s;
+    }
+    .compare-card:hover { border-color: var(--primary); }
+    .compare-card h4 {
+      font-family: var(--font-display);
+      font-size: var(--text-base);
+      font-weight: 700;
+      margin-bottom: var(--space-2);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .compare-card p {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin: 0;
+    }
+    .compare-flag {
+      font-size: var(--text-lg);
+    }
+
+    /* ── Do / Don't columns ── */
+    .do-dont {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    @media (max-width: 640px) {
+      .do-dont { grid-template-columns: 1fr; }
+    }
+    .do-col, .dont-col {
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+    }
+    .do-col {
+      background: rgba(0,232,157,0.06);
+      border: 1px solid rgba(0,232,157,0.2);
+    }
+    .dont-col {
+      background: rgba(255,92,92,0.06);
+      border: 1px solid rgba(255,92,92,0.2);
+    }
+    .do-col h4 { color: var(--primary); font-size: var(--text-sm); font-weight: 700; margin-bottom: var(--space-3); }
+    .dont-col h4 { color: var(--accent-coral); font-size: var(--text-sm); font-weight: 700; margin-bottom: var(--space-3); }
+    .do-col li, .dont-col li {
+      font-size: var(--text-xs);
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: var(--space-2);
+      padding-left: var(--space-1);
+    }
+
+    /* ── Salary table ── */
+    .salary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .salary-item {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+    }
+    .salary-item .sal-label {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: var(--space-1);
+    }
+    .salary-item .sal-value {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* ── Checklist items ── */
+    .checklist-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-3);
+    }
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .check-item svg {
+      flex-shrink: 0;
+      margin-top: 2px;
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background -->
+  <div class="page-bg" aria-hidden="true">
+    <div class="dot-grid"></div>
+  </div>
+
+  <!-- ===================== NAVIGATION ===================== -->
+  <div id="gnav-placeholder"></div>
+
+  <!-- ===================== HERO ===================== -->
+  <section class="jh-hero" id="hero">
+    <div class="hero-gradient" aria-hidden="true"></div>
+    <div class="hero-gradient-2" aria-hidden="true"></div>
+
+    <div class="container">
+      <div class="reveal">
+        <a href="guides.html" class="back-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+          Back to Knowledge Hub
+        </a>
+        <span class="overline">Job Hunting Tips</span>
+        <h1>Stand Out in the Global <span class="gradient-text">Healthcare Job Market</span></h1>
+        <p class="jh-hero-subtitle">
+          Expert strategies for international healthcare professionals &mdash; from crafting a standout CV to negotiating the best compensation package for your next role abroad.
+        </p>
+
+        <div class="guide-nav">
+          <a href="#healthcare-cv">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+            CV Writing
+          </a>
+          <a href="#interview-prep">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            Interview Prep
+          </a>
+          <a href="#salary-negotiation">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Salary Negotiation
+          </a>
+          <a href="#evaluating-offers">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Evaluating Offers
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== GUIDE 1: HEALTHCARE CV ===================== -->
+  <section class="guide-article" id="healthcare-cv">
+    <div class="container">
+      <div class="article-header reveal">
+        <span class="overline">Job Hunting</span>
+        <h2>Writing a Healthcare CV That Gets Noticed</h2>
+        <p>Your CV is the first impression you make on international employers. Learn how to tailor it for different countries, highlight the right competencies, and avoid the mistakes that get applications rejected.</p>
+        <div class="article-meta">
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            8 min read
+          </span>
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+            5 sections &bull; Regional formatting tips
+          </span>
+        </div>
+      </div>
+
+      <div class="content-blocks reveal">
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:var(--primary-muted);color:var(--primary);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+            </span>
+            CV Structure for International Healthcare Roles
+          </h3>
+          <p>An effective healthcare CV follows a clear, scannable structure. Recruiters typically spend 6&ndash;10 seconds on an initial scan, so front-load the most important information.</p>
+          <ul class="tip-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Personal statement (3&ndash;4 lines):</strong> Summarise your specialty, years of experience, key clinical competencies, and what you are looking for. Tailor this for each application.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Registration &amp; licensing:</strong> List your current professional registrations (e.g., NMC PIN, SCFHS classification, DHA license number) prominently near the top. International employers need to see this immediately.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Clinical experience:</strong> List roles in reverse chronological order. For each, include the facility name, department/ward, bed count or patient volume, and 3&ndash;5 bullet points describing responsibilities and achievements.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Education &amp; qualifications:</strong> Degree title, institution name, country, and year of graduation. Include any postgraduate certifications, specialisations, or advanced life support credentials (BLS, ACLS, PALS).</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Skills &amp; competencies:</strong> Clinical skills (ventilator management, wound care, triage), technical skills (EMR systems like Epic, Cerner, MEDITECH), and language proficiencies with test scores (IELTS, OET).</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:var(--secondary-muted);color:var(--secondary);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </span>
+            Formatting by Country
+          </h3>
+          <p>CV expectations vary significantly across regions. What works in one country may get your application rejected in another.</p>
+          <div class="compare-grid">
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127468;&#127463;</span> United Kingdom</h4>
+              <p>Use the term "CV" (not "resume"). 2&ndash;3 pages is standard. Include your NMC PIN number. No photo required. NHS trusts value evidence of CPD and clinical audit participation. Use NHS-specific language (bands, AfC framework).</p>
+            </div>
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127482;&#127480;</span> United States</h4>
+              <p>Use the term "resume" (1&ndash;2 pages) or "CV" (academic/detailed). Include state license number and NCLEX pass status. Quantify achievements (e.g., "managed 6-bed ICU bay"). Include certifications prominently (BLS, ACLS, CCRN).</p>
+            </div>
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127462;&#127466;</span> Gulf States (UAE/Saudi)</h4>
+              <p>2&ndash;3 pages. Photo is expected. Include nationality, date of birth, and marital status (standard practice in the region). Highlight DataFlow verification status and DHA/SCFHS/HAAD license details. Mention years of post-qualification experience prominently.</p>
+            </div>
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127465;&#127466;</span> Germany</h4>
+              <p>Called "Lebenslauf." Include a professional photo. Chronological format preferred. Mention German language level (B2/C1) and Approbation status. Translated and certified copies of qualifications are expected alongside the CV.</p>
+            </div>
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127462;&#127482;</span> Australia</h4>
+              <p>Use "CV" or "resume." 2&ndash;4 pages accepted. Include AHPRA registration number and stream (A/B/C). Reference checks are critical &mdash; include 2&ndash;3 professional referees with contact details. Highlight rural/remote experience if targeting regional roles.</p>
+            </div>
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127464;&#127462;</span> Canada</h4>
+              <p>2&ndash;3 pages. No photo, age, or marital status. Emphasise NNAS assessment completion and NCLEX-RN pass. Mention provincial registration (CRNA, CNO). Canadian employers value demonstrated cultural competency and teamwork examples.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:rgba(255,176,32,0.12);color:var(--accent-amber);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+            </span>
+            Highlighting Clinical Competencies
+          </h3>
+          <p>International employers look for specific evidence that you can perform in their clinical environment. Use concrete, measurable language rather than vague statements.</p>
+          <div class="do-dont">
+            <div class="do-col">
+              <h4>Do write</h4>
+              <ul>
+                <li>"Managed ventilator settings for 4&ndash;6 critically ill patients per shift in a 20-bed ICU"</li>
+                <li>"Administered IV medications including vasopressors, antibiotics, and blood products"</li>
+                <li>"Led clinical audits on hand hygiene compliance, improving rates from 78% to 94%"</li>
+                <li>"Triaged 40+ patients per shift in a Level 1 trauma emergency department"</li>
+              </ul>
+            </div>
+            <div class="dont-col">
+              <h4>Avoid writing</h4>
+              <ul>
+                <li>"Responsible for patient care"</li>
+                <li>"Administered medications as prescribed"</li>
+                <li>"Good communication skills"</li>
+                <li>"Hardworking and dedicated nurse"</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:rgba(0,212,255,0.12);color:var(--accent-cyan);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v.01"/><path d="M12 8v4"/></svg>
+            </span>
+            Common Mistakes to Avoid
+          </h3>
+          <ul class="tip-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Using one CV for every country:</strong> Each country has different expectations. Adapt your CV's format, terminology, and emphasis for each destination.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Omitting license/registration details:</strong> This is the first thing international healthcare recruiters look for. Missing it suggests you haven't started the licensing process.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Not explaining your healthcare system:</strong> A recruiter in London may not understand your hospital's structure in Lagos or Manila. Briefly describe facility type, bed count, and patient demographics.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Gaps without explanation:</strong> If you took time for exam preparation (OSCE, NCLEX, Prometric), mention it. Unexplained gaps raise concerns.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Generic personal statements:</strong> "I am a dedicated nurse looking for opportunities abroad" tells the recruiter nothing. Be specific about your specialty, experience level, and target role.</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== GUIDE 2: INTERVIEW PREP ===================== -->
+  <section class="guide-article" id="interview-prep">
+    <div class="container">
+      <div class="article-header reveal">
+        <span class="overline">Job Hunting</span>
+        <h2>Interview Prep for International Roles</h2>
+        <p>How to ace virtual and in-person healthcare interviews: common clinical scenarios, behavioural questions, and cultural expectations by region.</p>
+        <div class="article-meta">
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            10 min read
+          </span>
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            4 sections &bull; Sample questions included
+          </span>
+        </div>
+      </div>
+
+      <div class="content-blocks reveal">
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:var(--primary-muted);color:var(--primary);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </span>
+            Virtual Interview Essentials
+          </h3>
+          <p>Most international healthcare interviews begin with a virtual stage, often via Zoom or Microsoft Teams. This is typically your first live interaction with the employer, and first impressions matter enormously.</p>
+          <ul class="tip-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Technical setup:</strong> Test your camera, microphone, and internet connection 24 hours before. Have a backup plan (mobile hotspot, phone dial-in). Use a quiet, well-lit room with a neutral background.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Time zones:</strong> Double-check the interview time in your local time zone. Use a world clock app. Join 5 minutes early &mdash; not too early, not late.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Professional appearance:</strong> Dress as you would for an in-person interview. For healthcare roles, smart professional attire is expected. Avoid scrubs unless specifically requested.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Documents at hand:</strong> Keep your CV, job description, and a notepad nearby. Have your license numbers, exam scores, and key dates accessible for quick reference.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:var(--secondary-muted);color:var(--secondary);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            Common Clinical Scenario Questions
+          </h3>
+          <p>Healthcare interviews almost always include clinical scenario questions to assess your practical knowledge and decision-making. Use the <strong>STAR method</strong> (Situation, Task, Action, Result) to structure your answers.</p>
+          <ul class="tip-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>"Describe a time you identified a deteriorating patient."</strong> Walk through your assessment (vital signs, early warning score), escalation pathway, interventions you initiated, and the outcome. Reference specific tools like NEWS2 (UK) or MEWS.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>"How would you handle a medication error?"</strong> Demonstrate honesty, immediate patient safety actions, reporting through the incident system, root cause analysis, and what you learned. Never suggest hiding an error.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>"Tell us about a difficult patient or family interaction."</strong> Show empathy, communication skills, de-escalation techniques, and cultural sensitivity. Highlight how you maintained professionalism under pressure.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>"How do you prioritise when managing multiple patients?"</strong> Describe your systematic approach: acuity assessment, delegation, time management, and communication with the team. Use concrete numbers (patient ratios, task frequency).</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:rgba(255,176,32,0.12);color:var(--accent-amber);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </span>
+            Cultural Expectations by Region
+          </h3>
+          <p>Interview style and expectations vary significantly by destination. Understanding these nuances can be the difference between an offer and a rejection.</p>
+          <div class="compare-grid">
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127468;&#127463;</span> UK (NHS)</h4>
+              <p>Structured panel interviews with scoring matrices. Questions are often values-based, aligned to the NHS Constitution. Expect questions about safeguarding, equality &amp; diversity, and evidence-based practice. Prepare examples demonstrating the 6Cs: Care, Compassion, Competence, Communication, Courage, Commitment.</p>
+            </div>
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127482;&#127480;</span> United States</h4>
+              <p>Often more conversational. Behavioural questions dominate ("Tell me about a time when..."). Employers value confidence and self-advocacy. Be prepared to discuss your visa status and timeline transparently. Phone screens are common before formal interviews.</p>
+            </div>
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127462;&#127466;</span> Gulf States</h4>
+              <p>Interviews may be shorter and more direct. Employers focus heavily on years of experience, specific clinical skills, and willingness to adapt. Questions about family status and accommodation preferences are common and considered normal. Demonstrate respect for local culture and customs.</p>
+            </div>
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127465;&#127466;</span> Germany</h4>
+              <p>Expect questions in German if you have claimed B2+ proficiency. Interviews are formal and structured. Punctuality is critical. Employers value thorough, detailed answers over brief responses. Be prepared to discuss your Approbation status and timeline.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:rgba(0,212,255,0.12);color:var(--accent-cyan);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </span>
+            Questions to Ask the Employer
+          </h3>
+          <p>Asking thoughtful questions demonstrates genuine interest and helps you evaluate whether the role is right for you. Always prepare 3&ndash;5 questions.</p>
+          <ul class="tip-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span>"What does the onboarding and supernumerary period look like for international nurses?"</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span>"What professional development and career progression opportunities are available?"</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span>"How many international staff are currently on the team, and what support systems are in place?"</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span>"What is the typical nurse-to-patient ratio on this ward/unit?"</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span>"Does the organisation provide accommodation support or relocation assistance?"</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== GUIDE 3: SALARY NEGOTIATION ===================== -->
+  <section class="guide-article" id="salary-negotiation">
+    <div class="container">
+      <div class="article-header reveal">
+        <span class="overline">Job Hunting</span>
+        <h2>Salary Negotiation Guide</h2>
+        <p>Learn how to research market rates, negotiate packages including housing allowances, evaluate total compensation, and know your worth in the global healthcare market.</p>
+        <div class="article-meta">
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            9 min read
+          </span>
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Salary benchmarks &bull; Negotiation tactics
+          </span>
+        </div>
+      </div>
+
+      <div class="content-blocks reveal">
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:var(--primary-muted);color:var(--primary);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </span>
+            Know the Market: Salary Benchmarks
+          </h3>
+          <p>Understanding what healthcare professionals earn in your target country is the foundation of any negotiation. These are typical annual nursing salary ranges (registered nurses, 2025/2026):</p>
+          <div class="salary-grid">
+            <div class="salary-item">
+              <span class="sal-label">&#127468;&#127463; United Kingdom</span>
+              <span class="sal-value">&pound;28,407 &ndash; &pound;70,000</span>
+            </div>
+            <div class="salary-item">
+              <span class="sal-label">&#127482;&#127480; United States</span>
+              <span class="sal-value">$75,000 &ndash; $120,000+</span>
+            </div>
+            <div class="salary-item">
+              <span class="sal-label">&#127462;&#127466; UAE (Dubai)</span>
+              <span class="sal-value">AED 8,000 &ndash; AED 20,000/mo</span>
+            </div>
+            <div class="salary-item">
+              <span class="sal-label">&#127480;&#127462; Saudi Arabia</span>
+              <span class="sal-value">SAR 7,000 &ndash; SAR 18,000/mo</span>
+            </div>
+            <div class="salary-item">
+              <span class="sal-label">&#127464;&#127462; Canada</span>
+              <span class="sal-value">CAD $65,000 &ndash; $100,000</span>
+            </div>
+            <div class="salary-item">
+              <span class="sal-label">&#127462;&#127482; Australia</span>
+              <span class="sal-value">AUD $70,000 &ndash; $110,000</span>
+            </div>
+            <div class="salary-item">
+              <span class="sal-label">&#127465;&#127466; Germany</span>
+              <span class="sal-value">&euro;36,000 &ndash; &euro;58,000</span>
+            </div>
+            <div class="salary-item">
+              <span class="sal-label">&#127480;&#127468; Singapore</span>
+              <span class="sal-value">SGD $36,000 &ndash; $72,000</span>
+            </div>
+          </div>
+          <p style="margin-top:var(--space-4);">Salaries vary significantly by specialty, experience, location (urban vs. rural), and facility type (public vs. private). ICU, emergency, and operating theatre nurses typically command 10&ndash;25% premiums. Always research the specific market for your specialty and target city.</p>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:var(--secondary-muted);color:var(--secondary);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </span>
+            Beyond Base Salary: Total Compensation
+          </h3>
+          <p>Base salary is only part of the picture. In many countries, particularly the Gulf states, benefits can add 30&ndash;50% to the total package value. Always evaluate the full compensation.</p>
+          <ul class="tip-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Housing allowance or free accommodation:</strong> Common in Gulf states (AED 3,000&ndash;6,000/mo) and some UK NHS trusts for initial months. This can be worth &pound;6,000&ndash;&pound;15,000+ annually.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Health insurance:</strong> Employer-provided in the US (worth $5,000&ndash;$15,000/yr), Gulf states, and Singapore. In the UK, you get NHS access. In Germany, health insurance is mandatory and split between employer/employee.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Flight tickets &amp; relocation support:</strong> Annual return flights home are standard in Gulf contracts. Some UK/US employers offer relocation bonuses ($2,000&ndash;$10,000).</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Pension &amp; retirement:</strong> NHS pension (UK) is one of the world's best. US employers offer 401(k) matching. Gulf states offer end-of-service gratuity. Factor these into long-term value.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Tax-free income:</strong> UAE, Saudi Arabia, Qatar, Kuwait, Bahrain, and Oman have zero income tax. A SAR 12,000/mo salary in Saudi Arabia is entirely take-home, equivalent to a much higher gross salary in a taxed country.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Paid leave:</strong> Ranges from 21 days (Gulf) to 27&ndash;33 days (UK NHS) to varying by state/employer (US). Some Gulf contracts include 30+ days plus public holidays.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:rgba(255,176,32,0.12);color:var(--accent-amber);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </span>
+            Negotiation Strategies
+          </h3>
+          <p>Many international healthcare professionals accept the first offer without negotiating. While some systems have fixed pay scales (NHS bands, public sector Gulf roles), there is almost always room to negotiate on benefits, start date, or specific allowances.</p>
+          <ul class="tip-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Research before you respond:</strong> Never accept or reject on the spot. Ask for 48&ndash;72 hours to review the full offer in writing. Compare against market benchmarks.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Negotiate the package, not just salary:</strong> If base salary is fixed, negotiate on housing allowance, sign-on bonus, flight frequency, annual leave days, or professional development funding.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Leverage your specialty:</strong> High-demand specialties (ICU, OR, ER, dialysis, oncology) command premiums. If you have certifications beyond the minimum (CCRN, CEN, specialist qualifications), use them as leverage.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Ask about contract review periods:</strong> Many contracts include salary reviews at 6 or 12 months. Ensure this is written into your contract with clear criteria for progression.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Get everything in writing:</strong> Verbal promises are not enforceable. Ensure every agreed benefit &mdash; housing, flights, bonuses, leave &mdash; is documented in your employment contract before you sign.</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== GUIDE 4: EVALUATING OFFERS ===================== -->
+  <section class="guide-article" id="evaluating-offers">
+    <div class="container">
+      <div class="article-header reveal">
+        <span class="overline">Job Hunting</span>
+        <h2>Evaluating Job Offers Across Countries</h2>
+        <p>A practical framework for comparing offers from different countries: cost of living adjustments, benefits analysis, career growth potential, and quality of life factors.</p>
+        <div class="article-meta">
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            14 min read
+          </span>
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Decision framework &bull; Country comparisons
+          </span>
+        </div>
+      </div>
+
+      <div class="content-blocks reveal">
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:var(--primary-muted);color:var(--primary);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </span>
+            The True Value Framework
+          </h3>
+          <p>Comparing offers across countries is not straightforward. A &pound;35,000 salary in London, a $90,000 salary in Texas, and an AED 15,000/month package in Dubai may look very different on paper but could provide similar or vastly different living standards. Use this framework to evaluate offers objectively.</p>
+          <ul class="tip-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Step 1 &mdash; Calculate net income:</strong> Deduct income tax, social security/national insurance, mandatory pension contributions, and health insurance premiums. Gulf states: net = gross (zero tax). UK: use HMRC take-home calculator. US: varies by state (Texas = no state tax, California = up to 13.3%).</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Step 2 &mdash; Add benefit values:</strong> Convert housing allowance, flight tickets, health insurance, and other benefits to a monthly cash value. A free apartment in Dubai worth AED 5,000/mo adds AED 60,000/year to your effective compensation.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Step 3 &mdash; Subtract cost of living:</strong> Estimate monthly expenses for rent (if not provided), food, transport, utilities, and insurance. Use tools like Numbeo or Expatistan for city-level comparisons.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Step 4 &mdash; Calculate monthly savings potential:</strong> Net income + benefits &minus; cost of living = your actual savings capacity. This is the most honest comparison metric across countries.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:var(--secondary-muted);color:var(--secondary);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+            </span>
+            Beyond Money: Quality of Life Factors
+          </h3>
+          <p>Money is important, but it is not everything. These factors significantly impact your day-to-day happiness and long-term career satisfaction.</p>
+          <div class="checklist-grid">
+            <div class="check-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <strong>Work-life balance:</strong> Shift patterns, overtime expectations, nurse-to-patient ratios, and annual leave entitlement
+            </div>
+            <div class="check-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <strong>Career progression:</strong> Structured pathways (NHS bands, Magnet status), specialisation opportunities, and management tracks
+            </div>
+            <div class="check-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <strong>Residency pathway:</strong> Does this role lead to permanent residency? UK (5 years ILR), Canada (Express Entry), Australia (skilled migration), Gulf (typically no PR pathway)
+            </div>
+            <div class="check-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <strong>Family considerations:</strong> Dependent visa availability, spouse work rights, quality of schools, and community support for families
+            </div>
+            <div class="check-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <strong>Climate &amp; lifestyle:</strong> Weather preference, outdoor activities, food availability, cultural amenities, and proximity to home country
+            </div>
+            <div class="check-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <strong>Professional development:</strong> CPD funding, conference attendance, postgraduate study support, and research opportunities
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:rgba(255,176,32,0.12);color:var(--accent-amber);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v.01"/><path d="M12 8v4"/></svg>
+            </span>
+            Red Flags in Job Offers
+          </h3>
+          <p>Not all international offers are legitimate or fair. Watch for these warning signs before committing.</p>
+          <ul class="tip-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Upfront payment demands:</strong> Legitimate employers never ask candidates to pay for recruitment, visa processing, or placement fees. This is a major red flag.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Passport retention:</strong> No employer should ever hold your passport. This is illegal in most countries and a sign of exploitative practices.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Vague contract terms:</strong> If salary, working hours, accommodation details, or termination clauses are unclear or missing, request specifics in writing before signing.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Unrealistic salary promises:</strong> If a salary is significantly above market rate with no clear justification, investigate thoroughly. It may involve hidden deductions or bait-and-switch tactics.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>No verifiable employer details:</strong> Research the hospital or healthcare group independently. Check regulatory body databases (CQC in UK, JCI accreditation, CBAHI in Saudi) to confirm the facility is licensed.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:rgba(0,212,255,0.12);color:var(--accent-cyan);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+            </span>
+            Making Your Decision
+          </h3>
+          <p>After evaluating offers using the framework above, rank your options across three dimensions:</p>
+          <ul class="tip-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Short-term financial gain (1&ndash;2 years):</strong> Gulf states often win here due to tax-free income, free housing, and high savings potential. Ideal if your primary goal is to save money quickly.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Long-term career growth (3&ndash;5+ years):</strong> UK, USA, Canada, and Australia offer structured career pathways, specialisation opportunities, and permanent residency. Better for building a lifelong international career.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Family &amp; lifestyle:</strong> Consider education quality, safety, cultural comfort, and community. Some professionals start in the Gulf for financial stability, then transition to the UK, Canada, or Australia for long-term settlement.</span>
+            </li>
+          </ul>
+          <p>There is no universally "best" country. The right choice depends on your personal priorities, family situation, career stage, and long-term goals. Many successful healthcare professionals build their international careers across multiple destinations over time.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== CTA ===================== -->
+  <section class="cta-section" id="get-started">
+    <div class="cta-glow" aria-hidden="true"></div>
+    <div class="container">
+      <div class="cta-box reveal">
+        <span class="overline" style="margin-bottom:var(--space-4);display:block;">Ready to Start Applying?</span>
+        <h2>Find Your Next <span class="gradient-text">Healthcare Role</span></h2>
+        <p>Browse open positions across 14 countries and apply directly through GlobalHire. Your international career starts here.</p>
+        <div class="cta-actions">
+          <a href="jobs.html" class="btn btn-primary btn-lg">
+            Browse Open Positions
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="signup.html" class="btn btn-ghost btn-lg">Create Free Account</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <div id="gfooter-placeholder"></div>
+
+  <!-- Scripts -->
+  <script src="js/core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/nav-global.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.GHNav) GHNav.init('guides');
+      if (window.GHE) GHE.init();
+
+      // Smooth scroll for anchor links
+      document.querySelectorAll('.guide-nav a').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          var target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
+
+      // Scroll to hash on load
+      if (window.location.hash) {
+        var target = document.querySelector(window.location.hash);
+        if (target) {
+          setTimeout(function() {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 300);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
