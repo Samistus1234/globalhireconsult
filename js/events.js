@@ -11,7 +11,7 @@
     if (window.GHE) GHE.init();
 
     // ── Countdown Timer ──
-    var targetDate = new Date('2026-03-15T00:00:00Z').getTime();
+    var targetDate = new Date('2026-05-11T00:00:00Z').getTime();
 
     function updateCountdown() {
       var now = Date.now();
