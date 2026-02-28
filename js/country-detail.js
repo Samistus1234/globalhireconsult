@@ -10,7 +10,7 @@
   var COUNTRIES = {
     gb: {
       code: 'gb', name: 'United Kingdom', flag: '\ud83c\uddec\ud83c\udde7', region: 'Europe',
-      avgSalary: '\u00a328,000 \u2013 \u00a345,000', processingTime: '3\u20136 months', language: 'English',
+      avgSalary: '\u00a328,407 \u2013 \u00a370,000', processingTime: '3\u20136 months', language: 'English',
       healthcareSystem: 'National Health Service (NHS)',
       glance: {
         healthcare: 'Universal public healthcare through the NHS, the largest single-payer system in the world. Funded through taxation, it provides free-at-point-of-use care to all UK residents. The NHS employs over 1.5 million staff and is the largest employer in Europe.',
@@ -43,7 +43,7 @@
 
     us: {
       code: 'us', name: 'United States', flag: '\ud83c\uddfa\ud83c\uddf8', region: 'North America',
-      avgSalary: '$65,000 \u2013 $120,000', processingTime: '6\u201312 months', language: 'English',
+      avgSalary: '$75,000 \u2013 $120,000+', processingTime: '6\u201312 months', language: 'English',
       healthcareSystem: 'Mixed Private & Public (Medicare/Medicaid)',
       glance: {
         healthcare: 'A mixed healthcare system combining private insurance, employer-sponsored plans, and government programs (Medicare for seniors, Medicaid for low-income). The US has the highest healthcare spending per capita globally with world-renowned research hospitals and medical centres.',
@@ -141,7 +141,7 @@
 
     ca: {
       code: 'ca', name: 'Canada', flag: '\ud83c\udde8\ud83c\udde6', region: 'North America',
-      avgSalary: 'CAD $70,000 \u2013 CAD $105,000', processingTime: '4\u20138 months', language: 'English / French',
+      avgSalary: 'CAD $65,000 \u2013 CAD $100,000', processingTime: '4\u20138 months', language: 'English / French',
       healthcareSystem: 'Universal Public Healthcare (Medicare)',
       glance: {
         healthcare: 'Canada\u2019s Medicare system provides universal coverage funded through taxation. Each province and territory manages its own health insurance plan. Public hospitals deliver most acute care, with growing private sector involvement in some provinces.',
@@ -173,7 +173,7 @@
 
     au: {
       code: 'au', name: 'Australia', flag: '\ud83c\udde6\ud83c\uddfa', region: 'Oceania',
-      avgSalary: 'AUD $72,000 \u2013 AUD $110,000', processingTime: '3\u20136 months', language: 'English',
+      avgSalary: 'AUD $70,000 \u2013 AUD $110,000', processingTime: '3\u20136 months', language: 'English',
       healthcareSystem: 'Universal Public (Medicare) + Private',
       glance: {
         healthcare: 'Australia\u2019s Medicare system provides universal access to public hospital care and subsidised medical services. The system is complemented by a strong private healthcare sector. Australia is known for excellent working conditions for healthcare staff.',
@@ -205,7 +205,7 @@
 
     de: {
       code: 'de', name: 'Germany', flag: '\ud83c\udde9\ud83c\uddea', region: 'Europe',
-      avgSalary: '\u20ac35,000 \u2013 \u20ac55,000', processingTime: '6\u201312 months', language: 'German',
+      avgSalary: '\u20ac36,000 \u2013 \u20ac58,000', processingTime: '6\u201312 months', language: 'German',
       healthcareSystem: 'Universal Multi-Payer (Statutory & Private Insurance)',
       glance: {
         healthcare: 'Germany has a dual public-private healthcare system with statutory health insurance (GKV) covering about 87% of the population. Known for excellent infrastructure, advanced medical technology, and a strong emphasis on preventive care. Severe nursing shortage creates high demand.',
@@ -333,7 +333,7 @@
 
     sg: {
       code: 'sg', name: 'Singapore', flag: '\ud83c\uddf8\ud83c\uddec', region: 'Asia-Pacific',
-      avgSalary: 'SGD $45,000 \u2013 SGD $85,000', processingTime: '2\u20134 months', language: 'English',
+      avgSalary: 'SGD $36,000 \u2013 SGD $72,000', processingTime: '2\u20134 months', language: 'English',
       healthcareSystem: 'Mixed Public-Private (3M Framework)',
       glance: {
         healthcare: 'Singapore\u2019s healthcare system consistently ranks among the world\u2019s best. The 3M framework (Medisave, MediShield, Medifund) ensures universal coverage. Public restructured hospitals (e.g., SGH, NUH) deliver world-class care alongside a thriving private sector.',
@@ -392,6 +392,70 @@
       stories: [
         { quote: 'Kuwait was my gateway to the Gulf. The savings potential is excellent with tax-free salary and provided housing. After 2 years, I\u2019ve been able to support my family back home significantly.', name: 'Joy Nwosu', role: 'ICU Nurse, Jaber Al-Ahmad Hospital', initials: 'JN', color: '#00e89d', textColor: '#080a0d' },
         { quote: 'The private hospital I work at in Kuwait has a wonderful international team. GlobalHire helped me navigate the MOH exam and I started working within 10 weeks of my initial application.', name: 'Deepak Sharma', role: 'OR Nurse, Dar Al Shifa Hospital', initials: 'DS', color: '#ffb020', textColor: '#080a0d' }
+      ]
+    },
+
+    om: {
+      code: 'om', name: 'Oman', flag: '\ud83c\uddf4\ud83c\uddf2', region: 'Middle East',
+      avgSalary: 'OMR 400 \u2013 OMR 1,200/mo', processingTime: '2\u20134 months', language: 'Arabic / English',
+      healthcareSystem: 'Ministry of Health & Private Sector',
+      glance: {
+        healthcare: 'Oman\u2019s healthcare system has developed significantly over recent decades. The Ministry of Health provides comprehensive healthcare services through government hospitals and health centers. The private sector is also expanding rapidly, creating growing demand for international healthcare professionals.',
+        language: 'Arabic is the official language. English is widely used in clinical settings, particularly in private hospitals and international facilities. Basic Arabic is helpful for patient interaction in government hospitals.',
+        costOfLiving: 'Low to Medium. Lower cost of living than UAE or Qatar. Accommodation is often employer-provided or subsidized. No income tax. Beautiful natural landscapes and a safe, welcoming society.',
+        workLife: '40\u201348 hours/week. 30 days annual leave. Tax-free salary with end-of-service benefits. Many employers provide housing, transport allowance, and annual flights home.'
+      },
+      licensingSteps: [
+        { title: 'Dataflow Verification', desc: 'Complete Primary Source Verification through Dataflow Group. All qualifications and employment history are verified directly at the issuing institutions.' },
+        { title: 'OMSB Registration', desc: 'Apply to the Oman Medical Specialty Board (OMSB) for professional classification and registration. Submit all verified documents and credentials.' },
+        { title: 'Prometric Exam', desc: 'Pass the Prometric licensing examination for your specialty. The exam covers clinical competency and Oman-specific healthcare regulations.' },
+        { title: 'License & Visa', desc: 'Receive your professional license from OMSB/MOH. Employer processes work visa and residence card. Benefits package typically includes housing and flights.' }
+      ],
+      requiredDocs: ['Valid passport', 'Nursing/medical qualification (attested)', 'Dataflow verification report', 'Good standing certificate', 'Experience certificates', 'Medical fitness report', 'Police clearance', 'Passport photos'],
+      jobs: [
+        { title: 'ICU Nurse', employer: 'Royal Hospital, Muscat', logo: 'RH', logoStyle: 'background:linear-gradient(135deg,#1a5276,#2e86c1);color:#fff', salary: 'OMR 800', period: 'month', match: 87, accent: 'var(--primary)', tags: ['Critical Care', 'Tax-Free', 'Housing'] },
+        { title: 'General Nurse', employer: 'Muscat Private Hospital', logo: 'MP', logoStyle: 'background:linear-gradient(135deg,#1e8449,#27ae60);color:#fff', salary: 'OMR 600', period: 'month', match: 84, accent: 'var(--accent-amber)', tags: ['General Ward', 'Private', 'Benefits'] },
+        { title: 'Emergency Nurse', employer: 'Sultan Qaboos University Hospital', logo: 'SQ', logoStyle: 'background:linear-gradient(135deg,#800020,#c0392b);color:#fff', salary: 'OMR 750', period: 'month', match: 82, accent: 'var(--accent-cyan)', tags: ['Emergency', 'University', 'Visa Sponsored'] }
+      ],
+      guides: [
+        { title: 'OMSB Registration Guide for International Healthcare Workers', tag: 'Licensing', readTime: '9 min' },
+        { title: 'Living in Oman: A Healthcare Professional\u2019s Guide', tag: 'Relocation', readTime: '7 min' }
+      ],
+      stories: [
+        { quote: 'Oman is a hidden gem in the Gulf. The cost of living is lower than Dubai or Qatar, but the quality of life is excellent. The people are incredibly welcoming and the natural beauty is stunning.', name: 'Grace Adekunle', role: 'ICU Nurse, Royal Hospital Muscat', initials: 'GA', color: '#00e89d', textColor: '#080a0d' },
+        { quote: 'I chose Oman for its peaceful environment and growing healthcare sector. GlobalHire made the OMSB process straightforward and my employer provided excellent accommodation near the hospital.', name: 'Ravi Patel', role: 'General Nurse, Muscat Private Hospital', initials: 'RP', color: '#ffb020', textColor: '#080a0d' }
+      ]
+    },
+
+    bh: {
+      code: 'bh', name: 'Bahrain', flag: '\ud83c\udde7\ud83c\udded', region: 'Middle East',
+      avgSalary: 'BHD 400 \u2013 BHD 1,200/mo', processingTime: '2\u20134 months', language: 'Arabic / English',
+      healthcareSystem: 'NHRA & Mixed Public-Private',
+      glance: {
+        healthcare: 'Bahrain offers a well-developed healthcare system with both government and private facilities. The National Health Regulatory Authority (NHRA) oversees healthcare professional licensing. The country has a growing private healthcare sector with modern facilities and international standards.',
+        language: 'Arabic is the official language. English is widely used in healthcare settings, especially in private hospitals. Bahrain\u2019s multicultural environment means many healthcare workers communicate primarily in English.',
+        costOfLiving: 'Low to Medium. More affordable than UAE or Qatar. No income tax. Compact and accessible country with modern infrastructure. Accommodation is often employer-provided or subsidized.',
+        workLife: '40\u201348 hours/week. 30 days annual leave. Tax-free salary with end-of-service benefits. Progressive labor law reforms offer better worker protections than many Gulf countries.'
+      },
+      licensingSteps: [
+        { title: 'Dataflow Verification', desc: 'Complete Primary Source Verification through Dataflow Group. All qualifications and employment records are authenticated at the issuing institutions.' },
+        { title: 'NHRA Registration', desc: 'Apply to the National Health Regulatory Authority (NHRA) for professional licensing. Submit all verified credentials and supporting documents.' },
+        { title: 'NHRA Exam', desc: 'Pass the NHRA licensing examination for your specialty. The exam covers clinical competency and Bahrain healthcare regulations.' },
+        { title: 'License & Visa', desc: 'Receive your NHRA professional license. Employer processes work visa and residence permit. Bahrain\u2019s progressive labor laws allow easier mobility between employers.' }
+      ],
+      requiredDocs: ['Valid passport', 'Nursing/medical qualification (attested)', 'Dataflow verification report', 'Good standing certificate', 'Experience certificates', 'Medical fitness report', 'Police clearance', 'Passport photos'],
+      jobs: [
+        { title: 'Staff Nurse \u2014 Medical', employer: 'Salmaniya Medical Complex', logo: 'SM', logoStyle: 'background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff', salary: 'BHD 650', period: 'month', match: 88, accent: 'var(--primary)', tags: ['General Medical', 'Government', 'Housing'] },
+        { title: 'NICU Nurse', employer: 'King Hamad University Hospital', logo: 'KH', logoStyle: 'background:linear-gradient(135deg,#0d4ea6,#2196f3);color:#fff', salary: 'BHD 750', period: 'month', match: 85, accent: 'var(--accent-cyan)', tags: ['Neonatal', 'University', 'Tax-Free'] },
+        { title: 'Operating Theatre Nurse', employer: 'Royal Bahrain Hospital', logo: 'RB', logoStyle: 'background:linear-gradient(135deg,#6c3483,#a569bd);color:#fff', salary: 'BHD 600', period: 'month', match: 82, accent: 'var(--secondary)', tags: ['Perioperative', 'Private', 'Benefits'] }
+      ],
+      guides: [
+        { title: 'NHRA Licensing Guide for International Healthcare Workers', tag: 'Licensing', readTime: '9 min' },
+        { title: 'Living in Bahrain: Healthcare Professional\u2019s Guide', tag: 'Relocation', readTime: '7 min' }
+      ],
+      stories: [
+        { quote: 'Bahrain is the most liberal and accessible country in the Gulf. The social environment is relaxed, the island is compact so everything is close, and the NHRA process was surprisingly fast with GlobalHire\u2019s help.', name: 'Chioma Obi', role: 'Staff Nurse, Salmaniya Medical Complex', initials: 'CO', color: '#00e89d', textColor: '#080a0d' },
+        { quote: 'I love working in Bahrain. The private healthcare sector is growing rapidly, offering great career advancement. The tax-free salary and modern infrastructure make it an excellent choice for healthcare professionals.', name: 'Ahmed Hassan', role: 'NICU Nurse, King Hamad University Hospital', initials: 'AH', color: '#7c5cff', textColor: '#fff' }
       ]
     }
   };
