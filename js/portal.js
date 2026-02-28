@@ -629,7 +629,7 @@
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner"></span>';
 
-        var { error } = await ghFrom('campaign_matches')
+        var { error } = await ghFrom('campaign_matches_write')
           .update({ response: response, responded_at: new Date().toISOString() })
           .eq('id', matchId);
 

@@ -120,10 +120,19 @@ CREATE POLICY "Applicants insert own applications"
   WITH CHECK (applicant_id = auth.uid());
 
 -- ══════════════════════════════════════════════
--- 5. GRANTS
+-- 5. FIX: campaign_matches write proxy
+-- The existing gh_campaign_matches is a joined view (matches+profiles)
+-- so PostgREST cannot update through it. This simple proxy allows updates.
+-- ══════════════════════════════════════════════
+CREATE OR REPLACE VIEW public.gh_campaign_matches_write AS
+SELECT * FROM globalhire.campaign_matches;
+
+-- ══════════════════════════════════════════════
+-- 6. GRANTS
 -- ══════════════════════════════════════════════
 GRANT SELECT, INSERT, UPDATE, DELETE ON globalhire.campaign_applications TO authenticated;
 GRANT ALL ON public.gh_campaign_applications TO authenticated, anon;
 GRANT ALL ON public.gh_campaign_applications_detail TO authenticated, anon;
 GRANT ALL ON public.gh_my_applications TO authenticated, anon;
+GRANT ALL ON public.gh_campaign_matches_write TO authenticated, anon;
 GRANT ALL ON globalhire.campaign_applications TO service_role;
