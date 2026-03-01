@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settling In Guides — GlobalHire@eLab</title>
+  <meta name="description" content="Practical settling-in guides for healthcare professionals abroad. Housing, banking, family relocation, and professional networking in a new country.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/nav-global.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300e89d'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' font-weight='bold' fill='%23080a0d'>G</text></svg>">
+
+  <style>
+    /* ── Hero ── */
+    .si-hero {
+      position: relative;
+      padding: var(--space-20) 0 var(--space-12);
+      text-align: center;
+      overflow: hidden;
+    }
+    .si-hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: var(--space-4);
+    }
+    .si-hero-subtitle {
+      font-size: var(--text-lg);
+      color: var(--text-secondary);
+      max-width: 680px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ── Guide nav ── */
+    .guide-nav {
+      display: flex;
+      gap: var(--space-3);
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: var(--space-8);
+    }
+    .guide-nav a {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-pill);
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .guide-nav a:hover {
+      background: var(--primary-muted);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* ── Back link ── */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      color: var(--text-muted);
+      font-size: var(--text-sm);
+      text-decoration: none;
+      margin-bottom: var(--space-4);
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--primary); }
+
+    /* ── Article sections ── */
+    .guide-article {
+      padding: var(--space-16) 0;
+      border-top: 1px solid var(--border-subtle);
+    }
+    .guide-article:nth-child(even) {
+      background: var(--bg-void);
+    }
+    .article-header {
+      margin-bottom: var(--space-10);
+    }
+    .article-header .overline { margin-bottom: var(--space-3); }
+    .article-header h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: var(--space-4);
+    }
+    .article-header > p {
+      color: var(--text-secondary);
+      font-size: var(--text-base);
+      max-width: 640px;
+      line-height: 1.7;
+    }
+    .article-meta {
+      display: flex;
+      gap: var(--space-4);
+      margin-top: var(--space-4);
+      flex-wrap: wrap;
+    }
+    .article-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+    }
+
+    /* ── Content blocks ── */
+    .content-blocks {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-8);
+    }
+    .content-block {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6) var(--space-8);
+    }
+    .content-block h3 {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 700;
+      margin-bottom: var(--space-4);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .content-block h3 .block-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .content-block p {
+      color: var(--text-secondary);
+      font-size: var(--text-sm);
+      line-height: 1.75;
+      margin-bottom: var(--space-4);
+    }
+    .content-block p:last-child { margin-bottom: 0; }
+
+    /* ── Tip lists ── */
+    .tip-list {
+      list-style: none;
+      padding: 0;
+      margin: var(--space-4) 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    .tip-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+    .tip-list li svg {
+      flex-shrink: 0;
+      margin-top: 2px;
+      color: var(--primary);
+    }
+    .tip-list li strong { color: var(--text-primary); }
+
+    /* ── Country comparison grid ── */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-4);
+    }
+    .compare-card {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5);
+      transition: border-color 0.2s;
+    }
+    .compare-card:hover { border-color: var(--primary); }
+    .compare-card h4 {
+      font-family: var(--font-display);
+      font-size: var(--text-base);
+      font-weight: 700;
+      margin-bottom: var(--space-2);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .compare-card p {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin: 0;
+    }
+    .compare-flag { font-size: var(--text-lg); }
+
+    /* ── Warning box ── */
+    .warning-box {
+      background: rgba(255,176,32,0.06);
+      border: 1px solid rgba(255,176,32,0.25);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4) var(--space-5);
+      margin: var(--space-4) 0;
+    }
+    .warning-box p {
+      color: var(--text-secondary);
+      font-size: var(--text-sm);
+      margin: 0;
+    }
+    .warning-box strong { color: var(--accent-amber); }
+
+    /* ── Checklist grid ── */
+    .checklist-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-3);
+    }
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .check-item svg {
+      flex-shrink: 0;
+      margin-top: 2px;
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background -->
+  <div class="page-bg" aria-hidden="true">
+    <div class="dot-grid"></div>
+  </div>
+
+  <!-- ===================== NAVIGATION ===================== -->
+  <div id="gnav-placeholder"></div>
+
+  <!-- ===================== HERO ===================== -->
+  <section class="si-hero" id="hero">
+    <div class="hero-gradient" aria-hidden="true"></div>
+    <div class="hero-gradient-2" aria-hidden="true"></div>
+
+    <div class="container">
+      <div class="reveal">
+        <a href="guides.html" class="back-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+          Back to Knowledge Hub
+        </a>
+        <span class="overline">Settling In</span>
+        <h1>Build Your New Life with <span class="gradient-text">Confidence</span></h1>
+        <p class="si-hero-subtitle">
+          From finding your first home to building a professional network &mdash; everything you need to settle in and thrive in your new country as a healthcare professional.
+        </p>
+
+        <div class="guide-nav">
+          <a href="#finding-housing">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            Housing
+          </a>
+          <a href="#banking-finance">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            Banking &amp; Finance
+          </a>
+          <a href="#schools-family">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            Schools &amp; Family
+          </a>
+          <a href="#professional-network">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/></svg>
+            Networking
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== GUIDE 1: FINDING HOUSING ===================== -->
+  <section class="guide-article" id="finding-housing">
+    <div class="container">
+      <div class="article-header reveal">
+        <span class="overline">Settling In</span>
+        <h2>Finding Housing in a New Country</h2>
+        <p>Where to search, rental expectations by country, avoiding scams, understanding lease agreements, and tips for securing accommodation from abroad before you arrive.</p>
+        <div class="article-meta">
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            11 min read
+          </span>
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            5 sections &bull; Country-specific tips
+          </span>
+        </div>
+      </div>
+
+      <div class="content-blocks reveal">
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:var(--primary-muted);color:var(--primary);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            </span>
+            Employer-Provided vs. Independent Housing
+          </h3>
+          <p>Many international healthcare employers offer accommodation support, particularly in the Gulf states and some UK NHS trusts. Understanding your options helps you make the right choice.</p>
+          <ul class="tip-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Employer-provided accommodation (common in Gulf, some UK):</strong> Usually free or heavily subsidised. Ask about location, room sharing policy, furnishings, distance to workplace, and whether utilities are included. Some employers provide a housing allowance instead &mdash; this gives you more freedom but requires you to find your own place.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Temporary accommodation first:</strong> If renting independently, consider booking a serviced apartment or Airbnb for 2&ndash;4 weeks. This gives you time to explore neighbourhoods in person before committing to a 12-month lease. Signing a lease from abroad sight-unseen is risky.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Hospital proximity:</strong> Healthcare shifts start early and can end late. Prioritise housing within 30 minutes of your workplace. For nurses working rotating shifts, reliable public transport or short driving distances matter more than living in the trendiest neighbourhood.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:var(--secondary-muted);color:var(--secondary);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </span>
+            Rental Markets by Country
+          </h3>
+          <div class="compare-grid">
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127468;&#127463;</span> United Kingdom</h4>
+              <p>Use Rightmove, Zoopla, or SpareRoom. London: &pound;900&ndash;&pound;2,000/mo for a one-bed. Manchester, Birmingham, Leeds: &pound;550&ndash;&pound;900. Expect a deposit (usually 5 weeks' rent) held in a government-backed deposit scheme. Most tenancies are 6&ndash;12 months. Furnished options are common. Council tax is paid separately.</p>
+            </div>
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127482;&#127480;</span> United States</h4>
+              <p>Use Zillow, Apartments.com, or Craigslist. Costs vary hugely by city: NYC $2,500+, Houston $1,200, rural areas $700. Most leases are 12 months. You will need to build a credit history &mdash; some landlords accept employer letters or extra deposit in lieu of credit scores. Utilities are usually separate.</p>
+            </div>
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127462;&#127466;</span> UAE (Dubai)</h4>
+              <p>Use Dubizzle or Property Finder. Studio: AED 30,000&ndash;50,000/yr. One-bed: AED 45,000&ndash;80,000/yr. Rent is traditionally paid in 1&ndash;4 cheques annually, though monthly payment is becoming more common. DEWA (utilities) deposit required. Many employers provide accommodation or an allowance of AED 3,000&ndash;6,000/mo.</p>
+            </div>
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127480;&#127462;</span> Saudi Arabia</h4>
+              <p>Most healthcare employers provide furnished compounds or housing allowances. If renting independently, use Haraj or Aqar. Riyadh one-bed: SAR 18,000&ndash;35,000/yr. Jeddah is slightly cheaper. Compounds offer a more familiar social environment for international workers with shared facilities.</p>
+            </div>
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127462;&#127482;</span> Australia</h4>
+              <p>Use Domain or RealEstate.com.au. Sydney: AUD 2,000&ndash;3,000/mo for a one-bed. Melbourne: AUD 1,600&ndash;2,400. Regional areas: AUD 800&ndash;1,400. Bond (deposit) is usually 4 weeks' rent. Rental market is competitive &mdash; apply quickly and bring references. Inspections are held at scheduled open times.</p>
+            </div>
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127465;&#127466;</span> Germany</h4>
+              <p>Use ImmobilienScout24 or WG-Gesucht (shared flats). Munich: &euro;1,200&ndash;1,800/mo. Berlin: &euro;900&ndash;1,400. Most rentals are unfurnished (including no kitchen). Kaution (deposit) is 3 months' cold rent. The Anmeldung (address registration) requires a Wohnungsgeber&shy;best&auml;tigung from your landlord.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:rgba(255,176,32,0.12);color:var(--accent-amber);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v.01"/><path d="M12 8v4"/></svg>
+            </span>
+            Avoiding Rental Scams
+          </h3>
+          <p>International newcomers are prime targets for rental fraud, especially when searching remotely. Protect yourself with these precautions.</p>
+          <div class="warning-box">
+            <p><strong>Never transfer money before verifying the property and landlord.</strong> Scammers commonly post fake listings with attractive prices, request deposits via bank transfer, and then disappear. Always insist on a video call walkthrough at minimum, and use official rental platforms with payment protections.</p>
+          </div>
+          <ul class="tip-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Verify the landlord:</strong> Check land registry records, ask for ID, and confirm ownership. In the UAE, verify through Ejari (Dubai) or Tawtheeq (Abu Dhabi).</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Use regulated platforms:</strong> Rightmove and Zoopla (UK), Zillow (US), Dubizzle (UAE) are legitimate. Be cautious of social media or WhatsApp group listings.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Read the lease thoroughly:</strong> Understand break clauses, notice periods, maintenance responsibilities, and what happens if you need to leave early. Have a colleague or legal advisor review if unsure.</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== GUIDE 2: BANKING & FINANCE ===================== -->
+  <section class="guide-article" id="banking-finance">
+    <div class="container">
+      <div class="article-header reveal">
+        <span class="overline">Settling In</span>
+        <h2>Banking &amp; Finance for New Arrivals</h2>
+        <p>Opening bank accounts as a new arrival, best remittance services, salary account requirements, credit building, and managing finances across two countries.</p>
+        <div class="article-meta">
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            10 min read
+          </span>
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            4 sections &bull; Remittance comparison
+          </span>
+        </div>
+      </div>
+
+      <div class="content-blocks reveal">
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:var(--primary-muted);color:var(--primary);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            </span>
+            Opening a Bank Account
+          </h3>
+          <p>Your employer will need a local bank account to pay your salary. Open one as soon as possible after arrival &mdash; ideally within the first week.</p>
+          <div class="compare-grid">
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127468;&#127463;</span> UK</h4>
+              <p>High street banks (Barclays, HSBC, Lloyds) require proof of address and employment letter. This creates a chicken-and-egg problem for new arrivals. Digital banks like <strong>Monzo, Starling, or Revolut</strong> are easier &mdash; they accept passport + visa and can be set up before arrival.</p>
+            </div>
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127482;&#127480;</span> USA</h4>
+              <p>Open with passport, visa, and employer letter. No SSN required initially at most banks (Chase, Bank of America, Wells Fargo). You will receive an ITIN for tax purposes. Building credit is essential &mdash; consider a secured credit card from day one.</p>
+            </div>
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127462;&#127466;</span> UAE</h4>
+              <p>Employer typically facilitates through a partner bank (e.g., Emirates NBD, ADCB). Requires Emirates ID, visa copy, and salary certificate. Salary accounts are free. WPS (Wage Protection System) ensures your salary is paid through the banking system.</p>
+            </div>
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127465;&#127466;</span> Germany</h4>
+              <p>A German bank account (Girokonto) is essential for rent, insurance, and salary. N26 or DKB are popular digital options. Traditional banks (Sparkasse, Deutsche Bank) require an Anmeldung. Open an account quickly &mdash; you cannot rent without one.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:var(--secondary-muted);color:var(--secondary);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </span>
+            Sending Money Home: Remittance Options
+          </h3>
+          <p>Most international healthcare professionals send a portion of their salary to family at home. Choosing the right service can save you hundreds or thousands per year in fees and exchange rate markups.</p>
+          <ul class="tip-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Wise (formerly TransferWise):</strong> Best exchange rates with transparent fees (typically 0.3&ndash;1.5%). Fastest for bank-to-bank transfers. Available in most countries. The multi-currency account is ideal for professionals working across borders.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Remitly:</strong> Competitive rates with options for express delivery (minutes) or economy (3&ndash;5 days). Good coverage for African and Asian countries. Frequent promotions for new users.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Western Union / MoneyGram:</strong> Widest global network with cash pickup options in remote areas. Higher fees than digital-first services, but useful when recipients don't have bank accounts.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Avoid bank wire transfers:</strong> Traditional bank transfers typically charge &pound;15&ndash;&pound;30 per transfer plus a 2&ndash;4% exchange rate markup. Over a year of monthly transfers, this adds up to hundreds in unnecessary fees.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:rgba(255,176,32,0.12);color:var(--accent-amber);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            Tax Obligations
+          </h3>
+          <p>Moving abroad does not automatically end your tax obligations at home. Understanding your tax position in both countries prevents nasty surprises.</p>
+          <ul class="tip-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Gulf states (zero income tax):</strong> UAE, Saudi Arabia, Qatar, Kuwait, Bahrain, and Oman do not tax personal income. However, you may still owe taxes in your home country depending on residency rules and double taxation agreements.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>UK (PAYE):</strong> Tax is deducted automatically from your salary. You receive a tax code from HMRC. The personal allowance is &pound;12,570/yr (2025/26). National Insurance contributions are separate. NHS pension contributions are also deducted.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>US:</strong> Federal + state taxes. Some states (Texas, Florida, Nevada) have no state income tax. File annually by April 15. If you are a US citizen or green card holder working abroad, you must still file US taxes worldwide.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Germany:</strong> Progressive income tax (14&ndash;45%). Church tax applies if registered with a church. Lohnsteuer (wage tax) is deducted monthly. Annual tax return (Steuererkl&auml;rung) can result in refunds &mdash; use services like SteuerGo or a tax advisor.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:rgba(0,212,255,0.12);color:var(--accent-cyan);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </span>
+            Building Financial Security Abroad
+          </h3>
+          <ul class="tip-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Emergency fund:</strong> Maintain 3&ndash;6 months of living expenses accessible at all times. This is even more important abroad where you may lack the family safety net you have at home.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Savings strategy:</strong> Set a savings target (many Gulf-based healthcare workers save 40&ndash;60% of income). Automate transfers to a savings account on payday. Track expenses for the first 3 months to establish a realistic budget.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Pension &amp; long-term planning:</strong> Contribute to employer pension schemes where available (NHS pension, US 401(k) with employer match). In the Gulf, end-of-service gratuity is calculated based on length of service &mdash; understand your entitlement.</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== GUIDE 3: SCHOOLS & FAMILY ===================== -->
+  <section class="guide-article" id="schools-family">
+    <div class="container">
+      <div class="article-header reveal">
+        <span class="overline">Settling In</span>
+        <h2>Schools &amp; Family Relocation</h2>
+        <p>Navigating school enrolment, international vs. local schools, dependent visa processes, spousal work permits, and keeping your family connected across borders.</p>
+        <div class="article-meta">
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            13 min read
+          </span>
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            4 sections &bull; Dependent visa info
+          </span>
+        </div>
+      </div>
+
+      <div class="content-blocks reveal">
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:var(--primary-muted);color:var(--primary);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            </span>
+            Choosing the Right School
+          </h3>
+          <p>Education is often the top concern for healthcare professionals relocating with families. The right school depends on your destination, budget, intended length of stay, and your children's needs.</p>
+          <ul class="tip-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Local/state schools (free):</strong> Available in UK, Australia, Canada, Germany, and US. Quality varies by area. In the UK, school allocation is based on catchment area &mdash; research schools before choosing where to live. In Germany, instruction is in German, which can be challenging initially.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>International schools:</strong> Follow British, American, or IB curricula. Essential in Gulf states if you want English-medium education. Fees range from AED 15,000&ndash;80,000/yr in UAE, &pound;10,000&ndash;&pound;30,000/yr in UK. Some employers include education allowances in packages, particularly in the Gulf.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Timing:</strong> Most school systems have specific enrolment windows. Apply early &mdash; popular schools in Dubai, London, and Sydney have waiting lists. Start researching 3&ndash;6 months before your move date.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:var(--secondary-muted);color:var(--secondary);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </span>
+            Dependent Visas &amp; Spousal Work Rights
+          </h3>
+          <p>Bringing your family abroad requires understanding visa entitlements for dependents and whether your spouse can work.</p>
+          <div class="compare-grid">
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127468;&#127463;</span> UK</h4>
+              <p>Health &amp; Care Worker Visa holders can bring dependents. Spouse receives full work rights &mdash; no restrictions on employment type. Dependents are eligible for NHS access. Apply together or separately (joining later costs more).</p>
+            </div>
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127482;&#127480;</span> USA</h4>
+              <p>EB-3 visa holders: spouse (H-4 visa) can apply for work authorisation (EAD) once I-140 is approved. Processing can take months. Children attend school on dependent visa. Green Card includes full family rights.</p>
+            </div>
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127462;&#127466;</span> UAE</h4>
+              <p>Sponsor dependents once earning above the minimum salary threshold (typically AED 4,000+ or AED 3,000 with accommodation). Spouse can obtain their own work permit independently. School-age children must be enrolled in a school to maintain visa status.</p>
+            </div>
+            <div class="compare-card">
+              <h4><span class="compare-flag">&#127462;&#127482;</span> Australia</h4>
+              <p>Skilled visa holders can include family in the application. Partner receives full work rights. Children access public education at domestic rates. Medicare covers all included dependents.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:rgba(255,176,32,0.12);color:var(--accent-amber);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </span>
+            Keeping Your Family Connected
+          </h3>
+          <ul class="tip-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>If relocating solo first:</strong> Many healthcare professionals move ahead of their families to secure housing and settle into work. Set a clear timeline for family joining. Schedule daily video calls. Involve family in decisions about the new home and neighbourhood.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Community support:</strong> Connect with diaspora communities in your destination. Many cities have Nigerian, Filipino, Indian, and other national community groups that organise events, worship, and mutual support. These connections are invaluable for families adjusting to a new culture.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Children's adjustment:</strong> Children are remarkably adaptable but need patience. Allow them to grieve the life they left behind. Maintain familiar routines (mealtimes, bedtime stories) while gradually introducing new experiences. School is usually the fastest route to new friendships.</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== GUIDE 4: PROFESSIONAL NETWORK ===================== -->
+  <section class="guide-article" id="professional-network">
+    <div class="container">
+      <div class="article-header reveal">
+        <span class="overline">Settling In</span>
+        <h2>Building Your Professional Network Abroad</h2>
+        <p>Strategies for networking in a new country: joining professional bodies, attending events, leveraging LinkedIn internationally, and finding mentors who accelerate your career.</p>
+        <div class="article-meta">
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            8 min read
+          </span>
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/></svg>
+            4 strategies &bull; Actionable tips
+          </span>
+        </div>
+      </div>
+
+      <div class="content-blocks reveal">
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:var(--primary-muted);color:var(--primary);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+            </span>
+            Join Professional Bodies
+          </h3>
+          <p>Professional membership opens doors to CPD events, conferences, networking opportunities, and career advancement. Most bodies offer discounted or free membership for newly registered international professionals.</p>
+          <div class="checklist-grid">
+            <div class="check-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <strong>UK:</strong> Royal College of Nursing (RCN), Unison, British Medical Association (BMA)
+            </div>
+            <div class="check-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <strong>US:</strong> American Nurses Association (ANA), specialty organisations (AACN, ENA, AORN)
+            </div>
+            <div class="check-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <strong>Australia:</strong> Australian Nursing &amp; Midwifery Federation (ANMF), specialty colleges
+            </div>
+            <div class="check-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <strong>Gulf:</strong> Emirates Nursing Association, Saudi Nursing Society, hospital-level professional groups
+            </div>
+            <div class="check-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <strong>Canada:</strong> Canadian Nurses Association (CNA), provincial associations (RNAO, BCCNM)
+            </div>
+            <div class="check-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <strong>Germany:</strong> Deutscher Berufsverband f&uuml;r Pflegeberufe (DBfK), Marburger Bund (physicians)
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:var(--secondary-muted);color:var(--secondary);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </span>
+            Leveraging LinkedIn Internationally
+          </h3>
+          <p>LinkedIn is the single most powerful networking tool for international healthcare professionals. A strong profile attracts recruiters, connects you with peers, and positions you for career advancement.</p>
+          <ul class="tip-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Update your headline:</strong> Go beyond "Registered Nurse." Use something like "ICU Nurse | NMC Registered | NHS Band 5 | Open to Senior Opportunities." Include your registration and destination country.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Connect strategically:</strong> Follow and connect with healthcare recruiters, hospital HR teams, and senior clinicians in your destination. Engage with their posts before reaching out directly.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Share your journey:</strong> Post about your relocation experience, licensing milestones, and professional insights. International nurse stories resonate strongly on LinkedIn and build your personal brand.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Join groups:</strong> "International Nurses UK," "Healthcare Professionals in the Gulf," "Nurses in Australia" &mdash; these groups share job postings, advice, and support from people who have walked the same path.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:rgba(255,176,32,0.12);color:var(--accent-amber);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </span>
+            Finding a Mentor
+          </h3>
+          <p>A mentor who has successfully navigated the international healthcare career path you are on is invaluable. They can offer guidance on career progression, workplace culture, and avoiding common pitfalls.</p>
+          <ul class="tip-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Within your workplace:</strong> Many hospitals assign preceptors or buddies to new international staff. Proactively ask senior colleagues if they would be willing to mentor you beyond the initial orientation period.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Through professional bodies:</strong> Many organisations (RCN, ANA, ANMF) run formal mentorship programmes matching new members with experienced professionals. These are structured and time-limited, making them less intimidating to initiate.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>From your home country network:</strong> Seek out healthcare professionals from your home country who are established in your destination. They understand both the clinical and cultural challenges you face and can provide uniquely relevant advice.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="content-block">
+          <h3>
+            <span class="block-icon" style="background:rgba(0,212,255,0.12);color:var(--accent-cyan);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+            </span>
+            Long-Term Career Growth
+          </h3>
+          <p>Your international career does not end with your first placement. The most successful healthcare professionals abroad actively invest in their growth from day one.</p>
+          <ul class="tip-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Pursue specialisation:</strong> Once established, consider specialist certifications (CCRN in US, specialist community nursing in UK, critical care certificates in Australia). These unlock higher-paying roles and greater job security.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Seek leadership roles:</strong> Volunteer for charge nurse shifts, join quality improvement committees, and express interest in team lead or ward manager positions. International experience is increasingly valued in leadership roles.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Continue education:</strong> Many countries offer funded postgraduate study for healthcare professionals. NHS-funded MSc programmes (UK), tuition reimbursement (US), and university partnerships (Australia) can advance your career while your employer covers the cost.</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>
+              <span><strong>Build your reputation:</strong> Present at ward meetings, contribute to clinical audits, publish case studies, and attend conferences. These activities build your professional reputation and open doors to opportunities that are never publicly advertised.</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== CTA ===================== -->
+  <section class="cta-section" id="get-started">
+    <div class="cta-glow" aria-hidden="true"></div>
+    <div class="container">
+      <div class="cta-box reveal">
+        <span class="overline" style="margin-bottom:var(--space-4);display:block;">Ready to Start Your Journey?</span>
+        <h2>Build Your <span class="gradient-text">International Career</span></h2>
+        <p>Join thousands of healthcare professionals who have successfully settled into thriving careers abroad with GlobalHire.</p>
+        <div class="cta-actions">
+          <a href="signup.html" class="btn btn-primary btn-lg">
+            Create Free Account
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="guides.html" class="btn btn-ghost btn-lg">Explore Knowledge Hub</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <div id="gfooter-placeholder"></div>
+
+  <!-- Scripts -->
+  <script src="js/core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/nav-global.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.GHNav) GHNav.init('guides');
+      if (window.GHE) GHE.init();
+
+      document.querySelectorAll('.guide-nav a').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          var target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
+
+      if (window.location.hash) {
+        var target = document.querySelector(window.location.hash);
+        if (target) {
+          setTimeout(function() {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 300);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
