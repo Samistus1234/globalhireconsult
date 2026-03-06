@@ -1013,50 +1013,6 @@
   }
 }
 
-/* ── Floating Particles ── */
-.floating-orb {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-  filter: blur(40px);
-  animation: orb-float 20s ease-in-out infinite;
-}
-
-.floating-orb-1 {
-  width: 200px;
-  height: 200px;
-  background: rgba(0, 232, 157, 0.06);
-  top: 20%;
-  right: 10%;
-}
-
-.floating-orb-2 {
-  width: 150px;
-  height: 150px;
-  background: rgba(124, 92, 255, 0.05);
-  bottom: 30%;
-  left: 5%;
-  animation-delay: -7s;
-  animation-duration: 25s;
-}
-
-.floating-orb-3 {
-  width: 100px;
-  height: 100px;
-  background: rgba(0, 212, 255, 0.04);
-  top: 60%;
-  right: 25%;
-  animation-delay: -12s;
-  animation-duration: 18s;
-}
-
-@keyframes orb-float {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(30px, -40px) scale(1.1); }
-  50% { transform: translate(-20px, 20px) scale(0.9); }
-  75% { transform: translate(40px, 30px) scale(1.05); }
-}
-
 /* ── Button Hover Shine ── */
 .btn-primary::after {
   content: '';

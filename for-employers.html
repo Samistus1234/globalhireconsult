@@ -17,10 +17,13 @@
 </head>
 <body>
   <div class="page-bg" aria-hidden="true"><div class="dot-grid"></div></div>
+  <div class="animated-grid-bg" aria-hidden="true"></div>
   <div id="gnav-placeholder"></div>
 
   <!-- ===================== HERO ===================== -->
-  <section class="page-hero">
+  <section class="page-hero" style="overflow:hidden;">
+    <div class="floating-orb floating-orb-mint" style="top:-15%;right:-5%;position:absolute;" aria-hidden="true"></div>
+    <div class="floating-orb floating-orb-violet" style="bottom:-20%;left:-8%;position:absolute;" aria-hidden="true"></div>
     <div class="container">
       <span class="overline">For Healthcare Employers</span>
       <h1>Stop Searching. <span class="gradient-text">Start Matching.</span></h1>
@@ -35,12 +38,14 @@
   </section>
 
   <!-- ===================== THE PROBLEM ===================== -->
-  <section class="content-section alt">
+  <section class="content-section alt" style="position:relative;overflow:hidden;">
+    <div class="floating-orb floating-orb-mint" style="top:-10%;right:-5%;" aria-hidden="true"></div>
+    <div class="floating-orb floating-orb-violet" style="bottom:10%;left:-8%;" aria-hidden="true"></div>
     <div class="container">
       <div class="two-col">
         <div class="two-col-content reveal-left">
           <span class="overline" style="display:block;margin-bottom:var(--space-4)">The Hiring Problem</span>
-          <h2>Healthcare Recruitment is Broken</h2>
+          <h2>Healthcare Recruitment is <span class="shimmer-text">Broken</span></h2>
           <p>You spend months sourcing candidates, weeks verifying credentials, and still risk compliance failures. Agency fees eat into budgets. Unverified candidates waste interview time. Critical roles stay unfilled.</p>
           <ul class="check-list" style="margin-top:var(--space-4)">
             <li>
