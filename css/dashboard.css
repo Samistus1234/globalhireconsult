@@ -87,7 +87,7 @@
   font-size: var(--text-sm);
   font-weight: 500;
   color: var(--text-secondary);
-  transition: all var(--duration-fast);
+  transition: all var(--duration-base) var(--ease-out);
   cursor: pointer;
   position: relative;
 }
@@ -95,6 +95,12 @@
 .nav-item:hover {
   background: var(--bg-elevated);
   color: var(--text-primary);
+  transform: translateX(4px);
+}
+
+.nav-item:hover svg {
+  transform: scale(1.1);
+  transition: transform var(--duration-base) var(--ease-spring);
 }
 
 .nav-item.active {
@@ -112,6 +118,11 @@
   height: 20px;
   background: var(--primary);
   border-radius: 0 2px 2px 0;
+  box-shadow: 0 0 8px rgba(0, 232, 157, 0.4);
+}
+
+.nav-item.active:hover {
+  transform: translateX(2px);
 }
 
 .nav-item svg {
@@ -309,12 +320,30 @@
   padding: var(--space-5) var(--space-6);
   position: relative;
   overflow: hidden;
-  transition: all var(--duration-base) var(--ease-out);
+  transition: all var(--duration-slow) var(--ease-out);
+  animation: kpi-enter 0.5s var(--ease-out) both;
+}
+
+.kpi-card:nth-child(1) { animation-delay: 0.05s; }
+.kpi-card:nth-child(2) { animation-delay: 0.1s; }
+.kpi-card:nth-child(3) { animation-delay: 0.15s; }
+.kpi-card:nth-child(4) { animation-delay: 0.2s; }
+
+@keyframes kpi-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .kpi-card:hover {
-  border-color: var(--border-default);
-  transform: translateY(-2px);
+  border-color: var(--border-accent);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg), 0 0 20px rgba(0, 232, 157, 0.08);
 }
 
 .kpi-card::before {
@@ -325,6 +354,13 @@
   right: 0;
   height: 2px;
   background: var(--kpi-accent, var(--primary));
+  background-size: 200% 100%;
+  animation: gradient-shift 3s linear infinite;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 0; }
+  100% { background-position: 200% 0; }
 }
 
 .kpi-header {
@@ -350,6 +386,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform var(--duration-slow) var(--ease-spring);
+}
+
+.kpi-card:hover .kpi-icon {
+  transform: rotate(-10deg) scale(1.15);
 }
 
 .kpi-icon svg {
@@ -364,6 +405,11 @@
   color: var(--text-primary);
   line-height: 1;
   margin-bottom: var(--space-2);
+  transition: transform var(--duration-slow) var(--ease-spring);
+}
+
+.kpi-card:hover .kpi-value {
+  transform: scale(1.05);
 }
 
 .kpi-change {

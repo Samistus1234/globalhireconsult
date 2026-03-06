@@ -23,6 +23,7 @@
   height: 60%;
   background: radial-gradient(circle, rgba(0,232,157,0.06) 0%, transparent 70%);
   pointer-events: none;
+  animation: auth-orb-drift 15s ease-in-out infinite;
 }
 
 .auth-page::after {
@@ -34,6 +35,13 @@
   height: 60%;
   background: radial-gradient(circle, rgba(124,92,255,0.06) 0%, transparent 70%);
   pointer-events: none;
+  animation: auth-orb-drift 20s ease-in-out infinite reverse;
+}
+
+@keyframes auth-orb-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(40px, -30px) scale(1.1); }
+  66% { transform: translate(-30px, 40px) scale(0.95); }
 }
 
 /* ── Auth Card ── */
@@ -49,6 +57,18 @@
   position: relative;
   z-index: 1;
   margin: var(--space-4);
+  animation: auth-card-enter 0.6s var(--ease-out) both;
+}
+
+@keyframes auth-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .auth-card-wide {

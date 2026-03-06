@@ -17,7 +17,7 @@ const GHE = {
       });
     }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-blur, .reveal-stagger').forEach(el => observer.observe(el));
   },
 
   // ── Counter Animation ──
@@ -39,7 +39,11 @@ const GHE = {
             const eased = 1 - Math.pow(1 - progress, 4);
             const current = Math.floor(eased * target);
             el.textContent = prefix + current.toLocaleString() + suffix;
-            if (progress < 1) requestAnimationFrame(update);
+            if (progress < 1) {
+              requestAnimationFrame(update);
+            } else {
+              el.classList.add('counter-done');
+            }
           };
 
           requestAnimationFrame(update);
@@ -214,6 +218,62 @@ const GHE = {
     });
   },
 
+  // ── Parallax Elements ──
+  initParallax() {
+    const els = document.querySelectorAll('[data-parallax]');
+    if (!els.length) return;
+
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const scrollY = window.scrollY;
+          els.forEach(el => {
+            const speed = parseFloat(el.dataset.parallax) || 0.1;
+            const rect = el.getBoundingClientRect();
+            const center = rect.top + rect.height / 2;
+            const offset = (center - window.innerHeight / 2) * speed;
+            el.style.transform = `translateY(${offset}px)`;
+          });
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+  },
+
+  // ── Magnetic Hover on CTA Buttons ──
+  initMagneticButtons() {
+    document.querySelectorAll('.btn-primary.btn-lg, .btn-secondary.btn-lg').forEach(btn => {
+      btn.addEventListener('mousemove', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        btn.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px) scale(1.03)`;
+      });
+
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transform = '';
+      });
+    });
+  },
+
+  // ── Card Tilt Effect ──
+  initCardTilt() {
+    document.querySelectorAll('.testimonial-card, .service-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        card.style.transform = `perspective(800px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg) translateY(-6px)`;
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+      });
+    });
+  },
+
   // ── Initialize all core features ──
   init() {
     this.initThemeToggle();
@@ -221,6 +281,9 @@ const GHE = {
     this.animateCounters();
     this.initStickyNav();
     this.initSmoothScroll();
+    this.initParallax();
+    this.initMagneticButtons();
+    this.initCardTilt();
   }
 };
 

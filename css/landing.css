@@ -349,7 +349,7 @@
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  transition: all var(--duration-base) var(--ease-out);
+  transition: all var(--duration-slow) var(--ease-out);
   position: relative;
   overflow: hidden;
 }
@@ -360,20 +360,22 @@
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 60px;
+  width: 0;
   height: 2px;
   background: linear-gradient(90deg, transparent, var(--primary), transparent);
   opacity: 0;
-  transition: opacity var(--duration-base);
+  transition: opacity var(--duration-slow), width var(--duration-slow) var(--ease-out);
 }
 
 .stat-item:hover::before {
   opacity: 1;
+  width: 80%;
 }
 
 .stat-item:hover {
-  border-color: var(--border-default);
-  transform: translateY(-4px);
+  border-color: var(--border-accent);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-glow-primary);
 }
 
 .stat-number {
@@ -383,6 +385,11 @@
   color: var(--text-primary);
   line-height: 1;
   margin-bottom: var(--space-2);
+  transition: transform var(--duration-slow) var(--ease-spring);
+}
+
+.stat-item:hover .stat-number {
+  transform: scale(1.08);
 }
 
 .stat-number .suffix {
@@ -444,9 +451,9 @@
 }
 
 .service-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--border-default);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-8px) scale(1.01);
+  border-color: var(--border-accent);
+  box-shadow: var(--shadow-lg), var(--shadow-glow-primary);
 }
 
 .service-card:hover::after {
@@ -467,6 +474,13 @@
   justify-content: center;
   margin-bottom: var(--space-6);
   font-size: var(--text-2xl);
+  transition: transform var(--duration-slow) var(--ease-spring),
+              box-shadow var(--duration-slow);
+}
+
+.service-card:hover .service-icon {
+  transform: translateY(-4px) rotate(-5deg) scale(1.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 .service-card h3 {
@@ -537,6 +551,13 @@
   font-weight: 800;
   position: relative;
   z-index: 2;
+  transition: transform var(--duration-slow) var(--ease-spring),
+              box-shadow var(--duration-slow);
+}
+
+.how-step:hover .how-number {
+  transform: scale(1.15) translateY(-4px);
+  box-shadow: 0 0 30px currentColor;
 }
 
 .how-step:nth-child(1) .how-number {
@@ -656,12 +677,41 @@
   background: linear-gradient(180deg, var(--primary), var(--primary-dark));
   border-radius: 3px 3px 0 0;
   min-height: 8px;
-  animation: bar-grow 1.5s var(--ease-out) both;
+  transform-origin: bottom;
+  animation: bar-grow 1.2s var(--ease-out) both;
+  position: relative;
+  overflow: hidden;
+}
+
+.mock-bar:nth-child(1) { animation-delay: 0.1s; }
+.mock-bar:nth-child(2) { animation-delay: 0.15s; }
+.mock-bar:nth-child(3) { animation-delay: 0.2s; }
+.mock-bar:nth-child(4) { animation-delay: 0.25s; }
+.mock-bar:nth-child(5) { animation-delay: 0.3s; }
+.mock-bar:nth-child(6) { animation-delay: 0.35s; }
+.mock-bar:nth-child(7) { animation-delay: 0.4s; }
+.mock-bar:nth-child(8) { animation-delay: 0.45s; }
+.mock-bar:nth-child(9) { animation-delay: 0.5s; }
+.mock-bar:nth-child(10) { animation-delay: 0.55s; }
+.mock-bar:nth-child(11) { animation-delay: 0.6s; }
+.mock-bar:nth-child(12) { animation-delay: 0.65s; }
+
+.mock-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.15), transparent);
+  opacity: 0;
+  transition: opacity var(--duration-base);
+}
+
+.features-visual:hover .mock-bar::after {
+  opacity: 1;
 }
 
 @keyframes bar-grow {
-  from { transform: scaleY(0); transform-origin: bottom; }
-  to { transform: scaleY(1); transform-origin: bottom; }
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
 }
 
 .features-list {
@@ -685,6 +735,11 @@
   justify-content: center;
   flex-shrink: 0;
   font-size: var(--text-xl);
+  transition: transform var(--duration-slow) var(--ease-spring);
+}
+
+.feature-item:hover .feature-icon {
+  transform: scale(1.15) rotate(-5deg);
 }
 
 .feature-item h4 {
@@ -708,13 +763,32 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
   padding: var(--space-8);
-  transition: all var(--duration-base) var(--ease-out);
+  transition: all var(--duration-slow) var(--ease-out);
   position: relative;
+  overflow: hidden;
+}
+
+.testimonial-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-slow) var(--ease-out);
 }
 
 .testimonial-card:hover {
-  transform: translateY(-4px) rotate(-0.5deg);
+  transform: translateY(-6px) rotate(-0.5deg);
   border-color: var(--border-default);
+  box-shadow: var(--shadow-lg);
+}
+
+.testimonial-card:hover::after {
+  transform: scaleX(1);
 }
 
 .testimonial-card .quote-mark {
@@ -783,6 +857,12 @@
   overflow: hidden;
   max-width: 800px;
   margin: 0 auto;
+  animation: cta-breathe 4s ease-in-out infinite;
+}
+
+@keyframes cta-breathe {
+  0%, 100% { box-shadow: 0 0 30px rgba(0, 232, 157, 0.05), 0 0 60px rgba(124, 92, 255, 0.03); }
+  50% { box-shadow: 0 0 50px rgba(0, 232, 157, 0.12), 0 0 100px rgba(124, 92, 255, 0.06); }
 }
 
 .cta-box::before {
@@ -793,6 +873,13 @@
   right: 0;
   height: 2px;
   background: linear-gradient(90deg, var(--primary), var(--secondary), var(--primary));
+  background-size: 200% 100%;
+  animation: gradient-shift 3s linear infinite;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 0; }
+  100% { background-position: 200% 0; }
 }
 
 .cta-box h2 {
@@ -902,6 +989,126 @@
 @keyframes scan-line {
   0% { transform: translateY(-100%); }
   100% { transform: translateY(100vh); }
+}
+
+/* ── Hero Text Line Reveal ── */
+.hero h1 .line {
+  display: block;
+  animation: hero-line-reveal 0.7s var(--ease-out) both;
+}
+.hero h1 .line:nth-child(1) { animation-delay: 0.15s; }
+.hero h1 .line:nth-child(2) { animation-delay: 0.3s; }
+.hero h1 .line:nth-child(3) { animation-delay: 0.45s; }
+
+@keyframes hero-line-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px) skewY(1deg);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) skewY(0);
+    filter: blur(0);
+  }
+}
+
+/* ── Floating Particles ── */
+.floating-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(40px);
+  animation: orb-float 20s ease-in-out infinite;
+}
+
+.floating-orb-1 {
+  width: 200px;
+  height: 200px;
+  background: rgba(0, 232, 157, 0.06);
+  top: 20%;
+  right: 10%;
+}
+
+.floating-orb-2 {
+  width: 150px;
+  height: 150px;
+  background: rgba(124, 92, 255, 0.05);
+  bottom: 30%;
+  left: 5%;
+  animation-delay: -7s;
+  animation-duration: 25s;
+}
+
+.floating-orb-3 {
+  width: 100px;
+  height: 100px;
+  background: rgba(0, 212, 255, 0.04);
+  top: 60%;
+  right: 25%;
+  animation-delay: -12s;
+  animation-duration: 18s;
+}
+
+@keyframes orb-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -40px) scale(1.1); }
+  50% { transform: translate(-20px, 20px) scale(0.9); }
+  75% { transform: translate(40px, 30px) scale(1.05); }
+}
+
+/* ── Button Hover Shine ── */
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-primary:hover::after {
+  left: 120%;
+}
+
+/* ── Service Features List Animate ── */
+.service-features li {
+  transition: transform var(--duration-base) var(--ease-out),
+              color var(--duration-base);
+}
+
+.service-card:hover .service-features li {
+  color: var(--text-primary);
+}
+
+.service-card:hover .service-features li:nth-child(1) { transform: translateX(4px); transition-delay: 0ms; }
+.service-card:hover .service-features li:nth-child(2) { transform: translateX(4px); transition-delay: 50ms; }
+.service-card:hover .service-features li:nth-child(3) { transform: translateX(4px); transition-delay: 100ms; }
+.service-card:hover .service-features li:nth-child(4) { transform: translateX(4px); transition-delay: 150ms; }
+
+/* ── Landing Divider Animated ── */
+.landing-divider {
+  background-size: 200% 100%;
+  animation: gradient-shift 4s linear infinite;
+}
+
+/* ── Counter Pop ── */
+.stat-number .counter-done {
+  animation: counter-pop 0.4s var(--ease-spring) both;
+}
+
+@keyframes counter-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* ── How-it-works connector line animate ── */
+.how-grid::before {
+  background-size: 200% 100%;
+  animation: gradient-shift 3s linear infinite;
 }
 
 /* ── Responsive ── */

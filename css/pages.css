@@ -23,11 +23,18 @@
   background: radial-gradient(circle, rgba(0, 232, 157, 0.06) 0%, transparent 70%);
   filter: blur(80px);
   pointer-events: none;
+  animation: page-hero-glow 8s ease-in-out infinite;
+}
+
+@keyframes page-hero-glow {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.8; }
+  50% { transform: translateX(-50%) scale(1.15); opacity: 1; }
 }
 
 .page-hero .overline {
   display: block;
   margin-bottom: var(--space-4);
+  animation: fade-in-up 0.6s var(--ease-out) both;
 }
 
 .page-hero h1 {
@@ -37,6 +44,7 @@
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
+  animation: fade-in-up 0.7s var(--ease-out) 0.1s both;
 }
 
 .page-hero .subtitle {
@@ -44,6 +52,7 @@
   margin-left: auto;
   margin-right: auto;
   margin-bottom: var(--space-8);
+  animation: fade-in-up 0.7s var(--ease-out) 0.2s both;
 }
 
 .page-hero .hero-actions {
@@ -51,6 +60,12 @@
   gap: var(--space-4);
   justify-content: center;
   flex-wrap: wrap;
+  animation: fade-in-up 0.7s var(--ease-out) 0.3s both;
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Content Section ── */
@@ -257,12 +272,21 @@
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
-  transition: all var(--duration-base) var(--ease-out);
+  transition: all var(--duration-slow) var(--ease-out);
 }
 
 .team-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--border-default);
+  transform: translateY(-6px) scale(1.02);
+  border-color: var(--border-accent);
+  box-shadow: var(--shadow-lg), var(--shadow-glow-primary);
+}
+
+.team-card .avatar {
+  transition: transform var(--duration-slow) var(--ease-spring);
+}
+
+.team-card:hover .avatar {
+  transform: scale(1.1);
 }
 
 .team-card .avatar {
@@ -297,6 +321,13 @@
   width: 2px;
   background: linear-gradient(180deg, var(--primary), var(--secondary), var(--primary));
   opacity: 0.3;
+  transform-origin: top;
+  animation: draw-line 1.5s var(--ease-out) both;
+}
+
+@keyframes draw-line {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
 }
 
 .timeline-item {
@@ -315,6 +346,13 @@
   background: var(--primary);
   border: 3px solid var(--bg-deep);
   z-index: 2;
+  transition: transform var(--duration-slow) var(--ease-spring),
+              box-shadow var(--duration-slow);
+}
+
+.timeline-item:hover::before {
+  transform: scale(1.4);
+  box-shadow: 0 0 12px rgba(0, 232, 157, 0.5);
 }
 
 .timeline-item h4 {
@@ -349,6 +387,12 @@
   overflow: hidden;
   max-width: 800px;
   margin: 0 auto;
+  animation: cta-breathe 4s ease-in-out infinite;
+}
+
+@keyframes cta-breathe {
+  0%, 100% { box-shadow: 0 0 30px rgba(0, 232, 157, 0.05), 0 0 60px rgba(124, 92, 255, 0.03); }
+  50% { box-shadow: 0 0 50px rgba(0, 232, 157, 0.12), 0 0 100px rgba(124, 92, 255, 0.06); }
 }
 
 .cta-banner .cta-box::before {
@@ -359,6 +403,13 @@
   right: 0;
   height: 2px;
   background: linear-gradient(90deg, var(--primary), var(--secondary), var(--primary));
+  background-size: 200% 100%;
+  animation: gradient-shift 3s linear infinite;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 0; }
+  100% { background-position: 200% 0; }
 }
 
 .cta-banner .cta-box h2 {

@@ -42,7 +42,12 @@
 .btn-primary:hover {
   background: var(--primary-light);
   box-shadow: var(--primary-glow-strong);
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.02);
+}
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.98);
+  transition-duration: 100ms;
 }
 
 .btn-secondary {
@@ -53,7 +58,13 @@
 
 .btn-secondary:hover {
   background: var(--secondary-light);
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: var(--secondary-glow);
+}
+
+.btn-secondary:active {
+  transform: translateY(0) scale(0.98);
+  transition-duration: 100ms;
 }
 
 .btn-ghost {
@@ -66,6 +77,13 @@
   border-color: var(--primary);
   color: var(--primary);
   background: var(--primary-muted);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 232, 157, 0.1);
+}
+
+.btn-ghost:active {
+  transform: translateY(0) scale(0.98);
+  transition-duration: 100ms;
 }
 
 .btn-outline-primary {
@@ -78,6 +96,12 @@
   background: var(--primary);
   color: var(--bg-deep);
   box-shadow: var(--primary-glow);
+  transform: translateY(-3px) scale(1.02);
+}
+
+.btn-outline-primary:active {
+  transform: translateY(0) scale(0.98);
+  transition-duration: 100ms;
 }
 
 .btn-sm {
@@ -109,7 +133,7 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   padding: var(--space-6);
-  transition: all var(--duration-base) var(--ease-out);
+  transition: all var(--duration-slow) var(--ease-out);
   position: relative;
   overflow: hidden;
 }
@@ -118,22 +142,24 @@
   content: '';
   position: absolute;
   top: 0;
-  left: 0;
+  left: -100%;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
+  width: 100%;
+  background: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent);
   opacity: 0;
-  transition: opacity var(--duration-base);
+  transition: opacity var(--duration-base), left var(--duration-slow) var(--ease-out);
 }
 
 .card:hover {
   border-color: var(--border-default);
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg), var(--shadow-glow-primary);
 }
 
 .card:hover::before {
   opacity: 1;
+  left: 0;
 }
 
 .card-glass {
@@ -215,6 +241,12 @@
   border-radius: 50%;
   background: currentColor;
   flex-shrink: 0;
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
 }
 
 /* ── Inputs ── */
@@ -344,7 +376,22 @@
   height: 100%;
   border-radius: var(--radius-full);
   background: linear-gradient(90deg, var(--primary-dark), var(--primary));
-  transition: width var(--duration-slow) var(--ease-out);
+  transition: width 1s var(--ease-out);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: progress-shimmer 2s ease-in-out infinite;
+}
+
+@keyframes progress-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 /* ── Tooltip ── */
@@ -385,11 +432,22 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: transform var(--duration-slow) var(--ease-spring),
+              box-shadow var(--duration-slow) var(--ease-out);
 }
 
 .icon-wrap svg {
   width: 22px;
   height: 22px;
+  transition: transform var(--duration-slow) var(--ease-spring);
+}
+
+.card:hover .icon-wrap {
+  transform: scale(1.1) translateY(-2px);
+}
+
+.card:hover .icon-wrap svg {
+  transform: rotate(-5deg);
 }
 
 .icon-wrap-primary {
@@ -575,14 +633,29 @@
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
-  transition: all var(--duration-base) var(--ease-out);
+  transition: all var(--duration-slow) var(--ease-out);
   position: relative;
+  overflow: hidden;
+}
+
+.feature-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, var(--primary-muted), transparent 70%);
+  opacity: 0;
+  transition: opacity var(--duration-slow);
+  pointer-events: none;
 }
 
 .feature-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--border-default);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-6px);
+  border-color: var(--border-accent);
+  box-shadow: var(--shadow-lg), var(--shadow-glow-primary);
+}
+
+.feature-card:hover::after {
+  opacity: 1;
 }
 
 .feature-card-icon {
@@ -594,6 +667,11 @@
   justify-content: center;
   margin-bottom: var(--space-5);
   font-size: var(--text-2xl);
+  transition: transform var(--duration-slow) var(--ease-spring);
+}
+
+.feature-card:hover .feature-card-icon {
+  transform: translateY(-4px) scale(1.1);
 }
 
 .feature-card h3 {
@@ -623,6 +701,13 @@
   width: 2px;
   background: linear-gradient(180deg, var(--primary), var(--secondary));
   opacity: 0.25;
+  transform-origin: top;
+  animation: draw-line 1.5s var(--ease-out) both;
+}
+
+@keyframes draw-line {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
 }
 
 .journey-step {
@@ -648,6 +733,15 @@
   background: var(--bg-surface);
   border: 2px solid var(--border-accent);
   color: var(--primary);
+  transition: transform var(--duration-slow) var(--ease-spring),
+              box-shadow var(--duration-slow) var(--ease-out),
+              border-color var(--duration-slow);
+}
+
+.journey-step:hover .journey-number {
+  transform: scale(1.12);
+  border-color: var(--primary);
+  box-shadow: 0 0 20px rgba(0, 232, 157, 0.3);
 }
 
 .journey-content h4 {
@@ -674,12 +768,13 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-2xl);
   text-align: center;
-  transition: all var(--duration-base) var(--ease-out);
+  transition: all var(--duration-slow) var(--ease-out);
 }
 
 .dual-cta-card:hover {
   border-color: var(--border-accent);
-  transform: translateY(-4px);
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: var(--shadow-lg), var(--shadow-glow-primary);
 }
 
 .dual-cta-card h3 {
