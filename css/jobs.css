@@ -422,6 +422,84 @@
   border: 1px solid rgba(124, 92, 255, 0.2);
 }
 
+.job-badge-featured {
+  background: linear-gradient(135deg, rgba(212, 168, 75, 0.18), rgba(139, 26, 58, 0.18));
+  color: #f0d78c;
+  border: 1px solid rgba(212, 168, 75, 0.3);
+}
+
+/* ── Featured Job Card ── */
+.job-card.featured {
+  border: 1px solid rgba(212, 168, 75, 0.2);
+  background: linear-gradient(135deg, rgba(139, 26, 58, 0.06), rgba(212, 168, 75, 0.04), var(--bg-surface));
+}
+
+.job-card.featured::before {
+  background: linear-gradient(135deg, rgba(139, 26, 58, 0.12), rgba(212, 168, 75, 0.08));
+}
+
+.job-card.featured:hover {
+  border-color: rgba(212, 168, 75, 0.35);
+  box-shadow: 0 8px 32px rgba(139, 26, 58, 0.15);
+}
+
+.job-card.featured .featured-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #8b1a3a, #d4a84b, #8b1a3a);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+.job-card.featured .btn-featured {
+  background: linear-gradient(135deg, #8b1a3a, #6b1530);
+  color: #fff;
+  border: none;
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-decoration: none;
+  transition: box-shadow 0.2s, transform 0.15s;
+  box-shadow: 0 4px 16px rgba(139, 26, 58, 0.3);
+}
+
+.job-card.featured .btn-featured:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(139, 26, 58, 0.4);
+}
+
+.job-card.featured .benefits-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.job-card.featured .benefit-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(212, 168, 75, 0.08);
+  border: 1px solid rgba(212, 168, 75, 0.15);
+  color: #d4a84b;
+}
+
+.job-card.featured .benefit-tag svg {
+  width: 12px;
+  height: 12px;
+}
+
 /* ── Advanced Filter Sidebar ── */
 .jobs-layout {
   display: grid;

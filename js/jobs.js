@@ -7,6 +7,44 @@
   var allCampaigns = [];   // raw data from Supabase
   var filtered     = [];   // after search / filter / sort
 
+  /* ---------- Featured / Pinned listings ---------- */
+  var WA_LINK = 'https://wa.me/19294192327?text=Hi%20eLab%2C%20I%E2%80%99m%20interested%20in%20the%20Qatar%20Caregiver%20position.%20My%20name%20is%20____%20and%20I%20have%20____%20years%20of%20experience.';
+
+  var featuredListings = [
+    {
+      id: 'featured-elderly-caregiver-qatar',
+      title: 'Elderly Caregiver',
+      employer_name: 'Qatar Healthcare Employer',
+      destination_country: 'Qatar',
+      specialty: 'Elderly Care',
+      category: 'Allied Health',
+      positions: 3,
+      salary_display: '2,500 QAR/month',
+      min_experience: 2,
+      visa_sponsored: true,
+      benefits: ['Accommodation', 'Transport', 'Meals', 'Flight', 'Visa'],
+      description: 'Provide daily living assistance, medication reminders, mobility support, and companionship for elderly patients in Qatar.',
+      requirements: 'Caregiver certificate + 2 years experience',
+      wa_link: WA_LINK,
+    },
+    {
+      id: 'featured-paediatric-caregiver-qatar',
+      title: 'Paediatric Caregiver',
+      employer_name: 'Qatar Healthcare Employer',
+      destination_country: 'Qatar',
+      specialty: 'Paediatric Care',
+      category: 'Allied Health',
+      positions: 2,
+      salary_display: '2,500 QAR/month',
+      min_experience: 2,
+      visa_sponsored: true,
+      benefits: ['Accommodation', 'Transport', 'Meals', 'Flight', 'Visa'],
+      description: 'Provide child care, developmental support, feeding, bathing, health monitoring, and age-appropriate activities.',
+      requirements: 'Caregiver certificate + 2 years experience',
+      wa_link: WA_LINK,
+    },
+  ];
+
   /* ---------- DOM refs ---------- */
   var container    = null;
   var countEl      = null;
@@ -160,13 +198,81 @@
     );
   }
 
+  /* ---------- Featured card HTML ---------- */
+  function featuredCardHtml(f) {
+    var benefitsHtml = f.benefits.map(function (b) {
+      return '<span class="benefit-tag">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>' +
+        b + '</span>';
+    }).join('');
+
+    return (
+      '<div class="job-card featured" data-id="' + f.id + '">' +
+        '<div class="featured-accent"></div>' +
+        '<span class="job-badge job-badge-featured">FEATURED</span>' +
+        '<div class="job-card-body">' +
+          '<div class="job-card-header">' +
+            '<div class="job-employer-logo" style="background:rgba(139,26,58,0.15);color:#d4a84b;font-weight:800;">' +
+              (f.title === 'Elderly Caregiver' ? '&#x2764;' : '&#x1F476;') +
+            '</div>' +
+            '<div>' +
+              '<h3>' + escHtml(f.title) + '</h3>' +
+              '<span class="job-employer-name">' + escHtml(f.employer_name) + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<p style="color:var(--text-secondary);font-size:var(--text-sm);line-height:1.6;margin-top:var(--space-3);margin-bottom:var(--space-2);">' +
+            escHtml(f.description) +
+          '</p>' +
+          '<div class="job-meta">' +
+            '<span class="job-meta-item">' +
+              '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ' +
+              escHtml(f.destination_country) +
+            '</span>' +
+            '<span class="job-meta-item">' +
+              '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg> ' +
+              escHtml(f.specialty) +
+            '</span>' +
+            '<span class="job-meta-item">' +
+              '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> ' +
+              f.min_experience + '+ years' +
+            '</span>' +
+            '<span class="job-meta-item">' +
+              '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> ' +
+              f.positions + ' positions' +
+            '</span>' +
+          '</div>' +
+          '<div class="job-tags">' +
+            '<span class="tag">' + escHtml(f.specialty) + '</span>' +
+            '<span class="tag">Visa Sponsored</span>' +
+          '</div>' +
+          '<div class="benefits-strip">' + benefitsHtml + '</div>' +
+        '</div>' +
+        '<div class="job-card-aside">' +
+          '<div class="job-salary" style="color:#d4a84b;">' + escHtml(f.salary_display) + '</div>' +
+          '<span class="job-posted" style="color:var(--text-tertiary);">' + escHtml(f.requirements) + '</span>' +
+          '<div class="job-card-actions">' +
+            '<a href="' + f.wa_link + '" target="_blank" rel="noopener noreferrer" class="btn-featured">' +
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>' +
+              'Apply on WhatsApp' +
+            '</a>' +
+          '</div>' +
+          '<a href="/qatar-caregivers" style="font-size:var(--text-xs);color:var(--text-tertiary);margin-top:var(--space-2);display:inline-block;text-decoration:underline;">View full details &rarr;</a>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
   /* ---------- Render filtered list ---------- */
   function render() {
-    if (!filtered.length) { showEmpty(); }
+    // Always render featured listings first
+    var featuredHtml = featuredListings.map(featuredCardHtml).join('');
+
+    if (!filtered.length && !featuredListings.length) { showEmpty(); }
     else {
-      container.innerHTML = filtered.map(cardHtml).join('');
+      container.innerHTML = featuredHtml + filtered.map(cardHtml).join('');
     }
-    countEl.textContent = 'Showing ' + filtered.length + ' position' + (filtered.length !== 1 ? 's' : '');
+    var total = filtered.length + featuredListings.length;
+    countEl.textContent = 'Showing ' + total + ' position' + (total !== 1 ? 's' : '');
   }
 
   /* ---------- Collect current filter state ---------- */
