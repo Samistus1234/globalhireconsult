@@ -256,7 +256,7 @@
               'Apply on WhatsApp' +
             '</a>' +
           '</div>' +
-          '<a href="/qatar-caregivers" style="font-size:var(--text-xs);color:var(--text-tertiary);margin-top:var(--space-2);display:inline-block;text-decoration:underline;">View full details &rarr;</a>' +
+          '<a href="https://elabsolution.org/qatar-caregivers" style="font-size:var(--text-xs);color:var(--text-tertiary);margin-top:var(--space-2);display:inline-block;text-decoration:underline;">View full details &rarr;</a>' +
         '</div>' +
       '</div>'
     );
