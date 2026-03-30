@@ -8,7 +8,9 @@
   var filtered     = [];   // after search / filter / sort
 
   /* ---------- Featured / Pinned listings ---------- */
-  var WA_LINK = 'https://wa.me/19294192327?text=Hi%20eLab%2C%20I%E2%80%99m%20interested%20in%20the%20Qatar%20Caregiver%20position.%20My%20name%20is%20____%20and%20I%20have%20____%20years%20of%20experience.';
+  var WA_QATAR = 'https://wa.me/19294192327?text=Hi%20eLab%2C%20I%E2%80%99m%20interested%20in%20the%20Qatar%20Caregiver%20position.%20My%20name%20is%20____%20and%20I%20have%20____%20years%20of%20experience.';
+  var WA_LINK = WA_QATAR;
+  var WA_ALBANIA = 'https://wa.me/19294192327?text=Hi%20eLab%2C%20I%E2%80%99m%20interested%20in%20the%20Albania%20Work%20Visa%20program.%20My%20name%20is%20____%20and%20I%20want%20to%20know%20more.';
 
   var featuredListings = [
     {
@@ -41,7 +43,25 @@
       benefits: ['Accommodation', 'Transport', 'Meals', 'Flight', 'Visa'],
       description: 'Provide child care, developmental support, feeding, bathing, health monitoring, and age-appropriate activities.',
       requirements: 'Caregiver certificate + 2 years experience',
-      wa_link: WA_LINK,
+      wa_link: WA_QATAR,
+    },
+    {
+      id: 'featured-albania-work-visa',
+      title: 'Work in Albania (Europe) — D Visa',
+      employer_name: 'eLab Solutions International',
+      destination_country: 'Albania',
+      specialty: 'General / Multiple Roles',
+      category: 'General',
+      positions: 0,
+      salary_display: '600–850 EUR/month',
+      min_experience: 0,
+      visa_sponsored: true,
+      benefits: ['Accommodation', 'Meals', 'Flight', 'Residence Permit', 'Citizenship Pathway'],
+      description: 'Work legally in Europe with a Type D working visa and residence permit. Earn in Euros, with accommodation and meals included. Eligible for Albanian citizenship after 5-6 years.',
+      requirements: 'Passport + Certificate + Police Report + CV',
+      wa_link: WA_ALBANIA,
+      detail_link: 'https://elabsolution.org/albania',
+      accent_color: '#E41E3F',
     },
   ];
 
@@ -238,7 +258,7 @@
             '</span>' +
             '<span class="job-meta-item">' +
               '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> ' +
-              f.positions + ' positions' +
+              (f.positions > 0 ? f.positions + ' positions' : 'Multiple openings') +
             '</span>' +
           '</div>' +
           '<div class="job-tags">' +
@@ -256,7 +276,7 @@
               'Apply on WhatsApp' +
             '</a>' +
           '</div>' +
-          '<a href="https://elabsolution.org/qatar-caregivers" style="font-size:var(--text-xs);color:var(--text-tertiary);margin-top:var(--space-2);display:inline-block;text-decoration:underline;">View full details &rarr;</a>' +
+          '<a href="' + (f.detail_link || 'https://elabsolution.org/qatar-caregivers') + '" style="font-size:var(--text-xs);color:var(--text-tertiary);margin-top:var(--space-2);display:inline-block;text-decoration:underline;">View full details &rarr;</a>' +
         '</div>' +
       '</div>'
     );
