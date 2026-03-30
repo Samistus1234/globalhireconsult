@@ -89,19 +89,35 @@
               <label class="form-label" for="signup-specialty">Specialty *</label>
               <select class="form-input" id="signup-specialty" required>
                 <option value="">Select specialty...</option>
-                <option>General Nursing</option>
-                <option>ICU / Critical Care Nursing</option>
-                <option>Emergency Nursing</option>
-                <option>Paediatric Nursing</option>
-                <option>Midwifery</option>
-                <option>General Medicine</option>
-                <option>General Surgery</option>
-                <option>Emergency Medicine</option>
-                <option>Radiology / Radiography</option>
-                <option>Pharmacy</option>
-                <option>Physiotherapy</option>
-                <option>Laboratory Science</option>
-                <option>Dentistry</option>
+                <optgroup label="Nursing">
+                  <option>General Nursing</option>
+                  <option>ICU / Critical Care Nursing</option>
+                  <option>Emergency Nursing</option>
+                  <option>Paediatric Nursing</option>
+                  <option>Midwifery</option>
+                </optgroup>
+                <optgroup label="Medical">
+                  <option>General Medicine</option>
+                  <option>General Surgery</option>
+                  <option>Emergency Medicine</option>
+                  <option>Dentistry</option>
+                </optgroup>
+                <optgroup label="Allied Health">
+                  <option>Pharmacy</option>
+                  <option>Physiotherapy</option>
+                  <option>Radiology / Radiography</option>
+                  <option>Laboratory Science</option>
+                </optgroup>
+                <optgroup label="Non-Medical Roles">
+                  <option>Caregiving (Elderly / Paediatric)</option>
+                  <option>Hospitality / Hotel</option>
+                  <option>Driving / Transport</option>
+                  <option>Construction / Trades</option>
+                  <option>Cleaning / Housekeeping</option>
+                  <option>Chef / Cooking</option>
+                  <option>Agriculture / Farming</option>
+                  <option>General Labour</option>
+                </optgroup>
                 <option>Other</option>
               </select>
             </div>
@@ -166,54 +182,27 @@
             <label class="form-label">Preferred Destination Countries</label>
             <p style="font-size:var(--text-xs);color:var(--text-tertiary);margin-bottom:var(--space-3);">Select all that interest you.</p>
             <div class="dest-grid">
-              <label class="dest-option">
-                <input type="checkbox" class="dest-checkbox" value="Saudi Arabia">
-                <span class="dest-label">Saudi Arabia</span>
-              </label>
-              <label class="dest-option">
-                <input type="checkbox" class="dest-checkbox" value="Qatar">
-                <span class="dest-label">Qatar</span>
-              </label>
-              <label class="dest-option">
-                <input type="checkbox" class="dest-checkbox" value="Kuwait">
-                <span class="dest-label">Kuwait</span>
-              </label>
-              <label class="dest-option">
-                <input type="checkbox" class="dest-checkbox" value="UAE">
-                <span class="dest-label">UAE</span>
-              </label>
-              <label class="dest-option">
-                <input type="checkbox" class="dest-checkbox" value="Oman">
-                <span class="dest-label">Oman</span>
-              </label>
-              <label class="dest-option">
-                <input type="checkbox" class="dest-checkbox" value="Bahrain">
-                <span class="dest-label">Bahrain</span>
-              </label>
-              <label class="dest-option">
-                <input type="checkbox" class="dest-checkbox" value="United Kingdom">
-                <span class="dest-label">United Kingdom</span>
-              </label>
-              <label class="dest-option">
-                <input type="checkbox" class="dest-checkbox" value="USA">
-                <span class="dest-label">USA</span>
-              </label>
-              <label class="dest-option">
-                <input type="checkbox" class="dest-checkbox" value="Canada">
-                <span class="dest-label">Canada</span>
-              </label>
-              <label class="dest-option">
-                <input type="checkbox" class="dest-checkbox" value="Germany">
-                <span class="dest-label">Germany</span>
-              </label>
-              <label class="dest-option">
-                <input type="checkbox" class="dest-checkbox" value="Australia">
-                <span class="dest-label">Australia</span>
-              </label>
-              <label class="dest-option">
-                <input type="checkbox" class="dest-checkbox" value="Other">
-                <span class="dest-label">Other</span>
-              </label>
+              <p style="grid-column:1/-1;font-size:var(--text-xs);color:var(--text-tertiary);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin:0;">Middle East</p>
+              <label class="dest-option"><input type="checkbox" class="dest-checkbox" value="Saudi Arabia"><span class="dest-label">Saudi Arabia</span></label>
+              <label class="dest-option"><input type="checkbox" class="dest-checkbox" value="Qatar"><span class="dest-label">Qatar</span></label>
+              <label class="dest-option"><input type="checkbox" class="dest-checkbox" value="Kuwait"><span class="dest-label">Kuwait</span></label>
+              <label class="dest-option"><input type="checkbox" class="dest-checkbox" value="UAE"><span class="dest-label">UAE</span></label>
+              <label class="dest-option"><input type="checkbox" class="dest-checkbox" value="Oman"><span class="dest-label">Oman</span></label>
+              <label class="dest-option"><input type="checkbox" class="dest-checkbox" value="Bahrain"><span class="dest-label">Bahrain</span></label>
+
+              <p style="grid-column:1/-1;font-size:var(--text-xs);color:var(--text-tertiary);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin:var(--space-3) 0 0;">Europe</p>
+              <label class="dest-option"><input type="checkbox" class="dest-checkbox" value="Albania"><span class="dest-label">Albania</span></label>
+              <label class="dest-option"><input type="checkbox" class="dest-checkbox" value="United Kingdom"><span class="dest-label">United Kingdom</span></label>
+              <label class="dest-option"><input type="checkbox" class="dest-checkbox" value="Germany"><span class="dest-label">Germany</span></label>
+              <label class="dest-option"><input type="checkbox" class="dest-checkbox" value="Ireland"><span class="dest-label">Ireland</span></label>
+              <label class="dest-option"><input type="checkbox" class="dest-checkbox" value="Poland"><span class="dest-label">Poland</span></label>
+              <label class="dest-option"><input type="checkbox" class="dest-checkbox" value="Romania"><span class="dest-label">Romania</span></label>
+
+              <p style="grid-column:1/-1;font-size:var(--text-xs);color:var(--text-tertiary);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin:var(--space-3) 0 0;">Americas & Oceania</p>
+              <label class="dest-option"><input type="checkbox" class="dest-checkbox" value="USA"><span class="dest-label">USA</span></label>
+              <label class="dest-option"><input type="checkbox" class="dest-checkbox" value="Canada"><span class="dest-label">Canada</span></label>
+              <label class="dest-option"><input type="checkbox" class="dest-checkbox" value="Australia"><span class="dest-label">Australia</span></label>
+              <label class="dest-option"><input type="checkbox" class="dest-checkbox" value="Other"><span class="dest-label">Other</span></label>
             </div>
           </div>
 
