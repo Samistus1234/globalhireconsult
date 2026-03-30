@@ -1,12 +1,19 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { corsHeaders, handleCors } from "../_shared/cors.ts";
+
+// ── CORS (inlined) ──
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+};
 
 const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
 const CLAUDE_MODEL = "claude-sonnet-4-20250514";
 
 Deno.serve(async (req) => {
-  const corsResp = handleCors(req);
-  if (corsResp) return corsResp;
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
 
   const json = (body: unknown, status = 200) =>
     new Response(JSON.stringify(body), {
@@ -15,7 +22,7 @@ Deno.serve(async (req) => {
     });
 
   try {
-    // ── Auth ──────────────────────────────────────────
+    // ── Auth ──
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) return json({ error: "Missing authorization" }, 401);
 
@@ -25,10 +32,7 @@ Deno.serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    const {
-      data: { user },
-      error: authError,
-    } = await userClient.auth.getUser();
+    const { data: { user }, error: authError } = await userClient.auth.getUser();
     if (authError || !user) return json({ error: "Unauthorized" }, 401);
 
     // Service client for storage + DB writes
@@ -48,7 +52,7 @@ Deno.serve(async (req) => {
       return json({ error: "Admin access required" }, 403);
     }
 
-    // ── Get document ─────────────────────────────────
+    // ── Get document ──
     const { document_id } = await req.json();
     if (!document_id) return json({ error: "document_id required" }, 400);
 
@@ -58,33 +62,22 @@ Deno.serve(async (req) => {
       .eq("id", document_id)
       .single();
 
-    if (docErr || !doc) {
-      return json({ error: "Document not found" }, 404);
-    }
+    if (docErr || !doc) return json({ error: "Document not found" }, 404);
+    if (!doc.file_path) return json({ error: "Document has no file path" }, 400);
 
-    if (!doc.file_path) {
-      return json({ error: "Document has no file path" }, 400);
-    }
-
-    // ── Download file from storage ───────────────────
+    // ── Download file from storage ──
     const { data: fileData, error: dlErr } = await sb.storage
       .from("gh-applicant-documents")
       .download(doc.file_path);
 
     if (dlErr || !fileData) {
-      return json(
-        { error: "Failed to download file: " + (dlErr?.message || "unknown") },
-        500
-      );
+      return json({ error: "Failed to download file: " + (dlErr?.message || "unknown") }, 500);
     }
 
     // Convert to base64
     const arrayBuffer = await fileData.arrayBuffer();
     const base64 = btoa(
-      new Uint8Array(arrayBuffer).reduce(
-        (data, byte) => data + String.fromCharCode(byte),
-        ""
-      )
+      new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), "")
     );
 
     // Determine media type
@@ -93,13 +86,10 @@ Deno.serve(async (req) => {
     const isPdf = mime === "application/pdf";
 
     if (!isImage && !isPdf) {
-      return json(
-        { error: "Unsupported file type: " + mime + ". Only images and PDFs are supported." },
-        400
-      );
+      return json({ error: "Unsupported file type: " + mime }, 400);
     }
 
-    // ── Get applicant name for context ───────────────
+    // ── Get applicant name for context ──
     const { data: applicant } = await sb
       .from("gh_profiles")
       .select("full_name")
@@ -109,29 +99,14 @@ Deno.serve(async (req) => {
     const applicantName = applicant?.full_name || "Unknown";
     const claimedType = doc.doc_type || "unknown";
 
-    // ── Call Claude Vision API ────────────────────────
+    // ── Call Claude Vision API ──
     if (!ANTHROPIC_API_KEY) {
-      return json({ error: "ANTHROPIC_API_KEY not configured" }, 500);
+      return json({ error: "ANTHROPIC_API_KEY not configured. Set it in Edge Function secrets." }, 500);
     }
 
-    // Build the content block
     const imageContent: any = isImage
-      ? {
-          type: "image",
-          source: {
-            type: "base64",
-            media_type: mime,
-            data: base64,
-          },
-        }
-      : {
-          type: "document",
-          source: {
-            type: "base64",
-            media_type: "application/pdf",
-            data: base64,
-          },
-        };
+      ? { type: "image", source: { type: "base64", media_type: mime, data: base64 } }
+      : { type: "document", source: { type: "base64", media_type: "application/pdf", data: base64 } };
 
     const prompt = `You are a document verification specialist for a healthcare recruitment platform called GlobalHire.
 
@@ -174,58 +149,37 @@ No markdown, no code fences, just the JSON object.`;
       body: JSON.stringify({
         model: CLAUDE_MODEL,
         max_tokens: 1024,
-        messages: [
-          {
-            role: "user",
-            content: [imageContent, { type: "text", text: prompt }],
-          },
-        ],
+        messages: [{ role: "user", content: [imageContent, { type: "text", text: prompt }] }],
       }),
     });
 
     if (!claudeResp.ok) {
       const errBody = await claudeResp.text();
       console.error("Claude API error:", claudeResp.status, errBody);
-      return json(
-        { error: "AI analysis failed: " + claudeResp.status },
-        500
-      );
+      return json({ error: "AI analysis failed: " + claudeResp.status }, 500);
     }
 
     const claudeData = await claudeResp.json();
-    const textBlock = claudeData.content?.find(
-      (b: any) => b.type === "text"
-    );
+    const textBlock = claudeData.content?.find((b: any) => b.type === "text");
 
-    if (!textBlock?.text) {
-      return json({ error: "No response from AI" }, 500);
-    }
+    if (!textBlock?.text) return json({ error: "No response from AI" }, 500);
 
-    // Parse the JSON response — handle potential markdown wrapping
+    // Parse JSON response — handle potential markdown wrapping
     let analysisText = textBlock.text.trim();
-    // Strip markdown code fences if present
     if (analysisText.startsWith("```")) {
-      analysisText = analysisText
-        .replace(/^```(?:json)?\s*\n?/, "")
-        .replace(/\n?```\s*$/, "");
+      analysisText = analysisText.replace(/^```(?:json)?\s*\n?/, "").replace(/\n?```\s*$/, "");
     }
 
     let analysis: any;
     try {
       analysis = JSON.parse(analysisText);
-    } catch (parseErr) {
+    } catch {
       console.error("Failed to parse Claude response:", analysisText);
-      return json(
-        { error: "Failed to parse AI response", raw: analysisText },
-        500
-      );
+      return json({ error: "Failed to parse AI response", raw: analysisText }, 500);
     }
 
-    // ── Save results to database ─────────────────────
-    const authenticity = Math.max(
-      0,
-      Math.min(100, analysis.authenticity_score || 0)
-    );
+    // ── Save results to database ──
+    const authenticity = Math.max(0, Math.min(100, analysis.authenticity_score || 0));
 
     const { error: updateErr } = await sb
       .from("gh_documents")
@@ -246,10 +200,7 @@ No markdown, no code fences, just the JSON object.`;
 
     if (updateErr) {
       console.error("DB update error:", updateErr);
-      return json(
-        { error: "Analysis complete but failed to save: " + updateErr.message },
-        500
-      );
+      return json({ error: "Analysis complete but failed to save: " + updateErr.message }, 500);
     }
 
     return json({
