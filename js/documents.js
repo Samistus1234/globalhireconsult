@@ -12,9 +12,12 @@
 
   var docTypeLabels = {
     license: 'Professional License',
-    degree: 'Degree Certificate',
-    passport: 'Passport Copy',
-    cv: 'CV / Resume'
+    degree: 'Degree / Certificate',
+    passport: 'Passport (Data Page)',
+    cv: 'CV / Resume',
+    passport_photo: 'Passport Photo',
+    police_report: 'Police Character Report',
+    travel_insurance: 'Travel Insurance'
   };
 
   window.addEventListener('gh:auth-ready', async function (e) {
@@ -142,7 +145,7 @@
     // Bind download
     tbody.querySelectorAll('.btn-download').forEach(function (btn) {
       btn.addEventListener('click', async function () {
-        var { data, error } = await sb.storage.from('gh-documents').createSignedUrl(btn.dataset.path, 3600);
+        var { data, error } = await sb.storage.from('gh-applicant-documents').createSignedUrl(btn.dataset.path, 3600);
         if (data && data.signedUrl) {
           window.open(data.signedUrl, '_blank');
         } else {
