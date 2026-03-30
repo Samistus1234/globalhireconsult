@@ -281,9 +281,189 @@
     // Bind view buttons
     tbody.querySelectorAll('.btn-view').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        // Future: navigate to candidate detail page
-        // For now just log
-        console.log('View candidate:', btn.dataset.id);
+        openCandidatePanel(btn.dataset.id);
+      });
+    });
+  }
+
+  // ── Candidate Detail Panel ──
+  var panelEl = null;
+  var overlayEl = null;
+  var panelContentEl = null;
+
+  function initPanel() {
+    panelEl = document.getElementById('candidate-panel');
+    overlayEl = document.getElementById('candidate-overlay');
+    panelContentEl = document.getElementById('panel-content');
+    var closeBtn = document.getElementById('panel-close');
+
+    if (closeBtn) closeBtn.addEventListener('click', closePanel);
+    if (overlayEl) overlayEl.addEventListener('click', closePanel);
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closePanel();
+    });
+  }
+
+  function openPanel() {
+    if (!panelEl) initPanel();
+    panelEl.style.display = 'block';
+    overlayEl.style.display = 'block';
+    requestAnimationFrame(function () {
+      panelEl.style.transform = 'translateX(0)';
+      overlayEl.style.opacity = '1';
+    });
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closePanel() {
+    if (!panelEl) return;
+    panelEl.style.transform = 'translateX(100%)';
+    overlayEl.style.opacity = '0';
+    document.body.style.overflow = '';
+    setTimeout(function () {
+      panelEl.style.display = 'none';
+      overlayEl.style.display = 'none';
+    }, 300);
+  }
+
+  var docTypeLabels = {
+    license: 'Professional License',
+    degree: 'Degree / Certificate',
+    passport: 'Passport (Data Page)',
+    cv: 'CV / Resume',
+    passport_photo: 'Passport Photo',
+    police_report: 'Police Character Report',
+    travel_insurance: 'Travel Insurance'
+  };
+
+  async function openCandidatePanel(candidateId) {
+    if (!panelContentEl) initPanel();
+    panelContentEl.innerHTML = '<div style="text-align:center;padding:var(--space-12);"><div class="spinner" style="margin:0 auto;"></div><p style="color:var(--text-tertiary);margin-top:var(--space-4);">Loading candidate...</p></div>';
+    openPanel();
+
+    // Fetch profile
+    var { data: profile, error: profileErr } = await ghFrom('profiles')
+      .select('*')
+      .eq('id', candidateId)
+      .single();
+
+    if (profileErr || !profile) {
+      panelContentEl.innerHTML = '<p style="color:var(--error);padding:var(--space-4);">Failed to load candidate: ' + (profileErr ? profileErr.message : 'Not found') + '</p>';
+      return;
+    }
+
+    // Fetch documents
+    var { data: docs, error: docsErr } = await ghFrom('documents')
+      .select('*')
+      .eq('applicant_id', candidateId)
+      .order('uploaded_at', { ascending: false });
+
+    docs = docs || [];
+
+    var colors = GHE.avatarColors[profile.avatar_color_index || 0];
+
+    // Build profile section
+    var html = '';
+
+    // Header
+    html += '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-6);">';
+    html += '<div class="avatar avatar-lg" style="background:' + colors[0] + ';color:' + colors[1] + ';font-size:var(--text-xl);width:56px;height:56px;">' + (profile.avatar_initials || '??') + '</div>';
+    html += '<div>';
+    html += '<div style="font-size:var(--text-xl);font-weight:700;color:var(--text-primary);">' + GHE.escapeHtml(profile.full_name || 'Unnamed') + '</div>';
+    html += '<div style="font-size:var(--text-sm);color:var(--text-tertiary);">' + GHE.escapeHtml(profile.specialty || 'No specialty') + '</div>';
+    html += '</div>';
+    html += '</div>';
+
+    // Info grid
+    var fields = [
+      { label: 'Phone', value: profile.phone },
+      { label: 'Country', value: profile.country_of_origin },
+      { label: 'Experience', value: profile.years_of_experience != null ? profile.years_of_experience + ' years' : null },
+      { label: 'License No.', value: profile.license_number },
+      { label: 'Specialty Detail', value: profile.specialty_detail },
+      { label: 'Availability', value: profile.availability_status || 'active' },
+      { label: 'Profile Complete', value: profile.profile_completed ? 'Yes' : 'No' },
+      { label: 'Joined', value: profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '-' },
+    ];
+
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin-bottom:var(--space-6);">';
+    fields.forEach(function (f) {
+      html += '<div style="padding:var(--space-3);background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-md);">';
+      html += '<div style="font-size:11px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">' + f.label + '</div>';
+      html += '<div style="font-size:var(--text-sm);color:var(--text-primary);font-weight:500;">' + GHE.escapeHtml(f.value || '-') + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+
+    // Preferred destinations
+    if (profile.preferred_destinations && profile.preferred_destinations.length > 0) {
+      html += '<div style="margin-bottom:var(--space-6);">';
+      html += '<div style="font-size:12px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:var(--space-2);">Preferred Destinations</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:var(--space-2);">';
+      profile.preferred_destinations.forEach(function (d) {
+        html += '<span class="tag">' + GHE.escapeHtml(d) + '</span>';
+      });
+      html += '</div></div>';
+    }
+
+    // Documents section
+    html += '<div style="border-top:1px solid var(--border-subtle);padding-top:var(--space-5);margin-top:var(--space-2);">';
+    html += '<div style="font-size:var(--text-base);font-weight:700;color:var(--text-primary);margin-bottom:var(--space-4);">Documents (' + docs.length + ')</div>';
+
+    if (docs.length === 0) {
+      html += '<p style="color:var(--text-tertiary);font-size:var(--text-sm);">No documents uploaded yet.</p>';
+    } else {
+      docs.forEach(function (d) {
+        var statusMap = {
+          pending: { color: 'var(--warning)', label: 'Pending' },
+          in_review: { color: 'var(--info)', label: 'In Review' },
+          verified: { color: 'var(--success)', label: 'Verified' },
+          rejected: { color: 'var(--error)', label: 'Rejected' }
+        };
+        var st = statusMap[d.status] || statusMap.pending;
+        var uploaded = d.uploaded_at ? new Date(d.uploaded_at).toLocaleDateString() : '-';
+        var size = d.file_size_bytes ? (d.file_size_bytes < 1024 * 1024 ? (d.file_size_bytes / 1024).toFixed(1) + ' KB' : (d.file_size_bytes / (1024 * 1024)).toFixed(1) + ' MB') : '-';
+        var typeLabel = docTypeLabels[d.doc_type] || d.doc_type || 'Unknown';
+
+        html += '<div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3);background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-md);margin-bottom:var(--space-2);">';
+        html += '<div style="width:36px;height:36px;border-radius:var(--radius-sm);background:var(--primary-muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;">';
+        html += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>';
+        html += '</div>';
+        html += '<div style="flex:1;min-width:0;">';
+        html += '<div style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + GHE.escapeHtml(typeLabel) + '</div>';
+        html += '<div style="font-size:11px;color:var(--text-tertiary);">' + GHE.escapeHtml(d.file_name || '') + ' · ' + size + ' · ' + uploaded + '</div>';
+        html += '</div>';
+        html += '<span style="font-size:11px;font-weight:600;color:' + st.color + ';">' + st.label + '</span>';
+        if (d.file_path) {
+          html += '<button class="btn btn-ghost btn-sm btn-dl-doc" data-path="' + d.file_path + '" style="padding:var(--space-1) var(--space-2);font-size:11px;">Download</button>';
+        }
+        html += '</div>';
+      });
+    }
+    html += '</div>';
+
+    // WhatsApp quick contact
+    if (profile.phone) {
+      var waNumber = profile.phone.replace(/[^0-9]/g, '');
+      html += '<div style="margin-top:var(--space-6);padding-top:var(--space-5);border-top:1px solid var(--border-subtle);">';
+      html += '<a href="https://wa.me/' + waNumber + '" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="width:100%;justify-content:center;display:flex;align-items:center;gap:var(--space-2);">';
+      html += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>';
+      html += 'WhatsApp ' + GHE.escapeHtml(profile.full_name || 'Candidate');
+      html += '</a></div>';
+    }
+
+    panelContentEl.innerHTML = html;
+
+    // Bind download buttons
+    panelContentEl.querySelectorAll('.btn-dl-doc').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        var { data, error } = await sb.storage.from('gh-applicant-documents').createSignedUrl(btn.dataset.path, 3600);
+        if (data && data.signedUrl) {
+          window.open(data.signedUrl, '_blank');
+        } else {
+          alert('Could not generate download link.');
+        }
       });
     });
   }
