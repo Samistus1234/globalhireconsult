@@ -29,12 +29,12 @@ window.ghFrom = ghFrom;
 if (typeof GHE === 'undefined') {
   window.GHE = {
     avatarColors: [
-      ['#00e89d', '#080a0d'],
-      ['#7c5cff', '#ffffff'],
-      ['#ff5c5c', '#ffffff'],
-      ['#ffb020', '#080a0d'],
-      ['#00d4ff', '#080a0d'],
-      ['#ff6ec7', '#080a0d']
+      ['#0077B6', '#ffffff'],
+      ['#D4A84B', '#0A1628'],
+      ['#2EC4B6', '#0A1628'],
+      ['#48CAE4', '#0A1628'],
+      ['#E56B8A', '#ffffff'],
+      ['#F4A261', '#0A1628']
     ]
   };
 }

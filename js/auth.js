@@ -138,7 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
           email,
           password,
           options: {
-            data: { full_name: fullName }
+            data: { full_name: fullName },
+            emailRedirectTo: window.location.origin + '/login.html'
           }
         });
 
@@ -163,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!data.session) {
           alertBox.textContent = 'Account created! Please check your email to confirm, then log in.';
           alertBox.style.display = 'block';
-          alertBox.style.background = 'rgba(0,232,157,0.1)';
+          alertBox.style.background = 'rgba(0,119,182,0.1)';
           alertBox.style.borderColor = 'var(--primary)';
           alertBox.style.color = 'var(--primary)';
           submitBtn.disabled = false;
