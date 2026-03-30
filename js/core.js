@@ -1,6 +1,6 @@
 /* ============================================
    GLOBALHIRE@ELAB — Core JavaScript
-   Shared utilities, animations, and interactions
+   Healthcare Recruitment Platform v2.0
    ============================================ */
 
 'use strict';
@@ -85,87 +85,6 @@ const GHE = {
     });
   },
 
-  // ── Network Canvas (Hero Background) ──
-  initNetworkCanvas(canvasId) {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    let animId;
-    const nodes = [];
-    const nodeCount = 40;
-    const connectionDistance = 160;
-
-    function resize() {
-      canvas.width = canvas.parentElement.clientWidth;
-      canvas.height = canvas.parentElement.clientHeight;
-    }
-
-    function createNodes() {
-      nodes.length = 0;
-      for (let i = 0; i < nodeCount; i++) {
-        nodes.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          vx: (Math.random() - 0.5) * 0.4,
-          vy: (Math.random() - 0.5) * 0.4,
-          radius: Math.random() * 2 + 1,
-          opacity: Math.random() * 0.5 + 0.2
-        });
-      }
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Draw connections
-      for (let i = 0; i < nodes.length; i++) {
-        for (let j = i + 1; j < nodes.length; j++) {
-          const dx = nodes[i].x - nodes[j].x;
-          const dy = nodes[i].y - nodes[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < connectionDistance) {
-            const opacity = (1 - dist / connectionDistance) * 0.15;
-            ctx.beginPath();
-            ctx.moveTo(nodes[i].x, nodes[i].y);
-            ctx.lineTo(nodes[j].x, nodes[j].y);
-            ctx.strokeStyle = `rgba(0, 232, 157, ${opacity})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        }
-      }
-
-      // Draw & update nodes
-      nodes.forEach(node => {
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0, 232, 157, ${node.opacity})`;
-        ctx.fill();
-
-        node.x += node.vx;
-        node.y += node.vy;
-
-        if (node.x < 0 || node.x > canvas.width) node.vx *= -1;
-        if (node.y < 0 || node.y > canvas.height) node.vy *= -1;
-      });
-
-      animId = requestAnimationFrame(draw);
-    }
-
-    resize();
-    createNodes();
-    draw();
-
-    window.addEventListener('resize', () => {
-      resize();
-      createNodes();
-    });
-
-    return () => cancelAnimationFrame(animId);
-  },
-
   // ── Format Numbers ──
   formatNumber(num) {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
@@ -182,14 +101,14 @@ const GHE = {
     };
   },
 
-  // ── Generate random color avatar ──
+  // ── Avatar colors (healthcare palette) ──
   avatarColors: [
-    ['#00e89d', '#08090d'],
-    ['#7c5cff', '#ffffff'],
-    ['#ff5c5c', '#ffffff'],
-    ['#ffb020', '#08090d'],
-    ['#00d4ff', '#08090d'],
-    ['#ff4da6', '#ffffff'],
+    ['#0077B6', '#ffffff'],
+    ['#D4A84B', '#0A1628'],
+    ['#2EC4B6', '#0A1628'],
+    ['#48CAE4', '#0A1628'],
+    ['#E56B8A', '#ffffff'],
+    ['#F4A261', '#0A1628'],
   ],
 
   getAvatarStyle(index) {
@@ -242,38 +161,6 @@ const GHE = {
     });
   },
 
-  // ── Magnetic Hover on CTA Buttons ──
-  initMagneticButtons() {
-    document.querySelectorAll('.btn-primary.btn-lg, .btn-secondary.btn-lg').forEach(btn => {
-      btn.addEventListener('mousemove', (e) => {
-        const rect = btn.getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width / 2;
-        const y = e.clientY - rect.top - rect.height / 2;
-        btn.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px) scale(1.03)`;
-      });
-
-      btn.addEventListener('mouseleave', () => {
-        btn.style.transform = '';
-      });
-    });
-  },
-
-  // ── Card Tilt Effect ──
-  initCardTilt() {
-    document.querySelectorAll('.testimonial-card, .service-card').forEach(card => {
-      card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width - 0.5;
-        const y = (e.clientY - rect.top) / rect.height - 0.5;
-        card.style.transform = `perspective(800px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg) translateY(-6px)`;
-      });
-
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = '';
-      });
-    });
-  },
-
   // ── Initialize all core features ──
   init() {
     this.initThemeToggle();
@@ -282,8 +169,6 @@ const GHE = {
     this.initStickyNav();
     this.initSmoothScroll();
     this.initParallax();
-    this.initMagneticButtons();
-    this.initCardTilt();
   }
 };
 

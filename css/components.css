@@ -153,8 +153,8 @@
 
 .card:hover {
   border-color: var(--border-default);
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-lg), var(--shadow-glow-primary);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
 }
 
 .card:hover::before {
@@ -171,7 +171,7 @@
 
 .card-glow {
   background: var(--bg-surface);
-  border: 1px solid var(--border-accent);
+  border: 1px solid var(--primary);
 }
 
 .card-glow:hover {
@@ -447,7 +447,7 @@
 }
 
 .card:hover .icon-wrap svg {
-  transform: rotate(-5deg);
+  transform: none;
 }
 
 .icon-wrap-primary {
@@ -649,9 +649,9 @@
 }
 
 .feature-card:hover {
-  transform: translateY(-6px);
+  transform: translateY(-4px);
   border-color: var(--border-accent);
-  box-shadow: var(--shadow-lg), var(--shadow-glow-primary);
+  box-shadow: var(--shadow-lg);
 }
 
 .feature-card:hover::after {
@@ -671,7 +671,7 @@
 }
 
 .feature-card:hover .feature-card-icon {
-  transform: translateY(-4px) scale(1.1);
+  transform: translateY(-4px);
 }
 
 .feature-card h3 {
@@ -773,8 +773,8 @@
 
 .dual-cta-card:hover {
   border-color: var(--border-accent);
-  transform: translateY(-6px) scale(1.01);
-  box-shadow: var(--shadow-lg), var(--shadow-glow-primary);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
 }
 
 .dual-cta-card h3 {

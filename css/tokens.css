@@ -1,61 +1,63 @@
 /* ============================================
    GLOBALHIRE@ELAB — Design Tokens
-   Neural Lattice Design System v1.0
+   Healthcare Recruitment Design System v2.0
    ============================================ */
 
 :root {
   /* ── Color: Backgrounds ── */
-  --bg-void: #04050a;
-  --bg-deep: #08090d;
-  --bg-base: #0c0e14;
-  --bg-surface: #11131b;
-  --bg-elevated: #181b24;
-  --bg-card: #1c1f2b;
-  --bg-hover: #232736;
+  --bg-void: #0A1628;
+  --bg-deep: #0D1B30;
+  --bg-base: #0F1D32;
+  --bg-surface: #162440;
+  --bg-elevated: #1C2D4F;
+  --bg-card: #1E3150;
+  --bg-hover: #253A5E;
+  --bg-tertiary: #1a2942;
 
-  /* ── Color: Primary (Electric Mint) ── */
-  --primary: #00e89d;
-  --primary-light: #33edaf;
-  --primary-dark: #00c484;
-  --primary-muted: #00e89d33;
-  --primary-glow: 0 0 30px rgba(0, 232, 157, 0.25);
-  --primary-glow-strong: 0 0 60px rgba(0, 232, 157, 0.35);
+  /* ── Color: Primary (Medical Blue) ── */
+  --primary: #0077B6;
+  --primary-light: #00B4D8;
+  --primary-dark: #005F8A;
+  --primary-muted: rgba(0, 119, 182, 0.2);
+  --primary-glow: 0 0 30px rgba(0, 119, 182, 0.2);
+  --primary-glow-strong: 0 0 60px rgba(0, 119, 182, 0.3);
 
-  /* ── Color: Secondary (Ultraviolet) ── */
-  --secondary: #7c5cff;
-  --secondary-light: #9b82ff;
-  --secondary-dark: #5a3dd6;
-  --secondary-muted: #7c5cff22;
-  --secondary-glow: 0 0 30px rgba(124, 92, 255, 0.2);
+  /* ── Color: Secondary (Warm Gold) ── */
+  --secondary: #D4A84B;
+  --secondary-light: #E8C672;
+  --secondary-dark: #B8903A;
+  --secondary-muted: rgba(212, 168, 75, 0.15);
+  --secondary-glow: 0 0 30px rgba(212, 168, 75, 0.15);
 
   /* ── Color: Accents ── */
-  --accent-coral: #ff5c5c;
-  --accent-amber: #ffb020;
-  --accent-cyan: #00d4ff;
-  --accent-rose: #ff4da6;
+  --accent-coral: #E63946;
+  --accent-amber: #F4A261;
+  --accent-cyan: #48CAE4;
+  --accent-rose: #E56B8A;
+  --accent-teal: #2EC4B6;
 
   /* ── Color: Semantic ── */
-  --success: #00e89d;
-  --warning: #ffb020;
-  --error: #ff5c5c;
-  --info: #00d4ff;
+  --success: #2EC4B6;
+  --warning: #F4A261;
+  --error: #E63946;
+  --info: #48CAE4;
 
   /* ── Color: Text ── */
-  --text-primary: #eef0f6;
-  --text-secondary: #8b91a8;
-  --text-tertiary: #5a5f73;
-  --text-inverse: #08090d;
+  --text-primary: #E8ECF4;
+  --text-secondary: #8DA2BE;
+  --text-tertiary: #5A7190;
+  --text-inverse: #0A1628;
 
   /* ── Color: Borders ── */
-  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-subtle: rgba(255, 255, 255, 0.05);
   --border-default: rgba(255, 255, 255, 0.08);
   --border-strong: rgba(255, 255, 255, 0.14);
-  --border-accent: rgba(0, 232, 157, 0.3);
+  --border-accent: rgba(0, 119, 182, 0.3);
 
   /* ── Typography ── */
-  --font-display: 'Syne', sans-serif;
-  --font-body: 'Outfit', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-display: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  --font-body: 'Inter', 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'Inter', sans-serif;
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
@@ -97,23 +99,23 @@
 
   /* ── Radius ── */
   --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-2xl: 32px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
   --radius-full: 9999px;
 
   /* ── Shadows ── */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.7);
-  --shadow-glow-primary: 0 0 40px rgba(0, 232, 157, 0.15), 0 0 80px rgba(0, 232, 157, 0.05);
-  --shadow-glow-secondary: 0 0 40px rgba(124, 92, 255, 0.15);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
+  --shadow-glow-primary: 0 0 40px rgba(0, 119, 182, 0.12), 0 0 80px rgba(0, 119, 182, 0.05);
+  --shadow-glow-secondary: 0 0 40px rgba(212, 168, 75, 0.12);
 
   /* ── Glass ── */
-  --glass-bg: rgba(17, 19, 27, 0.6);
-  --glass-bg-strong: rgba(17, 19, 27, 0.85);
+  --glass-bg: rgba(15, 29, 50, 0.6);
+  --glass-bg-strong: rgba(15, 29, 50, 0.85);
   --glass-blur: blur(20px);
   --glass-blur-strong: blur(40px);
 
@@ -157,7 +159,8 @@
   --display-sm: clamp(1.8rem, 3vw, 2.5rem);
 
   /* ── Gradients ── */
-  --gradient-primary: linear-gradient(135deg, var(--primary), var(--secondary));
+  --gradient-primary: linear-gradient(135deg, var(--primary), var(--primary-light));
+  --gradient-warm: linear-gradient(135deg, var(--secondary), var(--secondary-light));
   --gradient-surface-alt: var(--bg-void);
   --gradient-divider: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent);
 }
@@ -168,60 +171,61 @@
 
 [data-theme="light"] {
   /* ── Color: Backgrounds ── */
-  --bg-void: #f0f1f5;
-  --bg-deep: #f4f5f8;
-  --bg-base: #f8f9fc;
+  --bg-void: #F0F4F8;
+  --bg-deep: #F4F7FA;
+  --bg-base: #F8FAFC;
   --bg-surface: #ffffff;
   --bg-elevated: #ffffff;
   --bg-card: #ffffff;
-  --bg-hover: #eef0f5;
+  --bg-hover: #EEF2F7;
+  --bg-tertiary: #e2e8f0;
 
-  /* ── Color: Primary (Electric Mint) — darkened for contrast on light ── */
-  --primary: #00b87a;
-  --primary-light: #00d48d;
-  --primary-dark: #009964;
-  --primary-muted: rgba(0, 184, 122, 0.12);
-  --primary-glow: 0 0 20px rgba(0, 184, 122, 0.1);
-  --primary-glow-strong: 0 0 40px rgba(0, 184, 122, 0.15);
+  /* ── Color: Primary (Medical Blue) — darkened for contrast ── */
+  --primary: #005F8A;
+  --primary-light: #0077B6;
+  --primary-dark: #004A6E;
+  --primary-muted: rgba(0, 95, 138, 0.1);
+  --primary-glow: 0 0 20px rgba(0, 95, 138, 0.08);
+  --primary-glow-strong: 0 0 40px rgba(0, 95, 138, 0.12);
 
-  /* ── Color: Secondary (Ultraviolet) ── */
-  --secondary: #6a4cdb;
-  --secondary-light: #8570e6;
-  --secondary-dark: #5138b8;
-  --secondary-muted: rgba(106, 76, 219, 0.1);
-  --secondary-glow: 0 0 20px rgba(106, 76, 219, 0.08);
+  /* ── Color: Secondary (Warm Gold) ── */
+  --secondary: #B8903A;
+  --secondary-light: #D4A84B;
+  --secondary-dark: #9A7830;
+  --secondary-muted: rgba(184, 144, 58, 0.1);
+  --secondary-glow: 0 0 20px rgba(184, 144, 58, 0.06);
 
   /* ── Color: Accents ── */
-  --accent-coral: #e84545;
-  --accent-amber: #e69a00;
-  --accent-cyan: #00a8cc;
-  --accent-rose: #e6408f;
+  --accent-coral: #D32F3D;
+  --accent-amber: #D98D4C;
+  --accent-cyan: #0096B7;
+  --accent-rose: #D15C78;
 
   /* ── Color: Semantic ── */
-  --success: #00b87a;
-  --warning: #e69a00;
-  --error: #e84545;
-  --info: #00a8cc;
+  --success: #22A899;
+  --warning: #D98D4C;
+  --error: #D32F3D;
+  --info: #0096B7;
 
   /* ── Color: Text ── */
-  --text-primary: #1a1c23;
-  --text-secondary: #4b5068;
-  --text-tertiary: #6b7084;
-  --text-inverse: #f8f9fc;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-tertiary: #64748B;
+  --text-inverse: #F8FAFC;
 
   /* ── Color: Borders ── */
   --border-subtle: rgba(0, 0, 0, 0.04);
   --border-default: rgba(0, 0, 0, 0.08);
   --border-strong: rgba(0, 0, 0, 0.14);
-  --border-accent: rgba(0, 184, 122, 0.3);
+  --border-accent: rgba(0, 95, 138, 0.3);
 
   /* ── Shadows ── */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.12);
-  --shadow-glow-primary: 0 0 40px rgba(0, 184, 122, 0.06), 0 0 80px rgba(0, 184, 122, 0.03);
-  --shadow-glow-secondary: 0 0 40px rgba(106, 76, 219, 0.06);
+  --shadow-glow-primary: 0 0 40px rgba(0, 95, 138, 0.05);
+  --shadow-glow-secondary: 0 0 40px rgba(184, 144, 58, 0.05);
 
   /* ── Glass ── */
   --glass-bg: rgba(255, 255, 255, 0.6);
