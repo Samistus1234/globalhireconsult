@@ -279,6 +279,11 @@
 
     try {
       var session = await GHAuth.getSession();
+      if (!session || !session.access_token) {
+        alert('Analysis failed: Not authenticated. Please log in again.');
+        return;
+      }
+
       var resp = await fetch(SUPABASE_URL + '/functions/v1/analyze-document', {
         method: 'POST',
         headers: {
@@ -288,10 +293,17 @@
         body: JSON.stringify({ document_id: docId })
       });
 
-      var result = await resp.json();
+      var resultText = await resp.text();
+      var result;
+      try { result = JSON.parse(resultText); } catch (e) {
+        console.error('Non-JSON response from analyze-document:', resp.status, resultText);
+        alert('Analysis failed (HTTP ' + resp.status + '): ' + resultText.substring(0, 200));
+        return;
+      }
 
       if (!resp.ok) {
-        alert('Analysis failed: ' + (result.error || 'Unknown error'));
+        console.error('Analysis failed:', resp.status, result);
+        alert('Analysis failed: ' + (result.error || result.message || 'HTTP ' + resp.status));
         return;
       }
 
