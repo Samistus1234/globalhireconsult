@@ -62,7 +62,8 @@
       return;
     }
 
-    allApplicants = data || [];
+    // Exclude recruiter accounts from the candidates list
+    allApplicants = (data || []).filter(function (a) { return a.role !== 'recruiter'; });
     await Promise.all([loadLastMessages(), loadApprovedRecruiters()]);
     populateSpecialtyFilter();
     applyFilters();
