@@ -11,6 +11,8 @@
   let filteredApplicants = [];
   let currentPage = 1;
   const pageSize = 20;
+  // Map of applicant_id → 'outbound' | 'inbound' (direction of last message)
+  let lastMessageDir = {};
 
   window.addEventListener('gh:auth-ready', async (e) => {
     adminProfile = e.detail.profile;
@@ -59,8 +61,26 @@
     }
 
     allApplicants = data || [];
+    await loadLastMessages();
     populateSpecialtyFilter();
     applyFilters();
+  }
+
+  // ── Load last message direction per applicant ──
+  async function loadLastMessages() {
+    var { data } = await ghFrom('messages')
+      .select('applicant_id, direction, sent_at')
+      .order('sent_at', { ascending: false });
+
+    lastMessageDir = {};
+    if (data) {
+      // First occurrence per applicant = most recent (already ordered desc)
+      data.forEach(function (m) {
+        if (!lastMessageDir[m.applicant_id]) {
+          lastMessageDir[m.applicant_id] = m.direction;
+        }
+      });
+    }
   }
 
   // ── Populate specialty dropdown from data ──
@@ -226,6 +246,12 @@
       // Docs count
       var docs = (a.total_docs != null ? a.total_docs : 0) + '/4 docs';
 
+      // Awaiting reply indicator
+      var lastDir = lastMessageDir[a.id];
+      var awaitingBadge = lastDir === 'outbound'
+        ? '<div style="display:inline-flex;align-items:center;gap:4px;margin-top:3px;"><span style="width:7px;height:7px;border-radius:50%;background:#F59E0B;display:inline-block;animation:pulse-dot 1.5s infinite;"></span><span style="font-size:10px;color:#F59E0B;font-weight:600;letter-spacing:0.02em;">Awaiting Reply</span></div>'
+        : (lastDir === 'inbound' ? '<div style="display:inline-flex;align-items:center;gap:4px;margin-top:3px;"><span style="width:7px;height:7px;border-radius:50%;background:var(--success);display:inline-block;"></span><span style="font-size:10px;color:var(--success);font-weight:600;">Replied</span></div>' : '');
+
       // Actions
       var actionHtml = availStatus !== 'active'
         ? '<button class="btn btn-primary btn-sm btn-reactivate" data-id="' + a.id + '">Reactivate</button>'
@@ -238,6 +264,7 @@
             '<div class="applicant-info">' +
               '<div class="applicant-name">' + GHE.escapeHtml(a.full_name || 'Unnamed') + '</div>' +
               '<div class="applicant-detail">' + GHE.escapeHtml(a.email || '') + '</div>' +
+              awaitingBadge +
             '</div>' +
           '</div>' +
         '</td>' +
@@ -361,6 +388,14 @@
 
     docs = docs || [];
 
+    // Fetch message thread
+    var { data: messages } = await ghFrom('messages')
+      .select('id, direction, subject, body, sent_at')
+      .eq('applicant_id', candidateId)
+      .order('sent_at', { ascending: true });
+
+    messages = messages || [];
+
     var colors = GHE.avatarColors[profile.avatar_color_index || 0];
 
     // Build profile section
@@ -453,8 +488,41 @@
       html += '</a></div>';
     }
 
-    // ── Smart Email Composer ──
+    // ── Message Thread ──
     html += '<div style="margin-top:var(--space-6);padding-top:var(--space-5);border-top:1px solid var(--border-subtle);">';
+    html += '<div style="font-size:var(--text-base);font-weight:700;color:var(--text-primary);margin-bottom:var(--space-4);">Message Thread (' + messages.length + ')</div>';
+
+    if (messages.length === 0) {
+      html += '<p style="color:var(--text-tertiary);font-size:var(--text-sm);margin-bottom:var(--space-2);">No messages yet. Send the first one below.</p>';
+    } else {
+      html += '<div id="msg-thread" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:var(--space-3);margin-bottom:var(--space-4);">';
+      messages.forEach(function (m) {
+        var isOut = m.direction === 'outbound';
+        var timeStr = m.sent_at ? new Date(m.sent_at).toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '';
+        var bubbleStyle = isOut
+          ? 'background:#EFF6FF;border:1px solid #BFDBFE;border-radius:12px 12px 4px 12px;padding:var(--space-3) var(--space-4);align-self:flex-end;max-width:90%;'
+          : 'background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:12px 12px 12px 4px;padding:var(--space-3) var(--space-4);align-self:flex-start;max-width:90%;';
+        var senderLabel = isOut
+          ? '<span style="font-size:10px;font-weight:700;color:#2563EB;text-transform:uppercase;letter-spacing:0.05em;">Team</span>'
+          : '<span style="font-size:10px;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:0.05em;">Applicant</span>';
+
+        html += '<div style="' + bubbleStyle + '">';
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">';
+        html += senderLabel;
+        html += '<span style="font-size:10px;color:var(--text-tertiary);">' + timeStr + '</span>';
+        html += '</div>';
+        if (m.subject) {
+          html += '<div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">' + GHE.escapeHtml(m.subject) + '</div>';
+        }
+        html += '<div style="font-size:13px;color:var(--text-primary);line-height:1.55;white-space:pre-wrap;">' + GHE.escapeHtml(m.body || '') + '</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+
+    // ── Smart Email Composer ──
+    html += '<div style="margin-top:var(--space-4);padding-top:var(--space-4);border-top:1px solid var(--border-subtle);">';
     html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);">';
     html += '<div style="font-size:var(--text-base);font-weight:700;color:var(--text-primary);">Send Email</div>';
     html += '<button id="btn-auto-draft" class="btn btn-secondary btn-sm" style="display:flex;align-items:center;gap:var(--space-1);font-size:12px;">';

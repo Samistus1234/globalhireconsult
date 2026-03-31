@@ -36,6 +36,9 @@
     try {
       await loadSettings();
     } catch (err) { console.error('Settings load error:', err); }
+    try {
+      await loadMessages();
+    } catch (err) { console.error('Messages load error:', err); }
     // Check for ?apply= param after everything is loaded
     try {
       await checkApplyParam();
@@ -773,6 +776,107 @@
     const sizes = ['B', 'KB', 'MB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  }
+
+  // ── Messages tab ──
+  async function loadMessages() {
+    var threadEl = document.getElementById('messages-thread');
+    if (!threadEl) return;
+
+    var { data: messages, error } = await ghFrom('messages')
+      .select('id, direction, subject, body, sent_at')
+      .eq('applicant_id', currentUser.id)
+      .order('sent_at', { ascending: true });
+
+    messages = messages || [];
+
+    // Update badge
+    var unread = messages.filter(function (m) { return m.direction === 'outbound'; }).length;
+    var badge = document.getElementById('messages-badge');
+    if (badge) {
+      badge.textContent = messages.length;
+      badge.style.display = messages.length > 0 ? '' : 'none';
+    }
+
+    if (messages.length === 0) {
+      threadEl.innerHTML = '<div style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">No messages yet. Our team will reach out here when there are updates about your application.</div>';
+      return;
+    }
+
+    threadEl.innerHTML = messages.map(function (m) {
+      var isOut = m.direction === 'outbound';
+      var timeStr = m.sent_at ? new Date(m.sent_at).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+      var align = isOut ? 'flex-end' : 'flex-start';
+      var bubbleBg = isOut ? 'background:#EFF6FF;border:1px solid #BFDBFE;' : 'background:var(--bg-surface);border:1px solid var(--border-subtle);';
+      var radius = isOut ? 'border-radius:14px 14px 4px 14px;' : 'border-radius:14px 14px 14px 4px;';
+      var label = isOut
+        ? '<span style="font-size:10px;font-weight:700;color:#2563EB;text-transform:uppercase;letter-spacing:0.05em;">Recruitment Team</span>'
+        : '<span style="font-size:10px;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:0.05em;">You</span>';
+
+      return '<div style="display:flex;justify-content:' + align + ';">' +
+        '<div style="' + bubbleBg + radius + 'padding:12px 16px;max-width:85%;">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:5px;">' +
+            label +
+            '<span style="font-size:10px;color:var(--text-tertiary);white-space:nowrap;">' + timeStr + '</span>' +
+          '</div>' +
+          (m.subject ? '<div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">' + GHE.escapeHtml(m.subject) + '</div>' : '') +
+          '<div style="font-size:14px;color:var(--text-primary);line-height:1.6;white-space:pre-wrap;">' + GHE.escapeHtml(m.body || '') + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    // Scroll to bottom
+    threadEl.scrollTop = threadEl.scrollHeight;
+
+    // Bind reply button
+    var sendBtn = document.getElementById('portal-reply-send');
+    var bodyInput = document.getElementById('portal-reply-body');
+    if (sendBtn && !sendBtn._bound) {
+      sendBtn._bound = true;
+      sendBtn.addEventListener('click', async function () {
+        var body = (bodyInput && bodyInput.value.trim()) || '';
+        if (!body) { alert('Please write a message before sending.'); return; }
+
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px;"></span> Sending...';
+
+        try {
+          var session = await GHAuth.getSession();
+          if (!session) throw new Error('Not authenticated');
+
+          var resp = await fetch(SUPABASE_URL + '/functions/v1/send-reply', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + session.access_token
+            },
+            body: JSON.stringify({ body: body })
+          });
+
+          var result = await resp.json();
+          if (!resp.ok || !result.success) throw new Error(result.error || 'Send failed');
+
+          if (bodyInput) bodyInput.value = '';
+          sendBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Sent!';
+          sendBtn.style.background = 'var(--success)';
+
+          // Reload thread
+          await loadMessages();
+
+          setTimeout(function () {
+            sendBtn.style.background = '';
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Reply';
+            sendBtn._bound = false;
+          }, 3000);
+
+        } catch (err) {
+          alert('Failed to send: ' + (err.message || 'Unknown error'));
+          sendBtn.disabled = false;
+          sendBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Reply';
+        }
+      });
+    }
   }
 
   // ── Helper: switch to tab ──

@@ -67,6 +67,12 @@
           Saved Jobs
         </a>
 
+        <a class="portal-nav-item" data-tab="tab-messages" style="position:relative;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Messages
+          <span class="nav-badge" id="messages-badge" style="display:none">0</span>
+        </a>
+
         <a class="portal-nav-item" data-tab="tab-settings" style="position:relative;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           Account Settings
@@ -444,6 +450,33 @@
                   </div>
                 </div>
 
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ TAB: Messages ═══ -->
+        <div class="portal-tab" id="tab-messages">
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Messages from Recruitment Team</span>
+            </div>
+            <div class="panel-body" style="padding:var(--space-6);">
+              <!-- Thread -->
+              <div id="messages-thread" style="display:flex;flex-direction:column;gap:var(--space-4);margin-bottom:var(--space-6);min-height:80px;">
+                <div style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">
+                  <div class="spinner" style="margin:0 auto var(--space-3);"></div>
+                  Loading messages...
+                </div>
+              </div>
+              <!-- Reply Form -->
+              <div style="border-top:1px solid var(--border-subtle);padding-top:var(--space-5);">
+                <div style="font-size:var(--text-sm);font-weight:700;color:var(--text-primary);margin-bottom:var(--space-3);">Reply to Team</div>
+                <textarea id="portal-reply-body" rows="4" placeholder="Type your reply here..." style="width:100%;padding:var(--space-3);font-size:var(--text-sm);border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-primary);resize:vertical;font-family:inherit;line-height:1.6;box-sizing:border-box;"></textarea>
+                <button id="portal-reply-send" class="btn btn-primary" style="margin-top:var(--space-3);display:flex;align-items:center;gap:var(--space-2);">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                  Send Reply
+                </button>
               </div>
             </div>
           </div>

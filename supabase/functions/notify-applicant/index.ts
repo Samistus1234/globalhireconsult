@@ -201,7 +201,7 @@ Deno.serve(async (req) => {
       ctaText = "View in Portal";
 
       bodyHtml = '<p style="margin:0 0 20px;font-size:15px;color:#475569;">Hi <strong style="color:#0F172A;">' + esc(applicantName) + '</strong>,</p>';
-      bodyHtml += '<p style="margin:0 0 28px;font-size:15px;line-height:1.7;color:#475569;">' + esc(customMessage || "You have a new update. Please log in to your portal for details.") + '</p>';
+      bodyHtml += textToHtml(customMessage || "You have a new update. Please log in to your portal for details.");
 
     } else {
       return json({ error: "Invalid type. Use: review_started, review_complete, or custom" }, 400);
@@ -254,6 +254,22 @@ Deno.serve(async (req) => {
     });
 
     transport.close();
+
+    // ── Save outbound message to thread ──
+    try {
+      await sb.schema("globalhire").from("messages").insert({
+        applicant_id: applicantId,
+        direction: "outbound",
+        subject: emailSubject,
+        body: customMessage || plainText,
+        sent_at: new Date().toISOString(),
+        sent_by_admin: user.id,
+      });
+    } catch (saveErr) {
+      // Non-fatal — email was sent, just log the error
+      console.warn("Failed to save message to thread:", saveErr);
+    }
+
     return json({ success: true, sent_to: applicantEmail, type });
 
   } catch (err) {
@@ -264,4 +280,38 @@ Deno.serve(async (req) => {
 
 function esc(str: string): string {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// Convert plain text (with \n line breaks and • bullets) to HTML paragraphs/lists
+function textToHtml(text: string): string {
+  const lines = text.split("\n");
+  let html = "";
+  let inList = false;
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    const isBullet = line.startsWith("•") || line.startsWith("-") || line.startsWith("*");
+
+    if (isBullet) {
+      if (!inList) {
+        html += '<ul style="margin:0 0 16px;padding-left:20px;">';
+        inList = true;
+      }
+      const content = line.replace(/^[•\-\*]\s*/, "");
+      html += '<li style="font-size:14px;line-height:1.7;color:#475569;margin-bottom:4px;">' + esc(content) + "</li>";
+    } else {
+      if (inList) {
+        html += "</ul>";
+        inList = false;
+      }
+      if (line === "") {
+        // blank line = paragraph break (skip, handled by next non-empty line)
+        continue;
+      }
+      html += '<p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#475569;">' + esc(line) + "</p>";
+    }
+  }
+
+  if (inList) html += "</ul>";
+  return html;
 }
