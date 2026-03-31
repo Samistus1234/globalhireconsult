@@ -111,10 +111,27 @@ Deno.serve(async (req) => {
     }
 
     if (action === "list_recruiters") {
+      // Pull all users whose auth metadata marks them as recruiter, then fetch profiles
+      const { data: usersPage, error: usersErr } = await sb.auth.admin.listUsers({ perPage: 1000 });
+      if (usersErr) return json({ error: usersErr.message }, 500);
+
+      const recruiterIds = (usersPage.users || [])
+        .filter((u) => u.user_metadata?.role === "recruiter")
+        .map((u) => u.id);
+
+      if (recruiterIds.length === 0) return json({ success: true, recruiters: [] });
+
+      // Fix any mismatched roles in profiles while we're here
+      await sb.schema("globalhire").from("profiles")
+        .update({ role: "recruiter" })
+        .in("id", recruiterIds)
+        .neq("role", "recruiter");
+
       const { data: recruiters } = await sb.schema("globalhire").from("profiles")
         .select("id, full_name, organization_name, country_of_origin, phone, recruiter_approved, created_at")
-        .eq("role", "recruiter")
+        .in("id", recruiterIds)
         .order("created_at", { ascending: false });
+
       return json({ success: true, recruiters: recruiters || [] });
     }
 
