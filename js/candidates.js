@@ -539,6 +539,40 @@
     }
     html += '</div>';
 
+    // ── Pipeline Stage (eLab sets, recruiter sees) ──
+    var isSaudiCand = (profile.preferred_destinations || []).some(function (d) { return /saudi|ksa|riyadh|jeddah/i.test(d); });
+    var stageOptions = isSaudiCand ? [
+      { value: '',          label: '— Not set —' },
+      { value: 'profile',   label: 'Profile & Documents' },
+      { value: 'dataflow',  label: 'DataFlow Verification' },
+      { value: 'mumaris',   label: 'Mumaris+ Registration' },
+      { value: 'prometric', label: 'Prometric / ORA Evaluation' },
+      { value: 'license',   label: 'License Issuance' },
+      { value: 'visa',      label: 'Visa & Deployment' },
+    ] : [
+      { value: '',             label: '— Not set —' },
+      { value: 'profile',      label: 'Profile & Documents' },
+      { value: 'verification', label: 'Credential Verification' },
+      { value: 'licensing',    label: 'Licensing / Exam' },
+      { value: 'offer',        label: 'Job Offer' },
+      { value: 'deployment',   label: 'Visa & Deployment' },
+    ];
+    html += '<div style="margin-top:var(--space-6);padding-top:var(--space-5);border-top:1px solid var(--border-subtle);">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-3);">';
+    html += '<div>';
+    html += '<div style="font-size:var(--text-base);font-weight:700;color:var(--text-primary);">Pipeline Stage</div>';
+    html += '<div style="font-size:11px;color:var(--text-tertiary);margin-top:2px;">Set here — reflects on recruiter\'s dashboard automatically</div>';
+    html += '</div>';
+    html += '<span id="stage-save-status" style="font-size:11px;color:var(--success);display:none;font-weight:600;"></span>';
+    html += '</div>';
+    html += '<select id="pipeline-stage-select" style="width:100%;padding:var(--space-2) var(--space-3);font-size:var(--text-sm);border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-primary);">';
+    stageOptions.forEach(function (opt) {
+      var sel = (profile.pipeline_stage || '') === opt.value ? ' selected' : '';
+      html += '<option value="' + GHE.escapeHtml(opt.value) + '"' + sel + '>' + GHE.escapeHtml(opt.label) + '</option>';
+    });
+    html += '</select>';
+    html += '</div>';
+
     // ── Recruiter Notes ──
     html += '<div style="margin-top:var(--space-6);padding-top:var(--space-5);border-top:1px solid var(--border-subtle);">';
     html += '<div style="font-size:var(--text-base);font-weight:700;color:var(--text-primary);margin-bottom:var(--space-3);">Recruiter Notes';
@@ -621,6 +655,30 @@
     html += '</div>';
 
     panelContentEl.innerHTML = html;
+
+    // Bind pipeline stage selector
+    var stageSelect = document.getElementById('pipeline-stage-select');
+    var stageSaveStatus = document.getElementById('stage-save-status');
+    if (stageSelect) {
+      stageSelect.addEventListener('change', async function () {
+        var newStage = stageSelect.value || null;
+        stageSelect.disabled = true;
+        if (stageSaveStatus) { stageSaveStatus.textContent = 'Saving...'; stageSaveStatus.style.color = 'var(--text-tertiary)'; stageSaveStatus.style.display = ''; }
+        var { error } = await ghFrom('profiles').update({ pipeline_stage: newStage }).eq('id', candidateId);
+        stageSelect.disabled = false;
+        if (stageSaveStatus) {
+          if (error) {
+            stageSaveStatus.textContent = 'Error: ' + error.message;
+            stageSaveStatus.style.color = 'var(--error)';
+          } else {
+            stageSaveStatus.textContent = 'Saved \u2713';
+            stageSaveStatus.style.color = 'var(--success)';
+            setTimeout(function () { stageSaveStatus.style.display = 'none'; }, 2500);
+          }
+          stageSaveStatus.style.display = '';
+        }
+      });
+    }
 
     // Bind "Forward to Applicant" buttons on recruiter notes
     panelContentEl.querySelectorAll('.btn-forward-note').forEach(function (btn) {

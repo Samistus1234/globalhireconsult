@@ -22,14 +22,19 @@
   };
 
   // ── Saudi Arabia recruitment pipeline stages ──
+  // Correct order: DataFlow → Mumaris+ → Prometric/ORA → License → Deployment
   var SAUDI_PIPELINE = [
-    { id: 'profile', label: 'Profile & Documents', desc: 'Candidate profile complete, all required documents submitted', icon: '1' },
-    { id: 'dataflow', label: 'DataFlow Verification', desc: 'Credential verification submitted to DataFlow (SCFHS requirement)', icon: '2' },
-    { id: 'prometric', label: 'Prometric Exam', desc: 'Saudi Commission for Health Specialties licensing exam', icon: '3' },
-    { id: 'sfhs_eval', label: 'SFHS/MOH Evaluation', desc: 'Saudi Food & Health Services / Ministry of Health licence evaluation', icon: '4' },
-    { id: 'mumaris', label: 'Mumaris+ Registration', desc: 'Professional registration on the Mumaris+ platform (SCFHS portal)', icon: '5' },
-    { id: 'visa', label: 'Visa & Deployment', desc: 'Job offer confirmed, visa processed, deployment scheduled', icon: '6' },
+    { id: 'profile',   label: 'Profile & Documents',       desc: 'Candidate profile complete, all required documents submitted', icon: '1' },
+    { id: 'dataflow',  label: 'DataFlow Verification',     desc: 'Primary source verification of credentials — mandatory SCFHS requirement', icon: '2' },
+    { id: 'mumaris',   label: 'Mumaris+ Registration',     desc: 'Professional registration on the Mumaris+ platform (SCFHS portal)', icon: '3' },
+    { id: 'prometric', label: 'Prometric / ORA Evaluation', desc: 'SCFHS licensing exam (Prometric) or ORA evaluation — required for license issuance', icon: '4' },
+    { id: 'license',   label: 'License Issuance',          desc: 'MOH / SCFHS professional practice license issued', icon: '5' },
+    { id: 'visa',      label: 'Visa & Deployment',         desc: 'Job offer confirmed, visa processed, deployment scheduled', icon: '6' },
   ];
+
+  // Stage ID → step index maps (for pipeline_stage DB value → stepper position)
+  var SAUDI_STAGE_MAP   = { profile: 0, dataflow: 1, mumaris: 2, prometric: 3, license: 4, visa: 5 };
+  var GENERIC_STAGE_MAP = { profile: 0, verification: 1, licensing: 2, offer: 3, deployment: 4 };
 
   // ── Generic recruitment pipeline stages ──
   var GENERIC_PIPELINE = [
@@ -168,7 +173,7 @@
 
     // Fetch profiles
     var { data: profiles } = await ghFrom('profiles')
-      .select('id, full_name, specialty, country_of_origin, years_of_experience, avatar_initials, avatar_color_index, preferred_destinations, phone, license_number')
+      .select('id, full_name, specialty, country_of_origin, years_of_experience, avatar_initials, avatar_color_index, preferred_destinations, phone, license_number, pipeline_stage')
       .in('id', applicantIds);
 
     // Fetch documents summary
@@ -472,13 +477,19 @@
     var pipeline = isSaudi(candidate) ? SAUDI_PIPELINE : GENERIC_PIPELINE;
     var pipelineTitle = isSaudi(candidate) ? 'Saudi Arabia Recruitment Path' : 'Recruitment Path';
     var pipelineSubtitle = isSaudi(candidate)
-      ? 'DataFlow \u2192 Prometric \u2192 SFHS Evaluation \u2192 Mumaris+ \u2192 Deployment'
+      ? 'DataFlow \u2192 Mumaris+ \u2192 Prometric / ORA \u2192 License \u2192 Deployment'
       : 'Verification \u2192 Licensing \u2192 Job Offer \u2192 Deployment';
 
-    // Infer current step from doc stage
-    // docStage 0 = step 0 (profile), docStage 1 = step 1 (still on profile/docs), docStage 2 = step 1 complete, entering step 2
-    var docStage = getDocStage(docs);
-    var currentPipelineStep = docStage >= 2 ? 1 : 0; // 0-indexed; step 2+ require recruiter to advance manually
+    // Use pipeline_stage set by eLab admin (stored in profiles.pipeline_stage)
+    var stageMap = isSaudi(candidate) ? SAUDI_STAGE_MAP : GENERIC_STAGE_MAP;
+    var currentPipelineStep = 0;
+    if (candidate.pipeline_stage && stageMap.hasOwnProperty(candidate.pipeline_stage)) {
+      currentPipelineStep = stageMap[candidate.pipeline_stage];
+    } else {
+      // Fallback: infer from doc status if admin hasn't set a stage yet
+      var docStage = getDocStage(docs);
+      currentPipelineStep = docStage >= 2 ? 1 : 0;
+    }
 
     html += '<div>';
     html += '<div class="panel-section-title">' + esc(pipelineTitle) + '</div>';
