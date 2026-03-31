@@ -273,7 +273,7 @@
         html += '</div>';
         html += '<span style="font-size:11px;font-weight:600;color:' + st.c + ';">' + st.l + '</span>';
         if (d.file_path) {
-          html += '<button class="btn btn-ghost btn-sm btn-dl" data-path="' + esc(d.file_path) + '" style="font-size:11px;padding:2px 8px;">View</button>';
+          html += '<button class="btn btn-ghost btn-sm btn-dl" data-path="' + esc(d.file_path) + '" data-cand="' + esc(candidateId) + '" style="font-size:11px;padding:2px 8px;">View</button>';
         }
         html += '</div>';
       });
@@ -305,9 +305,24 @@
     // Bind document view buttons
     panelBodyEl.querySelectorAll('.btn-dl').forEach(function (btn) {
       btn.addEventListener('click', async function () {
-        var { data } = await sb.storage.from('gh-applicant-documents').createSignedUrl(btn.dataset.path, 3600);
-        if (data && data.signedUrl) { window.open(data.signedUrl, '_blank'); }
-        else { alert('Could not open document.'); }
+        btn.disabled = true;
+        btn.textContent = '...';
+        try {
+          var session = await GHAuth.getSession();
+          var resp = await fetch(SUPABASE_URL + '/functions/v1/recruiter-get-doc', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+            body: JSON.stringify({ file_path: btn.dataset.path, applicant_id: btn.dataset.cand })
+          });
+          var result = await resp.json();
+          if (result.url) { window.open(result.url, '_blank'); }
+          else { alert('Could not open document: ' + (result.error || 'Unknown error')); }
+        } catch (err) {
+          alert('Could not open document.');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'View';
+        }
       });
     });
 
