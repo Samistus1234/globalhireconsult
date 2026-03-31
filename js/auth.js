@@ -48,6 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
       var redirectParam = new URLSearchParams(window.location.search).get('redirect');
       if (profile && profile.role === 'admin') {
         window.location.href = 'dashboard.html';
+      } else if (profile && profile.role === 'recruiter') {
+        window.location.href = 'recruiter.html';
       } else if (redirectParam) {
         window.location.href = redirectParam;
       } else {

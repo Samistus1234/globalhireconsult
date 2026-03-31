@@ -65,6 +65,8 @@
     if (requiredRole && profile.role !== requiredRole) {
       if (profile.role === 'admin') {
         window.location.replace('dashboard.html');
+      } else if (profile.role === 'recruiter') {
+        window.location.replace('recruiter.html');
       } else {
         window.location.replace('portal.html');
       }

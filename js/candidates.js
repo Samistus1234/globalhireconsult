@@ -13,6 +13,8 @@
   const pageSize = 20;
   // Map of applicant_id → 'outbound' | 'inbound' (direction of last message)
   let lastMessageDir = {};
+  // List of approved recruiters for assignment
+  let approvedRecruiters = [];
 
   window.addEventListener('gh:auth-ready', async (e) => {
     adminProfile = e.detail.profile;
@@ -61,9 +63,18 @@
     }
 
     allApplicants = data || [];
-    await loadLastMessages();
+    await Promise.all([loadLastMessages(), loadApprovedRecruiters()]);
     populateSpecialtyFilter();
     applyFilters();
+  }
+
+  // ── Load approved recruiters for assignment dropdown ──
+  async function loadApprovedRecruiters() {
+    var { data } = await ghFrom('profiles')
+      .select('id, full_name, organization_name')
+      .eq('role', 'recruiter')
+      .eq('recruiter_approved', true);
+    approvedRecruiters = data || [];
   }
 
   // ── Load last message direction per applicant ──
@@ -488,6 +499,38 @@
       html += '</a></div>';
     }
 
+    // ── Assign to Recruiter ──
+    // Fetch current assignments for this candidate
+    var { data: currentAssignments } = await ghFrom('recruiter_assignments')
+      .select('recruiter_id')
+      .eq('applicant_id', candidateId);
+    var assignedIds = (currentAssignments || []).map(function (a) { return a.recruiter_id; });
+
+    html += '<div style="margin-top:var(--space-6);padding-top:var(--space-5);border-top:1px solid var(--border-subtle);">';
+    html += '<div style="font-size:var(--text-base);font-weight:700;color:var(--text-primary);margin-bottom:var(--space-3);">Assign to Recruiter</div>';
+
+    if (approvedRecruiters.length === 0) {
+      html += '<p style="font-size:var(--text-sm);color:var(--text-tertiary);">No approved recruiters yet. Approve recruiters from the Recruiters page.</p>';
+    } else {
+      html += '<div style="display:flex;flex-direction:column;gap:var(--space-2);" id="recruiter-assign-list">';
+      approvedRecruiters.forEach(function (r) {
+        var isAssigned = assignedIds.includes(r.id);
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-2) var(--space-3);background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-md);">';
+        html += '<div>';
+        html += '<div style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary);">' + GHE.escapeHtml(r.full_name) + '</div>';
+        html += '<div style="font-size:11px;color:var(--text-tertiary);">' + GHE.escapeHtml(r.organization_name || 'Recruiter') + '</div>';
+        html += '</div>';
+        if (isAssigned) {
+          html += '<button class="btn btn-ghost btn-sm btn-unassign" data-rid="' + r.id + '" style="color:var(--error);font-size:11px;">Unassign</button>';
+        } else {
+          html += '<button class="btn btn-secondary btn-sm btn-assign" data-rid="' + r.id + '" style="font-size:11px;">Assign</button>';
+        }
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+
     // ── Message Thread ──
     html += '<div style="margin-top:var(--space-6);padding-top:var(--space-5);border-top:1px solid var(--border-subtle);">';
     html += '<div style="font-size:var(--text-base);font-weight:700;color:var(--text-primary);margin-bottom:var(--space-4);">Message Thread (' + messages.length + ')</div>';
@@ -549,6 +592,48 @@
           window.open(data.signedUrl, '_blank');
         } else {
           alert('Could not generate download link.');
+        }
+      });
+    });
+
+    // ── Assign / Unassign buttons ──
+    panelContentEl.querySelectorAll('.btn-assign, .btn-unassign').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        var isAssign = btn.classList.contains('btn-assign');
+        var recruiterId = btn.dataset.rid;
+        btn.disabled = true;
+        btn.textContent = isAssign ? 'Assigning...' : 'Removing...';
+
+        try {
+          var session = await GHAuth.getSession();
+          var resp = await fetch(SUPABASE_URL + '/functions/v1/manage-recruiter', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+            body: JSON.stringify({ action: isAssign ? 'assign' : 'unassign', recruiter_id: recruiterId, applicant_id: candidateId })
+          });
+          var result = await resp.json();
+          if (!resp.ok || !result.success) throw new Error(result.error || 'Failed');
+
+          // Toggle button state
+          if (isAssign) {
+            btn.className = 'btn btn-ghost btn-sm btn-unassign';
+            btn.style.color = 'var(--error)';
+            btn.style.fontSize = '11px';
+            btn.textContent = 'Unassign';
+          } else {
+            btn.className = 'btn btn-secondary btn-sm btn-assign';
+            btn.style.color = '';
+            btn.style.fontSize = '11px';
+            btn.textContent = 'Assign';
+          }
+          btn.disabled = false;
+
+          // Re-bind this button
+          btn.addEventListener('click', arguments.callee);
+        } catch (err) {
+          alert('Failed: ' + err.message);
+          btn.disabled = false;
+          btn.textContent = isAssign ? 'Assign' : 'Unassign';
         }
       });
     });
