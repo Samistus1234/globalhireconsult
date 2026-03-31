@@ -779,6 +779,12 @@
   }
 
   // ── Messages tab ──
+  function escHtml(str) {
+    var d = document.createElement('div');
+    d.appendChild(document.createTextNode(String(str || '')));
+    return d.innerHTML;
+  }
+
   async function loadMessages() {
     var threadEl = document.getElementById('messages-thread');
     if (!threadEl) return;
@@ -819,8 +825,8 @@
             label +
             '<span style="font-size:10px;color:var(--text-tertiary);white-space:nowrap;">' + timeStr + '</span>' +
           '</div>' +
-          (m.subject ? '<div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">' + GHE.escapeHtml(m.subject) + '</div>' : '') +
-          '<div style="font-size:14px;color:var(--text-primary);line-height:1.6;white-space:pre-wrap;">' + GHE.escapeHtml(m.body || '') + '</div>' +
+          (m.subject ? '<div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">' + escHtml(m.subject) + '</div>' : '') +
+          '<div style="font-size:14px;color:var(--text-primary);line-height:1.6;white-space:pre-wrap;">' + escHtml(m.body) + '</div>' +
         '</div>' +
       '</div>';
     }).join('');
