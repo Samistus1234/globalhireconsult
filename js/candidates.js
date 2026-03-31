@@ -552,13 +552,17 @@
       recruiterNotes.forEach(function (n) {
         var rec = approvedRecruiters.find(function(r){ return r.id === n.recruiter_id; });
         var recruiterName = rec ? (rec.full_name + (rec.organization_name ? ' · ' + rec.organization_name : '')) : 'Recruiter';
+        var recruiterShortName = rec ? rec.full_name : 'the recruiter';
         var dateStr = n.created_at ? new Date(n.created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '';
         html += '<div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);">';
         html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-1);">';
         html += '<span style="font-size:11px;font-weight:700;color:#C2410C;text-transform:uppercase;letter-spacing:0.05em;">' + GHE.escapeHtml(recruiterName) + '</span>';
+        html += '<div style="display:flex;align-items:center;gap:var(--space-3);">';
         html += '<span style="font-size:11px;color:var(--text-tertiary);">' + dateStr + '</span>';
+        html += '<button class="btn-forward-note" data-note="' + GHE.escapeHtml(n.note) + '" data-recruiter="' + GHE.escapeHtml(recruiterShortName) + '" style="font-size:11px;font-weight:600;color:#0077B6;background:none;border:1px solid #BFDBFE;border-radius:var(--radius-sm);padding:2px 8px;cursor:pointer;">↪ Forward to Applicant</button>';
         html += '</div>';
-        html += '<div style="font-size:13px;color:var(--text-primary);line-height:1.55;">' + GHE.escapeHtml(n.note) + '</div>';
+        html += '</div>';
+        html += '<div style="font-size:13px;color:var(--text-primary);line-height:1.55;margin-top:var(--space-1);">' + GHE.escapeHtml(n.note) + '</div>';
         html += '</div>';
       });
       html += '</div>';
@@ -617,6 +621,22 @@
     html += '</div>';
 
     panelContentEl.innerHTML = html;
+
+    // Bind "Forward to Applicant" buttons on recruiter notes
+    panelContentEl.querySelectorAll('.btn-forward-note').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var note = btn.dataset.note;
+        var recruiter = btn.dataset.recruiter;
+        var subjectEl = document.getElementById('msg-subject');
+        var bodyEl = document.getElementById('msg-body');
+        if (subjectEl) subjectEl.value = 'Update Regarding Your Application';
+        if (bodyEl) bodyEl.value = 'Dear ' + (profile.full_name || 'Candidate') + ',\n\nWe have received the following feedback from ' + recruiter + ' regarding your application:\n\n"' + note + '"\n\nPlease feel free to reach out if you have any questions.\n\nBest regards,\nGlobalHire@eLab Team';
+        // Scroll down to the email composer
+        var sendSection = document.getElementById('msg-subject');
+        if (sendSection) sendSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (subjectEl) subjectEl.focus();
+      });
+    });
 
     // Bind download buttons
     panelContentEl.querySelectorAll('.btn-dl-doc').forEach(function (btn) {
