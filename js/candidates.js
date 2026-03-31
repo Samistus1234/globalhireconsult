@@ -400,6 +400,13 @@
 
     docs = docs || [];
 
+    // Fetch recruiter notes for this candidate
+    var { data: recruiterNotes } = await ghFrom('recruiter_notes')
+      .select('id, note, created_at, recruiter_id')
+      .eq('applicant_id', candidateId)
+      .order('created_at', { ascending: false });
+    recruiterNotes = recruiterNotes || [];
+
     // Fetch message thread
     var { data: messages } = await ghFrom('messages')
       .select('id, direction, subject, body, sent_at')
@@ -526,6 +533,32 @@
         } else {
           html += '<button class="btn btn-secondary btn-sm btn-assign" data-rid="' + r.id + '" style="font-size:11px;">Assign</button>';
         }
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+
+    // ── Recruiter Notes ──
+    html += '<div style="margin-top:var(--space-6);padding-top:var(--space-5);border-top:1px solid var(--border-subtle);">';
+    html += '<div style="font-size:var(--text-base);font-weight:700;color:var(--text-primary);margin-bottom:var(--space-3);">Recruiter Notes';
+    if (recruiterNotes.length > 0) html += ' <span style="font-size:12px;font-weight:500;color:var(--text-tertiary);">(' + recruiterNotes.length + ')</span>';
+    html += '</div>';
+
+    if (recruiterNotes.length === 0) {
+      html += '<p style="font-size:var(--text-sm);color:var(--text-tertiary);">No recruiter notes yet.</p>';
+    } else {
+      html += '<div style="display:flex;flex-direction:column;gap:var(--space-3);">';
+      recruiterNotes.forEach(function (n) {
+        var rec = approvedRecruiters.find(function(r){ return r.id === n.recruiter_id; });
+        var recruiterName = rec ? (rec.full_name + (rec.organization_name ? ' · ' + rec.organization_name : '')) : 'Recruiter';
+        var dateStr = n.created_at ? new Date(n.created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '';
+        html += '<div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);">';
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-1);">';
+        html += '<span style="font-size:11px;font-weight:700;color:#C2410C;text-transform:uppercase;letter-spacing:0.05em;">' + GHE.escapeHtml(recruiterName) + '</span>';
+        html += '<span style="font-size:11px;color:var(--text-tertiary);">' + dateStr + '</span>';
+        html += '</div>';
+        html += '<div style="font-size:13px;color:var(--text-primary);line-height:1.55;">' + GHE.escapeHtml(n.note) + '</div>';
         html += '</div>';
       });
       html += '</div>';
