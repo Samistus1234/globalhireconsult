@@ -151,6 +151,46 @@ Deno.serve(async (req) => {
       return json({ success: true });
     }
 
+    if (action === "resend_welcome") {
+      const { recruiter_id } = body;
+      if (!recruiter_id) return json({ error: "recruiter_id required" }, 400);
+
+      const { data: { user: recruiterUser } } = await sb.auth.admin.getUserById(recruiter_id);
+      const recruiterEmail = recruiterUser?.email;
+      if (!recruiterEmail) return json({ error: "Recruiter email not found" }, 404);
+
+      const { data: rp } = await sb.schema("globalhire").from("profiles")
+        .select("full_name").eq("id", recruiter_id).single();
+
+      const smtpUser = Deno.env.get("GMAIL_USER") || Deno.env.get("SMTP_USER") || "support@elabsolution.org";
+      const smtpPass = Deno.env.get("GMAIL_APP_PASSWORD") || Deno.env.get("SMTP_PASS");
+      if (!smtpPass) return json({ error: "SMTP not configured" }, 500);
+
+      const recruiterName = rp?.full_name || "Recruiter";
+      const emailHtml = "<div style=\"font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f9fafb;padding:32px 24px;border-radius:12px;\">"
+        + "<div style=\"text-align:center;margin-bottom:28px;\"><span style=\"font-size:22px;font-weight:800;color:#0077B6;\">GlobalHire@eLab</span></div>"
+        + "<div style=\"background:#fff;border-radius:10px;padding:28px 24px;border:1px solid #e5e7eb;\">"
+        + "<p style=\"margin:0 0 8px;font-size:16px;font-weight:700;color:#111827;\">Hello " + recruiterName + ",</p>"
+        + "<p style=\"margin:0 0 20px;font-size:14px;color:#374151;line-height:1.6;\">Welcome to <strong>GlobalHire@eLab</strong>! Your recruiter account has been set up. Use your email address (" + recruiterEmail + ") to log in to the recruiter portal.</p>"
+        + "<a href=\"https://globalhireconsult.com/recruiter.html\" style=\"display:inline-block;background:#0077B6;color:#fff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;\">Access Recruiter Portal</a>"
+        + "<p style=\"margin:24px 0 0;font-size:13px;color:#6B7280;\">If you need your password reset, use the Forgot Password option on the login page.</p>"
+        + "</div>"
+        + "<p style=\"text-align:center;font-size:11px;color:#9CA3AF;margin-top:20px;\">GlobalHire@eLab</p>"
+        + "</div>";
+
+      const smtp = new SMTPClient({
+        connection: { hostname: "smtp.gmail.com", port: 465, tls: true, auth: { username: smtpUser, password: smtpPass } },
+      });
+      await smtp.send({
+        from: smtpUser,
+        to: recruiterEmail,
+        subject: "Welcome to GlobalHire@eLab - Your Recruiter Account",
+        html: emailHtml,
+      });
+      await smtp.close();
+      return json({ success: true });
+    }
+
     if (action === "unassign") {
       const { recruiter_id, applicant_id } = body;
       if (!recruiter_id || !applicant_id) return json({ error: "recruiter_id and applicant_id required" }, 400);

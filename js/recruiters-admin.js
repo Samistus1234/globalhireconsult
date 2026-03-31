@@ -75,9 +75,10 @@
         ? '<span class="status-approved">● Approved</span>'
         : '<span class="status-pending">● Pending Approval</span>';
 
+      var resendBtn = '<button class="btn btn-ghost btn-sm btn-resend-welcome" data-id="' + r.id + '" data-name="' + esc(r.full_name) + '" style="font-size:11px;margin-left:var(--space-2);" title="Resend welcome email">✉ Resend</button>';
       var actions = r.recruiter_approved
-        ? '<span style="font-size:11px;color:var(--text-tertiary);">Active</span>'
-        : '<button class="btn btn-primary btn-sm btn-approve" data-id="' + r.id + '" data-name="' + esc(r.full_name) + '">Approve</button>';
+        ? '<div style="display:flex;align-items:center;">' + resendBtn + '</div>'
+        : '<div style="display:flex;align-items:center;gap:var(--space-2);"><button class="btn btn-primary btn-sm btn-approve" data-id="' + r.id + '" data-name="' + esc(r.full_name) + '">Approve</button>' + resendBtn + '</div>';
 
       return '<tr>' +
         '<td>' +
@@ -120,6 +121,33 @@
           alert('Failed to approve: ' + err.message);
           btn.disabled = false;
           btn.textContent = 'Approve';
+        }
+      });
+    });
+
+    // Bind resend welcome email buttons
+    tbody.querySelectorAll('.btn-resend-welcome').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        var recruiterId = btn.dataset.id;
+        var name = btn.dataset.name;
+        if (!confirm('Resend welcome email to ' + name + '?')) return;
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
+        try {
+          var session = await GHAuth.getSession();
+          var resp = await fetch(SUPABASE_URL + '/functions/v1/manage-recruiter', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+            body: JSON.stringify({ action: 'resend_welcome', recruiter_id: recruiterId })
+          });
+          var result = await resp.json();
+          if (!resp.ok || !result.success) throw new Error(result.error || 'Failed');
+          btn.textContent = 'Sent ✓';
+          setTimeout(function () { btn.textContent = '✉ Resend'; btn.disabled = false; }, 3000);
+        } catch (err) {
+          alert('Failed to send: ' + err.message);
+          btn.textContent = '✉ Resend';
+          btn.disabled = false;
         }
       });
     });
