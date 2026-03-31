@@ -383,7 +383,7 @@
   }
 
   function openPanel() {
-    panelEl.style.display = 'block';
+    panelEl.style.display = 'flex';
     overlayEl.style.display = 'block';
     requestAnimationFrame(function () {
       panelEl.style.transform = 'translateX(0)';
