@@ -453,6 +453,24 @@
       html += '</a></div>';
     }
 
+    // ── Smart Email Composer ──
+    html += '<div style="margin-top:var(--space-6);padding-top:var(--space-5);border-top:1px solid var(--border-subtle);">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);">';
+    html += '<div style="font-size:var(--text-base);font-weight:700;color:var(--text-primary);">Send Email</div>';
+    html += '<button id="btn-auto-draft" class="btn btn-secondary btn-sm" style="display:flex;align-items:center;gap:var(--space-1);font-size:12px;">';
+    html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>';
+    html += 'Auto-Draft with AI</button>';
+    html += '</div>';
+    html += '<div id="draft-status" style="display:none;font-size:12px;color:var(--text-tertiary);margin-bottom:var(--space-3);padding:var(--space-2) var(--space-3);background:var(--bg-surface);border-radius:var(--radius-sm);border-left:3px solid var(--primary);"></div>';
+    html += '<div>';
+    html += '<input type="text" id="msg-subject" placeholder="Subject line..." style="width:100%;padding:var(--space-2) var(--space-3);font-size:var(--text-sm);border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-primary);margin-bottom:var(--space-3);box-sizing:border-box;">';
+    html += '<textarea id="msg-body" rows="7" placeholder="Write your message here, or click Auto-Draft to generate one..." style="width:100%;padding:var(--space-3);font-size:var(--text-sm);border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-primary);resize:vertical;font-family:inherit;line-height:1.6;box-sizing:border-box;"></textarea>';
+    html += '</div>';
+    html += '<button id="btn-send-email" class="btn btn-primary" style="width:100%;justify-content:center;display:flex;align-items:center;gap:var(--space-2);margin-top:var(--space-3);">';
+    html += '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+    html += 'Send Email</button>';
+    html += '</div>';
+
     panelContentEl.innerHTML = html;
 
     // Bind download buttons
@@ -466,6 +484,127 @@
         }
       });
     });
+
+    // ── Auto-Draft button ──
+    var autoDraftBtn = document.getElementById('btn-auto-draft');
+    var draftStatusEl = document.getElementById('draft-status');
+    var subjectInput = document.getElementById('msg-subject');
+    var bodyTextarea = document.getElementById('msg-body');
+
+    if (autoDraftBtn) {
+      autoDraftBtn.addEventListener('click', async function () {
+        autoDraftBtn.disabled = true;
+        autoDraftBtn.innerHTML = '<span class="spinner" style="width:12px;height:12px;border-width:2px;"></span> Drafting...';
+
+        if (draftStatusEl) {
+          draftStatusEl.style.display = 'block';
+          draftStatusEl.textContent = 'AI is reading the profile and documents...';
+        }
+
+        try {
+          var session = await GHAuth.getSession();
+          if (!session) throw new Error('Not authenticated');
+
+          var resp = await fetch(SUPABASE_URL + '/functions/v1/draft-message', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + session.access_token
+            },
+            body: JSON.stringify({ applicant_id: candidateId })
+          });
+
+          var result = await resp.json();
+
+          if (!resp.ok || !result.success) {
+            throw new Error(result.error || 'Draft failed');
+          }
+
+          if (subjectInput) subjectInput.value = result.subject || '';
+          if (bodyTextarea) bodyTextarea.value = result.body || '';
+
+          var ctx = result.context || {};
+          var hint = 'Draft ready';
+          if (ctx.missing_count > 0) hint += ' · ' + ctx.missing_count + ' document(s) missing';
+          if (ctx.rejected_count > 0) hint += ' · ' + ctx.rejected_count + ' rejected';
+          if (ctx.verified_count > 0) hint += ' · ' + ctx.verified_count + ' verified';
+
+          if (draftStatusEl) draftStatusEl.textContent = hint;
+
+        } catch (err) {
+          if (draftStatusEl) {
+            draftStatusEl.style.borderLeftColor = 'var(--error)';
+            draftStatusEl.textContent = 'Draft failed: ' + (err.message || 'Unknown error');
+          }
+        }
+
+        autoDraftBtn.disabled = false;
+        autoDraftBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> Auto-Draft with AI';
+      });
+    }
+
+    // ── Send Email button ──
+    var sendEmailBtn = document.getElementById('btn-send-email');
+    if (sendEmailBtn) {
+      sendEmailBtn.addEventListener('click', async function () {
+        var subject = (subjectInput && subjectInput.value.trim()) || '';
+        var body = (bodyTextarea && bodyTextarea.value.trim()) || '';
+
+        if (!subject || !body) {
+          alert('Please enter both a subject and message body before sending.');
+          return;
+        }
+
+        sendEmailBtn.disabled = true;
+        sendEmailBtn.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px;"></span> Sending...';
+
+        try {
+          var session = await GHAuth.getSession();
+          if (!session) throw new Error('Not authenticated');
+
+          var resp = await fetch(SUPABASE_URL + '/functions/v1/notify-applicant', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + session.access_token
+            },
+            body: JSON.stringify({
+              applicant_id: candidateId,
+              type: 'custom',
+              subject: subject,
+              message: body
+            })
+          });
+
+          var result = await resp.json();
+
+          if (!resp.ok || !result.success) {
+            throw new Error(result.error || 'Send failed');
+          }
+
+          // Success feedback
+          sendEmailBtn.style.background = 'var(--success)';
+          sendEmailBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Sent to ' + GHE.escapeHtml(result.sent_to || 'applicant');
+
+          if (draftStatusEl) {
+            draftStatusEl.style.borderLeftColor = 'var(--success)';
+            draftStatusEl.textContent = 'Email delivered to ' + (result.sent_to || 'applicant');
+          }
+
+          // Reset form after 4s
+          setTimeout(function () {
+            sendEmailBtn.style.background = '';
+            sendEmailBtn.disabled = false;
+            sendEmailBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Email';
+          }, 4000);
+
+        } catch (err) {
+          alert('Failed to send: ' + (err.message || 'Unknown error'));
+          sendEmailBtn.disabled = false;
+          sendEmailBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Email';
+        }
+      });
+    }
   }
 
   // ── Render pagination ──
