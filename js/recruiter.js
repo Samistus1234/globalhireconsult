@@ -132,15 +132,18 @@
   }
 
   function initTabs() {
-    document.querySelectorAll('.sidebar-nav-item[data-tab]').forEach(function (item) {
+    var pageTitles = { 'tab-candidates': 'Assigned Candidates', 'tab-pipeline': 'Pipeline View', 'tab-notes': 'My Assessments' };
+    document.querySelectorAll('.sb-nav-item[data-tab]').forEach(function (item) {
       item.addEventListener('click', function (e) {
         e.preventDefault();
         var tabId = item.dataset.tab;
-        document.querySelectorAll('.sidebar-nav-item').forEach(function (n) { n.classList.remove('active'); });
+        document.querySelectorAll('.sb-nav-item').forEach(function (n) { n.classList.remove('active'); });
         item.classList.add('active');
-        document.querySelectorAll('.recruiter-tab').forEach(function (t) {
+        document.querySelectorAll('.rec-tab').forEach(function (t) {
           t.classList.toggle('active', t.id === tabId);
         });
+        var titleEl = document.getElementById('topbar-title');
+        if (titleEl) titleEl.textContent = pageTitles[tabId] || 'Portal';
       });
     });
   }
@@ -225,35 +228,53 @@
       var pending = p.docs.filter(function (d) { return d.status === 'pending' || d.status === 'in_review'; }).length;
       var rejected = p.docs.filter(function (d) { return d.status === 'rejected'; }).length;
 
-      var pills = '';
-      if (verified) pills += '<span class="doc-pill doc-pill-verified">' + verified + ' verified</span>';
-      if (pending) pills += '<span class="doc-pill doc-pill-pending">' + pending + ' pending</span>';
-      if (rejected) pills += '<span class="doc-pill doc-pill-rejected">' + rejected + ' needs attention</span>';
-      if (!p.docs.length) pills += '<span class="doc-pill" style="background:var(--bg-surface);color:var(--text-tertiary);">No docs yet</span>';
+      var chips = '';
+      if (verified) chips += '<span class="doc-chip doc-chip-v">' + verified + ' verified</span>';
+      if (pending)  chips += '<span class="doc-chip doc-chip-p">' + pending + ' pending</span>';
+      if (rejected) chips += '<span class="doc-chip doc-chip-r">' + rejected + ' needs attention</span>';
+      if (!p.docs.length) chips += '<span class="doc-chip doc-chip-e">No docs yet</span>';
 
-      var dests = (p.preferred_destinations || []).slice(0, 2).map(function (d) {
-        return '<span class="tag" style="font-size:10px;">' + esc(d) + '</span>';
+      var dests = (p.preferred_destinations || []).slice(0, 3).map(function (d) {
+        return '<span class="dest-tag">' + esc(d) + '</span>';
       }).join('');
 
-      return '<div class="candidate-card" data-id="' + esc(p.id) + '">' +
-        '<div class="candidate-card-header">' +
-          '<div class="avatar avatar-sm" style="background:' + colors[0] + ';color:' + colors[1] + '">' + esc(p.avatar_initials || '??') + '</div>' +
-          '<div class="candidate-card-info">' +
-            '<div class="cname">' + esc(p.full_name || 'Unnamed') + '</div>' +
-            '<div class="cspecialty">' + esc(p.specialty || 'No specialty') + ' \u00b7 ' + esc(p.country_of_origin || '\u2014') + '</div>' +
+      // Accent bar color based on stage
+      var accentGrad = rejected > 0
+        ? 'linear-gradient(90deg,#E63946,#ff6b6b)'
+        : (pending > 0 ? 'linear-gradient(90deg,#F4A261,#ffd166)' : (verified > 0 && !pending && !rejected ? 'linear-gradient(90deg,#2EC4B6,#48CAE4)' : 'linear-gradient(90deg,var(--primary),var(--primary-light))'));
+
+      var footerHtml = '<div class="cand-footer">' +
+        (needsReview
+          ? '<span class="review-needed"><span class="review-dot"></span>Awaiting review</span>'
+          : '<span class="assessed-ok"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Assessed</span>') +
+        '<span style="font-size:11px;color:var(--text-tertiary);">' + esc(p.country_of_origin || '') + '</span>' +
+        '</div>';
+
+      return '<div class="cand-card" data-id="' + esc(p.id) + '">' +
+        '<div class="cand-card-accent" style="background:' + accentGrad + '"></div>' +
+        '<div class="cand-card-body">' +
+          '<div class="cand-header">' +
+            '<div class="cand-avatar" style="background:' + colors[0] + ';color:' + colors[1] + '">' + esc(p.avatar_initials || '??') + '</div>' +
+            '<div class="cand-info">' +
+              '<div class="cand-name">' + esc(p.full_name || 'Unnamed') + '</div>' +
+              '<div class="cand-specialty">' + esc(p.specialty || 'No specialty') + '</div>' +
+            '</div>' +
+            '<span class="stage-pill" style="background:' + badge.bg + ';color:' + badge.color + ';align-self:flex-start;">' +
+              '<span class="stage-dot" style="background:' + badge.color + '"></span>' + esc(badge.label) +
+            '</span>' +
           '</div>' +
+          (dests ? '<div class="cand-dests">' + dests + '</div>' : '') +
+          '<div class="cand-docs">' + chips + '</div>' +
+          footerHtml +
         '</div>' +
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-3);">' +
-          '<span class="stage-badge" style="background:' + badge.bg + ';color:' + badge.color + '">' + esc(badge.label) + '</span>' +
-          (needsReview ? '<span style="font-size:10px;font-weight:600;color:#F59E0B;">\u25cf Review needed</span>' : '') +
-        '</div>' +
-        (dests ? '<div style="display:flex;flex-wrap:wrap;gap:var(--space-1);margin-bottom:var(--space-3);">' + dests + '</div>' : '') +
-        '<div class="doc-pills">' + pills + '</div>' +
       '</div>';
     }).join('');
 
+    var countEl = document.getElementById('candidates-count');
+    if (countEl) countEl.textContent = list.length + ' candidate' + (list.length !== 1 ? 's' : '');
+
     // Bind card clicks
-    grid.querySelectorAll('.candidate-card').forEach(function (card) {
+    grid.querySelectorAll('.cand-card').forEach(function (card) {
       card.addEventListener('click', function () {
         openCandidatePanel(card.dataset.id);
       });
@@ -307,29 +328,23 @@
 
     var html = '';
     groups.forEach(function (group) {
-      html += '<div class="pipeline-column">';
-      html += '<div class="pipeline-column-header" style="background:' + group.bg + ';border-bottom:1px solid var(--border-subtle);">';
-      html += '<span style="width:8px;height:8px;border-radius:50%;background:' + group.color + ';display:inline-block;flex-shrink:0;"></span>';
-      html += '<span style="color:' + group.color + '">' + esc(group.label) + '</span>';
-      html += '<span style="margin-left:auto;font-size:11px;font-weight:700;color:var(--text-tertiary);">' + group.candidates.length + '</span>';
+      html += '<div class="pipeline-col">';
+      html += '<div class="pipeline-col-header">';
+      html += '<span class="pipeline-col-title"><span class="col-dot" style="background:' + group.color + '"></span><span style="color:' + group.color + '">' + esc(group.label) + '</span></span>';
+      html += '<span class="pipeline-col-count">' + group.candidates.length + '</span>';
       html += '</div>';
-      html += '<div class="pipeline-column-body">';
+      html += '<div class="pipeline-col-body">';
       if (group.candidates.length === 0) {
-        html += '<div style="font-size:var(--text-sm);color:var(--text-tertiary);text-align:center;padding:var(--space-4) 0;">No candidates in this stage</div>';
+        html += '<div class="pipeline-empty">No candidates here</div>';
       } else {
         group.candidates.forEach(function (p) {
           var colors = GHE.avatarColors[p.avatar_color_index || 0];
-          var dests = (p.preferred_destinations || []).slice(0, 2).map(function (d) {
-            return '<span class="tag" style="font-size:10px;">' + esc(d) + '</span>';
-          }).join('');
-          html += '<div class="pipeline-mini-card" data-id="' + esc(p.id) + '">';
-          html += '<div class="avatar avatar-sm" style="background:' + colors[0] + ';color:' + colors[1] + ';flex-shrink:0;">' + esc(p.avatar_initials || '??') + '</div>';
-          html += '<div style="flex:1;min-width:0;">';
-          html += '<div style="font-size:var(--text-sm);font-weight:700;color:var(--text-primary);">' + esc(p.full_name || 'Unnamed') + '</div>';
-          html += '<div style="font-size:11px;color:var(--text-tertiary);">' + esc(p.specialty || '\u2014') + '</div>';
-          if (dests) html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">' + dests + '</div>';
-          html += '</div>';
-          html += '</div>';
+          html += '<div class="pipeline-mini" data-id="' + esc(p.id) + '">';
+          html += '<div class="pipeline-mini-av" style="background:' + colors[0] + ';color:' + colors[1] + '">' + esc(p.avatar_initials || '??') + '</div>';
+          html += '<div class="pipeline-mini-info">';
+          html += '<div class="pipeline-mini-name">' + esc(p.full_name || 'Unnamed') + '</div>';
+          html += '<div class="pipeline-mini-spec">' + esc(p.specialty || '—') + '</div>';
+          html += '</div></div>';
         });
       }
       html += '</div></div>';
@@ -337,11 +352,8 @@
 
     board.innerHTML = html;
 
-    // Bind mini-card clicks
-    board.querySelectorAll('.pipeline-mini-card').forEach(function (card) {
-      card.addEventListener('click', function () {
-        openCandidatePanel(card.dataset.id);
-      });
+    board.querySelectorAll('.pipeline-mini').forEach(function (card) {
+      card.addEventListener('click', function () { openCandidatePanel(card.dataset.id); });
     });
   }
 
@@ -391,7 +403,9 @@
   }
 
   async function openCandidatePanel(candidateId) {
-    panelBodyEl.innerHTML = '<div style="text-align:center;padding:var(--space-10);"><div class="spinner" style="margin:0 auto;"></div></div>';
+    var heroEl = document.getElementById('panel-hero');
+    if (heroEl) heroEl.innerHTML = '<div style="padding:var(--space-6);"><div class="spinner" style="margin:0 auto;"></div></div>';
+    panelBodyEl.innerHTML = '';
     openPanel();
 
     var candidate = allAssigned.find(function (p) { return p.id === candidateId; });
@@ -402,56 +416,59 @@
 
     // Fetch full documents list
     var { data: docs } = await ghFrom('documents')
-      .select('*')
-      .eq('applicant_id', candidateId)
-      .order('uploaded_at', { ascending: false });
+      .select('*').eq('applicant_id', candidateId).order('uploaded_at', { ascending: false });
     docs = docs || [];
 
     // Fetch recruiter notes for this candidate
     var { data: notes } = await ghFrom('recruiter_notes')
-      .select('id, note, created_at')
-      .eq('applicant_id', candidateId)
-      .eq('recruiter_id', currentUser.id)
+      .select('id, note, created_at').eq('applicant_id', candidateId).eq('recruiter_id', currentUser.id)
       .order('created_at', { ascending: false });
     notes = notes || [];
 
     var colors = GHE.avatarColors[candidate.avatar_color_index || 0];
+    var badge = getStageBadge(candidate.docs || docs);
+
+    // ── Panel Hero ──
+    var heroHtml = '<div class="panel-hero">';
+    heroHtml += '<div class="panel-hero-row">';
+    heroHtml += '<div class="panel-avatar-lg" style="background:' + colors[0] + ';color:' + colors[1] + '">' + esc(candidate.avatar_initials || '??') + '</div>';
+    heroHtml += '<div style="flex:1;min-width:0;">';
+    heroHtml += '<div class="panel-name">' + esc(candidate.full_name || 'Unnamed') + '</div>';
+    heroHtml += '<div class="panel-specialty">' + esc(candidate.specialty || 'No specialty') + (candidate.country_of_origin ? ' &nbsp;·&nbsp; ' + esc(candidate.country_of_origin) : '') + '</div>';
+    heroHtml += '</div></div>';
+    heroHtml += '<div style="margin-top:var(--space-4);display:flex;align-items:center;gap:var(--space-3);">';
+    heroHtml += '<span class="stage-pill" style="background:' + badge.bg + ';color:' + badge.color + '"><span class="stage-dot" style="background:' + badge.color + '"></span>' + esc(badge.label) + '</span>';
+    if (candidate.years_of_experience != null) heroHtml += '<span style="font-size:11px;color:var(--text-tertiary);">' + candidate.years_of_experience + ' yrs exp</span>';
+    heroHtml += '</div>';
+    heroHtml += '</div>';
+    if (heroEl) heroEl.innerHTML = heroHtml;
+
     var html = '';
 
-    // ── Section 1: Header ──
-    html += '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-5);">';
-    html += '<div class="avatar" style="width:52px;height:52px;font-size:var(--text-xl);background:' + colors[0] + ';color:' + colors[1] + ';flex-shrink:0;">' + esc(candidate.avatar_initials || '??') + '</div>';
-    html += '<div style="flex:1;min-width:0;">';
-    html += '<div style="font-size:var(--text-xl);font-weight:700;color:var(--text-primary);">' + esc(candidate.full_name || 'Unnamed') + '</div>';
-    html += '<div style="font-size:var(--text-sm);color:var(--text-tertiary);">' + esc(candidate.specialty || 'No specialty') + '</div>';
-    html += '</div></div>';
-
-    // ── Section 2: Info grid ──
+    // ── Section: Info grid ──
     var fields = [
       { label: 'Country', value: candidate.country_of_origin },
       { label: 'Experience', value: candidate.years_of_experience != null ? candidate.years_of_experience + ' yrs' : null },
       { label: 'Phone', value: candidate.phone },
       { label: 'License No.', value: candidate.license_number },
     ];
-    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);margin-bottom:var(--space-5);">';
+    html += '<div><div class="panel-section-title">Profile</div>';
+    html += '<div class="info-grid">';
     fields.forEach(function (f) {
-      html += '<div style="padding:var(--space-2) var(--space-3);background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);">';
-      html += '<div style="font-size:10px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;margin-bottom:2px;">' + esc(f.label) + '</div>';
-      html += '<div style="font-size:var(--text-sm);color:var(--text-primary);font-weight:500;">' + esc(f.value || '\u2014') + '</div>';
-      html += '</div>';
+      html += '<div class="info-cell"><div class="info-cell-label">' + esc(f.label) + '</div><div class="info-cell-value">' + esc(f.value || '—') + '</div></div>';
     });
-    html += '</div>';
+    html += '</div></div>';
 
-    // ── Section 3: Preferred destinations ──
+    // ── Section: Preferred destinations ──
     if (candidate.preferred_destinations && candidate.preferred_destinations.length > 0) {
-      html += '<div style="margin-bottom:var(--space-5);">';
-      html += '<div style="font-size:11px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;margin-bottom:var(--space-2);">Preferred Destinations</div>';
+      html += '<div>';
+      html += '<div class="panel-section-title">Target Destinations</div>';
       html += '<div style="display:flex;flex-wrap:wrap;gap:var(--space-2);">';
-      candidate.preferred_destinations.forEach(function (d) { html += '<span class="tag">' + esc(d) + '</span>'; });
+      candidate.preferred_destinations.forEach(function (d) { html += '<span class="dest-tag">' + esc(d) + '</span>'; });
       html += '</div></div>';
     }
 
-    // ── Section 4: Recruitment Pipeline ──
+    // ── Section: Recruitment Pipeline ──
     var pipeline = isSaudi(candidate) ? SAUDI_PIPELINE : GENERIC_PIPELINE;
     var pipelineTitle = isSaudi(candidate) ? 'Saudi Arabia Recruitment Path' : 'Recruitment Path';
     var pipelineSubtitle = isSaudi(candidate)
@@ -463,132 +480,119 @@
     var docStage = getDocStage(docs);
     var currentPipelineStep = docStage >= 2 ? 1 : 0; // 0-indexed; step 2+ require recruiter to advance manually
 
-    html += '<div style="border-top:1px solid var(--border-subtle);padding-top:var(--space-5);margin-bottom:var(--space-5);">';
-    html += '<div style="font-size:var(--text-base);font-weight:700;color:var(--text-primary);margin-bottom:2px;">' + esc(pipelineTitle) + '</div>';
+    html += '<div>';
+    html += '<div class="panel-section-title">' + esc(pipelineTitle) + '</div>';
     html += '<div style="font-size:11px;color:var(--text-tertiary);margin-bottom:var(--space-4);">' + esc(pipelineSubtitle) + '</div>';
     html += '<div class="pipeline-stepper">';
 
     pipeline.forEach(function (step, idx) {
       var isComplete = idx < currentPipelineStep;
       var isCurrent = idx === currentPipelineStep;
-      var isUpcoming = idx > currentPipelineStep;
 
-      var dotBg, dotColor, stepBg;
-      if (isComplete) {
-        dotBg = 'var(--success)'; dotColor = '#fff'; stepBg = 'rgba(46,196,182,0.04)';
-      } else if (isCurrent) {
-        dotBg = 'var(--primary)'; dotColor = '#fff'; stepBg = 'var(--primary-muted)';
-      } else {
-        dotBg = 'var(--bg-surface)'; dotColor = 'var(--text-tertiary)'; stepBg = 'transparent';
-      }
+      var stepClass = 'pipeline-step' + (isComplete ? ' step-done' : (isCurrent ? ' step-current' : ''));
+      var dotClass = 'step-dot ' + (isComplete ? 'step-dot-done' : (isCurrent ? 'step-dot-current' : 'step-dot-pending'));
+      var labelClass = 'step-label' + ((!isComplete && !isCurrent) ? ' step-label-pending' : '');
 
-      var labelColor = isUpcoming ? 'var(--text-tertiary)' : 'var(--text-primary)';
-      var borderStyle = isCurrent ? 'border:1px solid var(--primary);' : 'border:1px solid var(--border-subtle);';
-
-      html += '<div class="pipeline-step" style="background:' + stepBg + ';' + borderStyle + '">';
-      html += '<div class="pipeline-step-dot" style="background:' + dotBg + ';color:' + dotColor + ';border:' + (isUpcoming ? '2px solid var(--border-strong)' : '2px solid ' + dotBg) + ';">' + esc(step.icon) + '</div>';
-      html += '<div style="flex:1;min-width:0;">';
-      html += '<div style="font-size:var(--text-sm);font-weight:700;color:' + labelColor + ';">' + esc(step.label) + '</div>';
-      html += '<div style="font-size:11px;color:var(--text-tertiary);margin-top:2px;">' + esc(step.desc) + '</div>';
+      html += '<div class="' + stepClass + '">';
+      html += '<div class="step-dot-wrap"><div class="' + dotClass + '">';
+      if (isComplete) html += '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+      else html += esc(step.icon);
+      html += '</div></div>';
+      html += '<div class="step-content">';
+      html += '<div class="' + labelClass + '">' + esc(step.label);
+      if (isCurrent) html += ' <span style="font-size:10px;font-weight:700;color:var(--primary);background:rgba(0,119,182,0.1);padding:1px 7px;border-radius:20px;">Active</span>';
       html += '</div>';
-      if (isComplete) {
-        html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2EC4B6" stroke-width="3" flex-shrink="0"><polyline points="20 6 9 17 4 12"/></svg>';
-      } else if (isCurrent) {
-        html += '<span style="font-size:10px;font-weight:700;color:var(--primary);white-space:nowrap;">In Progress</span>';
-      } else {
-        html += '<span style="font-size:10px;color:var(--text-tertiary);white-space:nowrap;">Upcoming</span>';
-      }
-      html += '</div>';
+      html += '<div class="step-desc">' + esc(step.desc) + '</div>';
+      html += '</div></div>';
     });
 
     html += '</div></div>';
 
-    // ── Section 5: Documents (read-only) ──
-    html += '<div style="border-top:1px solid var(--border-subtle);padding-top:var(--space-5);margin-bottom:var(--space-5);">';
-    html += '<div style="font-size:var(--text-base);font-weight:700;color:var(--text-primary);margin-bottom:var(--space-3);">Documents (' + docs.length + ')</div>';
+    // ── Section: Documents ──
+    html += '<div>';
+    html += '<div class="panel-section-title">Documents (' + docs.length + ')</div>';
     if (docs.length === 0) {
       html += '<p style="color:var(--text-tertiary);font-size:var(--text-sm);">No documents uploaded yet.</p>';
     } else {
       var statusMap = {
-        pending: { c: 'var(--warning)', l: 'Pending' },
-        in_review: { c: 'var(--info)', l: 'In Review' },
-        verified: { c: 'var(--success)', l: 'Verified' },
-        rejected: { c: 'var(--error)', l: 'Rejected' }
+        pending:   { c: '#F4A261', bg: 'rgba(244,162,97,0.1)',  l: 'Pending' },
+        in_review: { c: '#48CAE4', bg: 'rgba(72,202,228,0.1)',  l: 'In Review' },
+        verified:  { c: '#2EC4B6', bg: 'rgba(46,196,182,0.1)',  l: 'Verified' },
+        rejected:  { c: '#E63946', bg: 'rgba(230,57,70,0.1)',   l: 'Rejected' }
       };
       docs.forEach(function (d) {
         var st = statusMap[d.status] || statusMap.pending;
         var label = DOC_LABELS[d.doc_type] || d.doc_type || 'Document';
-        html += '<div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3);background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-md);margin-bottom:var(--space-2);">';
+        html += '<div class="doc-row">';
+        html += '<div class="doc-row-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="' + st.c + '" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>';
         html += '<div style="flex:1;min-width:0;">';
         html += '<div style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary);">' + esc(label) + '</div>';
         html += '<div style="font-size:11px;color:var(--text-tertiary);">' + esc(d.file_name || '') + '</div>';
         html += '</div>';
-        html += '<span style="font-size:11px;font-weight:600;color:' + st.c + ';white-space:nowrap;">' + st.l + '</span>';
-        if (d.file_path) {
-          html += '<button class="btn btn-ghost btn-sm btn-dl" data-path="' + esc(d.file_path) + '" data-cand="' + esc(candidateId) + '" style="font-size:11px;padding:2px 8px;">View</button>';
-        }
+        html += '<span class="doc-status-badge" style="background:' + st.bg + ';color:' + st.c + ';border:1px solid ' + st.c + '30;">' + st.l + '</span>';
+        if (d.file_path) html += '<button class="btn-view-doc btn-dl" data-path="' + esc(d.file_path) + '" data-cand="' + esc(candidateId) + '">View</button>';
         html += '</div>';
       });
     }
     html += '</div>';
 
-    // ── Section 6: Recruiter Feedback / Assessment ──
-    html += '<div style="border-top:1px solid var(--border-subtle);padding-top:var(--space-5);margin-bottom:var(--space-5);">';
-    html += '<div style="font-size:var(--text-base);font-weight:700;color:var(--text-primary);margin-bottom:2px;">Your Assessment</div>';
-    html += '<div style="font-size:11px;color:var(--text-tertiary);margin-bottom:var(--space-4);">This assessment is private and shared with the eLab team only.</div>';
+    // ── Section: Assessment ──
+    html += '<div>';
+    html += '<div class="panel-section-title">Your Assessment</div>';
+    html += '<div style="font-size:11px;color:var(--text-tertiary);margin-bottom:var(--space-4);">Private — shared only with the eLab team.</div>';
 
-    // Recommendation grid
-    html += '<div class="recommendation-grid" id="rec-grid">';
     var recOptions = [
-      { key: 'Suitable for Position', icon: '\u2713' },
-      { key: 'Needs More Documentation', icon: '\ud83d\udccb' },
-      { key: 'Further Assessment Required', icon: '\ud83d\udd0d' },
-      { key: 'Not Suitable at This Time', icon: '\u2717' },
+      { key: 'Suitable for Position',     icon: '✓', sel: 'sel-green' },
+      { key: 'Needs More Documentation',  icon: '📋', sel: 'sel-amber' },
+      { key: 'Further Assessment Required', icon: '🔍', sel: 'sel-blue' },
+      { key: 'Not Suitable at This Time', icon: '✗', sel: 'sel-red' },
     ];
+    html += '<div class="rec-grid">';
     recOptions.forEach(function (opt) {
-      html += '<div class="rec-option" data-rec="' + esc(opt.key) + '">' + opt.icon + ' ' + esc(opt.key) + '</div>';
+      html += '<div class="rec-tile" data-rec="' + esc(opt.key) + '" data-sel="' + esc(opt.sel) + '">';
+      html += '<div class="rec-tile-icon">' + opt.icon + '</div>';
+      html += '<div class="rec-tile-label">' + esc(opt.key) + '</div>';
+      html += '</div>';
     });
     html += '</div>';
 
-    html += '<textarea id="note-input" rows="3" placeholder="Add detailed notes..." style="width:100%;padding:var(--space-3);font-size:var(--text-sm);border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-primary);resize:vertical;font-family:inherit;box-sizing:border-box;"></textarea>';
-    html += '<button id="btn-add-note" class="btn btn-secondary btn-sm" data-cid="' + esc(candidateId) + '" style="margin-top:var(--space-2);">Save Assessment</button>';
+    html += '<textarea class="rec-textarea" id="note-input" rows="4" placeholder="Add detailed notes about this candidate…"></textarea>';
+    html += '<button class="btn-save-assess" id="btn-add-note" data-cid="' + esc(candidateId) + '">';
+    html += '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>';
+    html += 'Save Assessment</button>';
     html += '</div>';
 
-    // ── Section 7: Previous Notes / Assessments ──
-    if (notes.length > 0) {
-      html += '<div style="border-top:1px solid var(--border-subtle);padding-top:var(--space-5);">';
-      html += '<div style="font-size:var(--text-base);font-weight:700;color:var(--text-primary);margin-bottom:var(--space-3);">Previous Assessments</div>';
+    // ── Section: Previous Assessments ──
+    html += '<div>';
+    html += '<div class="panel-section-title">Previous Assessments</div>';
+    if (notes.length === 0) {
+      html += '<p style="color:var(--text-tertiary);font-size:var(--text-sm);">No assessments yet.</p>';
+    } else {
       notes.forEach(function (n) {
         var parsed = parseAssessment(n.note);
         var dateStr = n.created_at ? new Date(n.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
-        html += '<div style="padding:var(--space-3);background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-md);margin-bottom:var(--space-2);">';
+        html += '<div class="prev-note">';
         if (parsed.rec) {
           var ac = getAssessmentColor(parsed.rec);
-          html += '<div style="margin-bottom:var(--space-2);">';
-          html += '<span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 10px;border-radius:20px;background:' + ac.bg + ';color:' + ac.color + ';">' + esc(parsed.rec) + '</span>';
-          html += '</div>';
+          html += '<span class="assess-badge" style="background:' + ac.bg + ';color:' + ac.color + '">' + esc(parsed.rec) + '</span>';
         }
-        if (parsed.text) {
-          html += '<div style="font-size:var(--text-sm);color:var(--text-primary);white-space:pre-wrap;">' + esc(parsed.text) + '</div>';
-        }
-        html += '<div style="font-size:10px;color:var(--text-tertiary);margin-top:4px;">' + esc(dateStr) + '</div>';
+        if (parsed.text) html += '<div style="font-size:var(--text-sm);color:var(--text-primary);white-space:pre-wrap;line-height:1.6;">' + esc(parsed.text) + '</div>';
+        html += '<div class="prev-note-date">' + esc(dateStr) + '</div>';
         html += '</div>';
       });
-      html += '</div>';
-    } else {
-      html += '<div style="border-top:1px solid var(--border-subtle);padding-top:var(--space-5);">';
-      html += '<p style="color:var(--text-tertiary);font-size:var(--text-sm);">No assessments yet. Use the form above to add your first assessment.</p>';
-      html += '</div>';
     }
+    html += '</div>';
 
     panelBodyEl.innerHTML = html;
 
     // ── Bind recommendation tile selection ──
     var selectedRec = null;
-    panelBodyEl.querySelectorAll('.rec-option').forEach(function (tile) {
+    panelBodyEl.querySelectorAll('.rec-tile').forEach(function (tile) {
       tile.addEventListener('click', function () {
-        panelBodyEl.querySelectorAll('.rec-option').forEach(function (t) { t.classList.remove('selected'); });
-        tile.classList.add('selected');
+        panelBodyEl.querySelectorAll('.rec-tile').forEach(function (t) {
+          t.classList.remove('sel-green', 'sel-amber', 'sel-blue', 'sel-red');
+        });
+        tile.classList.add(tile.dataset.sel);
         selectedRec = tile.dataset.rec;
       });
     });
@@ -677,25 +681,31 @@
       return;
     }
 
-    list.innerHTML = notes.map(function (n) {
+    var notesHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:var(--space-4);">';
+    notes.forEach(function (n) {
       var candidate = allAssigned.find(function (p) { return p.id === n.applicant_id; });
+      var candColors = candidate ? GHE.avatarColors[candidate.avatar_color_index || 0] : GHE.avatarColors[0];
+      var initials = candidate ? (candidate.avatar_initials || '??') : '??';
       var name = candidate ? esc(candidate.full_name) : 'Unknown candidate';
       var dateStr = n.created_at ? new Date(n.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
       var parsed = parseAssessment(n.note);
 
-      var recBadge = '';
+      notesHtml += '<div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);padding:var(--space-5);display:flex;flex-direction:column;gap:var(--space-3);">';
+      // Candidate header
+      notesHtml += '<div style="display:flex;align-items:center;gap:var(--space-3);">';
+      notesHtml += '<div style="width:36px;height:36px;border-radius:var(--radius-md);background:' + candColors[0] + ';color:' + candColors[1] + ';display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;">' + esc(initials) + '</div>';
+      notesHtml += '<div style="flex:1;min-width:0;"><div style="font-size:var(--text-sm);font-weight:700;color:var(--text-primary);">' + name + '</div>';
+      notesHtml += '<div style="font-size:11px;color:var(--text-tertiary);">' + dateStr + '</div></div>';
       if (parsed.rec) {
         var ac = getAssessmentColor(parsed.rec);
-        recBadge = '<span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 10px;border-radius:20px;background:' + ac.bg + ';color:' + ac.color + ';margin-bottom:var(--space-2);">' + esc(parsed.rec) + '</span><br>';
+        notesHtml += '<span class="assess-badge" style="background:' + ac.bg + ';color:' + ac.color + '">' + esc(parsed.rec) + '</span>';
       }
-
-      return '<div style="padding:var(--space-4);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);margin-bottom:var(--space-3);">' +
-        '<div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:var(--space-2);">' + name + '</div>' +
-        recBadge +
-        (parsed.text ? '<div style="font-size:var(--text-sm);color:var(--text-primary);white-space:pre-wrap;">' + esc(parsed.text) + '</div>' : '') +
-        '<div style="font-size:11px;color:var(--text-tertiary);margin-top:var(--space-2);">' + dateStr + '</div>' +
-        '</div>';
-    }).join('');
+      notesHtml += '</div>';
+      if (parsed.text) notesHtml += '<div style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.6;white-space:pre-wrap;">' + esc(parsed.text) + '</div>';
+      notesHtml += '</div>';
+    });
+    notesHtml += '</div>';
+    list.innerHTML = notesHtml;
   }
 
 })();

@@ -5,271 +5,628 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Recruiter Portal — GlobalHire</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/base.css">
   <style>
-    /* ── Layout ── */
-    .recruiter-layout { display: flex; min-height: 100vh; }
-    .recruiter-sidebar {
-      width: 260px; flex-shrink: 0;
-      background: var(--bg-card);
+
+    /* ══════════════════════════════════════════
+       BASE
+    ══════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font-body); background: var(--bg-base); color: var(--text-primary); }
+    .rec-layout { display: flex; min-height: 100vh; }
+
+    /* ══════════════════════════════════════════
+       SIDEBAR
+    ══════════════════════════════════════════ */
+    .rec-sidebar {
+      width: 272px; flex-shrink: 0;
+      background: var(--bg-deep);
       border-right: 1px solid var(--border-subtle);
       display: flex; flex-direction: column;
-      padding: var(--space-6) 0; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+      position: sticky; top: 0; height: 100vh; overflow-y: auto;
     }
-    .recruiter-main { flex: 1; padding: var(--space-8); min-width: 0; background: var(--bg-base); }
-
-    /* ── Sidebar ── */
-    .sidebar-brand { padding: 0 var(--space-6) var(--space-6); border-bottom: 1px solid var(--border-subtle); margin-bottom: var(--space-4); }
-    .sidebar-logo { display: flex; align-items: center; gap: var(--space-3); }
-    .sidebar-logo-icon { width: 34px; height: 34px; background: var(--primary); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #fff; font-size: 14px; }
-    .sidebar-logo-text { font-size: var(--text-lg); font-weight: 800; }
-    .sidebar-logo-text span { color: var(--primary); }
-    .sidebar-user { padding: var(--space-4) var(--space-6); display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-2); }
-    .sidebar-user-info .name { font-size: var(--text-sm); font-weight: 700; color: var(--text-primary); }
-    .sidebar-user-info .role-label { font-size: 11px; color: var(--text-tertiary); }
-    .sidebar-nav { padding: 0 var(--space-3); flex: 1; }
-    .sidebar-nav-label { font-size: 10px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; padding: var(--space-3) var(--space-3) var(--space-1); }
-    .sidebar-nav-item {
-      display: flex; align-items: center; gap: var(--space-3);
-      padding: var(--space-2) var(--space-3); border-radius: var(--radius-md);
-      font-size: var(--text-sm); color: var(--text-secondary); cursor: pointer;
-      text-decoration: none; transition: background 0.15s; margin-bottom: 2px;
+    .sb-brand {
+      padding: var(--space-6) var(--space-6) var(--space-5);
+      border-bottom: 1px solid var(--border-subtle);
+      background: linear-gradient(160deg, rgba(0,119,182,0.08) 0%, transparent 60%);
     }
-    .sidebar-nav-item svg { width: 17px; height: 17px; flex-shrink: 0; }
-    .sidebar-nav-item:hover, .sidebar-nav-item.active { background: var(--primary-muted); color: var(--primary); }
-    .sidebar-nav-item.active { font-weight: 600; }
-    .nav-count { margin-left: auto; background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 20px; }
-    .sidebar-footer { padding: var(--space-4) var(--space-6); border-top: 1px solid var(--border-subtle); margin-top: auto; }
-
-    /* ── Tabs ── */
-    .recruiter-tab { display: none; }
-    .recruiter-tab.active { display: block; }
-
-    /* ── KPI Strip ── */
-    .kpi-strip { display: flex; flex-direction: row; gap: var(--space-4); margin-bottom: var(--space-6); }
-    .kpi-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: var(--space-5);
-      flex: 1;
-      min-width: 0;
-    }
-    .kpi-value { font-size: 28px; font-weight: 800; }
-    .kpi-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); }
-
-    /* ── Stage Badge ── */
-    .stage-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 10px; border-radius: 20px; }
-
-    /* ── Pipeline Stepper ── */
-    .pipeline-stepper { display: flex; flex-direction: column; gap: var(--space-3); }
-    .pipeline-step { display: flex; align-items: flex-start; gap: var(--space-3); padding: var(--space-3); border-radius: var(--radius-md); }
-    .pipeline-step-dot {
-      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 700;
-    }
-
-    /* ── Recommendation Grid ── */
-    .recommendation-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-2); margin-bottom: var(--space-3); }
-    .rec-option {
-      padding: var(--space-3);
-      border: 1px solid var(--border-subtle);
+    .sb-logo { display: flex; align-items: center; gap: var(--space-3); }
+    .sb-logo-mark {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
       border-radius: var(--radius-md);
-      cursor: pointer;
-      font-size: 12px; font-weight: 600; text-align: center;
-      transition: all 0.15s;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; color: #fff; font-size: 16px;
+      box-shadow: 0 0 20px rgba(0,119,182,0.4);
     }
-    .rec-option:hover { border-color: var(--border-strong); }
-    .rec-option.selected { border-color: var(--primary); background: var(--primary-muted); color: var(--primary); }
-    .rec-option[data-rec="Suitable for Position"].selected { border-color: #2EC4B6; background: rgba(46,196,182,0.1); color: #2EC4B6; }
-    .rec-option[data-rec="Needs More Documentation"].selected { border-color: #F59E0B; background: rgba(245,158,11,0.1); color: #F59E0B; }
-    .rec-option[data-rec="Further Assessment Required"].selected { border-color: #48CAE4; background: rgba(72,202,228,0.1); color: #48CAE4; }
-    .rec-option[data-rec="Not Suitable at This Time"].selected { border-color: #E63946; background: rgba(230,57,70,0.1); color: #E63946; }
+    .sb-logo-text { font-size: var(--text-lg); font-weight: 800; color: var(--text-primary); font-family: var(--font-display); }
+    .sb-logo-text span { color: var(--primary-light); }
+    .sb-badge {
+      margin-top: var(--space-3);
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--primary-light); background: rgba(0,180,216,0.1); border: 1px solid rgba(0,180,216,0.2);
+      padding: 3px 10px; border-radius: var(--radius-full);
+    }
+    .sb-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--primary-light); animation: pulse-dot 2s infinite; }
 
-    /* ── Candidate cards ── */
-    .candidate-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--space-4); }
-    .candidate-card {
+    .sb-profile {
+      margin: var(--space-4) var(--space-4);
+      padding: var(--space-4);
+      background: var(--bg-surface); border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      display: flex; align-items: center; gap: var(--space-3);
+    }
+    .sb-profile-name { font-size: var(--text-sm); font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+    .sb-profile-role { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+
+    .sb-nav { flex: 1; padding: var(--space-2) var(--space-3) var(--space-4); }
+    .sb-nav-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-tertiary); padding: var(--space-4) var(--space-3) var(--space-2);
+    }
+    .sb-nav-item {
+      display: flex; align-items: center; gap: var(--space-3);
+      padding: 10px var(--space-3); border-radius: var(--radius-md);
+      font-size: var(--text-sm); font-weight: 500; color: var(--text-secondary);
+      cursor: pointer; text-decoration: none;
+      transition: background var(--duration-fast), color var(--duration-fast);
+      margin-bottom: 2px; position: relative; border: 1px solid transparent;
+    }
+    .sb-nav-item svg { width: 17px; height: 17px; flex-shrink: 0; opacity: 0.7; transition: opacity var(--duration-fast); }
+    .sb-nav-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .sb-nav-item:hover svg { opacity: 1; }
+    .sb-nav-item.active {
+      background: linear-gradient(135deg, rgba(0,119,182,0.18), rgba(0,180,216,0.08));
+      color: var(--primary-light); font-weight: 600;
+      border-color: rgba(0,119,182,0.2);
+    }
+    .sb-nav-item.active svg { opacity: 1; }
+    .sb-nav-item.active::before {
+      content: ''; position: absolute; left: 0; top: 20%; bottom: 20%;
+      width: 3px; background: var(--primary-light); border-radius: 0 3px 3px 0;
+    }
+    .sb-count {
+      margin-left: auto; min-width: 20px; height: 20px;
+      background: var(--primary); color: #fff;
+      font-size: 10px; font-weight: 700; padding: 0 6px;
+      border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center;
+    }
+
+    .sb-footer { padding: var(--space-4); border-top: 1px solid var(--border-subtle); }
+    .sb-signout {
+      display: flex; align-items: center; gap: var(--space-3);
+      padding: 10px var(--space-3); border-radius: var(--radius-md);
+      font-size: var(--text-sm); color: var(--text-tertiary); cursor: pointer; text-decoration: none;
+      transition: all var(--duration-fast);
+    }
+    .sb-signout svg { width: 16px; height: 16px; }
+    .sb-signout:hover { color: var(--error); background: rgba(230,57,70,0.06); }
+
+    /* ══════════════════════════════════════════
+       MAIN
+    ══════════════════════════════════════════ */
+    .rec-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+    .rec-topbar {
+      height: 64px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 var(--space-8);
+      background: var(--bg-deep); border-bottom: 1px solid var(--border-subtle);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .rec-breadcrumb { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); }
+    .bc-root { color: var(--text-tertiary); }
+    .bc-sep { color: var(--text-tertiary); opacity: 0.4; }
+    .bc-current { color: var(--text-primary); font-weight: 600; }
+    .topbar-live {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600; color: var(--success);
+      background: rgba(46,196,182,0.08); border: 1px solid rgba(46,196,182,0.2);
+      padding: 4px 10px; border-radius: var(--radius-full);
+    }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); animation: pulse-dot 2s infinite; }
+
+    .rec-content { flex: 1; padding: var(--space-8); }
+    .rec-tab { display: none; }
+    .rec-tab.active { display: block; }
+
+    /* ══════════════════════════════════════════
+       PAGE HEADER
+    ══════════════════════════════════════════ */
+    .page-header { margin-bottom: var(--space-6); }
+    .page-title { font-size: var(--text-2xl); font-weight: 800; color: var(--text-primary); font-family: var(--font-display); letter-spacing: -0.02em; }
+    .page-subtitle { font-size: var(--text-sm); color: var(--text-tertiary); margin-top: var(--space-1); }
+
+    /* ══════════════════════════════════════════
+       KPI CARDS
+    ══════════════════════════════════════════ */
+    .kpi-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); margin-bottom: var(--space-8); }
+    .kpi-card {
+      position: relative; overflow: hidden;
+      background: var(--bg-card); border: 1px solid var(--border-default);
+      border-radius: var(--radius-xl); padding: var(--space-6);
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .kpi-card:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+    .kpi-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--kpi-accent, var(--primary)); opacity: 0.7;
+    }
+    .kpi-icon {
+      width: 40px; height: 40px; border-radius: var(--radius-md);
+      background: var(--kpi-icon-bg, rgba(0,119,182,0.12));
+      display: flex; align-items: center; justify-content: center; margin-bottom: var(--space-4);
+    }
+    .kpi-icon svg { width: 20px; height: 20px; stroke: var(--kpi-icon-color, var(--primary-light)); }
+    .kpi-value { font-size: 36px; font-weight: 800; line-height: 1; font-family: var(--font-display); color: var(--text-primary); margin-bottom: var(--space-1); }
+    .kpi-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); }
+    .kpi-sub { font-size: 11px; color: var(--text-tertiary); margin-top: var(--space-2); opacity: 0.7; }
+
+    /* ══════════════════════════════════════════
+       TOOLBAR
+    ══════════════════════════════════════════ */
+    .toolbar { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-5); }
+    .toolbar-search {
+      flex: 1; max-width: 340px;
+      display: flex; align-items: center; gap: var(--space-2);
+      background: var(--bg-surface); border: 1px solid var(--border-default);
+      border-radius: var(--radius-md); padding: 0 var(--space-3);
+      transition: border-color 0.15s;
+    }
+    .toolbar-search:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,119,182,0.1); }
+    .toolbar-search svg { width: 15px; height: 15px; color: var(--text-tertiary); flex-shrink: 0; }
+    .toolbar-search input {
+      flex: 1; background: none; border: none; outline: none;
+      font-size: var(--text-sm); color: var(--text-primary); padding: 10px 0; font-family: var(--font-body);
+    }
+    .toolbar-search input::placeholder { color: var(--text-tertiary); }
+    .toolbar-count { margin-left: auto; font-size: var(--text-sm); color: var(--text-tertiary); }
+
+    /* ══════════════════════════════════════════
+       CANDIDATE CARDS
+    ══════════════════════════════════════════ */
+    .candidates-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--space-4); }
+
+    .cand-card {
       background: var(--bg-card); border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg); padding: var(--space-5);
-      cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s;
+      border-radius: var(--radius-xl); overflow: hidden; cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s; position: relative;
     }
-    .candidate-card:hover { border-color: var(--primary); box-shadow: 0 4px 16px rgba(0,119,182,0.1); }
-    .candidate-card-header { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-4); }
-    .candidate-card-info .cname { font-size: var(--text-base); font-weight: 700; color: var(--text-primary); }
-    .candidate-card-info .cspecialty { font-size: var(--text-sm); color: var(--text-tertiary); }
-    .doc-pills { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
-    .doc-pill { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
-    .doc-pill-verified { background: rgba(46,196,182,0.1); color: #2EC4B6; }
-    .doc-pill-pending { background: rgba(245,158,11,0.1); color: #F59E0B; }
-    .doc-pill-rejected { background: rgba(230,57,70,0.1); color: #E63946; }
+    .cand-card:hover {
+      border-color: rgba(0,119,182,0.35);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,119,182,0.1);
+      transform: translateY(-2px);
+    }
+    .cand-card-accent { height: 3px; background: var(--card-accent, linear-gradient(90deg, var(--primary), var(--primary-light))); }
+    .cand-card-body { padding: var(--space-5); }
 
-    /* ── Pipeline Board ── */
-    .pipeline-column-header {
-      font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
-      color: var(--text-tertiary); padding: var(--space-3) var(--space-4);
+    .cand-header { display: flex; align-items: flex-start; gap: var(--space-3); margin-bottom: var(--space-4); }
+    .cand-avatar {
+      width: 48px; height: 48px; border-radius: var(--radius-lg); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 16px; letter-spacing: -0.5px;
+    }
+    .cand-info { flex: 1; min-width: 0; }
+    .cand-name { font-size: var(--text-base); font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cand-specialty { font-size: var(--text-sm); color: var(--text-tertiary); margin-top: 2px; }
+
+    .stage-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: var(--radius-full);
+    }
+    .stage-dot { width: 5px; height: 5px; border-radius: 50%; }
+
+    .cand-dests { display: flex; flex-wrap: wrap; gap: var(--space-1); margin-bottom: var(--space-4); }
+    .dest-tag {
+      font-size: 10px; font-weight: 600; color: var(--primary-light);
+      background: rgba(0,119,182,0.1); border: 1px solid rgba(0,119,182,0.2);
+      padding: 2px 8px; border-radius: var(--radius-full);
+    }
+
+    .cand-docs { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+    .doc-chip { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: var(--radius-full); }
+    .doc-chip-v { background: rgba(46,196,182,0.1); color: #2EC4B6; border: 1px solid rgba(46,196,182,0.2); }
+    .doc-chip-p { background: rgba(244,162,97,0.1);  color: #F4A261; border: 1px solid rgba(244,162,97,0.2); }
+    .doc-chip-r { background: rgba(230,57,70,0.1);   color: #E63946; border: 1px solid rgba(230,57,70,0.2); }
+    .doc-chip-e { background: var(--bg-surface); color: var(--text-tertiary); border: 1px solid var(--border-subtle); }
+
+    .cand-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--border-subtle);
+    }
+    .review-needed {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 10px; font-weight: 700; color: #F4A261;
+      background: rgba(244,162,97,0.08); border: 1px solid rgba(244,162,97,0.2);
+      padding: 3px 9px; border-radius: var(--radius-full);
+    }
+    .review-dot { width: 5px; height: 5px; border-radius: 50%; background: #F4A261; animation: pulse-dot 1.8s infinite; }
+    .assessed-ok { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; color: var(--success); }
+
+    /* ══════════════════════════════════════════
+       PIPELINE BOARD
+    ══════════════════════════════════════════ */
+    .pipeline-board { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-4); align-items: start; }
+    .pipeline-col { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); overflow: hidden; }
+    .pipeline-col-header {
+      padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-subtle);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .pipeline-col-title { font-size: var(--text-sm); font-weight: 700; display: flex; align-items: center; gap: var(--space-2); }
+    .col-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .pipeline-col-count { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: var(--radius-full); background: var(--bg-surface); color: var(--text-secondary); }
+    .pipeline-col-body { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); min-height: 60px; }
+    .pipeline-mini {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md); padding: var(--space-3) var(--space-4);
+      cursor: pointer; transition: border-color 0.15s, background 0.15s;
+      display: flex; align-items: center; gap: var(--space-3);
+    }
+    .pipeline-mini:hover { border-color: rgba(0,119,182,0.3); background: var(--bg-hover); }
+    .pipeline-mini-av { width: 30px; height: 30px; border-radius: var(--radius-sm); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; }
+    .pipeline-mini-info { flex: 1; min-width: 0; }
+    .pipeline-mini-name { font-size: var(--text-sm); font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pipeline-mini-spec { font-size: 11px; color: var(--text-tertiary); }
+    .pipeline-empty { text-align: center; padding: var(--space-6) var(--space-4); font-size: var(--text-sm); color: var(--text-tertiary); font-style: italic; }
+
+    /* ══════════════════════════════════════════
+       DETAIL PANEL
+    ══════════════════════════════════════════ */
+    .detail-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+      z-index: 200; opacity: 0; display: none; transition: opacity 0.35s;
+    }
+    .detail-panel {
+      position: fixed; top: 0; right: 0;
+      width: 540px; max-width: 100vw; height: 100vh;
+      background: var(--bg-deep); border-left: 1px solid var(--border-default);
+      z-index: 201; transform: translateX(100%);
+      transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+      overflow: hidden; display: none; flex-direction: column;
+    }
+    .panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-deep); flex-shrink: 0;
+    }
+    .panel-header-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-tertiary); }
+    .panel-close-btn {
+      width: 32px; height: 32px; border-radius: var(--radius-md);
+      background: var(--bg-surface); border: 1px solid var(--border-subtle);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.15s; color: var(--text-secondary);
+    }
+    .panel-close-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+    .panel-hero {
+      padding: var(--space-6);
+      background: linear-gradient(160deg, rgba(0,119,182,0.07) 0%, transparent 60%);
+      border-bottom: 1px solid var(--border-subtle); flex-shrink: 0;
+    }
+    .panel-hero-row { display: flex; align-items: center; gap: var(--space-4); }
+    .panel-avatar-lg {
+      width: 64px; height: 64px; border-radius: var(--radius-xl); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 22px; letter-spacing: -1px; box-shadow: var(--shadow-md);
+    }
+    .panel-name { font-size: var(--text-xl); font-weight: 800; color: var(--text-primary); font-family: var(--font-display); }
+    .panel-specialty { font-size: var(--text-sm); color: var(--text-secondary); margin-top: 3px; }
+
+    .panel-body { flex: 1; overflow-y: auto; padding: var(--space-6); display: flex; flex-direction: column; gap: var(--space-6); }
+
+    .panel-section-title {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-tertiary); margin-bottom: var(--space-3);
       display: flex; align-items: center; gap: var(--space-2);
     }
-    .pipeline-column { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: var(--space-4); }
-    .pipeline-column-body { padding: var(--space-3) var(--space-3); }
-    .pipeline-mini-card {
+    .panel-section-title::after { content: ''; flex: 1; height: 1px; background: var(--border-subtle); }
+
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
+    .info-cell { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); }
+    .info-cell-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); margin-bottom: 3px; }
+    .info-cell-value { font-size: var(--text-sm); font-weight: 600; color: var(--text-primary); }
+
+    /* Pipeline stepper */
+    .pipeline-stepper { display: flex; flex-direction: column; }
+    .pipeline-step { display: flex; gap: var(--space-3); position: relative; }
+    .pipeline-step:not(:last-child)::before {
+      content: ''; position: absolute; left: 13px; top: 28px; bottom: -4px;
+      width: 2px; background: var(--border-default); z-index: 0;
+    }
+    .pipeline-step.step-done::before { background: var(--success); }
+    .pipeline-step.step-current::before { background: linear-gradient(to bottom, var(--primary), transparent); }
+    .step-dot-wrap { flex-shrink: 0; position: relative; z-index: 1; padding-bottom: var(--space-4); }
+    .step-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800;
+    }
+    .step-dot-pending { background: var(--bg-elevated); border: 2px solid var(--border-default); color: var(--text-tertiary); }
+    .step-dot-done { background: var(--success); border: 2px solid var(--success); color: #fff; }
+    .step-dot-current { background: linear-gradient(135deg,var(--primary),var(--primary-light)); border: 2px solid var(--primary-light); color: #fff; box-shadow: 0 0 16px rgba(0,119,182,0.5); }
+    .step-content { flex: 1; padding-bottom: var(--space-4); }
+    .step-label { font-size: var(--text-sm); font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+    .step-label-pending { color: var(--text-tertiary); font-weight: 500; }
+    .step-desc { font-size: 11px; color: var(--text-tertiary); line-height: 1.5; }
+
+    /* Doc rows */
+    .doc-row {
       display: flex; align-items: center; gap: var(--space-3);
-      padding: var(--space-3); background: var(--bg-card);
-      border: 1px solid var(--border-subtle); border-radius: var(--radius-md);
-      margin-bottom: var(--space-2); cursor: pointer; transition: border-color 0.15s;
+      padding: var(--space-3) var(--space-4);
+      background: var(--bg-surface); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md); margin-bottom: var(--space-2);
     }
-    .pipeline-mini-card:hover { border-color: var(--primary); }
-    .pipeline-mini-card:last-child { margin-bottom: 0; }
+    .doc-row-icon { width: 34px; height: 34px; border-radius: var(--radius-sm); background: var(--bg-elevated); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .doc-status-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: var(--radius-full); }
 
-    /* ── Detail Panel ── */
-    .detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; opacity: 0; display: none; transition: opacity 0.3s; }
-    .detail-panel {
-      position: fixed; top: 0; right: 0; width: 520px; max-width: 100vw; height: 100vh;
-      background: var(--bg-card); border-left: 1px solid var(--border-subtle);
-      z-index: 101; transform: translateX(100%); transition: transform 0.3s ease;
-      overflow-y: auto; display: none;
+    /* Recommendation tiles */
+    .rec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); margin-bottom: var(--space-4); }
+    .rec-tile {
+      padding: var(--space-3) var(--space-4); background: var(--bg-surface);
+      border: 1.5px solid var(--border-subtle); border-radius: var(--radius-md);
+      cursor: pointer; transition: all 0.15s; text-align: center;
     }
-    .detail-panel-header { display: flex; align-items: center; justify-content: space-between; padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--border-subtle); position: sticky; top: 0; background: var(--bg-card); z-index: 1; }
-    .detail-panel-body { padding: var(--space-6); }
+    .rec-tile:hover { border-color: var(--border-strong); background: var(--bg-elevated); }
+    .rec-tile.sel-green { background: rgba(46,196,182,0.08); border-color: var(--success); color: var(--success); }
+    .rec-tile.sel-amber { background: rgba(244,162,97,0.08); border-color: var(--warning); color: var(--warning); }
+    .rec-tile.sel-blue  { background: rgba(72,202,228,0.08);  border-color: var(--info);    color: var(--info); }
+    .rec-tile.sel-red   { background: rgba(230,57,70,0.08);   border-color: var(--error);   color: var(--error); }
+    .rec-tile-icon { font-size: 20px; margin-bottom: 4px; }
+    .rec-tile-label { font-size: 11px; font-weight: 700; }
 
-    /* ── Pending approval screen ── */
-    .pending-screen { text-align: center; padding: var(--space-16) var(--space-8); }
-    .pending-icon { width: 64px; height: 64px; background: rgba(245,158,11,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-6); }
+    .assess-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+      padding: 3px 10px; border-radius: var(--radius-full); margin-bottom: var(--space-2);
+    }
+    .prev-note { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-4); margin-bottom: var(--space-3); }
+    .prev-note-date { font-size: 10px; color: var(--text-tertiary); margin-top: var(--space-2); }
+
+    .rec-textarea {
+      width: 100%; padding: var(--space-3) var(--space-4);
+      font-size: var(--text-sm); font-family: var(--font-body);
+      background: var(--bg-surface); border: 1px solid var(--border-default);
+      border-radius: var(--radius-md); color: var(--text-primary);
+      resize: vertical; outline: none; line-height: 1.6; box-sizing: border-box;
+      transition: border-color 0.15s;
+    }
+    .rec-textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,119,182,0.1); }
+
+    .btn-save-assess {
+      width: 100%; padding: 13px var(--space-4);
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff; font-size: var(--text-sm); font-weight: 700;
+      border: none; border-radius: var(--radius-md); cursor: pointer;
+      transition: opacity 0.15s, transform 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: var(--space-2);
+      box-shadow: 0 4px 16px rgba(0,119,182,0.3); margin-top: var(--space-3);
+    }
+    .btn-save-assess:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-save-assess:disabled { opacity: 0.5; transform: none; cursor: not-allowed; }
+
+    .btn-view-doc {
+      font-size: 11px; font-weight: 700; color: var(--primary-light);
+      background: rgba(0,119,182,0.1); border: 1px solid rgba(0,119,182,0.2);
+      padding: 4px 12px; border-radius: var(--radius-full); cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-view-doc:hover { background: rgba(0,119,182,0.2); }
+    .btn-view-doc:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ══════════════════════════════════════════
+       PENDING SCREEN
+    ══════════════════════════════════════════ */
+    .pending-wrap { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 60vh; }
+    .pending-inner { text-align: center; max-width: 460px; padding: var(--space-8); }
+    .pending-icon-wrap {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: rgba(244,162,97,0.1); border: 2px solid rgba(244,162,97,0.2);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto var(--space-6); box-shadow: 0 0 40px rgba(244,162,97,0.1);
+    }
+
+    /* ══════════════════════════════════════════
+       ANIMATIONS
+    ══════════════════════════════════════════ */
+    @keyframes pulse-dot {
+      0%,100% { opacity:1; transform:scale(1); }
+      50% { opacity:0.5; transform:scale(0.8); }
+    }
+    @keyframes fadeInUp {
+      from { opacity:0; transform:translateY(10px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    .ani { animation: fadeInUp 0.35s cubic-bezier(0.16,1,0.3,1) both; }
+    .ani-1 { animation-delay:0.05s; }
+    .ani-2 { animation-delay:0.1s; }
+    .ani-3 { animation-delay:0.15s; }
   </style>
 </head>
 <body data-auth-role="recruiter">
 
-  <div class="recruiter-layout">
-    <!-- Sidebar -->
-    <aside class="recruiter-sidebar">
-      <div class="sidebar-brand">
-        <div class="sidebar-logo">
-          <div class="sidebar-logo-icon">G</div>
-          <div class="sidebar-logo-text">Global<span>Hire</span></div>
-        </div>
+<div class="rec-layout">
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <aside class="rec-sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo">
+        <div class="sb-logo-mark">G</div>
+        <div class="sb-logo-text">Global<span>Hire</span></div>
       </div>
+      <div class="sb-badge"><span class="sb-badge-dot"></span> Recruiter Portal</div>
+    </div>
 
-      <div class="sidebar-user">
-        <div class="avatar avatar-sm" id="rec-avatar">RR</div>
-        <div class="sidebar-user-info">
-          <div class="name" id="rec-name">Loading...</div>
-          <div class="role-label" id="rec-org">Recruiter</div>
-        </div>
+    <div class="sb-profile">
+      <div class="avatar avatar-sm" id="rec-avatar" style="border-radius:10px;">RR</div>
+      <div>
+        <div class="sb-profile-name" id="rec-name">Loading…</div>
+        <div class="sb-profile-role" id="rec-org">Recruiter</div>
       </div>
+    </div>
 
-      <nav class="sidebar-nav">
-        <div class="sidebar-nav-label">My Work</div>
-        <a class="sidebar-nav-item active" data-tab="tab-candidates">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          Assigned Candidates
-          <span class="nav-count" id="assigned-count" style="display:none">0</span>
-        </a>
-        <a class="sidebar-nav-item" data-tab="tab-pipeline">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          Pipeline View
-        </a>
-        <a class="sidebar-nav-item" data-tab="tab-notes">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
-          My Notes
-        </a>
-        <div class="sidebar-nav-label">Account</div>
-        <a class="sidebar-nav-item" id="rec-signout" href="#">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          Sign Out
-        </a>
-      </nav>
-    </aside>
+    <nav class="sb-nav">
+      <div class="sb-nav-label">My Work</div>
+      <a class="sb-nav-item active" data-tab="tab-candidates" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Assigned Candidates
+        <span class="sb-count" id="assigned-count" style="display:none">0</span>
+      </a>
+      <a class="sb-nav-item" data-tab="tab-pipeline" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Pipeline View
+      </a>
+      <a class="sb-nav-item" data-tab="tab-notes" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        My Assessments
+      </a>
+      <div class="sb-nav-label">Support</div>
+      <a class="sb-nav-item" href="mailto:support@elabsolution.org">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Contact eLab Team
+      </a>
+    </nav>
 
-    <!-- Main content -->
-    <main class="recruiter-main">
+    <div class="sb-footer">
+      <a class="sb-signout" href="#" id="rec-signout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign Out
+      </a>
+    </div>
+  </aside>
 
-      <!-- Pending Approval Screen -->
-      <div id="screen-pending" style="display:none;">
-        <div class="pending-screen">
-          <div class="pending-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+  <!-- ═══════════ MAIN ═══════════ -->
+  <div class="rec-main">
+
+    <!-- Top bar -->
+    <div class="rec-topbar">
+      <div class="rec-breadcrumb">
+        <span class="bc-root">GlobalHire</span>
+        <span class="bc-sep">/</span>
+        <span class="bc-current" id="topbar-title">Assigned Candidates</span>
+      </div>
+      <div class="topbar-live"><span class="live-dot"></span> Live</div>
+    </div>
+
+    <!-- Pending approval -->
+    <div id="screen-pending" style="display:none;">
+      <div class="pending-wrap">
+        <div class="pending-inner ani">
+          <div class="pending-icon-wrap">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#F4A261" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
-          <div style="font-size:var(--text-2xl);font-weight:800;color:var(--text-primary);margin-bottom:var(--space-3);">Account Pending Approval</div>
-          <div style="font-size:var(--text-base);color:var(--text-tertiary);max-width:400px;margin:0 auto;">Your recruiter account is being reviewed by our team. You will receive an email once approved and can then access your assigned candidates.</div>
+          <div style="font-size:var(--text-2xl);font-weight:800;font-family:var(--font-display);color:var(--text-primary);margin-bottom:var(--space-3);">Account Pending Approval</div>
+          <div style="font-size:var(--text-base);color:var(--text-tertiary);line-height:1.7;">Your recruiter account is under review by the eLab team. You'll receive an email once approved.</div>
+          <div style="margin-top:var(--space-8);padding:var(--space-4) var(--space-5);background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);font-size:var(--text-sm);color:var(--text-tertiary);">
+            Questions? <a href="mailto:support@elabsolution.org" style="color:var(--primary-light);">support@elabsolution.org</a>
+          </div>
         </div>
       </div>
+    </div>
 
-      <!-- Main Portal Content (shown when approved) -->
-      <div id="screen-portal" style="display:none;">
+    <!-- Portal tabs -->
+    <div id="screen-portal" style="display:none;">
+      <div class="rec-content">
 
-        <!-- Tab: Assigned Candidates -->
-        <div class="recruiter-tab active" id="tab-candidates">
-          <!-- KPI Strip -->
-          <div class="kpi-strip" id="kpi-strip">
-            <div class="kpi-card">
+        <!-- ── Assigned Candidates ── -->
+        <div class="rec-tab active" id="tab-candidates">
+          <div class="page-header ani">
+            <div class="page-title">Assigned Candidates</div>
+            <div class="page-subtitle">Candidates matched to you by the eLab placement team</div>
+          </div>
+
+          <div class="kpi-strip ani ani-1">
+            <div class="kpi-card" style="--kpi-accent:var(--primary-light);--kpi-icon-bg:rgba(0,119,182,0.12);--kpi-icon-color:var(--primary-light);">
+              <div class="kpi-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              </div>
               <div class="kpi-value" id="kpi-total">—</div>
               <div class="kpi-label">Total Assigned</div>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-card" style="--kpi-accent:var(--success);--kpi-icon-bg:rgba(46,196,182,0.12);--kpi-icon-color:var(--success);">
+              <div class="kpi-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
               <div class="kpi-value" id="kpi-docs-complete" style="color:var(--success)">—</div>
-              <div class="kpi-label">Docs Complete</div>
+              <div class="kpi-label">Docs Verified</div>
+              <div class="kpi-sub">Ready for DataFlow stage</div>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-card" style="--kpi-accent:var(--warning);--kpi-icon-bg:rgba(244,162,97,0.12);--kpi-icon-color:var(--warning);">
+              <div class="kpi-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
               <div class="kpi-value" id="kpi-needs-review" style="color:var(--warning)">—</div>
               <div class="kpi-label">Awaiting Your Review</div>
+              <div class="kpi-sub">No assessment submitted yet</div>
             </div>
           </div>
 
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-6);">
-            <div>
-              <div style="font-size:var(--text-2xl);font-weight:800;color:var(--text-primary);">Assigned Candidates</div>
-              <div style="font-size:var(--text-sm);color:var(--text-tertiary);margin-top:4px;">Candidates matched to you by the eLab team</div>
+          <div class="toolbar ani ani-2">
+            <div class="toolbar-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="candidate-search" placeholder="Search by name, specialty, country…">
             </div>
-            <input type="text" id="candidate-search" class="search-input" placeholder="Search candidates..." style="width:220px;">
+            <span class="toolbar-count" id="candidates-count"></span>
           </div>
-          <div id="candidates-grid" class="candidate-grid">
-            <div style="text-align:center;padding:var(--space-12);color:var(--text-tertiary);grid-column:1/-1;">
+
+          <div id="candidates-grid" class="candidates-grid ani ani-3">
+            <div style="grid-column:1/-1;text-align:center;padding:var(--space-16);color:var(--text-tertiary);">
               <div class="spinner" style="margin:0 auto var(--space-4);"></div>
-              Loading candidates...
+              Loading your assigned candidates…
             </div>
           </div>
         </div>
 
-        <!-- Tab: Pipeline View -->
-        <div class="recruiter-tab" id="tab-pipeline">
-          <div style="font-size:var(--text-2xl);font-weight:800;color:var(--text-primary);margin-bottom:4px;">Recruitment Pipeline</div>
-          <div style="font-size:var(--text-sm);color:var(--text-tertiary);margin-bottom:var(--space-6);">Saudi Arabia healthcare placement stages</div>
-          <div id="pipeline-board"><!-- filled by JS --></div>
+        <!-- ── Pipeline View ── -->
+        <div class="rec-tab" id="tab-pipeline">
+          <div class="page-header">
+            <div class="page-title">Recruitment Pipeline</div>
+            <div class="page-subtitle">Saudi Arabia healthcare placement — DataFlow · Prometric · SFHS · Mumaris+</div>
+          </div>
+          <div id="pipeline-board" class="pipeline-board">
+            <div style="grid-column:1/-1;text-align:center;padding:var(--space-12);color:var(--text-tertiary);">
+              <div class="spinner" style="margin:0 auto var(--space-4);"></div> Loading pipeline…
+            </div>
+          </div>
         </div>
 
-        <!-- Tab: My Notes -->
-        <div class="recruiter-tab" id="tab-notes">
-          <div style="font-size:var(--text-2xl);font-weight:800;color:var(--text-primary);margin-bottom:var(--space-6);">My Notes &amp; Assessments</div>
+        <!-- ── My Assessments ── -->
+        <div class="rec-tab" id="tab-notes">
+          <div class="page-header">
+            <div class="page-title">My Assessments</div>
+            <div class="page-subtitle">All candidate assessments you've submitted</div>
+          </div>
           <div id="notes-list">
             <div style="text-align:center;padding:var(--space-12);color:var(--text-tertiary);">
-              <div class="spinner" style="margin:0 auto var(--space-4);"></div>
-              Loading notes...
+              <div class="spinner" style="margin:0 auto var(--space-4);"></div> Loading…
             </div>
           </div>
         </div>
 
       </div>
-    </main>
-  </div>
-
-  <!-- Candidate Detail Panel -->
-  <div class="detail-overlay" id="detail-overlay"></div>
-  <div class="detail-panel" id="detail-panel">
-    <div class="detail-panel-header">
-      <div style="font-size:var(--text-base);font-weight:700;color:var(--text-primary);">Candidate Details</div>
-      <button class="btn btn-ghost btn-sm" id="panel-close">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
     </div>
-    <div class="detail-panel-body" id="panel-body"><!-- filled by JS --></div>
   </div>
+</div>
 
-  <script src="js/core.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="js/supabase-client.js"></script>
-  <script src="js/auth-guard.js"></script>
-  <script src="js/recruiter.js"></script>
+<!-- ═══════════ DETAIL PANEL ═══════════ -->
+<div class="detail-overlay" id="detail-overlay"></div>
+<div class="detail-panel" id="detail-panel">
+  <div class="panel-header">
+    <span class="panel-header-label">Candidate Details</span>
+    <button class="panel-close-btn" id="panel-close">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div style="overflow-y:auto;flex:1;display:flex;flex-direction:column;">
+    <div id="panel-hero"></div>
+    <div class="panel-body" id="panel-body"></div>
+  </div>
+</div>
+
+<script src="js/core.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth-guard.js"></script>
+<script src="js/recruiter.js"></script>
 </body>
 </html>
