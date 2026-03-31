@@ -72,23 +72,40 @@ Deno.serve(async (req) => {
     const initials = full_name.trim().split(/\s+/).map((w: string) => w[0]).join("").toUpperCase().substring(0, 2);
     const colorIndex = Math.floor(Math.random() * 8);
 
-    // Upsert profile with recruiter fields
-    const { error: profileErr } = await sb.schema("globalhire").from("profiles").upsert({
-      id: userId,
-      full_name,
-      phone: phone || null,
-      country_of_origin: country || null,
-      organization_name: organization_name || null,
-      role: "recruiter",
-      recruiter_approved: adminCreated,
-      avatar_initials: initials,
-      avatar_color_index: colorIndex,
-      profile_completed: false,
-    });
+    // Update the trigger-created profile with recruiter fields
+    // (the DB trigger creates the row on auth.users insert; we update it here)
+    const { data: updateData, error: profileErr } = await sb.schema("globalhire").from("profiles")
+      .update({
+        full_name,
+        phone: phone || null,
+        country_of_origin: country || null,
+        organization_name: organization_name || null,
+        role: "recruiter",
+        recruiter_approved: adminCreated,
+        avatar_initials: initials,
+        avatar_color_index: colorIndex,
+        profile_completed: false,
+      })
+      .eq("id", userId)
+      .select();
 
     if (profileErr) {
-      console.error("Profile upsert error:", profileErr);
-      // Non-fatal — user was created, profile can be fixed
+      console.error("Profile update error:", profileErr);
+    } else if (!updateData || updateData.length === 0) {
+      // Trigger hasn't fired yet — insert directly
+      const { error: insertErr } = await sb.schema("globalhire").from("profiles").insert({
+        id: userId,
+        full_name,
+        phone: phone || null,
+        country_of_origin: country || null,
+        organization_name: organization_name || null,
+        role: "recruiter",
+        recruiter_approved: adminCreated,
+        avatar_initials: initials,
+        avatar_color_index: colorIndex,
+        profile_completed: false,
+      });
+      if (insertErr) console.error("Profile insert fallback error:", insertErr);
     }
 
     // ── Send welcome email ──

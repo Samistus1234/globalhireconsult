@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
       if (!recruiter_id) return json({ error: "recruiter_id required" }, 400);
 
       const { error } = await sb.schema("globalhire").from("profiles")
-        .update({ recruiter_approved: true })
+        .update({ recruiter_approved: true, role: "recruiter" })
         .eq("id", recruiter_id);
       if (error) return json({ error: error.message }, 500);
       return json({ success: true });
