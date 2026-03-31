@@ -228,11 +228,52 @@
       new_status: newStatus
     });
 
+    // Send email notification to applicant
+    if (doc && (newStatus === 'verified' || newStatus === 'rejected')) {
+      notifyApplicant(doc.applicant_id, newStatus === 'verified' ? 'document_verified' : 'document_rejected', docId);
+    }
+
     await loadDocuments();
 
     // If modal is open for this doc, refresh it
     if (currentDocId === docId) {
       openDocModal(docId);
+    }
+  }
+
+  // ══════════════════════════════════════════
+  // APPLICANT EMAIL NOTIFICATIONS
+  // ══════════════════════════════════════════
+
+  async function notifyApplicant(applicantId, type, documentId, customMessage) {
+    try {
+      var session = await GHAuth.getSession();
+      if (!session) return;
+
+      var body = {
+        applicant_id: applicantId,
+        type: type,
+      };
+      if (documentId) body.document_id = documentId;
+      if (customMessage) body.message = customMessage;
+
+      var resp = await fetch(SUPABASE_URL + '/functions/v1/notify-applicant', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + session.access_token
+        },
+        body: JSON.stringify(body)
+      });
+
+      var result = await resp.json();
+      if (resp.ok && result.success) {
+        console.log('Notification sent to', result.sent_to, 'type:', type);
+      } else {
+        console.warn('Notification failed:', result.error || 'Unknown');
+      }
+    } catch (err) {
+      console.warn('Notification error:', err.message);
     }
   }
 
@@ -308,6 +349,12 @@
       }
 
       await loadDocuments();
+
+      // Notify applicant that document is under review
+      var analyzedDoc = allDocs.find(function (d) { return d.id === docId; });
+      if (analyzedDoc) {
+        notifyApplicant(analyzedDoc.applicant_id, 'document_analyzed', docId);
+      }
 
       // If modal is open, refresh analysis tab
       if (currentDocId === docId) {
