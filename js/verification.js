@@ -228,9 +228,9 @@
       new_status: newStatus
     });
 
-    // Send email notification to applicant
+    // Check if ALL documents for this applicant are now reviewed
     if (doc && (newStatus === 'verified' || newStatus === 'rejected')) {
-      notifyApplicant(doc.applicant_id, newStatus === 'verified' ? 'document_verified' : 'document_rejected', docId);
+      checkAndNotifyIfAllReviewed(doc.applicant_id);
     }
 
     await loadDocuments();
@@ -245,16 +245,44 @@
   // APPLICANT EMAIL NOTIFICATIONS
   // ══════════════════════════════════════════
 
-  async function notifyApplicant(applicantId, type, documentId, customMessage) {
+  // Track which applicants we've already notified in this session
+  var notifiedReviewStarted = {};
+
+  async function checkAndNotifyIfFirstReview(applicantId) {
+    // Only send "review started" once per applicant per session
+    if (notifiedReviewStarted[applicantId]) return;
+
+    // Check how many docs are still "pending" (not yet analyzed)
+    var applicantDocs = allDocs.filter(function (d) { return d.applicant_id === applicantId; });
+    var pendingCount = applicantDocs.filter(function (d) { return d.status === 'pending'; }).length;
+    var totalCount = applicantDocs.length;
+
+    // If this is the first doc moving out of pending (most are still pending), send the email
+    if (pendingCount < totalCount) {
+      notifiedReviewStarted[applicantId] = true;
+      sendNotification(applicantId, 'review_started');
+    }
+  }
+
+  async function checkAndNotifyIfAllReviewed(applicantId) {
+    // Check if ALL docs for this applicant are now verified or rejected (none pending/in_review)
+    var applicantDocs = allDocs.filter(function (d) { return d.applicant_id === applicantId; });
+    var unreviewedCount = applicantDocs.filter(function (d) {
+      return d.status === 'pending' || d.status === 'in_review';
+    }).length;
+
+    // If all reviewed, send the summary email
+    if (unreviewedCount === 0 && applicantDocs.length > 0) {
+      sendNotification(applicantId, 'review_complete');
+    }
+  }
+
+  async function sendNotification(applicantId, type, customMessage) {
     try {
       var session = await GHAuth.getSession();
       if (!session) return;
 
-      var body = {
-        applicant_id: applicantId,
-        type: type,
-      };
-      if (documentId) body.document_id = documentId;
+      var body = { applicant_id: applicantId, type: type };
       if (customMessage) body.message = customMessage;
 
       var resp = await fetch(SUPABASE_URL + '/functions/v1/notify-applicant', {
@@ -350,10 +378,10 @@
 
       await loadDocuments();
 
-      // Notify applicant that document is under review
+      // Notify applicant only if this is the FIRST document being reviewed
       var analyzedDoc = allDocs.find(function (d) { return d.id === docId; });
       if (analyzedDoc) {
-        notifyApplicant(analyzedDoc.applicant_id, 'document_analyzed', docId);
+        checkAndNotifyIfFirstReview(analyzedDoc.applicant_id);
       }
 
       // If modal is open, refresh analysis tab
