@@ -63,6 +63,24 @@
       detail_link: 'https://elabsolution.org/albania',
       accent_color: '#E41E3F',
     },
+    {
+      id: 'featured-saudi-ent-surgeon',
+      title: 'ENT Surgeon / Otorhinolaryngologist',
+      employer_name: 'Private Hospital — Saudi Arabia',
+      destination_country: 'Saudi Arabia',
+      specialty: 'Otorhinolaryngology (ENT)',
+      category: 'Physician',
+      positions: 1,
+      salary_display: 'Competitive Tax-Free',
+      min_experience: 2,
+      visa_sponsored: true,
+      benefits: ['Tax-Free Salary', 'Accommodation', 'Annual Flights', 'Medical Insurance', 'End of Service'],
+      description: 'A leading private hospital in Saudi Arabia is recruiting an ENT Specialist. Must have DataFlow, Mumaris (SCFHS), and Prometric. Minimum 2 years post-specialization experience.',
+      requirements: 'DataFlow + Mumaris + Prometric + Specialist License + 2 yrs experience',
+      wa_link: 'https://wa.me/19294192327?text=Hi%20eLab%2C%20I%E2%80%99m%20an%20ENT%20Surgeon%20interested%20in%20the%20Saudi%20placement.%20My%20name%20is%20____%20and%20I%20want%20to%20know%20more.',
+      detail_link: 'https://elabsolution.org/saudi-ent',
+      accent_color: '#006C35',
+    },
   ];
 
   /* ---------- DOM refs ---------- */
@@ -517,8 +535,66 @@
       });
   }
 
+  /* ---------- Job Alerts Signup ---------- */
+  function initJobAlerts() {
+    var form = document.getElementById('job-alerts-form');
+    if (!form) return;
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var nameEl = document.getElementById('alert-name');
+      var emailEl = document.getElementById('alert-email');
+      var specEl = document.getElementById('alert-specialty');
+      var msgEl = document.getElementById('alert-msg');
+      var btn = form.querySelector('button[type="submit"]');
+
+      var name = nameEl.value.trim();
+      var email = emailEl.value.trim();
+      var specialty = specEl.value;
+
+      if (!name || !email) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Subscribing...';
+      msgEl.style.display = 'none';
+
+      try {
+        var { error } = await ghFrom('job_alert_subscribers').insert({
+          full_name: name,
+          email: email,
+          specialty_interest: specialty || null,
+        });
+
+        if (error) {
+          if (error.message && error.message.includes('duplicate')) {
+            msgEl.textContent = 'You\'re already subscribed! We\'ll keep you updated.';
+            msgEl.style.color = 'var(--primary)';
+          } else {
+            throw error;
+          }
+        } else {
+          msgEl.textContent = 'Subscribed! You\'ll receive job alerts at ' + email;
+          msgEl.style.color = 'var(--success, #10b981)';
+          nameEl.value = '';
+          emailEl.value = '';
+          specEl.value = '';
+        }
+      } catch (err) {
+        console.error('Alert signup error:', err);
+        msgEl.textContent = 'Something went wrong. Please try again or contact us on WhatsApp.';
+        msgEl.style.color = 'var(--error, #ef4444)';
+      }
+
+      msgEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Subscribe';
+    });
+  }
+
   /* ---------- Public API ---------- */
   window.JobsPage = { apply: handleApply };
 
-  document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('DOMContentLoaded', function () {
+    init();
+    initJobAlerts();
+  });
 })();

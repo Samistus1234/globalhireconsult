@@ -179,6 +179,32 @@
       </div>
 
     </div>
+
+    <!-- ===================== JOB ALERTS SIGNUP ===================== -->
+    <div class="job-alerts-section reveal" style="max-width:720px;margin:3rem auto 0;padding:2.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);text-align:center;">
+      <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;margin-bottom:0.75rem;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        <h3 style="font-size:var(--text-lg);font-weight:700;color:var(--text-primary);margin:0;">Get Job Alerts</h3>
+      </div>
+      <p style="color:var(--text-secondary);font-size:var(--text-sm);margin-bottom:1.25rem;line-height:1.6;">Be the first to know when new positions are posted. We'll send you updates on opportunities that match your specialty.</p>
+      <form id="job-alerts-form" style="display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:center;align-items:flex-start;">
+        <input id="alert-name" type="text" placeholder="Full Name" required style="flex:1 1 160px;padding:0.75rem 1rem;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg);color:var(--text-primary);font-size:var(--text-sm);outline:none;" />
+        <input id="alert-email" type="email" placeholder="Email address" required style="flex:1 1 200px;padding:0.75rem 1rem;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg);color:var(--text-primary);font-size:var(--text-sm);outline:none;" />
+        <select id="alert-specialty" style="flex:1 1 160px;padding:0.75rem 1rem;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg);color:var(--text-primary);font-size:var(--text-sm);outline:none;">
+          <option value="">Any Specialty</option>
+          <option value="Nursing">Nursing</option>
+          <option value="Physician">Physician / Doctor</option>
+          <option value="Allied Health">Allied Health</option>
+          <option value="Midwifery">Midwifery</option>
+          <option value="Pharmacy">Pharmacy</option>
+          <option value="General">General / Non-Medical</option>
+        </select>
+        <button type="submit" style="padding:0.75rem 1.75rem;border-radius:var(--radius);background:var(--primary);color:#fff;font-weight:700;font-size:var(--text-sm);border:none;cursor:pointer;white-space:nowrap;transition:opacity 0.15s;">Subscribe</button>
+      </form>
+      <div id="alert-msg" style="display:none;margin-top:0.75rem;font-size:var(--text-sm);"></div>
+      <p style="font-size:11px;color:var(--text-tertiary);margin-top:0.75rem;">No spam. Unsubscribe anytime.</p>
+    </div>
+
   </div>
 
   <!-- ===================== FOOTER ===================== -->
