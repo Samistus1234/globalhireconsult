@@ -153,9 +153,9 @@
           '<div class="gfooter-col">' +
             '<h5>Legal</h5>' +
             '<ul>' +
-              '<li><a href="#">Privacy Policy</a></li>' +
-              '<li><a href="#">Terms of Service</a></li>' +
-              '<li><a href="#">Cookie Policy</a></li>' +
+              '<li><a href="privacy.html">Privacy Policy</a></li>' +
+              '<li><a href="terms.html">Terms of Service</a></li>' +
+              '<li><a href="cookies.html">Cookie Policy</a></li>' +
             '</ul>' +
           '</div>' +
         '</div>' +
