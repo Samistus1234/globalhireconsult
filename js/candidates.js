@@ -122,6 +122,7 @@
     var pipelineSelect = document.getElementById('filter-pipeline');
     var availabilitySelect = document.getElementById('filter-availability');
     var specialtySelect = document.getElementById('filter-specialty');
+    var sourceSelect = document.getElementById('filter-source');
 
     if (searchInput) {
       searchInput.addEventListener('input', GHE.debounce(function () {
@@ -130,7 +131,7 @@
       }, 250));
     }
 
-    [pipelineSelect, availabilitySelect, specialtySelect].forEach(function (el) {
+    [pipelineSelect, availabilitySelect, specialtySelect, sourceSelect].forEach(function (el) {
       if (el) {
         el.addEventListener('change', function () {
           currentPage = 1;
@@ -146,15 +147,18 @@
     var pipelineVal = document.getElementById('filter-pipeline')?.value || '';
     var availVal = document.getElementById('filter-availability')?.value || '';
     var specVal = document.getElementById('filter-specialty')?.value || '';
+    var sourceVal = document.getElementById('filter-source')?.value || '';
 
     filteredApplicants = allApplicants.filter(function (a) {
-      // Search: name, email, specialty
+      // Search: name, email, specialty, source
       if (searchVal) {
         var haystack = [
           a.full_name || '',
           a.email || '',
           a.specialty || '',
-          a.country_of_origin || ''
+          a.country_of_origin || '',
+          a.source || '',
+          a.specialty_detail || ''
         ].join(' ').toLowerCase();
         if (haystack.indexOf(searchVal) === -1) return false;
       }
@@ -168,6 +172,15 @@
 
       // Specialty
       if (specVal && a.specialty !== specVal) return false;
+
+      // Source / campaign
+      if (sourceVal) {
+        if (sourceVal === 'direct-signup') {
+          if (a.source) return false; // direct signup has no source tag
+        } else {
+          if (a.source !== sourceVal) return false;
+        }
+      }
 
       return true;
     });
@@ -264,6 +277,18 @@
         ? '<div style="display:inline-flex;align-items:center;gap:4px;margin-top:3px;"><span style="width:7px;height:7px;border-radius:50%;background:#F59E0B;display:inline-block;animation:pulse-dot 1.5s infinite;"></span><span style="font-size:10px;color:#F59E0B;font-weight:600;letter-spacing:0.02em;">Awaiting Reply</span></div>'
         : (lastDir === 'inbound' ? '<div style="display:inline-flex;align-items:center;gap:4px;margin-top:3px;"><span style="width:7px;height:7px;border-radius:50%;background:var(--success);display:inline-block;"></span><span style="font-size:10px;color:var(--success);font-weight:600;">Replied</span></div>' : '');
 
+      // Source badge
+      var sourceLabels = {
+        'albania-work-visa': { label: 'Albania', color: '#E41E3F', bg: 'rgba(228,30,63,0.08)' },
+        'saudi-ent-surgeon': { label: 'Saudi ENT', color: '#006C35', bg: 'rgba(0,108,53,0.08)' },
+        'saudi-fast-track': { label: 'Saudi Fast Track', color: '#D4A84B', bg: 'rgba(212,168,75,0.1)' },
+        'qatar-caregivers': { label: 'Qatar', color: '#8b5cf6', bg: 'rgba(139,92,246,0.08)' },
+      };
+      var srcInfo = a.source ? sourceLabels[a.source] : null;
+      var sourceBadge = srcInfo
+        ? '<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;color:' + srcInfo.color + ';background:' + srcInfo.bg + ';letter-spacing:0.03em;">' + srcInfo.label + '</span>'
+        : '';
+
       // Actions
       var actionHtml = availStatus !== 'active'
         ? '<button class="btn btn-primary btn-sm btn-reactivate" data-id="' + a.id + '">Reactivate</button>'
@@ -274,7 +299,7 @@
           '<div class="applicant-row">' +
             '<div class="avatar avatar-sm" style="background:' + colors[0] + ';color:' + colors[1] + '">' + (a.avatar_initials || '??') + '</div>' +
             '<div class="applicant-info">' +
-              '<div class="applicant-name">' + GHE.escapeHtml(a.full_name || 'Unnamed') + '</div>' +
+              '<div class="applicant-name">' + GHE.escapeHtml(a.full_name || 'Unnamed') + ' ' + sourceBadge + '</div>' +
               '<div class="applicant-detail">' + GHE.escapeHtml(a.email || '') + '</div>' +
               awaitingBadge +
             '</div>' +
