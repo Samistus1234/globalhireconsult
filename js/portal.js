@@ -968,6 +968,7 @@
       t.classList.toggle('active', t.id === tabId);
     });
   }
+  window.switchToTab = switchToTab;
 
   // ── Helper: show portal toast ──
   function showPortalToast(msg) {
