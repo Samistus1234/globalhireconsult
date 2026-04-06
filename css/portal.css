@@ -119,6 +119,11 @@
   padding: var(--space-2) 0;
   font-size: var(--text-sm);
   color: var(--text-tertiary);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.checklist-item:not(.done):hover {
+  color: var(--primary);
 }
 
 .checklist-item svg {

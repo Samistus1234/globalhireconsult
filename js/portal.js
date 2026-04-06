@@ -121,8 +121,15 @@
         { key: 'passport', label: 'Upload passport copy' },
         { key: 'cv', label: 'Upload CV / Resume' }
       ];
+      const tabMap = {
+        profile: 'tab-profile',
+        license: 'tab-documents',
+        degree: 'tab-documents',
+        passport: 'tab-documents',
+        cv: 'tab-documents'
+      };
       checklistEl.innerHTML = items.map(i => `
-        <div class="checklist-item ${checks[i.key] ? 'done' : ''}">
+        <div class="checklist-item ${checks[i.key] ? 'done' : ''}" data-goto="${tabMap[i.key] || ''}" style="cursor:pointer;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
             ${checks[i.key]
               ? '<path d="m5 12 5 5L20 7"/>'
@@ -132,6 +139,12 @@
           <span>${i.label}</span>
         </div>
       `).join('');
+      checklistEl.querySelectorAll('.checklist-item[data-goto]').forEach(el => {
+        el.addEventListener('click', function() {
+          const tab = this.dataset.goto;
+          if (tab) switchToTab(tab);
+        });
+      });
     }
 
     // Pipeline status
