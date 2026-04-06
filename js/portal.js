@@ -87,31 +87,60 @@
 
   // ── Dashboard tab ──
   async function loadDashboard() {
-    // Completion checklist
-    const checks = {
-      profile: currentProfile.profile_completed,
-      license: false, degree: false, passport: false, cv: false
-    };
+    const p = currentProfile;
 
+    // ── Profile summary card ──
+    const avatarEl = document.getElementById('dash-avatar');
+    const nameEl = document.getElementById('dash-name');
+    const emailEl = document.getElementById('dash-email');
+    const detailsEl = document.getElementById('dash-profile-details');
+
+    if (avatarEl) {
+      const colors = (typeof GHE !== 'undefined' && GHE.avatarColors) ? GHE.avatarColors[p.avatar_color_index || 0] : ['var(--primary)', 'var(--bg-deep)'];
+      avatarEl.style.background = colors[0];
+      avatarEl.style.color = colors[1];
+      avatarEl.textContent = p.avatar_initials || '??';
+    }
+    if (nameEl) nameEl.textContent = p.full_name || 'Unnamed';
+    if (emailEl) emailEl.textContent = currentUser.email || '';
+
+    if (detailsEl) {
+      const fields = [
+        { label: 'Specialty', value: p.specialty },
+        { label: 'Country', value: p.country_of_origin },
+        { label: 'Experience', value: p.years_of_experience != null ? p.years_of_experience + ' years' : null },
+        { label: 'License', value: p.license_number },
+        { label: 'Phone', value: p.phone },
+        { label: 'Destinations', value: (p.preferred_destinations || []).join(', ') },
+      ];
+      detailsEl.innerHTML = fields.filter(f => f.value).map(f =>
+        '<div style="font-size:var(--text-xs);"><span style="color:var(--text-tertiary);">' + f.label + ':</span> <span style="color:var(--text-primary);font-weight:600;">' + f.value + '</span></div>'
+      ).join('') || '<div style="font-size:var(--text-sm);color:var(--text-tertiary);">No profile details yet. <a href="#" onclick="switchToTab(\'tab-profile\');return false;" style="color:var(--primary);text-decoration:underline;">Complete your profile</a></div>';
+    }
+
+    // ── Fetch documents ──
     const { data: docs } = await ghFrom('documents')
-      .select('doc_type, status')
+      .select('doc_type, status, file_name')
       .eq('applicant_id', currentUser.id);
 
-    if (docs) {
-      docs.forEach(d => { checks[d.doc_type] = true; });
-    }
+    const allDocs = docs || [];
+
+    // ── Completion checklist ──
+    const checks = {
+      profile: p.profile_completed,
+      license: false, degree: false, passport: false, cv: false
+    };
+    allDocs.forEach(d => { checks[d.doc_type] = true; });
 
     const totalSteps = 5;
     const completedSteps = Object.values(checks).filter(Boolean).length;
     const pct = Math.round((completedSteps / totalSteps) * 100);
 
-    // Update progress bar
     const progressFill = document.getElementById('completion-fill');
     const progressText = document.getElementById('completion-pct');
     if (progressFill) progressFill.style.width = pct + '%';
     if (progressText) progressText.textContent = pct + '%';
 
-    // Checklist items
     const checklistEl = document.getElementById('completion-checklist');
     if (checklistEl) {
       const items = [
@@ -121,38 +150,68 @@
         { key: 'passport', label: 'Upload passport copy' },
         { key: 'cv', label: 'Upload CV / Resume' }
       ];
-      const tabMap = {
-        profile: 'tab-profile',
-        license: 'tab-documents',
-        degree: 'tab-documents',
-        passport: 'tab-documents',
-        cv: 'tab-documents'
-      };
+      const tabMap = { profile: 'tab-profile', license: 'tab-documents', degree: 'tab-documents', passport: 'tab-documents', cv: 'tab-documents' };
       checklistEl.innerHTML = items.map(i => `
         <div class="checklist-item ${checks[i.key] ? 'done' : ''}" data-goto="${tabMap[i.key] || ''}" style="cursor:pointer;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-            ${checks[i.key]
-              ? '<path d="m5 12 5 5L20 7"/>'
-              : '<circle cx="12" cy="12" r="10"/>'
-            }
+            ${checks[i.key] ? '<path d="m5 12 5 5L20 7"/>' : '<circle cx="12" cy="12" r="10"/>'}
           </svg>
           <span>${i.label}</span>
         </div>
       `).join('');
       checklistEl.querySelectorAll('.checklist-item[data-goto]').forEach(el => {
-        el.addEventListener('click', function() {
-          const tab = this.dataset.goto;
-          if (tab) switchToTab(tab);
-        });
+        el.addEventListener('click', function() { if (this.dataset.goto) switchToTab(this.dataset.goto); });
       });
     }
 
-    // Pipeline status
+    // ── KPI counts ──
+    const verifiedCount = allDocs.filter(d => d.status === 'verified').length;
+    const pendingCount = allDocs.filter(d => d.status === 'pending' || d.status === 'in_review').length;
+
+    const docsCountEl = document.getElementById('dash-docs-count');
+    const verifiedCountEl = document.getElementById('dash-verified-count');
+    const pendingCountEl = document.getElementById('dash-pending-count');
+    const appsCountEl = document.getElementById('dash-apps-count');
+
+    if (docsCountEl) docsCountEl.textContent = allDocs.length;
+    if (verifiedCountEl) verifiedCountEl.textContent = verifiedCount;
+    if (pendingCountEl) pendingCountEl.textContent = pendingCount;
+
+    // Fetch application count
+    const { count: appsCount } = await ghFrom('campaign_applications')
+      .select('*', { count: 'exact', head: true })
+      .eq('applicant_id', currentUser.id);
+    if (appsCountEl) appsCountEl.textContent = appsCount || 0;
+
+    // ── Documents overview list ──
+    const docsListEl = document.getElementById('dash-docs-list');
+    if (docsListEl) {
+      const typeLabels = { license: 'Professional License', degree: 'Degree Certificate', passport: 'Passport', cv: 'CV / Resume', passport_photo: 'Passport Photo', police_report: 'Police Report', travel_insurance: 'Travel Insurance' };
+      const statusStyles = { verified: { color: 'var(--success, #10b981)', label: 'Verified' }, pending: { color: 'var(--warning, #f59e0b)', label: 'Pending' }, in_review: { color: 'var(--accent-cyan, #0ea5e9)', label: 'In Review' }, rejected: { color: 'var(--error, #ef4444)', label: 'Needs Attention' } };
+
+      if (allDocs.length === 0) {
+        docsListEl.innerHTML = '<div style="text-align:center;padding:var(--space-4);color:var(--text-tertiary);font-size:var(--text-sm);">No documents uploaded yet. <a href="#" onclick="switchToTab(\'tab-documents\');return false;" style="color:var(--primary);text-decoration:underline;">Upload documents</a></div>';
+      } else {
+        docsListEl.innerHTML = allDocs.map(d => {
+          const st = statusStyles[d.status] || statusStyles.pending;
+          return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-subtle);">' +
+            '<div style="display:flex;align-items:center;gap:var(--space-3);">' +
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>' +
+              '<div><div style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary);">' + (typeLabels[d.doc_type] || d.doc_type) + '</div>' +
+              '<div style="font-size:var(--text-xs);color:var(--text-tertiary);">' + (d.file_name || '') + '</div></div>' +
+            '</div>' +
+            '<span style="font-size:var(--text-xs);font-weight:700;color:' + st.color + ';">' + st.label + '</span>' +
+          '</div>';
+        }).join('');
+      }
+    }
+
+    // ── Pipeline status ──
     const stages = ['applied', 'screening', 'verifying', 'verified'];
     const stageLabels = ['Applied', 'Profile Complete', 'Documents Uploaded', 'Under Review'];
     let currentStage = 'applied';
-    if (currentProfile.profile_completed && completedSteps >= 5) currentStage = 'verifying';
-    else if (currentProfile.profile_completed) currentStage = 'screening';
+    if (p.profile_completed && completedSteps >= 5) currentStage = 'verifying';
+    else if (p.profile_completed) currentStage = 'screening';
     const stageIdx = stages.indexOf(currentStage);
 
     const pipelineEl = document.getElementById('status-pipeline');
