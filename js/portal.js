@@ -877,9 +877,8 @@
     }
 
     if (messages.length === 0) {
-      threadEl.innerHTML = '<div style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">No messages yet. Our team will reach out here when there are updates about your application.</div>';
-      return;
-    }
+      threadEl.innerHTML = '<div style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">No messages yet. You can send us a message below and our team will respond.</div>';
+    } else {
 
     threadEl.innerHTML = messages.map(function (m) {
       var isOut = m.direction === 'outbound';
@@ -905,6 +904,7 @@
 
     // Scroll to bottom
     threadEl.scrollTop = threadEl.scrollHeight;
+    }
 
     // Bind reply button
     var sendBtn = document.getElementById('portal-reply-send');
