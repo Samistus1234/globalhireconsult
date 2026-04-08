@@ -65,7 +65,7 @@
       console.error('Failed to load candidates:', error);
       var tbody = document.getElementById('candidates-tbody');
       if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:var(--space-8);color:var(--error);">Failed to load candidates. Please refresh.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:var(--space-8);color:var(--error);">Failed to load candidates. Please refresh.</td></tr>';
       }
       return;
     }
@@ -248,7 +248,7 @@
     var pageData = filteredApplicants.slice(startIdx, startIdx + pageSize);
 
     if (pageData.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">No candidates match the current filters.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">No candidates match the current filters.</td></tr>';
       return;
     }
 
@@ -315,6 +315,7 @@
         '</td>' +
         '<td>' + GHE.escapeHtml(a.specialty || '-') + '</td>' +
         '<td><span class="tag">' + GHE.escapeHtml(a.country_of_origin || '-') + '</span></td>' +
+        '<td>' + GHE.escapeHtml((a.preferred_destinations || []).join(', ') || '-') + '</td>' +
         '<td>' + exp + '</td>' +
         '<td>' + docs + '</td>' +
         '<td><span class="badge ' + st.badge + ' badge-dot">' + st.label + '</span></td>' +
@@ -1012,5 +1013,88 @@
       return div.innerHTML;
     };
   }
+
+  // ── Export: toggle menu ──
+  var exportBtn = document.getElementById('btn-export');
+  var exportMenu = document.getElementById('export-menu');
+  if (exportBtn && exportMenu) {
+    exportBtn.addEventListener('click', function () {
+      exportMenu.style.display = exportMenu.style.display === 'none' ? 'block' : 'none';
+    });
+    document.addEventListener('click', function (e) {
+      if (!document.getElementById('export-wrapper').contains(e.target)) {
+        exportMenu.style.display = 'none';
+      }
+    });
+  }
+
+  // ── Export: CSV ──
+  document.getElementById('export-csv')?.addEventListener('click', function () {
+    exportMenu.style.display = 'none';
+    var rows = [['Name', 'Email', 'Specialty', 'Origin', 'Destination', 'Experience', 'Docs', 'Pipeline', 'Availability', 'Source']];
+    filteredApplicants.forEach(function (a) {
+      rows.push([
+        a.full_name || '',
+        a.email || '',
+        a.specialty || '',
+        a.country_of_origin || '',
+        (a.preferred_destinations || []).join('; '),
+        a.years_of_experience != null ? a.years_of_experience + ' yrs' : '',
+        (a.total_docs != null ? a.total_docs : 0) + ' docs',
+        a.pipeline_status || '',
+        a.availability_status || 'active',
+        a.source || 'direct'
+      ]);
+    });
+    var csv = rows.map(function (r) {
+      return r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',');
+    }).join('\n');
+    var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = 'globalhire-candidates-' + new Date().toISOString().slice(0, 10) + '.csv';
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // ── Export: PDF ──
+  document.getElementById('export-pdf')?.addEventListener('click', function () {
+    exportMenu.style.display = 'none';
+    var rows = filteredApplicants.map(function (a) {
+      return [
+        a.full_name || 'Unnamed',
+        a.specialty || '-',
+        a.country_of_origin || '-',
+        (a.preferred_destinations || []).join(', ') || '-',
+        a.years_of_experience != null ? a.years_of_experience + ' yrs' : '-',
+        (a.total_docs != null ? a.total_docs : 0) + ' docs',
+        a.pipeline_status || '-',
+        a.source || 'direct'
+      ];
+    });
+
+    var printWin = window.open('', '_blank');
+    printWin.document.write('<!DOCTYPE html><html><head><title>GlobalHire Candidates Export</title>');
+    printWin.document.write('<style>');
+    printWin.document.write('body{font-family:Arial,sans-serif;margin:24px;color:#111;}');
+    printWin.document.write('h1{font-size:18px;margin-bottom:4px;}');
+    printWin.document.write('p.sub{font-size:12px;color:#666;margin-bottom:16px;}');
+    printWin.document.write('table{width:100%;border-collapse:collapse;font-size:11px;}');
+    printWin.document.write('th{background:#0077B6;color:#fff;padding:8px 10px;text-align:left;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;}');
+    printWin.document.write('td{padding:7px 10px;border-bottom:1px solid #e5e7eb;}');
+    printWin.document.write('tr:nth-child(even){background:#f9fafb;}');
+    printWin.document.write('@media print{body{margin:0;} @page{margin:12mm;}}');
+    printWin.document.write('</style></head><body>');
+    printWin.document.write('<h1>GlobalHire@eLab — Candidates Report</h1>');
+    printWin.document.write('<p class="sub">Generated: ' + new Date().toLocaleString() + ' &bull; ' + rows.length + ' candidates</p>');
+    printWin.document.write('<table><thead><tr><th>Name</th><th>Specialty</th><th>Origin</th><th>Destination</th><th>Exp</th><th>Docs</th><th>Pipeline</th><th>Source</th></tr></thead><tbody>');
+    rows.forEach(function (r) {
+      printWin.document.write('<tr>' + r.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>');
+    });
+    printWin.document.write('</tbody></table></body></html>');
+    printWin.document.close();
+    setTimeout(function () { printWin.print(); }, 300);
+  });
 
 })();
