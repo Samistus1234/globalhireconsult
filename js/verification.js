@@ -325,6 +325,14 @@
 
     var { error } = await ghFrom('verification_audit').insert(payload);
     if (error) console.error('Audit log error:', error);
+    // Track in eLab Command Centre
+    if (window.ElabTracker) {
+      var category = (action === 'status_change') ? 'high_value' : 'medium_value';
+      ElabTracker.track('gh_doc_' + action, category, {
+        document_id: docId, method: method, old_status: extraDetails && extraDetails.old_status,
+        new_status: extraDetails && extraDetails.new_status, platform: 'globalhire'
+      });
+    }
   }
 
   // ══════════════════════════════════════════

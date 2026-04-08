@@ -116,6 +116,7 @@
           });
           var result = await resp.json();
           if (!resp.ok || !result.success) throw new Error(result.error || 'Failed');
+          if (window.ElabTracker) ElabTracker.track('gh_recruiter_approved', 'high_value', { recruiter_id: recruiterId, recruiter_name: name, platform: 'globalhire' });
           await loadRecruiters();
         } catch (err) {
           alert('Failed to approve: ' + err.message);

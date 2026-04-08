@@ -831,6 +831,13 @@
       details: details || {},
       actor_id: adminProfile.id
     });
+    // Track in eLab Command Centre
+    if (window.ElabTracker) {
+      var category = (eventType === 'stage_changed' || eventType === 'completed' || eventType === 'terminated') ? 'high_value' : 'medium_value';
+      ElabTracker.track('gh_placement_' + eventType, category, {
+        placement_id: placementId, old_value: oldValue, new_value: newValue, platform: 'globalhire'
+      });
+    }
   }
 
   // ── Helpers ──

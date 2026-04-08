@@ -403,6 +403,7 @@
         event_data: { title: payload.title },
         actor_id: currentSession.user.id
       });
+      if (window.ElabTracker) ElabTracker.track('gh_campaign_created', 'high_value', { campaign_id: savedId, title: payload.title, platform: 'globalhire' });
     }
 
     currentCampaignId = savedId;
@@ -501,6 +502,7 @@
       event_type: 'closed',
       actor_id: currentSession.user.id
     });
+    if (window.ElabTracker) ElabTracker.track('gh_campaign_closed', 'medium_value', { campaign_id: campaignId, platform: 'globalhire' });
 
     await loadCampaignDetail(campaignId);
     await loadActivityLog(campaignId);
@@ -517,6 +519,7 @@
       event_data: { reason: 'deactivated' },
       actor_id: currentSession.user.id
     });
+    if (window.ElabTracker) ElabTracker.track('gh_campaign_deactivated', 'medium_value', { campaign_id: campaignId, platform: 'globalhire' });
 
     await loadCampaigns();
     if (currentCampaignId === campaignId) {
@@ -533,6 +536,7 @@
       event_type: 'reopened',
       actor_id: currentSession.user.id
     });
+    if (window.ElabTracker) ElabTracker.track('gh_campaign_reopened', 'medium_value', { campaign_id: campaignId, platform: 'globalhire' });
 
     await loadCampaigns();
     if (currentCampaignId === campaignId) {

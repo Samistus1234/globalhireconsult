@@ -698,6 +698,7 @@
         var newStage = stageSelect.value || null;
         stageSelect.disabled = true;
         if (stageSaveStatus) { stageSaveStatus.textContent = 'Saving...'; stageSaveStatus.style.color = 'var(--text-tertiary)'; stageSaveStatus.style.display = ''; }
+        var oldStage = stageSelect.dataset.prevValue || null;
         var { error } = await ghFrom('profiles').update({ pipeline_stage: newStage }).eq('id', candidateId);
         stageSelect.disabled = false;
         if (stageSaveStatus) {
@@ -708,6 +709,8 @@
             stageSaveStatus.textContent = 'Saved \u2713';
             stageSaveStatus.style.color = 'var(--success)';
             setTimeout(function () { stageSaveStatus.style.display = 'none'; }, 2500);
+            stageSelect.dataset.prevValue = newStage;
+            if (window.ElabTracker) ElabTracker.track('gh_candidate_stage_changed', 'high_value', { candidate_id: candidateId, old_stage: oldStage, new_stage: newStage, platform: 'globalhire' });
           }
           stageSaveStatus.style.display = '';
         }
