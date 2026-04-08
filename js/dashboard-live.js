@@ -266,51 +266,64 @@
     var badgeEl = document.getElementById('inbox-count-badge');
     if (!listEl) return;
 
-    // Get all inbound messages (from applicants), newest first
-    var { data: inbound } = await ghFrom('messages')
-      .select('applicant_id, subject, body, sent_at')
-      .eq('direction', 'inbound')
-      .order('sent_at', { ascending: false })
-      .limit(20);
+    try {
+      // Get all inbound messages (from applicants), newest first
+      var { data: inbound, error: msgErr } = await ghFrom('messages')
+        .select('applicant_id, subject, body, sent_at')
+        .eq('direction', 'inbound')
+        .order('sent_at', { ascending: false })
+        .limit(20);
 
-    inbound = inbound || [];
+      if (msgErr) { console.error('Inbox messages error:', msgErr); }
+      inbound = inbound || [];
 
-    if (badgeEl) {
-      badgeEl.textContent = inbound.length;
-      badgeEl.style.display = inbound.length > 0 ? '' : 'none';
-    }
+      if (badgeEl) {
+        badgeEl.textContent = inbound.length;
+        badgeEl.style.display = inbound.length > 0 ? '' : 'none';
+      }
 
-    if (inbound.length === 0) {
-      listEl.innerHTML = '<div style="padding:var(--space-6);text-align:center;color:var(--text-tertiary);font-size:var(--text-sm);">No applicant messages yet.</div>';
-      return;
-    }
+      if (inbound.length === 0) {
+        listEl.innerHTML = '<div style="padding:var(--space-6);text-align:center;color:var(--text-tertiary);font-size:var(--text-sm);">No applicant messages yet.</div>';
+        return;
+      }
 
-    // Get unique applicant IDs and fetch their profiles
-    var applicantIds = [...new Set(inbound.map(function(m) { return m.applicant_id; }))];
-    var { data: profiles } = await ghFrom('admin_applicant_overview')
-      .select('id, full_name, avatar_initials, avatar_color_index, email')
-      .in('id', applicantIds);
+      // Get unique applicant IDs and fetch their profiles
+      var applicantIds = [];
+      inbound.forEach(function(m) {
+        if (applicantIds.indexOf(m.applicant_id) === -1) applicantIds.push(m.applicant_id);
+      });
 
-    var profileMap = {};
-    (profiles || []).forEach(function(p) { profileMap[p.id] = p; });
+      var profileMap = {};
+      // Fetch profiles one at a time to avoid .in() issues with views
+      for (var i = 0; i < applicantIds.length; i++) {
+        var { data: pData } = await ghFrom('profiles')
+          .select('id, full_name, avatar_initials, avatar_color_index')
+          .eq('id', applicantIds[i])
+          .single();
+        if (pData) profileMap[pData.id] = pData;
+      }
 
-    listEl.innerHTML = inbound.map(function(m) {
-      var p = profileMap[m.applicant_id] || {};
-      var colors = GHE.avatarColors[p.avatar_color_index || 0];
-      var timeStr = m.sent_at ? new Date(m.sent_at).toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '';
-      var preview = (m.body || '').substring(0, 100) + ((m.body || '').length > 100 ? '...' : '');
+      listEl.innerHTML = inbound.map(function(m) {
+        var p = profileMap[m.applicant_id] || {};
+        var colors = GHE.avatarColors ? GHE.avatarColors[p.avatar_color_index || 0] : ['var(--primary)', '#fff'];
+        var timeStr = m.sent_at ? new Date(m.sent_at).toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '';
+        var preview = (m.body || '').substring(0, 100) + ((m.body || '').length > 100 ? '...' : '');
 
-      return '<a href="candidates.html" style="display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-3) var(--space-5);border-bottom:1px solid var(--border-subtle);text-decoration:none;transition:background 0.15s;cursor:pointer;" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'\'">' +
-        '<div class="avatar avatar-sm" style="background:' + colors[0] + ';color:' + colors[1] + ';flex-shrink:0;margin-top:2px;">' + GHE.escapeHtml(p.avatar_initials || '??') + '</div>' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-2);margin-bottom:2px;">' +
-            '<span style="font-size:var(--text-sm);font-weight:700;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + GHE.escapeHtml(p.full_name || 'Unknown') + '</span>' +
-            '<span style="font-size:10px;color:var(--text-tertiary);white-space:nowrap;flex-shrink:0;">' + timeStr + '</span>' +
+        return '<a href="candidates.html" style="display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-3) var(--space-5);border-bottom:1px solid var(--border-subtle);text-decoration:none;transition:background 0.15s;cursor:pointer;" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'\'">' +
+          '<div class="avatar avatar-sm" style="background:' + colors[0] + ';color:' + colors[1] + ';flex-shrink:0;margin-top:2px;">' + GHE.escapeHtml(p.avatar_initials || '??') + '</div>' +
+          '<div style="flex:1;min-width:0;">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-2);margin-bottom:2px;">' +
+              '<span style="font-size:var(--text-sm);font-weight:700;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + GHE.escapeHtml(p.full_name || 'Unknown') + '</span>' +
+              '<span style="font-size:10px;color:var(--text-tertiary);white-space:nowrap;flex-shrink:0;">' + timeStr + '</span>' +
+            '</div>' +
+            '<div style="font-size:var(--text-xs);color:var(--text-secondary);line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + GHE.escapeHtml(preview) + '</div>' +
           '</div>' +
-          '<div style="font-size:var(--text-xs);color:var(--text-secondary);line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + GHE.escapeHtml(preview) + '</div>' +
-        '</div>' +
-      '</a>';
-    }).join('');
+        '</a>';
+      }).join('');
+    } catch (err) {
+      console.error('loadInbox error:', err);
+      listEl.innerHTML = '<div style="padding:var(--space-6);text-align:center;color:var(--text-tertiary);font-size:var(--text-sm);">Failed to load inbox.</div>';
+    }
   }
 
   // ── Realtime subscription ──
