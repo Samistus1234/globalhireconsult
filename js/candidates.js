@@ -21,6 +21,14 @@
     updateAdminUI();
     await loadAllCandidates();
     bindFilters();
+
+    // Auto-open candidate if ?open= param is present
+    var params = new URLSearchParams(window.location.search);
+    var openId = params.get('open');
+    if (openId) {
+      history.replaceState(null, '', window.location.pathname);
+      openCandidatePanel(openId);
+    }
   });
 
   // ── Admin sidebar UI ──

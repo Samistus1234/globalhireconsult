@@ -295,7 +295,7 @@
         var timeStr = m.sent_at ? new Date(m.sent_at).toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '';
         var preview = (m.body || '').substring(0, 100) + ((m.body || '').length > 100 ? '...' : '');
 
-        return '<a href="candidates.html" style="display:flex;align-items:flex-start;gap:12px;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.06);text-decoration:none;cursor:pointer;" onmouseover="this.style.background=\'rgba(255,255,255,0.03)\'" onmouseout="this.style.background=\'\'">' +
+        return '<a href="candidates.html?open=' + m.applicant_id + '" style="display:flex;align-items:flex-start;gap:12px;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.06);text-decoration:none;cursor:pointer;" onmouseover="this.style.background=\'rgba(255,255,255,0.03)\'" onmouseout="this.style.background=\'\'">' +
           '<div class="avatar avatar-sm" style="background:' + colorArr[0] + ';color:' + colorArr[1] + ';flex-shrink:0;margin-top:2px;">' + esc(m.avatar_initials || '??') + '</div>' +
           '<div style="flex:1;min-width:0;">' +
             '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:2px;">' +
