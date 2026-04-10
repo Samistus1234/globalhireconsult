@@ -64,6 +64,42 @@
       accent_color: '#E41E3F',
     },
     {
+      id: 'featured-qatar-nursing-2yr',
+      title: 'Registered Nurse — 2-Year Contract',
+      employer_name: 'Qatar Hospital',
+      destination_country: 'Qatar',
+      specialty: 'General Nursing',
+      category: 'Nursing',
+      positions: 0,
+      salary_display: '4,500 QAR/month',
+      min_experience: 0,
+      visa_sponsored: true,
+      benefits: ['Accommodation', 'Flight', 'Visa'],
+      description: 'Nursing positions in Qatar with a 2-year contract. Salary of 4,500 QAR/month with accommodation, flight, and visa fully covered. Interviews starting in 1 week.',
+      requirements: 'Prometric + DataFlow + Degree + License + CV',
+      wa_link: 'https://wa.me/19294192327?text=Hi%20eLab%2C%20I%E2%80%99m%20interested%20in%20the%20Qatar%20Nursing%20position%20(2-year%20contract).%20My%20name%20is%20____%20and%20I%20have%20____%20years%20of%20experience.',
+      detail_link: 'qatar-nursing.html',
+      accent_color: '#6366f1',
+    },
+    {
+      id: 'featured-qatar-nursing-5yr',
+      title: 'Registered Nurse — 5-Year Contract',
+      employer_name: 'Qatar Hospital',
+      destination_country: 'Qatar',
+      specialty: 'General Nursing',
+      category: 'Nursing',
+      positions: 0,
+      salary_display: '4,400 QAR/month',
+      min_experience: 0,
+      visa_sponsored: true,
+      benefits: ['Accommodation', 'Flight', 'Visa'],
+      description: 'Long-term nursing positions in Qatar with a 5-year contract. Salary of 4,400 QAR/month with accommodation, flight, and visa fully covered. Interviews starting in 1 week.',
+      requirements: 'Prometric + DataFlow + Degree + License + CV',
+      wa_link: 'https://wa.me/19294192327?text=Hi%20eLab%2C%20I%E2%80%99m%20interested%20in%20the%20Qatar%20Nursing%20position%20(5-year%20contract).%20My%20name%20is%20____%20and%20I%20have%20____%20years%20of%20experience.',
+      detail_link: 'qatar-nursing-5yr.html',
+      accent_color: '#6366f1',
+    },
+    {
       id: 'featured-saudi-ent-surgeon',
       title: 'ENT Surgeon / Otorhinolaryngologist',
       employer_name: 'Private Hospital — Saudi Arabia',
@@ -250,8 +286,8 @@
         '<span class="job-badge job-badge-featured">FEATURED</span>' +
         '<div class="job-card-body">' +
           '<div class="job-card-header">' +
-            '<div class="job-employer-logo" style="background:rgba(139,26,58,0.15);color:#d4a84b;font-weight:800;">' +
-              (f.title === 'Elderly Caregiver' ? '&#x2764;' : '&#x1F476;') +
+            '<div class="job-employer-logo" style="background:' + (f.accent_color ? f.accent_color + '20' : 'rgba(139,26,58,0.15)') + ';color:' + (f.accent_color || '#d4a84b') + ';font-weight:800;font-size:18px;">' +
+              (f.id.indexOf('elderly') !== -1 ? '&#x2764;' : f.id.indexOf('paediatric') !== -1 ? '&#x1F476;' : f.id.indexOf('albania') !== -1 ? '&#x1F1E6;&#x1F1F1;' : f.id.indexOf('nursing') !== -1 ? '&#x1FA7A;' : f.id.indexOf('ent') !== -1 ? '&#x1F3E5;' : escHtml((f.employer_name || '?').charAt(0))) +
             '</div>' +
             '<div>' +
               '<h3>' + escHtml(f.title) + '</h3>' +
@@ -286,9 +322,10 @@
           '<div class="benefits-strip">' + benefitsHtml + '</div>' +
         '</div>' +
         '<div class="job-card-aside">' +
-          '<div class="job-salary" style="color:#d4a84b;">' + escHtml(f.salary_display) + '</div>' +
+          '<div class="job-salary" style="color:' + (f.accent_color || '#d4a84b') + ';">' + escHtml(f.salary_display) + '</div>' +
           '<span class="job-posted" style="color:var(--text-tertiary);">' + escHtml(f.requirements) + '</span>' +
-          '<div class="job-card-actions">' +
+          '<div class="job-card-actions" style="display:flex;flex-direction:column;gap:8px;">' +
+            (f.detail_link ? '<a href="' + f.detail_link + '" class="btn btn-primary btn-sm" style="text-decoration:none;text-align:center;">Apply Now</a>' : '') +
             '<a href="' + f.wa_link + '" target="_blank" rel="noopener noreferrer" class="btn-featured">' +
               '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>' +
               'Apply on WhatsApp' +

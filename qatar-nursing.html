@@ -531,7 +531,7 @@
     .form-input::placeholder { color: var(--text-muted); }
 
     /* File Drop */
-    .file-drop-wrap { flex: 1 1 200px; }
+    .file-drop-wrap { flex: 1 1 200px; min-width: 0; overflow: hidden; }
     .file-drop-label { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; display: block; }
     .file-drop-label .req { color: var(--indigo); }
     .file-drop-hint { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
@@ -1373,7 +1373,7 @@
         // 1. Create Supabase auth account
         var authResult = await window.ghSupabase.auth.signUp({
           email: email,
-          password: crypto.randomUUID().slice(0, 16),
+          password: (crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.getRandomValues(new Uint8Array(16)), function(b) { return b.toString(16).padStart(2, '0'); }).join('')).slice(0, 16),
           options: {
             data: {
               full_name: fullName,
