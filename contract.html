@@ -12,8 +12,8 @@
     html { scroll-behavior: smooth; }
     body {
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: #0a0f1a;
-      color: #94a3b8;
+      background: #f5f7fa;
+      color: #334155;
       line-height: 1.7;
       -webkit-font-smoothing: antialiased;
     }
@@ -22,64 +22,76 @@
     button { font-family: inherit; }
 
     :root {
-      --bg: #0a0f1a;
-      --card-bg: rgba(255,255,255,0.04);
-      --card-border: rgba(255,255,255,0.08);
-      --emerald: #059669;
-      --emerald-light: #34d399;
-      --gold: #d4a84b;
-      --gold-light: #f0d78c;
+      --bg: #f5f7fa;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --navy: #1a365d;
+      --navy-light: #2d4a7a;
+      --cyan: #0077B6;
+      --cyan-light: #0096d6;
+      --cyan-dark: #005f8a;
       --white: #FFFFFF;
-      --text-primary: #f1f5f9;
-      --text-secondary: #94a3b8;
-      --text-muted: #64748b;
-      --radius: 12px;
+      --text-primary: #1a365d;
+      --text-body: #334155;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --radius: 8px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 24px rgba(0,0,0,0.06);
+      --shadow-lg: 0 4px 12px rgba(0,0,0,0.08), 0 12px 40px rgba(0,0,0,0.08);
     }
 
     /* ── Header ─────────────────────────────────── */
     .gh-header {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px 24px;
+      background: var(--white);
       border-bottom: 1px solid var(--card-border);
-      background: rgba(10,15,26,0.95);
-      backdrop-filter: blur(12px);
+      padding: 16px 24px;
       position: sticky;
       top: 0;
       z-index: 100;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
     }
-    .gh-header .logo {
+    .gh-header-inner {
+      max-width: 860px;
+      margin: 0 auto;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
     }
-    .gh-header .logo-icon {
-      width: 36px;
-      height: 36px;
-      background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+    .gh-header .logo-img {
+      width: 44px;
+      height: 44px;
       border-radius: 8px;
+      object-fit: contain;
+    }
+    .gh-header .company-info {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 16px;
-      color: var(--white);
+      flex-direction: column;
     }
-    .gh-header .logo-text {
-      font-size: 18px;
+    .gh-header .company-name {
+      font-size: 17px;
       font-weight: 700;
-      color: var(--text-primary);
+      color: var(--navy);
+      letter-spacing: -0.01em;
     }
-    .gh-header .logo-text span {
-      color: var(--gold);
+    .gh-header .company-address {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.3;
+    }
+    .gh-header-accent {
+      height: 3px;
+      background: linear-gradient(90deg, var(--cyan), var(--cyan-light), transparent);
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
     }
 
     /* ── Container ──────────────────────────────── */
     .container {
-      max-width: 860px;
+      max-width: 800px;
       margin: 0 auto;
-      padding: 40px 24px 80px;
+      padding: 32px 20px 80px;
     }
 
     /* ── State screens ──────────────────────────── */
@@ -87,45 +99,56 @@
       display: none;
       text-align: center;
       padding: 80px 24px;
+      max-width: 560px;
+      margin: 40px auto;
     }
     .state-screen.active {
       display: block;
     }
+    .state-card {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 48px 32px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--card-border);
+    }
     .state-screen .icon-circle {
-      width: 80px;
-      height: 80px;
+      width: 72px;
+      height: 72px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 36px;
-      margin: 0 auto 24px;
+      font-size: 32px;
+      margin: 0 auto 20px;
+      font-weight: 700;
     }
     .state-screen h2 {
-      font-size: 1.6rem;
+      font-size: 1.4rem;
       font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 12px;
+      color: var(--navy);
+      margin-bottom: 10px;
     }
     .state-screen p {
-      color: var(--text-secondary);
-      font-size: 1rem;
-      max-width: 480px;
+      color: var(--text-body);
+      font-size: 0.95rem;
+      max-width: 420px;
       margin: 0 auto;
+      line-height: 1.6;
     }
 
-    .icon-circle.error { background: rgba(239,68,68,0.15); color: #ef4444; }
-    .icon-circle.success { background: rgba(5,150,105,0.15); color: var(--emerald-light); }
-    .icon-circle.info { background: rgba(212,168,75,0.15); color: var(--gold); }
+    .icon-circle.error { background: #fef2f2; color: #dc2626; border: 2px solid #fecaca; }
+    .icon-circle.success { background: #f0fdf4; color: #16a34a; border: 2px solid #bbf7d0; }
+    .icon-circle.info { background: #f0fdf4; color: #16a34a; border: 2px solid #bbf7d0; }
 
     .spinner {
-      width: 48px;
-      height: 48px;
-      border: 4px solid var(--card-border);
-      border-top-color: var(--emerald);
+      width: 44px;
+      height: 44px;
+      border: 3px solid var(--card-border);
+      border-top-color: var(--cyan);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
-      margin: 0 auto 24px;
+      margin: 0 auto 20px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -134,23 +157,61 @@
     .agreement-wrapper.active { display: block; }
 
     .agreement-doc {
-      background: rgba(255,255,255,0.03);
+      background: var(--white);
       border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      padding: 48px 40px;
-      margin-bottom: 32px;
+      border-radius: 2px;
+      padding: 56px 48px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+    }
+    .agreement-doc::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--navy), var(--cyan));
+      border-radius: 2px 2px 0 0;
     }
     @media (max-width: 600px) {
-      .agreement-doc { padding: 28px 18px; }
+      .agreement-doc { padding: 32px 20px; }
+    }
+
+    .agreement-doc .doc-header {
+      text-align: center;
+      margin-bottom: 36px;
+      padding-bottom: 28px;
+      border-bottom: 2px solid var(--navy);
+    }
+    .agreement-doc .doc-header .doc-logo {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 12px;
+      border-radius: 8px;
+      object-fit: contain;
+    }
+    .agreement-doc .doc-header .doc-company {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .agreement-doc .doc-header .doc-address {
+      font-size: 12px;
+      color: var(--text-secondary);
     }
 
     .agreement-doc .doc-title {
-      font-size: 1.5rem;
+      font-size: 1.35rem;
       font-weight: 800;
-      color: var(--text-primary);
+      color: var(--navy);
       text-align: center;
       margin-bottom: 32px;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
     }
 
@@ -160,26 +221,28 @@
       border-bottom: 1px solid var(--card-border);
     }
     .agreement-doc .parties p {
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-      margin-bottom: 6px;
+      color: var(--text-body);
+      font-size: 0.93rem;
+      margin-bottom: 4px;
     }
     .agreement-doc .parties strong {
-      color: var(--text-primary);
+      color: var(--navy);
     }
 
     .agreement-doc .section-heading {
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 700;
-      color: var(--text-primary);
+      color: var(--navy);
       margin-top: 28px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
     }
     .agreement-doc .section-body {
-      color: var(--text-secondary);
-      font-size: 0.92rem;
-      line-height: 1.75;
-      margin-bottom: 8px;
+      color: var(--text-body);
+      font-size: 0.9rem;
+      line-height: 1.8;
+      margin-bottom: 6px;
     }
     .agreement-doc .section-body ul {
       list-style: none;
@@ -188,14 +251,15 @@
     }
     .agreement-doc .section-body ul li {
       position: relative;
-      padding-left: 20px;
-      margin-bottom: 4px;
+      padding-left: 22px;
+      margin-bottom: 5px;
     }
     .agreement-doc .section-body ul li::before {
       content: "\2022";
       position: absolute;
-      left: 4px;
-      color: var(--gold);
+      left: 6px;
+      color: var(--cyan);
+      font-weight: 700;
     }
 
     .doc-divider {
@@ -206,64 +270,69 @@
 
     /* ── Signature Blocks ───────────────────────── */
     .sig-section {
-      background: rgba(255,255,255,0.03);
+      background: var(--white);
       border: 1px solid var(--card-border);
       border-radius: var(--radius);
       padding: 32px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
     }
     @media (max-width: 600px) {
-      .sig-section { padding: 20px 16px; }
+      .sig-section { padding: 24px 18px; }
     }
     .sig-section h3 {
-      font-size: 1rem;
+      font-size: 0.85rem;
       font-weight: 700;
-      color: var(--gold);
+      color: var(--cyan);
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--cyan);
+      display: inline-block;
     }
     .sig-section p {
-      color: var(--text-secondary);
+      color: var(--text-body);
       font-size: 0.92rem;
       margin-bottom: 16px;
       line-height: 1.65;
     }
     .sig-row {
       display: flex;
-      gap: 24px;
+      gap: 20px;
       flex-wrap: wrap;
-      margin-top: 12px;
+      margin-top: 16px;
     }
     .sig-field {
       flex: 1;
-      min-width: 180px;
+      min-width: 160px;
     }
     .sig-field label {
       display: block;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 600;
-      color: var(--text-muted);
+      color: var(--text-secondary);
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
     .sig-field .value {
-      font-size: 0.95rem;
+      font-size: 0.93rem;
       color: var(--text-primary);
       padding: 10px 14px;
-      background: rgba(255,255,255,0.04);
+      background: #f8fafc;
       border: 1px solid var(--card-border);
-      border-radius: 8px;
+      border-radius: 6px;
+      font-weight: 500;
     }
     .elab-sig-preview {
       font-family: 'Dancing Script', cursive;
       font-size: 28px;
-      color: var(--text-primary);
-      padding: 12px 16px;
-      background: rgba(255,255,255,0.04);
+      color: var(--navy);
+      padding: 14px 16px;
+      background: #f8fafc;
       border: 1px solid var(--card-border);
-      border-radius: 8px;
+      border-radius: 6px;
       margin-bottom: 12px;
     }
 
@@ -272,9 +341,10 @@
       display: flex;
       gap: 0;
       margin-bottom: 16px;
-      border-radius: 8px;
+      border-radius: 6px;
       overflow: hidden;
       border: 1px solid var(--card-border);
+      background: #f8fafc;
     }
     .sig-tab {
       flex: 1;
@@ -283,13 +353,13 @@
       font-weight: 600;
       text-align: center;
       cursor: pointer;
-      background: rgba(255,255,255,0.03);
-      color: var(--text-muted);
+      background: transparent;
+      color: var(--text-secondary);
       border: none;
       transition: background 0.2s, color 0.2s;
     }
     .sig-tab.active {
-      background: var(--emerald);
+      background: var(--cyan);
       color: var(--white);
     }
 
@@ -298,8 +368,8 @@
 
     .sig-canvas-wrap {
       position: relative;
-      border: 2px dashed rgba(255,255,255,0.15);
-      border-radius: 8px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 6px;
       background: #fff;
       overflow: hidden;
     }
@@ -314,14 +384,18 @@
       position: absolute;
       top: 8px;
       right: 8px;
-      padding: 4px 12px;
+      padding: 4px 14px;
       font-size: 0.75rem;
       font-weight: 600;
-      background: rgba(0,0,0,0.6);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
+      background: #f1f5f9;
+      color: var(--text-secondary);
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
       cursor: pointer;
+      transition: background 0.15s;
+    }
+    .sig-canvas-clear:hover {
+      background: #e2e8f0;
     }
 
     .sig-type-input {
@@ -329,27 +403,28 @@
       padding: 12px 16px;
       font-size: 1rem;
       font-family: 'Inter', sans-serif;
-      background: rgba(255,255,255,0.06);
+      background: var(--white);
       border: 1px solid var(--card-border);
-      border-radius: 8px;
+      border-radius: 6px;
       color: var(--text-primary);
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
     .sig-type-input:focus {
-      border-color: var(--emerald);
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(0,119,182,0.1);
     }
     .sig-type-preview {
       font-family: 'Dancing Script', cursive;
       font-size: 32px;
-      color: var(--text-primary);
+      color: #1a1a2e;
       padding: 16px;
       min-height: 60px;
       margin-top: 10px;
       background: #fff;
-      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
       text-align: center;
-      color: #1a1a2e;
     }
 
     /* ── Checkbox & Button ──────────────────────── */
@@ -357,20 +432,26 @@
       display: flex;
       align-items: flex-start;
       gap: 12px;
-      margin: 24px 0;
+      margin: 20px 0;
+      background: var(--white);
+      padding: 16px 20px;
+      border-radius: var(--radius);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow);
     }
     .agree-row input[type="checkbox"] {
       width: 20px;
       height: 20px;
       margin-top: 2px;
-      accent-color: var(--emerald);
+      accent-color: var(--cyan);
       cursor: pointer;
       flex-shrink: 0;
     }
     .agree-row label {
       font-size: 0.92rem;
-      color: var(--text-secondary);
+      color: var(--text-body);
       cursor: pointer;
+      font-weight: 500;
     }
 
     .btn-sign {
@@ -383,18 +464,19 @@
       font-size: 16px;
       cursor: pointer;
       border: none;
-      background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+      background: var(--cyan);
       color: var(--white);
       width: 100%;
       justify-content: center;
-      transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
+      transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
     }
     .btn-sign:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(5,150,105,0.35);
+      background: var(--cyan-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(0,119,182,0.25);
     }
     .btn-sign:disabled {
-      opacity: 0.4;
+      opacity: 0.45;
       cursor: not-allowed;
     }
 
@@ -408,14 +490,15 @@
       font-size: 15px;
       cursor: pointer;
       border: none;
-      background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+      background: var(--cyan);
       color: var(--white);
       margin-top: 20px;
-      transition: transform 0.15s, box-shadow 0.15s;
+      transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
     }
     .btn-download:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(5,150,105,0.35);
+      background: var(--cyan-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(0,119,182,0.25);
     }
 
     /* ── Progress overlay ───────────────────────── */
@@ -423,7 +506,8 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(10,15,26,0.92);
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(4px);
       z-index: 200;
       flex-direction: column;
       align-items: center;
@@ -433,10 +517,10 @@
       display: flex;
     }
     .signing-overlay h2 {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 8px;
+      color: var(--navy);
+      margin-bottom: 6px;
     }
     .signing-overlay p {
       color: var(--text-secondary);
@@ -451,40 +535,52 @@
 
   <!-- Header -->
   <header class="gh-header">
-    <a href="index.html" class="logo">
-      <div class="logo-icon">G</div>
-      <div class="logo-text">Global<span>Hire</span></div>
-    </a>
+    <div class="gh-header-inner">
+      <img src="assets/elab-logo.jpg" alt="eLab Solutions" class="logo-img">
+      <div class="company-info">
+        <div class="company-name">eLab Solutions International</div>
+        <div class="company-address">4, Ado Road, Taiwo Shopping Complex, Ajah, Lagos</div>
+      </div>
+    </div>
+    <div class="gh-header-accent"></div>
   </header>
 
   <!-- Loading State -->
   <div id="state-loading" class="state-screen active">
-    <div class="spinner"></div>
-    <h2>Loading Agreement...</h2>
-    <p>Please wait while we retrieve your service agreement.</p>
+    <div class="state-card">
+      <div class="spinner"></div>
+      <h2>Loading Agreement...</h2>
+      <p>Please wait while we retrieve your service agreement.</p>
+    </div>
   </div>
 
   <!-- Error State -->
   <div id="state-error" class="state-screen">
-    <div class="icon-circle error">!</div>
-    <h2 id="error-title">Contract Not Found</h2>
-    <p id="error-message">The contract link is invalid or has expired. Please contact your eLab representative.</p>
+    <div class="state-card">
+      <div class="icon-circle error">!</div>
+      <h2 id="error-title">Contract Not Found</h2>
+      <p id="error-message">The contract link is invalid or has expired. Please contact your eLab representative.</p>
+    </div>
   </div>
 
   <!-- Already Signed State -->
   <div id="state-signed" class="state-screen">
-    <div class="icon-circle info">&#10003;</div>
-    <h2>Agreement Already Signed</h2>
-    <p>This service agreement was signed on <strong id="signed-date"></strong>.</p>
-    <button class="btn-download" id="btn-download-signed" onclick="downloadSignedPDF()">Download Signed PDF &darr;</button>
+    <div class="state-card">
+      <div class="icon-circle info">&#10003;</div>
+      <h2>Agreement Already Signed</h2>
+      <p>This service agreement was signed on <strong id="signed-date"></strong>.</p>
+      <button class="btn-download" id="btn-download-signed" onclick="downloadSignedPDF()">Download Signed PDF &darr;</button>
+    </div>
   </div>
 
   <!-- Success State -->
   <div id="state-success" class="state-screen">
-    <div class="icon-circle success">&#10003;</div>
-    <h2>Agreement Signed Successfully!</h2>
-    <p>Your eLab Complete Service Agreement has been signed and recorded. You will receive a confirmation email shortly.</p>
-    <button class="btn-download" id="btn-download-success" onclick="downloadSuccessPDF()">Download Signed PDF &darr;</button>
+    <div class="state-card">
+      <div class="icon-circle success">&#10003;</div>
+      <h2>Agreement Signed Successfully!</h2>
+      <p>Your eLab Complete Service Agreement has been signed and recorded. You will receive a confirmation email shortly.</p>
+      <button class="btn-download" id="btn-download-success" onclick="downloadSuccessPDF()">Download Signed PDF &darr;</button>
+    </div>
   </div>
 
   <!-- Signing Overlay -->
@@ -500,6 +596,13 @@
 
       <!-- Agreement Document -->
       <div class="agreement-doc" id="agreement-doc">
+
+        <div class="doc-header">
+          <img src="assets/elab-logo.jpg" alt="eLab" class="doc-logo">
+          <div class="doc-company">eLab Solutions International LLC</div>
+          <div class="doc-address">4, Ado Road, Taiwo Shopping Complex, Ajah, Lagos</div>
+        </div>
+
         <div class="doc-title">eLab Complete Service Agreement</div>
 
         <div class="parties">
@@ -513,7 +616,7 @@
 
         <hr class="doc-divider">
 
-        <div class="section-heading">1. PROGRAM DESCRIPTION</div>
+        <div class="section-heading">1. Program Description</div>
         <div class="section-body">
           <p>eLab Complete is a guaranteed end-to-end nursing placement program. eLab will manage all processes required to place the Candidate in a nursing role in <span class="dest-placeholder"></span>, including but not limited to:</p>
           <ul>
@@ -529,12 +632,12 @@
           </ul>
         </div>
 
-        <div class="section-heading">2. TIMELINE</div>
+        <div class="section-heading">2. Timeline</div>
         <div class="section-body">
           <p>eLab commits to completing the entire process &mdash; from enrollment to job placement &mdash; within 4 to 9 months from the date of enrollment. All stages will run concurrently where possible to minimize total timeline.</p>
         </div>
 
-        <div class="section-heading">3. PAYMENT TERMS</div>
+        <div class="section-heading">3. Payment Terms</div>
         <div class="section-body">
           <ul>
             <li>The Candidate shall make full payment of the agreed program fee prior to commencement of any services.</li>
@@ -544,13 +647,13 @@
           </ul>
         </div>
 
-        <div class="section-heading">4. PLACEMENT GUARANTEE</div>
+        <div class="section-heading">4. Placement Guarantee</div>
         <div class="section-body">
           <p>eLab guarantees that the Candidate will be placed in a nursing role in <span class="dest-placeholder"></span> within 9 months of enrollment.</p>
           <p>If eLab fails to place the Candidate within 9 months of enrollment, the Candidate shall receive a full refund of the program fee minus Tangible Costs (Section 5) already spent on the Candidate's behalf.</p>
         </div>
 
-        <div class="section-heading">5. TANGIBLE COSTS (NON-REFUNDABLE)</div>
+        <div class="section-heading">5. Tangible Costs (Non-Refundable)</div>
         <div class="section-body">
           <p>The following third-party costs, once incurred on the Candidate's behalf, are non-refundable under any circumstance:</p>
           <ul>
@@ -563,7 +666,7 @@
           </ul>
         </div>
 
-        <div class="section-heading">6. EXAM FAILURE</div>
+        <div class="section-heading">6. Exam Failure</div>
         <div class="section-body">
           <ul>
             <li><strong>First attempt failure:</strong> No refund. eLab will provide free resit preparation through eLab Academy. The Candidate shall pay the exam rebooking fee and eLab's rebooking coordination fee.</li>
@@ -571,7 +674,7 @@
           </ul>
         </div>
 
-        <div class="section-heading">7. VOLUNTARY WITHDRAWAL</div>
+        <div class="section-heading">7. Voluntary Withdrawal</div>
         <div class="section-body">
           <p>The Candidate may withdraw from the program at any time by providing written notice.</p>
           <p>Upon voluntary withdrawal, the Candidate shall receive a refund of the program fee minus:</p>
@@ -581,7 +684,7 @@
           </ul>
         </div>
 
-        <div class="section-heading">8. DISQUALIFICATION</div>
+        <div class="section-heading">8. Disqualification</div>
         <div class="section-body">
           <p>eLab may terminate this agreement immediately and without refund if the Candidate:</p>
           <ul>
@@ -592,7 +695,7 @@
           </ul>
         </div>
 
-        <div class="section-heading">9. CANDIDATE OBLIGATIONS</div>
+        <div class="section-heading">9. Candidate Obligations</div>
         <div class="section-body">
           <p>The Candidate agrees to:</p>
           <ul>
@@ -605,7 +708,7 @@
           </ul>
         </div>
 
-        <div class="section-heading">10. ELAB OBLIGATIONS</div>
+        <div class="section-heading">10. eLab Obligations</div>
         <div class="section-body">
           <p>eLab agrees to:</p>
           <ul>
@@ -617,7 +720,7 @@
           </ul>
         </div>
 
-        <div class="section-heading">11. NON-COMPETE</div>
+        <div class="section-heading">11. Non-Compete</div>
         <div class="section-body">
           <p>During the duration of this program (from enrollment until placement is completed or the agreement is terminated), the Candidate agrees not to:</p>
           <ul>
@@ -627,17 +730,17 @@
           <p>Violation of this clause shall be treated as Voluntary Withdrawal (Section 7), and the withdrawal refund terms shall apply.</p>
         </div>
 
-        <div class="section-heading">12. LIMITATION OF LIABILITY</div>
+        <div class="section-heading">12. Limitation of Liability</div>
         <div class="section-body">
           <p>eLab's total liability under this agreement shall not exceed the program fee paid by the Candidate. eLab shall not be liable for delays caused by third-party government agencies, regulatory bodies, or circumstances beyond its reasonable control.</p>
         </div>
 
-        <div class="section-heading">13. GOVERNING LAW</div>
+        <div class="section-heading">13. Governing Law</div>
         <div class="section-body">
           <p>This agreement shall be governed by and construed in accordance with the laws of the Federal Republic of Nigeria.</p>
         </div>
 
-        <div class="section-heading">14. ENTIRE AGREEMENT</div>
+        <div class="section-heading">14. Entire Agreement</div>
         <div class="section-body">
           <p>This document constitutes the entire agreement between the parties. Any amendments must be made in writing and signed by both parties.</p>
         </div>
