@@ -249,6 +249,14 @@
       actions.push(`<button class="btn btn-primary btn-sm" id="btn-reactivate-campaign">Reactivate</button>`);
     }
 
+    // Notify applicants button — always available for non-draft campaigns
+    if (c.status !== 'draft') {
+      actions.push(`<button class="btn btn-secondary btn-sm" id="btn-notify-applicants" style="background:var(--accent-cyan);color:var(--bg-deep);border-color:var(--accent-cyan);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Notify Applicants
+      </button>`);
+    }
+
     actionsEl.innerHTML = actions.join('');
 
     // Bind action buttons
@@ -256,6 +264,7 @@
     document.getElementById('btn-send-outreach')?.addEventListener('click', () => sendOutreach(campaignId));
     document.getElementById('btn-close-campaign')?.addEventListener('click', () => deactivateCampaign(campaignId));
     document.getElementById('btn-reactivate-campaign')?.addEventListener('click', () => reactivateCampaign(campaignId));
+    document.getElementById('btn-notify-applicants')?.addEventListener('click', () => showNotifyModal(campaignId, c));
   }
 
   // ── Load matches ──
@@ -630,4 +639,169 @@
         return '<strong>' + log.event_type + '</strong>';
     }
   }
+
+  // ── Notify Applicants Modal ──
+  async function showNotifyModal(campaignId, campaign) {
+    // Remove existing modal if any
+    var existing = document.getElementById('notify-modal');
+    if (existing) existing.remove();
+
+    var modal = document.createElement('div');
+    modal.id = 'notify-modal';
+    modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    modal.innerHTML = `
+      <div style="background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-xl);width:100%;max-width:560px;max-height:90vh;overflow-y:auto;padding:var(--space-6);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-5);">
+          <h3 style="font-size:var(--text-lg);font-weight:700;color:var(--text-primary);margin:0;">Notify Applicants</h3>
+          <button onclick="document.getElementById('notify-modal').remove()" style="background:none;border:none;cursor:pointer;color:var(--text-tertiary);font-size:20px;">&times;</button>
+        </div>
+        <p style="color:var(--text-secondary);font-size:var(--text-sm);margin-bottom:var(--space-4);">
+          Send an email about <strong style="color:var(--text-primary);">${escHtml(campaign.title)}</strong> to applicants in the system.
+        </p>
+
+        <div style="margin-bottom:var(--space-4);">
+          <label style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary);display:block;margin-bottom:var(--space-2);">Recipients</label>
+          <select id="notify-target" style="width:100%;padding:var(--space-3);background:var(--bg-deep);border:1px solid var(--border-subtle);border-radius:var(--radius-md);color:var(--text-primary);font-size:var(--text-sm);">
+            <option value="matched">Matched candidates only (from this campaign's matching results)</option>
+            <option value="all">All applicants in the system</option>
+            <option value="specialty">Applicants matching specialty: ${escHtml(campaign.specialty || 'any')}</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom:var(--space-4);">
+          <label style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary);display:block;margin-bottom:var(--space-2);">Email Subject</label>
+          <input type="text" id="notify-subject" value="New Opportunity: ${escHtml(campaign.title)} — ${escHtml(campaign.destination_country || '')}"
+            style="width:100%;padding:var(--space-3);background:var(--bg-deep);border:1px solid var(--border-subtle);border-radius:var(--radius-md);color:var(--text-primary);font-size:var(--text-sm);">
+        </div>
+
+        <div style="margin-bottom:var(--space-4);">
+          <label style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary);display:block;margin-bottom:var(--space-2);">Message</label>
+          <textarea id="notify-message" rows="6" style="width:100%;padding:var(--space-3);background:var(--bg-deep);border:1px solid var(--border-subtle);border-radius:var(--radius-md);color:var(--text-primary);font-size:var(--text-sm);resize:vertical;">Dear Applicant,
+
+We have an exciting new opportunity that matches your profile:
+
+Position: ${campaign.title}
+Destination: ${campaign.destination_country || 'TBD'}
+Salary: ${campaign.salary_display || 'Competitive'}
+${campaign.visa_sponsored ? 'Visa: Sponsored by employer' : ''}
+
+Apply now at https://globalhire.elabsolution.org/jobs.html or reply to this email for more information.
+
+Best regards,
+eLab Solutions International
+GlobalHire Recruitment Team</textarea>
+        </div>
+
+        <div id="notify-status" style="display:none;margin-bottom:var(--space-3);padding:var(--space-3);border-radius:var(--radius-md);font-size:var(--text-sm);"></div>
+
+        <div style="display:flex;gap:var(--space-3);justify-content:flex-end;">
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('notify-modal').remove()">Cancel</button>
+          <button class="btn btn-primary btn-sm" id="btn-send-notify" onclick="CampaignNotify.send('${campaignId}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Send Emails
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) modal.remove();
+    });
+  }
+
+  // ── Send notification emails ──
+  window.CampaignNotify = {
+    send: async function(campaignId) {
+      var btn = document.getElementById('btn-send-notify');
+      var statusEl = document.getElementById('notify-status');
+      var target = document.getElementById('notify-target').value;
+      var subject = document.getElementById('notify-subject').value.trim();
+      var message = document.getElementById('notify-message').value.trim();
+
+      if (!subject || !message) {
+        statusEl.style.display = 'block';
+        statusEl.style.background = 'rgba(239,68,68,0.1)';
+        statusEl.style.color = 'var(--error)';
+        statusEl.textContent = 'Please fill in both subject and message.';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      statusEl.style.display = 'block';
+      statusEl.style.background = 'rgba(0,119,182,0.1)';
+      statusEl.style.color = 'var(--primary)';
+      statusEl.textContent = 'Fetching recipients...';
+
+      try {
+        var emails = [];
+
+        if (target === 'matched') {
+          // Get matched candidates for this campaign
+          var { data: matches } = await ghFrom('campaign_matches')
+            .select('applicant_id')
+            .eq('campaign_id', campaignId);
+          if (matches && matches.length > 0) {
+            var ids = matches.map(function(m) { return m.applicant_id; });
+            // Get emails from auth.users via profiles
+            for (var i = 0; i < ids.length; i++) {
+              var { data: user } = await sb.auth.admin.getUserById(ids[i]).catch(function() { return { data: null }; });
+              if (user && user.user && user.user.email) {
+                emails.push({ email: user.user.email, name: '' });
+              }
+            }
+            // Fallback: get from profiles if admin API not available
+            if (emails.length === 0) {
+              var { data: profiles } = await ghFrom('profiles')
+                .select('id, full_name')
+                .in('id', ids);
+              // We don't have email in profiles, so use the Supabase function instead
+            }
+          }
+        } else if (target === 'all' || target === 'specialty') {
+          // Get all applicant profiles
+          var query = ghFrom('profiles').select('id, full_name').eq('role', 'applicant');
+          var { data: profiles } = await query;
+          if (profiles) {
+            // We need emails — call a Supabase function or query auth.users
+            // For now, we'll use the notify-make edge function approach
+          }
+        }
+
+        // Use Supabase edge function to send bulk emails
+        statusEl.textContent = 'Sending emails...';
+
+        var { data: result, error } = await sb.functions.invoke('notify-make', {
+          body: {
+            type: 'bulk_campaign_notify',
+            campaign_id: campaignId,
+            target: target,
+            subject: subject,
+            message: message,
+          },
+        });
+
+        if (error) throw error;
+
+        statusEl.style.background = 'rgba(46,196,182,0.1)';
+        statusEl.style.color = 'var(--success)';
+        statusEl.textContent = 'Emails sent successfully! ' + (result && result.count ? result.count + ' recipients notified.' : '');
+        btn.textContent = 'Sent!';
+
+        setTimeout(function() {
+          var modal = document.getElementById('notify-modal');
+          if (modal) modal.remove();
+        }, 3000);
+
+      } catch (err) {
+        console.error('Notify error:', err);
+        statusEl.style.background = 'rgba(239,68,68,0.1)';
+        statusEl.style.color = 'var(--error)';
+        statusEl.textContent = 'Failed to send: ' + (err.message || 'Unknown error') + '. Try sending via WhatsApp instead.';
+        btn.disabled = false;
+        btn.textContent = 'Retry';
+      }
+    }
+  };
 })();
