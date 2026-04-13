@@ -278,10 +278,10 @@
     // 4. Unread messages
     try {
       var { data } = await window.ghFrom('messages')
-        .select('id, body, created_at')
+        .select('id, body, sent_at')
         .eq('direction', 'inbound')
-        .is('read_at', null)
-        .order('created_at', { ascending: false })
+        .gte('sent_at', cutoff)
+        .order('sent_at', { ascending: false })
         .limit(10);
       if (data) {
         data.forEach(function (r) {
@@ -289,7 +289,7 @@
           items.push({
             icon: 'message',
             text: 'New message: ' + (preview || 'Message received'),
-            time: r.created_at,
+            time: r.sent_at,
             href: 'messages.html'
           });
         });
@@ -314,10 +314,10 @@
     // 1. Messages from eLab team (outbound messages TO the applicant)
     try {
       var { data } = await window.ghFrom('messages')
-        .select('id, body, created_at')
+        .select('id, body, sent_at')
         .eq('applicant_id', uid)
         .eq('direction', 'outbound')
-        .order('created_at', { ascending: false })
+        .order('sent_at', { ascending: false })
         .limit(10);
       if (data) {
         data.forEach(function (r) {
@@ -325,7 +325,7 @@
           items.push({
             icon: 'message',
             text: 'Message from eLab: ' + (preview || 'New message'),
-            time: r.created_at,
+            time: r.sent_at,
             href: '#',
             tab: 'tab-messages'
           });
@@ -336,10 +336,10 @@
     // 2. Document status changes (verified/rejected)
     try {
       var { data } = await window.ghFrom('documents')
-        .select('id, doc_type, status, updated_at')
+        .select('id, doc_type, status, reviewed_at, uploaded_at')
         .eq('applicant_id', uid)
         .neq('status', 'pending')
-        .order('updated_at', { ascending: false })
+        .order('reviewed_at', { ascending: false })
         .limit(10);
       if (data) {
         data.forEach(function (r) {
@@ -347,7 +347,7 @@
           items.push({
             icon: r.status === 'verified' ? 'check' : 'file',
             text: (r.doc_type || 'Document') + ' has been ' + statusText,
-            time: r.updated_at,
+            time: r.reviewed_at || r.uploaded_at,
             href: '#',
             tab: 'tab-documents'
           });
