@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>eLab Complete — GlobalHire@eLab</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230077B6'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' font-weight='bold' fill='%23ffffff'>G</text></svg>">
+
+  <style>
+    .copy-link-wrap { display:inline-flex; align-items:center; gap:var(--space-2); }
+    .copy-link-wrap input {
+      font-family:var(--font-mono);
+      font-size:11px;
+      padding:4px 8px;
+      border:1px solid var(--border-subtle);
+      border-radius:var(--radius-sm);
+      background:var(--bg-elevated);
+      color:var(--text-secondary);
+      width:220px;
+    }
+    .copy-link-wrap .btn-copy {
+      padding:4px 8px;
+      font-size:11px;
+      cursor:pointer;
+      border:1px solid var(--border-subtle);
+      border-radius:var(--radius-sm);
+      background:var(--bg-surface);
+      color:var(--text-secondary);
+    }
+    .copy-link-wrap .btn-copy:hover { background:var(--bg-elevated); }
+    .toast {
+      position:fixed; bottom:24px; right:24px; padding:12px 20px;
+      background:var(--primary); color:#fff; border-radius:var(--radius-md);
+      font-size:var(--text-sm); font-weight:600; z-index:9999;
+      opacity:0; transform:translateY(10px);
+      transition:opacity .2s, transform .2s;
+    }
+    .toast.show { opacity:1; transform:translateY(0); }
+  </style>
+</head>
+<body data-auth-role="admin">
+  <div class="dashboard-shell">
+
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-logo">
+          <div class="logo-mark">G</div>
+          <span>Global<span class="accent">Hire</span></span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Overview</div>
+        <a class="nav-item" href="dashboard.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </a>
+        <a class="nav-item" href="analytics.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          Analytics
+        </a>
+
+        <div class="nav-section-label">Recruitment</div>
+        <a class="nav-item" href="candidates.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Candidates
+        </a>
+        <a class="nav-item" href="campaign.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          Campaigns
+        </a>
+        <a class="nav-item" href="campaign.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+          AI Matching
+        </a>
+        <a class="nav-item" href="placements.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Placements
+        </a>
+
+        <div class="nav-section-label">Operations</div>
+        <a class="nav-item" href="verification.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          Verification
+        </a>
+        <a class="nav-item" href="documents.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+          Documents
+        </a>
+        <a class="nav-item" href="messages.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Messages
+        </a>
+
+        <div class="nav-section-label">Services</div>
+        <a class="nav-item active" href="elab-complete-admin.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          eLab Complete
+        </a>
+
+        <div class="nav-section-label">System</div>
+        <a class="nav-item" href="settings.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="avatar" id="admin-user-avatar" style="background:var(--primary);color:var(--bg-deep)">SO</div>
+          <div class="user-info">
+            <div class="user-name" id="admin-user-name">Admin</div>
+            <div class="user-role" id="admin-user-role">Platform Admin</div>
+          </div>
+          <a href="#" id="admin-signout" title="Sign Out" style="display:flex;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===================== MAIN CONTENT ===================== -->
+    <main class="dashboard-main">
+
+      <!-- Header -->
+      <header class="dash-header">
+        <div class="dash-header-left">
+          <button class="btn btn-icon" onclick="document.getElementById('sidebar').classList.toggle('open')" style="display:none;" id="sidebar-toggle">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+          </button>
+          <div>
+            <div class="breadcrumb">GlobalHire <span>/</span> Services <span>/</span> eLab Complete</div>
+            <h1>eLab Complete</h1>
+          </div>
+        </div>
+        <div class="dash-header-right">
+          <button class="theme-toggle-btn" title="Toggle theme">
+            <svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="loadData()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Refresh
+          </button>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="dash-content">
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card" style="--kpi-accent: var(--primary)">
+            <div class="kpi-header">
+              <span class="kpi-label">Total Consultations</span>
+              <div class="kpi-icon" style="background:var(--primary-muted);color:var(--primary)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpi-total">0</div>
+          </div>
+
+          <div class="kpi-card" style="--kpi-accent: var(--accent-amber)">
+            <div class="kpi-header">
+              <span class="kpi-label">Pending</span>
+              <div class="kpi-icon" style="background:rgba(255,176,32,0.12);color:var(--accent-amber)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpi-pending">0</div>
+          </div>
+
+          <div class="kpi-card" style="--kpi-accent: var(--accent-cyan)">
+            <div class="kpi-header">
+              <span class="kpi-label">Contracts Sent</span>
+              <div class="kpi-icon" style="background:rgba(0,212,255,0.12);color:var(--accent-cyan)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpi-contracts-sent">0</div>
+          </div>
+
+          <div class="kpi-card" style="--kpi-accent: var(--secondary)">
+            <div class="kpi-header">
+              <span class="kpi-label">Contracts Signed</span>
+              <div class="kpi-icon" style="background:var(--secondary-muted);color:var(--secondary)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpi-contracts-signed">0</div>
+          </div>
+        </div>
+
+        <!-- Consultation Bookings Table -->
+        <div class="panel" style="margin-bottom:var(--space-6);">
+          <div class="panel-header">
+            <span class="panel-title" style="display:flex;align-items:center;gap:var(--space-2);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Consultation Bookings
+              <span id="consultations-count" class="badge badge-primary badge-dot" style="display:none;">0</span>
+            </span>
+          </div>
+          <div class="panel-body-flush">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Candidate</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Destination</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Status</th>
+                  <th>Booked On</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="consultations-tbody">
+                <tr>
+                  <td colspan="9" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">
+                    <div class="skeleton" style="height:20px;width:60%;margin:0 auto var(--space-3);"></div>
+                    <div class="skeleton" style="height:14px;width:40%;margin:0 auto;"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Contracts Table -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title" style="display:flex;align-items:center;gap:var(--space-2);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+              Contracts
+              <span id="contracts-count" class="badge badge-primary badge-dot" style="display:none;">0</span>
+            </span>
+          </div>
+          <div class="panel-body-flush">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Candidate</th>
+                  <th>Destination</th>
+                  <th>Status</th>
+                  <th>Signed At</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="contracts-tbody">
+                <tr>
+                  <td colspan="5" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">
+                    <div class="skeleton" style="height:20px;width:60%;margin:0 auto var(--space-3);"></div>
+                    <div class="skeleton" style="height:14px;width:40%;margin:0 auto;"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Scripts -->
+  <script src="js/core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/elab-tracker.js"></script>
+  <script src="js/auth-guard.js"></script>
+
+  <script>
+    /* ============================================
+       eLab Complete — Admin Page Logic
+       ============================================ */
+
+    var consultations = [];
+    var contracts = [];
+
+    // ── Helpers ──
+
+    function showToast(msg) {
+      var el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(function() { el.classList.remove('show'); }, 2500);
+    }
+
+    function statusBadge(status, type) {
+      var map = {
+        // consultation statuses
+        pending:   'badge badge-warning',
+        confirmed: 'badge badge-info',
+        completed: 'badge badge-primary',
+        cancelled: 'badge badge-danger',
+        // contract statuses
+        draft:  'badge badge-neutral',
+        sent:   'badge badge-info',
+        signed: 'badge badge-primary'
+      };
+      var cls = map[status] || 'badge badge-neutral';
+      return '<span class="' + cls + '">' + (status || 'unknown') + '</span>';
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return '--';
+      var d = new Date(iso);
+      return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function fmtTime(t) {
+      if (!t) return '--';
+      // t could be "14:30:00" or "14:30"
+      var parts = t.split(':');
+      var h = parseInt(parts[0], 10);
+      var m = parts[1] || '00';
+      var ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      return h + ':' + m + ' ' + ampm;
+    }
+
+    function escHtml(str) {
+      if (!str) return '';
+      var div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ── Data Loading ──
+
+    async function loadData() {
+      await Promise.all([loadConsultations(), loadContracts()]);
+      updateKPIs();
+    }
+
+    async function loadConsultations() {
+      var { data, error } = await window.ghSupabase
+        .from('elab_complete_consultations')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading consultations:', error);
+        document.getElementById('consultations-tbody').innerHTML =
+          '<tr><td colspan="9" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">Failed to load consultations</td></tr>';
+        return;
+      }
+
+      consultations = data || [];
+      renderConsultations();
+    }
+
+    async function loadContracts() {
+      var { data, error } = await window.ghSupabase
+        .from('elab_complete_contracts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading contracts:', error);
+        document.getElementById('contracts-tbody').innerHTML =
+          '<tr><td colspan="5" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">Failed to load contracts</td></tr>';
+        return;
+      }
+
+      contracts = data || [];
+      renderContracts();
+    }
+
+    // ── KPIs ──
+
+    function updateKPIs() {
+      document.getElementById('kpi-total').textContent = consultations.length;
+      document.getElementById('kpi-pending').textContent = consultations.filter(function(c) { return c.status === 'pending'; }).length;
+      document.getElementById('kpi-contracts-sent').textContent = contracts.filter(function(c) { return c.status === 'sent'; }).length;
+      document.getElementById('kpi-contracts-signed').textContent = contracts.filter(function(c) { return c.status === 'signed'; }).length;
+
+      var cBadge = document.getElementById('consultations-count');
+      if (consultations.length > 0) {
+        cBadge.textContent = consultations.length;
+        cBadge.style.display = '';
+      }
+      var ctBadge = document.getElementById('contracts-count');
+      if (contracts.length > 0) {
+        ctBadge.textContent = contracts.length;
+        ctBadge.style.display = '';
+      }
+    }
+
+    // ── Render Consultations ──
+
+    function renderConsultations() {
+      var tbody = document.getElementById('consultations-tbody');
+
+      if (consultations.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">No consultation bookings yet</td></tr>';
+        return;
+      }
+
+      var html = '';
+      for (var i = 0; i < consultations.length; i++) {
+        var c = consultations[i];
+        var name = escHtml(c.full_name || c.candidate_name || '--');
+        var email = escHtml(c.email || '--');
+        var phone = escHtml(c.phone || '--');
+        var dest = escHtml(c.preferred_destination || c.destination || '--');
+        var date = fmtDate(c.consultation_date || c.date);
+        var time = fmtTime(c.consultation_time || c.time);
+        var badge = statusBadge(c.status);
+        var booked = fmtDate(c.created_at);
+
+        // Actions
+        var actions = '';
+        if (c.status === 'confirmed' || c.status === 'completed') {
+          actions += '<button class="btn btn-primary btn-sm" onclick="generateContract(' + i + ')">Generate Contract</button> ';
+        }
+        if (c.status === 'confirmed') {
+          actions += '<button class="btn btn-ghost btn-sm" onclick="markComplete(' + i + ')">Mark Complete</button> ';
+        }
+        if (c.status === 'pending') {
+          actions += '<button class="btn btn-ghost btn-sm" style="color:var(--accent-coral);" onclick="cancelConsultation(' + i + ')">Cancel</button>';
+        }
+        if (!actions) actions = '<span style="color:var(--text-tertiary);font-size:var(--text-sm);">--</span>';
+
+        // Check if contract already exists for this consultation
+        var existingContract = contracts.find(function(ct) { return ct.consultation_id === c.id; });
+        if (existingContract) {
+          var link = window.location.origin + '/contract.html?token=' + existingContract.token;
+          actions = '<div class="copy-link-wrap"><input type="text" value="' + escHtml(link) + '" readonly onclick="this.select()"><button class="btn-copy" onclick="copyLink(this)">Copy</button></div>';
+        }
+
+        html += '<tr>' +
+          '<td><strong>' + name + '</strong></td>' +
+          '<td>' + email + '</td>' +
+          '<td>' + phone + '</td>' +
+          '<td>' + dest + '</td>' +
+          '<td>' + date + '</td>' +
+          '<td>' + time + '</td>' +
+          '<td>' + badge + '</td>' +
+          '<td>' + booked + '</td>' +
+          '<td>' + actions + '</td>' +
+          '</tr>';
+      }
+      tbody.innerHTML = html;
+    }
+
+    // ── Render Contracts ──
+
+    function renderContracts() {
+      var tbody = document.getElementById('contracts-tbody');
+
+      if (contracts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">No contracts yet</td></tr>';
+        return;
+      }
+
+      var html = '';
+      for (var i = 0; i < contracts.length; i++) {
+        var c = contracts[i];
+        var name = escHtml(c.candidate_name || '--');
+        var dest = escHtml(c.destination || '--');
+        var badge = statusBadge(c.status);
+        var signedAt = c.signed_at ? fmtDate(c.signed_at) : '--';
+
+        var link = window.location.origin + '/contract.html?token=' + c.token;
+        var actions = '<div class="copy-link-wrap"><input type="text" value="' + escHtml(link) + '" readonly onclick="this.select()"><button class="btn-copy" onclick="copyLink(this)">Copy</button></div>';
+
+        if (c.status === 'signed' && c.pdf_path) {
+          actions += ' <button class="btn btn-ghost btn-sm" onclick="downloadPdf(' + i + ')">Download PDF</button>';
+        }
+
+        html += '<tr>' +
+          '<td><strong>' + name + '</strong></td>' +
+          '<td>' + dest + '</td>' +
+          '<td>' + badge + '</td>' +
+          '<td>' + signedAt + '</td>' +
+          '<td>' + actions + '</td>' +
+          '</tr>';
+      }
+      tbody.innerHTML = html;
+    }
+
+    // ── Actions ──
+
+    async function generateContract(idx) {
+      var row = consultations[idx];
+      if (!row) return;
+
+      // Check if contract already exists
+      var existing = contracts.find(function(ct) { return ct.consultation_id === row.id; });
+      if (existing) {
+        showToast('Contract already exists for this consultation');
+        return;
+      }
+
+      var { data: contract, error } = await window.ghSupabase
+        .from('elab_complete_contracts')
+        .insert({
+          candidate_name: row.full_name || row.candidate_name,
+          candidate_email: row.email,
+          destination: row.preferred_destination || row.destination,
+          consultation_id: row.id,
+          status: 'sent'
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error generating contract:', error);
+        showToast('Error: ' + (error.message || 'Failed to generate contract'));
+        return;
+      }
+
+      showToast('Contract generated successfully');
+      await loadData();
+    }
+
+    async function markComplete(idx) {
+      var row = consultations[idx];
+      if (!row) return;
+
+      var { error } = await window.ghSupabase
+        .from('elab_complete_consultations')
+        .update({ status: 'completed' })
+        .eq('id', row.id);
+
+      if (error) {
+        console.error('Error marking complete:', error);
+        showToast('Error: ' + (error.message || 'Failed to update'));
+        return;
+      }
+
+      showToast('Consultation marked as completed');
+      await loadData();
+    }
+
+    async function cancelConsultation(idx) {
+      var row = consultations[idx];
+      if (!row) return;
+
+      if (!confirm('Cancel this consultation for ' + (row.full_name || row.candidate_name) + '?')) return;
+
+      var { error } = await window.ghSupabase
+        .from('elab_complete_consultations')
+        .update({ status: 'cancelled' })
+        .eq('id', row.id);
+
+      if (error) {
+        console.error('Error cancelling:', error);
+        showToast('Error: ' + (error.message || 'Failed to cancel'));
+        return;
+      }
+
+      showToast('Consultation cancelled');
+      await loadData();
+    }
+
+    function copyLink(btn) {
+      var input = btn.previousElementSibling;
+      input.select();
+      document.execCommand('copy');
+      showToast('Link copied to clipboard');
+    }
+
+    async function downloadPdf(idx) {
+      var c = contracts[idx];
+      if (!c || !c.pdf_path) return;
+
+      var { data: fileData, error } = await window.ghSupabase.storage
+        .from('elab-complete-contracts')
+        .download(c.pdf_path);
+
+      if (error) {
+        console.error('Error downloading PDF:', error);
+        showToast('Error downloading PDF');
+        return;
+      }
+
+      var url = URL.createObjectURL(fileData);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = (c.candidate_name || 'contract') + '-contract.pdf';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // ── Init ──
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Wait for Supabase client to be ready
+      var checkReady = setInterval(function() {
+        if (window.ghSupabase) {
+          clearInterval(checkReady);
+          loadData();
+        }
+      }, 100);
+    });
+  </script>
+</body>
+</html>
