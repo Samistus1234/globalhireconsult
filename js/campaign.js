@@ -656,7 +656,7 @@
           <button onclick="document.getElementById('notify-modal').remove()" style="background:none;border:none;cursor:pointer;color:var(--text-tertiary);font-size:20px;">&times;</button>
         </div>
         <p style="color:var(--text-secondary);font-size:var(--text-sm);margin-bottom:var(--space-4);">
-          Send an email about <strong style="color:var(--text-primary);">${escHtml(campaign.title)}</strong> to applicants in the system.
+          Send an email about <strong style="color:var(--text-primary);">${GHE.escapeHtml(campaign.title)}</strong> to applicants in the system.
         </p>
 
         <div style="margin-bottom:var(--space-4);">
@@ -664,13 +664,13 @@
           <select id="notify-target" style="width:100%;padding:var(--space-3);background:var(--bg-deep);border:1px solid var(--border-subtle);border-radius:var(--radius-md);color:var(--text-primary);font-size:var(--text-sm);">
             <option value="matched">Matched candidates only (from this campaign's matching results)</option>
             <option value="all">All applicants in the system</option>
-            <option value="specialty">Applicants matching specialty: ${escHtml(campaign.specialty || 'any')}</option>
+            <option value="specialty">Applicants matching specialty: ${GHE.escapeHtml(campaign.specialty || 'any')}</option>
           </select>
         </div>
 
         <div style="margin-bottom:var(--space-4);">
           <label style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary);display:block;margin-bottom:var(--space-2);">Email Subject</label>
-          <input type="text" id="notify-subject" value="New Opportunity: ${escHtml(campaign.title)} — ${escHtml(campaign.destination_country || '')}"
+          <input type="text" id="notify-subject" value="New Opportunity: ${GHE.escapeHtml(campaign.title)} — ${GHE.escapeHtml(campaign.destination_country || '')}"
             style="width:100%;padding:var(--space-3);background:var(--bg-deep);border:1px solid var(--border-subtle);border-radius:var(--radius-md);color:var(--text-primary);font-size:var(--text-sm);">
         </div>
 
