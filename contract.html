@@ -1014,54 +1014,110 @@
       var contentW = pageW - margin * 2;
       var y = 20;
       var lineH = 5.5;
+      var navy = [26, 54, 93];     // #1a365d
+      var cyan = [0, 119, 182];    // #0077B6
+      var darkGray = [51, 65, 85]; // #334155
+      var midGray = [100, 116, 139]; // #64748b
 
       function checkPage(needed) {
-        if (y + needed > 280) {
+        if (y + needed > 275) {
+          addFooter();
           doc.addPage();
           y = 20;
         }
+      }
+
+      function addFooter() {
+        doc.setDrawColor(0, 119, 182);
+        doc.setLineWidth(0.5);
+        doc.line(margin, 285, pageW - margin, 285);
+        doc.setFontSize(7);
+        doc.setTextColor(100, 116, 139);
+        doc.setFont('helvetica', 'normal');
+        doc.text('eLab Solutions International LLC | 4, Ado Road, Taiwo Shopping Complex, Ajah, Lagos | www.elabsolution.org', pageW / 2, 289, { align: 'center' });
+        doc.setTextColor(0, 0, 0);
       }
 
       function addTitle(text) {
         checkPage(12);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(16);
+        doc.setTextColor(navy[0], navy[1], navy[2]);
         doc.text(text, pageW / 2, y, { align: 'center' });
+        doc.setTextColor(0, 0, 0);
         y += 12;
       }
 
       function addHeading(text) {
-        checkPage(10);
+        checkPage(14);
+        y += 3;
+        doc.setDrawColor(0, 119, 182);
+        doc.setLineWidth(0.3);
+        doc.line(margin, y - 2, pageW - margin, y - 2);
+        y += 4;
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(11);
+        doc.setTextColor(navy[0], navy[1], navy[2]);
         doc.text(text, margin, y);
+        doc.setTextColor(0, 0, 0);
         y += 7;
       }
 
       function addParagraph(text) {
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(10);
+        doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
         var lines = doc.splitTextToSize(text, contentW);
         checkPage(lines.length * lineH + 4);
         doc.text(lines, margin, y);
+        doc.setTextColor(0, 0, 0);
         y += lines.length * lineH + 3;
       }
 
       function addBullet(text) {
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(10);
+        doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
         var bulletIndent = margin + 5;
         var bulletW = contentW - 5;
         var lines = doc.splitTextToSize(text, bulletW);
         checkPage(lines.length * lineH + 2);
+        doc.setTextColor(cyan[0], cyan[1], cyan[2]);
         doc.text('\u2022', margin + 1, y);
+        doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
         doc.text(lines, bulletIndent, y);
+        doc.setTextColor(0, 0, 0);
         y += lines.length * lineH + 1;
       }
 
       var today = formatDate();
 
-      // Header
+      // ── Logo + Letterhead ──
+      try {
+        var logoImg = document.getElementById('pdf-logo');
+        if (logoImg && logoImg.complete) {
+          doc.addImage(logoImg, 'JPEG', margin, y, 50, 15);
+        }
+      } catch(e) {}
+      y += 18;
+
+      // Company info
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(midGray[0], midGray[1], midGray[2]);
+      doc.text('4, Ado Road, Taiwo Shopping Complex, Ajah, Lagos', pageW - margin, 24, { align: 'right' });
+      doc.text('www.elabsolution.org | support@elabsolution.org', pageW - margin, 28, { align: 'right' });
+      doc.text('+1 (929) 419-2327', pageW - margin, 32, { align: 'right' });
+      doc.setTextColor(0, 0, 0);
+
+      // Cyan accent line under header
+      y = 40;
+      doc.setDrawColor(0, 119, 182);
+      doc.setLineWidth(1);
+      doc.line(margin, y, pageW - margin, y);
+      y += 10;
+
+      // Title
       addTitle('ELAB COMPLETE SERVICE AGREEMENT');
 
       // Parties
@@ -1165,56 +1221,98 @@
       addParagraph('This document constitutes the entire agreement between the parties. Any amendments must be made in writing and signed by both parties.');
 
       // ── Signature page ───────────────────────────────
+      addFooter();
       doc.addPage();
-      y = 25;
+      y = 20;
+
+      // Logo on signature page too
+      try {
+        var logoImg2 = document.getElementById('pdf-logo');
+        if (logoImg2 && logoImg2.complete) {
+          doc.addImage(logoImg2, 'JPEG', margin, y, 40, 12);
+        }
+      } catch(e) {}
+      y += 16;
+
+      doc.setDrawColor(0, 119, 182);
+      doc.setLineWidth(0.5);
+      doc.line(margin, y, pageW - margin, y);
+      y += 10;
 
       // Candidate acknowledgment
-      addHeading('CANDIDATE ACKNOWLEDGMENT');
-      y += 2;
-      addParagraph('I, ' + data.candidate_name + ', have read and understood all terms of this Service Agreement. I agree to be bound by these terms.');
-      y += 4;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(13);
+      doc.setTextColor(navy[0], navy[1], navy[2]);
+      doc.text('CANDIDATE ACKNOWLEDGMENT', margin, y);
+      doc.setTextColor(0, 0, 0);
+      y += 10;
 
-      // Candidate signature image
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.text('Signature:', margin, y);
-      y += 3;
-      try {
-        doc.addImage(signatureDataURL, 'PNG', margin, y, 60, 18);
-      } catch(e) {}
-      y += 22;
+      doc.setFontSize(10);
+      doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
+      var ackLines = doc.splitTextToSize('I, ' + data.candidate_name + ', have read and understood all terms of this Service Agreement. I agree to be bound by these terms.', contentW);
+      doc.text(ackLines, margin, y);
+      y += ackLines.length * lineH + 8;
 
+      // Candidate signature box
+      doc.setDrawColor(200, 210, 220);
+      doc.setFillColor(248, 250, 252);
+      doc.roundedRect(margin, y, 80, 28, 2, 2, 'FD');
+      doc.setFontSize(8);
+      doc.setTextColor(midGray[0], midGray[1], midGray[2]);
+      doc.text('Candidate Signature:', margin + 3, y + 5);
+      doc.setTextColor(0, 0, 0);
+      try {
+        doc.addImage(signatureDataURL, 'PNG', margin + 3, y + 7, 55, 17);
+      } catch(e) {}
+      y += 32;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
       doc.text('Full Name: ' + data.candidate_name, margin, y);
       y += 6;
       doc.text('Date: ' + today, margin, y);
       y += 20;
 
       // Divider
-      doc.setDrawColor(180);
+      doc.setDrawColor(0, 119, 182);
+      doc.setLineWidth(0.5);
       doc.line(margin, y, pageW - margin, y);
-      y += 10;
+      y += 12;
 
       // eLab signature
-      addHeading('ON BEHALF OF ELAB SOLUTIONS INTERNATIONAL LLC');
-      y += 4;
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.text('Signature:', margin, y);
-      y += 3;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(13);
+      doc.setTextColor(navy[0], navy[1], navy[2]);
+      doc.text('ON BEHALF OF ELAB SOLUTIONS INTERNATIONAL LLC', margin, y);
+      doc.setTextColor(0, 0, 0);
+      y += 10;
 
-      // Render eLab signature text in italic as substitute for cursive
+      // eLab signature box
+      doc.setDrawColor(200, 210, 220);
+      doc.setFillColor(248, 250, 252);
+      doc.roundedRect(margin, y, 80, 28, 2, 2, 'FD');
+      doc.setFontSize(8);
+      doc.setTextColor(midGray[0], midGray[1], midGray[2]);
+      doc.text('Authorized Signature:', margin + 3, y + 5);
       doc.setFont('helvetica', 'bolditalic');
-      doc.setFontSize(20);
-      doc.text('Samuel Olatunji', margin, y + 10);
-      y += 22;
+      doc.setFontSize(18);
+      doc.setTextColor(navy[0], navy[1], navy[2]);
+      doc.text('Samuel Olatunji', margin + 5, y + 20);
+      doc.setTextColor(0, 0, 0);
+      y += 32;
 
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
+      doc.setFontSize(10);
+      doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
       doc.text('Name: Samuel Olatunji', margin, y);
       y += 6;
       doc.text('Title: Director', margin, y);
       y += 6;
       doc.text('Date: ' + today, margin, y);
+
+      addFooter();
 
       return doc;
     }
@@ -1349,5 +1447,7 @@
       setTimeout(init, 200);
     }
   </script>
+  <!-- Hidden logo for PDF generation -->
+  <img id="pdf-logo" src="assets/elab-logo.jpg" alt="" style="display:none;" crossorigin="anonymous">
 </body>
 </html>
