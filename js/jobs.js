@@ -117,6 +117,24 @@
       detail_link: 'https://elabsolution.org/saudi-ent',
       accent_color: '#006C35',
     },
+    {
+      id: 'featured-elab-complete',
+      title: 'eLab Complete — Guaranteed Nursing Placement',
+      employer_name: 'eLab Solutions International',
+      destination_country: 'Qatar & Saudi Arabia',
+      specialty: 'General Nursing',
+      category: 'Nursing',
+      positions: 0,
+      salary_display: 'Guaranteed Placement',
+      min_experience: 0,
+      visa_sponsored: true,
+      benefits: ['DataFlow', 'Exam Prep', 'Prometric', 'Job Placement', 'Visa Support', 'Money-Back Guarantee'],
+      description: 'End-to-end guaranteed nursing placement program. We handle everything from verification to deployment. If we don\'t place you within 9 months, you get your money back.',
+      requirements: 'RN/RM/BNSc + Age 21-45 + Medical Screening',
+      wa_link: 'https://wa.me/19294192327?text=Hi%20eLab%2C%20I%E2%80%99m%20interested%20in%20the%20eLab%20Complete%20guaranteed%20placement%20program.%20My%20name%20is%20____%20and%20I%20am%20a%20registered%20nurse.',
+      detail_link: 'elab-complete.html',
+      accent_color: '#059669',
+    },
   ];
 
   /* ---------- DOM refs ---------- */
