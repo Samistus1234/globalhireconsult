@@ -315,14 +315,22 @@
     const docMap = {};
     if (docs) docs.forEach(d => { docMap[d.doc_type] = d; });
 
+    const icons = {
+      shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
+      award: '<circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>',
+      globe: '<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+      'file-text': '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+      folder: '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>'
+    };
+
+    // Collect known types
+    const knownTypes = docTypes.map(dt => dt.type);
+
+    // Find "other" documents (types not in our predefined list)
+    const otherDocs = (docs || []).filter(d => !knownTypes.includes(d.doc_type));
+
     grid.innerHTML = docTypes.map(dt => {
       const doc = docMap[dt.type];
-      const icons = {
-        shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
-        award: '<circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>',
-        globe: '<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
-        'file-text': '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>'
-      };
 
       if (doc) {
         const statusClass = {
@@ -365,6 +373,65 @@
         </div>
       `;
     }).join('');
+
+    // ── Others section ──
+    let othersHtml = '<div style="grid-column:1/-1;border-top:1px solid var(--border-subtle);padding-top:var(--space-5);margin-top:var(--space-3);">';
+    othersHtml += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);">';
+    othersHtml += '<div style="font-size:var(--text-base);font-weight:700;color:var(--text-primary);">Other Documents</div>';
+    othersHtml += '<button class="btn btn-primary btn-sm" id="btn-add-other-doc"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Add Document</button>';
+    othersHtml += '</div>';
+
+    if (otherDocs.length > 0) {
+      othersHtml += '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));gap:var(--space-3);">';
+      otherDocs.forEach(d => {
+        const statusClass = {
+          pending: 'badge-warning', verified: 'badge-primary',
+          rejected: 'badge-error', in_review: 'badge-info'
+        }[d.status] || 'badge-neutral';
+        const typeLabel = d.doc_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        othersHtml += `
+          <div class="doc-card uploaded" data-type="${d.doc_type}">
+            <div class="doc-card-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icons.folder}</svg>
+              <h4>${typeLabel}</h4>
+            </div>
+            <div class="doc-file-info">
+              <span class="doc-filename">${d.file_name}</span>
+              <span class="doc-filesize">${formatBytes(d.file_size_bytes)}</span>
+            </div>
+            <span class="badge ${statusClass} badge-dot">${d.status.replace('_', ' ')}</span>
+            ${d.reviewer_notes ? `<p class="doc-notes">${d.reviewer_notes}</p>` : ''}
+            <div class="doc-actions">
+              <button class="btn btn-ghost btn-sm btn-remove" data-type="${d.doc_type}" data-doc-id="${d.id}" data-path="${d.file_path}" style="color:var(--error)">Remove</button>
+            </div>
+          </div>
+        `;
+      });
+      othersHtml += '</div>';
+    } else {
+      othersHtml += '<p style="color:var(--text-tertiary);font-size:var(--text-sm);">No additional documents uploaded yet.</p>';
+    }
+
+    othersHtml += '</div>';
+    grid.innerHTML += othersHtml;
+
+    // Bind "Add Document" button
+    const addBtn = document.getElementById('btn-add-other-doc');
+    if (addBtn) {
+      addBtn.addEventListener('click', () => {
+        const docName = prompt('Enter a name for this document (e.g., "Medical Certificate", "Reference Letter"):');
+        if (!docName || !docName.trim()) return;
+        const docType = docName.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+        if (!docType) return;
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.pdf,.jpg,.jpeg,.png,.webp';
+        input.addEventListener('change', () => {
+          if (input.files[0]) uploadFile(docType, input.files[0]);
+        });
+        input.click();
+      });
+    }
 
     // Bind upload events
     bindUploadHandlers();
