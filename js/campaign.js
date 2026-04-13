@@ -732,63 +732,37 @@ GlobalHire Recruitment Team</textarea>
       statusEl.style.display = 'block';
       statusEl.style.background = 'rgba(0,119,182,0.1)';
       statusEl.style.color = 'var(--primary)';
-      statusEl.textContent = 'Fetching recipients...';
 
       try {
-        var emails = [];
-
         if (target === 'matched') {
-          // Get matched candidates for this campaign
-          var { data: matches } = await ghFrom('campaign_matches')
-            .select('applicant_id')
-            .eq('campaign_id', campaignId);
-          if (matches && matches.length > 0) {
-            var ids = matches.map(function(m) { return m.applicant_id; });
-            // Get emails from auth.users via profiles
-            for (var i = 0; i < ids.length; i++) {
-              var { data: user } = await sb.auth.admin.getUserById(ids[i]).catch(function() { return { data: null }; });
-              if (user && user.user && user.user.email) {
-                emails.push({ email: user.user.email, name: '' });
-              }
-            }
-            // Fallback: get from profiles if admin API not available
-            if (emails.length === 0) {
-              var { data: profiles } = await ghFrom('profiles')
-                .select('id, full_name')
-                .in('id', ids);
-              // We don't have email in profiles, so use the Supabase function instead
-            }
-          }
-        } else if (target === 'all' || target === 'specialty') {
-          // Get all applicant profiles
-          var query = ghFrom('profiles').select('id, full_name').eq('role', 'applicant');
-          var { data: profiles } = await query;
-          if (profiles) {
-            // We need emails — call a Supabase function or query auth.users
-            // For now, we'll use the notify-make edge function approach
-          }
+          // Use existing gh-send-outreach edge function for matched candidates
+          statusEl.textContent = 'Sending to matched candidates via outreach system...';
+          var { data: result, error } = await sb.functions.invoke('gh-send-outreach', {
+            body: { campaign_id: campaignId },
+          });
+          if (error) throw error;
+          statusEl.style.background = 'rgba(46,196,182,0.1)';
+          statusEl.style.color = 'var(--success)';
+          statusEl.textContent = 'Outreach sent! ' + (result ? 'Sent: ' + (result.sent || 0) + ', Skipped: ' + (result.skipped || 0) : '');
+
+        } else {
+          // For "all" or "specialty" — use bulk-campaign-notify edge function
+          statusEl.textContent = 'Sending bulk notification...';
+          var { data: result, error } = await sb.functions.invoke('bulk-campaign-notify', {
+            body: {
+              campaign_id: campaignId,
+              target: target,
+              subject: subject,
+              message: message,
+            },
+          });
+          if (error) throw error;
+          statusEl.style.background = 'rgba(46,196,182,0.1)';
+          statusEl.style.color = 'var(--success)';
+          statusEl.textContent = 'Emails sent! ' + (result && result.sent ? result.sent + ' recipients notified.' : 'Notification dispatched.');
         }
 
-        // Use Supabase edge function to send bulk emails
-        statusEl.textContent = 'Sending emails...';
-
-        var { data: result, error } = await sb.functions.invoke('notify-make', {
-          body: {
-            type: 'bulk_campaign_notify',
-            campaign_id: campaignId,
-            target: target,
-            subject: subject,
-            message: message,
-          },
-        });
-
-        if (error) throw error;
-
-        statusEl.style.background = 'rgba(46,196,182,0.1)';
-        statusEl.style.color = 'var(--success)';
-        statusEl.textContent = 'Emails sent successfully! ' + (result && result.count ? result.count + ' recipients notified.' : '');
         btn.textContent = 'Sent!';
-
         setTimeout(function() {
           var modal = document.getElementById('notify-modal');
           if (modal) modal.remove();
@@ -798,7 +772,7 @@ GlobalHire Recruitment Team</textarea>
         console.error('Notify error:', err);
         statusEl.style.background = 'rgba(239,68,68,0.1)';
         statusEl.style.color = 'var(--error)';
-        statusEl.textContent = 'Failed to send: ' + (err.message || 'Unknown error') + '. Try sending via WhatsApp instead.';
+        statusEl.textContent = 'Failed: ' + (err.message || 'Unknown error') + '. Try the outreach system or WhatsApp instead.';
         btn.disabled = false;
         btn.textContent = 'Retry';
       }
