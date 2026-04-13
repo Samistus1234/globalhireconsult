@@ -6,6 +6,7 @@
 
   var allCampaigns = [];   // raw data from Supabase
   var filtered     = [];   // after search / filter / sort
+  var savedJobIds  = new Set(); // job IDs the current user has saved
 
   /* ---------- Featured / Pinned listings ---------- */
   var WA_QATAR = 'https://wa.me/19294192327?text=Hi%20eLab%2C%20I%E2%80%99m%20interested%20in%20the%20Qatar%20Caregiver%20position.%20My%20name%20is%20____%20and%20I%20have%20____%20years%20of%20experience.';
@@ -231,6 +232,72 @@
       '</div>';
   }
 
+  /* ---------- Bookmark SVG helpers ---------- */
+  var SVG_BOOKMARK_OUTLINE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>';
+  var SVG_BOOKMARK_FILLED  = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>';
+
+  /* ---------- Save / Unsave job ---------- */
+  async function handleSave(jobId, title, employer, destination, salary) {
+    var sb = window.ghSupabase;
+    if (!sb) return;
+
+    var res = await sb.auth.getSession();
+    var session = res.data && res.data.session;
+
+    if (!session) {
+      window.location.href = 'login.html?redirect=jobs.html';
+      return;
+    }
+
+    var userId = session.user.id;
+
+    if (savedJobIds.has(jobId)) {
+      // Unsave
+      await sb.from('gh_saved_jobs').delete()
+        .eq('user_id', userId)
+        .eq('job_id', jobId);
+      savedJobIds.delete(jobId);
+    } else {
+      // Save
+      await sb.from('gh_saved_jobs').upsert({
+        job_id: jobId,
+        user_id: userId,
+        job_title: title,
+        job_employer: employer,
+        job_destination: destination,
+        job_salary: salary
+      }, { onConflict: 'user_id,job_id' });
+      savedJobIds.add(jobId);
+    }
+
+    // Update all bookmark buttons for this job
+    document.querySelectorAll('.btn-save-job[data-job-id="' + jobId + '"]').forEach(function (btn) {
+      var isSaved = savedJobIds.has(jobId);
+      btn.innerHTML = isSaved ? SVG_BOOKMARK_FILLED : SVG_BOOKMARK_OUTLINE;
+      btn.title = isSaved ? 'Remove from saved' : 'Save this job';
+      btn.style.color = isSaved ? 'var(--primary)' : 'var(--text-tertiary)';
+    });
+  }
+
+  /* ---------- Load saved job IDs for current user ---------- */
+  async function loadSavedJobIds() {
+    var sb = window.ghSupabase;
+    if (!sb) return;
+    try {
+      var res = await sb.auth.getSession();
+      var session = res.data && res.data.session;
+      if (!session) return;
+      var { data } = await sb.from('gh_saved_jobs')
+        .select('job_id')
+        .eq('user_id', session.user.id);
+      if (data) {
+        data.forEach(function (row) { savedJobIds.add(row.job_id); });
+      }
+    } catch (e) {
+      console.warn('Could not load saved jobs:', e);
+    }
+  }
+
   /* ---------- Build card HTML ---------- */
   function cardHtml(c) {
     var badge = isNew(c.created_at)
@@ -284,6 +351,9 @@
           '<span class="job-posted">Posted ' + relativeTime(c.created_at) + '</span>' +
           '<div class="job-card-actions">' +
             '<button class="btn btn-primary btn-sm" onclick="JobsPage.apply(\'' + c.id + '\',\'' + escHtml(c.title).replace(/'/g, "\\'") + '\')">Apply Now</button>' +
+            '<button class="btn-save-job" data-job-id="' + c.id + '" title="' + (savedJobIds.has(c.id) ? 'Remove from saved' : 'Save this job') + '" style="background:none;border:none;cursor:pointer;padding:6px;display:flex;align-items:center;color:' + (savedJobIds.has(c.id) ? 'var(--primary)' : 'var(--text-tertiary)') + ';border-radius:var(--radius-sm);transition:color 0.15s;" onmouseover="this.style.color=\'var(--primary)\'" onmouseout="if(!window.JobsPage._isSaved(\'' + c.id + '\'))this.style.color=\'var(--text-tertiary)\'" onclick="JobsPage.saveJob(\'' + c.id + '\',\'' + escHtml(c.title).replace(/'/g, "\\'") + '\',\'' + escHtml(c.employer_name).replace(/'/g, "\\'") + '\',\'' + escHtml(c.destination_country).replace(/'/g, "\\'") + '\',\'' + escHtml(c.salary_display || 'Competitive').replace(/'/g, "\\'") + '\')">' +
+              (savedJobIds.has(c.id) ? SVG_BOOKMARK_FILLED : SVG_BOOKMARK_OUTLINE) +
+            '</button>' +
           '</div>' +
         '</div>' +
       '</div>'
@@ -344,6 +414,10 @@
           '<span class="job-posted" style="color:var(--text-tertiary);">' + escHtml(f.requirements) + '</span>' +
           '<div class="job-card-actions" style="display:flex;flex-direction:column;gap:8px;">' +
             (f.detail_link ? '<a href="' + f.detail_link + '" class="btn btn-primary btn-sm" style="text-decoration:none;text-align:center;">Apply Now</a>' : '') +
+            '<button class="btn-save-job" data-job-id="' + f.id + '" title="' + (savedJobIds.has(f.id) ? 'Remove from saved' : 'Save this job') + '" style="background:none;border:none;cursor:pointer;padding:6px;display:flex;align-items:center;gap:6px;color:' + (savedJobIds.has(f.id) ? 'var(--primary)' : 'var(--text-tertiary)') + ';font-size:var(--text-xs);border-radius:var(--radius-sm);transition:color 0.15s;" onmouseover="this.style.color=\'var(--primary)\'" onmouseout="if(!window.JobsPage._isSaved(\'' + f.id + '\'))this.style.color=\'var(--text-tertiary)\'" onclick="JobsPage.saveJob(\'' + f.id + '\',\'' + escHtml(f.title).replace(/'/g, "\\'") + '\',\'' + escHtml(f.employer_name).replace(/'/g, "\\'") + '\',\'' + escHtml(f.destination_country).replace(/'/g, "\\'") + '\',\'' + escHtml(f.salary_display).replace(/'/g, "\\'") + '\')">' +
+              (savedJobIds.has(f.id) ? SVG_BOOKMARK_FILLED : SVG_BOOKMARK_OUTLINE) +
+              (savedJobIds.has(f.id) ? 'Saved' : 'Save Job') +
+            '</button>' +
             '<a href="' + f.wa_link + '" target="_blank" rel="noopener noreferrer" class="btn-featured">' +
               '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>' +
               'Apply on WhatsApp' +
@@ -574,7 +648,9 @@
     showSkeleton();
     bindEvents();
 
-    ghFrom('campaigns')
+    // Load saved job IDs first (if logged in), then fetch campaigns
+    loadSavedJobIds().then(function () {
+      ghFrom('campaigns')
       .select('*')
       .not('status', 'in', '("draft","closed")')
       .order('created_at', { ascending: false })
@@ -588,6 +664,7 @@
         filtered = allCampaigns.slice();
         render();
       });
+    });
   }
 
   /* ---------- Job Alerts Signup ---------- */
@@ -646,7 +723,12 @@
   }
 
   /* ---------- Public API ---------- */
-  window.JobsPage = { apply: handleApply };
+  window.JobsPage = {
+    apply: handleApply,
+    saveJob: handleSave,
+    unsaveJob: function (jobId) { return handleSave(jobId, '', '', '', ''); },
+    _isSaved: function (jobId) { return savedJobIds.has(jobId); }
+  };
 
   document.addEventListener('DOMContentLoaded', function () {
     init();

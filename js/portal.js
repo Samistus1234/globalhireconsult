@@ -39,6 +39,9 @@
     try {
       await loadMessages();
     } catch (err) { console.error('Messages load error:', err); }
+    try {
+      await loadSavedJobs();
+    } catch (err) { console.error('Saved jobs load error:', err); }
     // Check for ?apply= param after everything is loaded
     try {
       await checkApplyParam();
@@ -992,6 +995,83 @@
     const sizes = ['B', 'KB', 'MB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  }
+
+  // ── Saved Jobs tab ──
+  async function loadSavedJobs() {
+    var listEl = document.getElementById('saved-jobs-list');
+    var countEl = document.getElementById('saved-count');
+    if (!listEl) return;
+
+    var { data: savedJobs, error } = await ghFrom('saved_jobs')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .order('saved_at', { ascending: false });
+
+    savedJobs = savedJobs || [];
+
+    // Update count badge
+    if (countEl) {
+      countEl.textContent = savedJobs.length + ' saved';
+    }
+
+    if (error || savedJobs.length === 0) {
+      listEl.innerHTML =
+        '<div style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">' +
+          '<p>No saved jobs yet.</p>' +
+          '<a href="jobs.html" class="btn btn-primary btn-sm" style="margin-top:var(--space-3);">Browse Opportunities</a>' +
+        '</div>';
+      return;
+    }
+
+    listEl.innerHTML = savedJobs.map(function (job) {
+      return (
+        '<div class="application-item" style="margin-bottom:var(--space-4);" data-saved-id="' + escHtml(job.job_id) + '">' +
+          '<div class="application-header">' +
+            '<div style="width:44px;height:44px;border-radius:50%;background:var(--primary-muted);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex-shrink:0;">' +
+              escHtml((job.job_title || '?').charAt(0).toUpperCase()) +
+            '</div>' +
+            '<div class="application-info" style="flex:1">' +
+              '<h4>' + escHtml(job.job_title || 'Untitled Role') + '</h4>' +
+              '<span>' + escHtml(job.job_employer || '') + (job.job_destination ? ' &middot; ' + escHtml(job.job_destination) : '') + '</span>' +
+            '</div>' +
+            (job.job_salary ? '<div class="application-salary">' + escHtml(job.job_salary) + '</div>' : '') +
+          '</div>' +
+          '<div style="display:flex;align-items:center;justify-content:flex-end;gap:var(--space-2);margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--border-subtle);">' +
+            '<a href="jobs.html" class="btn btn-primary btn-sm" style="text-decoration:none;">View &amp; Apply</a>' +
+            '<button class="btn btn-ghost btn-sm btn-remove-saved" data-job-id="' + escHtml(job.job_id) + '" style="color:var(--text-tertiary);">Remove</button>' +
+          '</div>' +
+        '</div>'
+      );
+    }).join('');
+
+    // Bind Remove buttons
+    listEl.querySelectorAll('.btn-remove-saved').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        var jobId = btn.dataset.jobId;
+        btn.disabled = true;
+        btn.textContent = 'Removing...';
+
+        var { error: delError } = await ghFrom('saved_jobs')
+          .delete()
+          .eq('user_id', currentUser.id)
+          .eq('job_id', jobId);
+
+        if (delError) {
+          alert('Could not remove: ' + delError.message);
+          btn.disabled = false;
+          btn.textContent = 'Remove';
+          return;
+        }
+
+        // Remove card from DOM immediately, then reload count
+        var card = listEl.querySelector('[data-saved-id="' + jobId + '"]');
+        if (card) card.remove();
+
+        // Reload to refresh count
+        await loadSavedJobs();
+      });
+    });
   }
 
   // ── Messages tab ──
