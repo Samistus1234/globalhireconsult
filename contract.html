@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Service Agreement — eLab Complete | GlobalHire by eLab Solutions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #0a0f1a;
+      color: #94a3b8;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    button { font-family: inherit; }
+
+    :root {
+      --bg: #0a0f1a;
+      --card-bg: rgba(255,255,255,0.04);
+      --card-border: rgba(255,255,255,0.08);
+      --emerald: #059669;
+      --emerald-light: #34d399;
+      --gold: #d4a84b;
+      --gold-light: #f0d78c;
+      --white: #FFFFFF;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --radius: 12px;
+    }
+
+    /* ── Header ─────────────────────────────────── */
+    .gh-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(10,15,26,0.95);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .gh-header .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .gh-header .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--white);
+    }
+    .gh-header .logo-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .gh-header .logo-text span {
+      color: var(--gold);
+    }
+
+    /* ── Container ──────────────────────────────── */
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* ── State screens ──────────────────────────── */
+    .state-screen {
+      display: none;
+      text-align: center;
+      padding: 80px 24px;
+    }
+    .state-screen.active {
+      display: block;
+    }
+    .state-screen .icon-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin: 0 auto 24px;
+    }
+    .state-screen h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+    .state-screen p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .icon-circle.error { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .icon-circle.success { background: rgba(5,150,105,0.15); color: var(--emerald-light); }
+    .icon-circle.info { background: rgba(212,168,75,0.15); color: var(--gold); }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--card-border);
+      border-top-color: var(--emerald);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 24px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Agreement Document ──────────────────────── */
+    .agreement-wrapper { display: none; }
+    .agreement-wrapper.active { display: block; }
+
+    .agreement-doc {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 48px 40px;
+      margin-bottom: 32px;
+    }
+    @media (max-width: 600px) {
+      .agreement-doc { padding: 28px 18px; }
+    }
+
+    .agreement-doc .doc-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      text-align: center;
+      margin-bottom: 32px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .agreement-doc .parties {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .agreement-doc .parties p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+    }
+    .agreement-doc .parties strong {
+      color: var(--text-primary);
+    }
+
+    .agreement-doc .section-heading {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-top: 28px;
+      margin-bottom: 10px;
+    }
+    .agreement-doc .section-body {
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      margin-bottom: 8px;
+    }
+    .agreement-doc .section-body ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 8px 0;
+    }
+    .agreement-doc .section-body ul li {
+      position: relative;
+      padding-left: 20px;
+      margin-bottom: 4px;
+    }
+    .agreement-doc .section-body ul li::before {
+      content: "\2022";
+      position: absolute;
+      left: 4px;
+      color: var(--gold);
+    }
+
+    .doc-divider {
+      border: none;
+      border-top: 1px solid var(--card-border);
+      margin: 24px 0;
+    }
+
+    /* ── Signature Blocks ───────────────────────── */
+    .sig-section {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 600px) {
+      .sig-section { padding: 20px 16px; }
+    }
+    .sig-section h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 16px;
+    }
+    .sig-section p {
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+      margin-bottom: 16px;
+      line-height: 1.65;
+    }
+    .sig-row {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .sig-field {
+      flex: 1;
+      min-width: 180px;
+    }
+    .sig-field label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+    .sig-field .value {
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+    }
+    .elab-sig-preview {
+      font-family: 'Dancing Script', cursive;
+      font-size: 28px;
+      color: var(--text-primary);
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+
+    /* ── Signature Tabs ─────────────────────────── */
+    .sig-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 16px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+    }
+    .sig-tab {
+      flex: 1;
+      padding: 10px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      background: rgba(255,255,255,0.03);
+      color: var(--text-muted);
+      border: none;
+      transition: background 0.2s, color 0.2s;
+    }
+    .sig-tab.active {
+      background: var(--emerald);
+      color: var(--white);
+    }
+
+    .sig-panel { display: none; }
+    .sig-panel.active { display: block; }
+
+    .sig-canvas-wrap {
+      position: relative;
+      border: 2px dashed rgba(255,255,255,0.15);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .sig-canvas-wrap canvas {
+      display: block;
+      width: 100%;
+      height: 150px;
+      cursor: crosshair;
+      touch-action: none;
+    }
+    .sig-canvas-clear {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 4px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .sig-type-input {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .sig-type-input:focus {
+      border-color: var(--emerald);
+    }
+    .sig-type-preview {
+      font-family: 'Dancing Script', cursive;
+      font-size: 32px;
+      color: var(--text-primary);
+      padding: 16px;
+      min-height: 60px;
+      margin-top: 10px;
+      background: #fff;
+      border-radius: 8px;
+      text-align: center;
+      color: #1a1a2e;
+    }
+
+    /* ── Checkbox & Button ──────────────────────── */
+    .agree-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .agree-row input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      accent-color: var(--emerald);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .agree-row label {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .btn-sign {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 40px;
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+      color: var(--white);
+      width: 100%;
+      justify-content: center;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
+    }
+    .btn-sign:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(5,150,105,0.35);
+    }
+    .btn-sign:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 32px;
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      border: none;
+      background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+      color: var(--white);
+      margin-top: 20px;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(5,150,105,0.35);
+    }
+
+    /* ── Progress overlay ───────────────────────── */
+    .signing-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10,15,26,0.92);
+      z-index: 200;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .signing-overlay.active {
+      display: flex;
+    }
+    .signing-overlay h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .signing-overlay p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    /* ── Utility ─────────────────────────────────── */
+    .hidden-canvas { position: absolute; left: -9999px; top: -9999px; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="gh-header">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">G</div>
+      <div class="logo-text">Global<span>Hire</span></div>
+    </a>
+  </header>
+
+  <!-- Loading State -->
+  <div id="state-loading" class="state-screen active">
+    <div class="spinner"></div>
+    <h2>Loading Agreement...</h2>
+    <p>Please wait while we retrieve your service agreement.</p>
+  </div>
+
+  <!-- Error State -->
+  <div id="state-error" class="state-screen">
+    <div class="icon-circle error">!</div>
+    <h2 id="error-title">Contract Not Found</h2>
+    <p id="error-message">The contract link is invalid or has expired. Please contact your eLab representative.</p>
+  </div>
+
+  <!-- Already Signed State -->
+  <div id="state-signed" class="state-screen">
+    <div class="icon-circle info">&#10003;</div>
+    <h2>Agreement Already Signed</h2>
+    <p>This service agreement was signed on <strong id="signed-date"></strong>.</p>
+    <button class="btn-download" id="btn-download-signed" onclick="downloadSignedPDF()">Download Signed PDF &darr;</button>
+  </div>
+
+  <!-- Success State -->
+  <div id="state-success" class="state-screen">
+    <div class="icon-circle success">&#10003;</div>
+    <h2>Agreement Signed Successfully!</h2>
+    <p>Your eLab Complete Service Agreement has been signed and recorded. You will receive a confirmation email shortly.</p>
+    <button class="btn-download" id="btn-download-success" onclick="downloadSuccessPDF()">Download Signed PDF &darr;</button>
+  </div>
+
+  <!-- Signing Overlay -->
+  <div id="signing-overlay" class="signing-overlay">
+    <div class="spinner"></div>
+    <h2>Generating &amp; Signing...</h2>
+    <p>Please do not close this page.</p>
+  </div>
+
+  <!-- Main Agreement -->
+  <div id="agreement-wrapper" class="agreement-wrapper">
+    <div class="container">
+
+      <!-- Agreement Document -->
+      <div class="agreement-doc" id="agreement-doc">
+        <div class="doc-title">eLab Complete Service Agreement</div>
+
+        <div class="parties">
+          <p><strong>Between:</strong></p>
+          <p>- eLab Solutions International LLC ("eLab", "we", "us")</p>
+          <p>- <strong id="party-candidate"></strong> ("Candidate", "you")</p>
+          <br>
+          <p><strong>Date:</strong> <span id="agreement-date"></span></p>
+          <p><strong>Program:</strong> eLab Complete &mdash; <span id="agreement-destination"></span></p>
+        </div>
+
+        <hr class="doc-divider">
+
+        <div class="section-heading">1. PROGRAM DESCRIPTION</div>
+        <div class="section-body">
+          <p>eLab Complete is a guaranteed end-to-end nursing placement program. eLab will manage all processes required to place the Candidate in a nursing role in <span class="dest-placeholder"></span>, including but not limited to:</p>
+          <ul>
+            <li>DataFlow verification (education, license, work experience, background check)</li>
+            <li>NMCN fee processing and institutional verification</li>
+            <li>Prometric exam booking and exam fees</li>
+            <li>eLab Academy enrollment for exam preparation (study materials, tutoring, coordination)</li>
+            <li>Professional licensing registration (Mumaris/SCFHS for Saudi Arabia; QCHP evaluation for Qatar)</li>
+            <li>CV preparation and interview coaching</li>
+            <li>Job matching with employers and interview coordination</li>
+            <li>Visa processing support</li>
+            <li>Exam travel support</li>
+          </ul>
+        </div>
+
+        <div class="section-heading">2. TIMELINE</div>
+        <div class="section-body">
+          <p>eLab commits to completing the entire process &mdash; from enrollment to job placement &mdash; within 4 to 9 months from the date of enrollment. All stages will run concurrently where possible to minimize total timeline.</p>
+        </div>
+
+        <div class="section-heading">3. PAYMENT TERMS</div>
+        <div class="section-body">
+          <ul>
+            <li>The Candidate shall make full payment of the agreed program fee prior to commencement of any services.</li>
+            <li>Payment is due upon signing this agreement.</li>
+            <li>Payment activates the Placement Guarantee (Section 4).</li>
+            <li>The program fee covers all services listed in Section 1, including third-party fees paid on the Candidate's behalf.</li>
+          </ul>
+        </div>
+
+        <div class="section-heading">4. PLACEMENT GUARANTEE</div>
+        <div class="section-body">
+          <p>eLab guarantees that the Candidate will be placed in a nursing role in <span class="dest-placeholder"></span> within 9 months of enrollment.</p>
+          <p>If eLab fails to place the Candidate within 9 months of enrollment, the Candidate shall receive a full refund of the program fee minus Tangible Costs (Section 5) already spent on the Candidate's behalf.</p>
+        </div>
+
+        <div class="section-heading">5. TANGIBLE COSTS (NON-REFUNDABLE)</div>
+        <div class="section-body">
+          <p>The following third-party costs, once incurred on the Candidate's behalf, are non-refundable under any circumstance:</p>
+          <ul>
+            <li>DataFlow verification fees</li>
+            <li>NMCN fees</li>
+            <li>Institutional verification fees</li>
+            <li>Prometric exam fees</li>
+            <li>Mumaris/SCFHS or QCHP registration fees</li>
+            <li>Exam travel costs (flights, accommodation) if already booked or completed</li>
+          </ul>
+        </div>
+
+        <div class="section-heading">6. EXAM FAILURE</div>
+        <div class="section-body">
+          <ul>
+            <li><strong>First attempt failure:</strong> No refund. eLab will provide free resit preparation through eLab Academy. The Candidate shall pay the exam rebooking fee and eLab's rebooking coordination fee.</li>
+            <li><strong>Second attempt failure:</strong> No refund. The Candidate shall pay the exam rebooking fee and eLab's rebooking coordination fee. The program continues.</li>
+          </ul>
+        </div>
+
+        <div class="section-heading">7. VOLUNTARY WITHDRAWAL</div>
+        <div class="section-body">
+          <p>The Candidate may withdraw from the program at any time by providing written notice.</p>
+          <p>Upon voluntary withdrawal, the Candidate shall receive a refund of the program fee minus:</p>
+          <ul>
+            <li>All Tangible Costs (Section 5) already spent on the Candidate's behalf; AND</li>
+            <li>A 15% administrative penalty of the total program fee.</li>
+          </ul>
+        </div>
+
+        <div class="section-heading">8. DISQUALIFICATION</div>
+        <div class="section-body">
+          <p>eLab may terminate this agreement immediately and without refund if the Candidate:</p>
+          <ul>
+            <li>Provides false, fraudulent, or forged documents</li>
+            <li>Fails the required medical screening</li>
+            <li>Is found to have a criminal record not disclosed during consultation</li>
+            <li>Repeatedly fails to meet the obligations set out in Section 9</li>
+          </ul>
+        </div>
+
+        <div class="section-heading">9. CANDIDATE OBLIGATIONS</div>
+        <div class="section-body">
+          <p>The Candidate agrees to:</p>
+          <ul>
+            <li>Attend all scheduled eLab Academy sessions and complete assigned preparation work</li>
+            <li>Respond to all communications from eLab within 48 hours</li>
+            <li>Attend all scheduled employer interviews arranged by eLab</li>
+            <li>Provide only authentic and genuine documents</li>
+            <li>Complete the required medical screening prior to enrollment</li>
+            <li>Not accept placement from any other recruitment agency, employer, or third party outside of eLab's matching process during the duration of this program (Non-Compete &mdash; Section 11)</li>
+          </ul>
+        </div>
+
+        <div class="section-heading">10. ELAB OBLIGATIONS</div>
+        <div class="section-body">
+          <p>eLab agrees to:</p>
+          <ul>
+            <li>Process all verifications and registrations in a timely manner</li>
+            <li>Provide comprehensive exam preparation through eLab Academy</li>
+            <li>Actively match the Candidate with suitable employers in the selected destination</li>
+            <li>Coordinate visa processing and travel arrangements</li>
+            <li>Provide regular progress updates to the Candidate</li>
+          </ul>
+        </div>
+
+        <div class="section-heading">11. NON-COMPETE</div>
+        <div class="section-body">
+          <p>During the duration of this program (from enrollment until placement is completed or the agreement is terminated), the Candidate agrees not to:</p>
+          <ul>
+            <li>Accept a job offer arranged by another recruitment agency or third party</li>
+            <li>Independently apply for or accept employment in the selected destination outside of eLab's matching process</li>
+          </ul>
+          <p>Violation of this clause shall be treated as Voluntary Withdrawal (Section 7), and the withdrawal refund terms shall apply.</p>
+        </div>
+
+        <div class="section-heading">12. LIMITATION OF LIABILITY</div>
+        <div class="section-body">
+          <p>eLab's total liability under this agreement shall not exceed the program fee paid by the Candidate. eLab shall not be liable for delays caused by third-party government agencies, regulatory bodies, or circumstances beyond its reasonable control.</p>
+        </div>
+
+        <div class="section-heading">13. GOVERNING LAW</div>
+        <div class="section-body">
+          <p>This agreement shall be governed by and construed in accordance with the laws of the Federal Republic of Nigeria.</p>
+        </div>
+
+        <div class="section-heading">14. ENTIRE AGREEMENT</div>
+        <div class="section-body">
+          <p>This document constitutes the entire agreement between the parties. Any amendments must be made in writing and signed by both parties.</p>
+        </div>
+      </div>
+
+      <!-- Candidate Signature Block -->
+      <div class="sig-section">
+        <h3>Candidate Acknowledgment</h3>
+        <p>I, <strong id="sig-candidate-name"></strong>, have read and understood all terms of this Service Agreement. I agree to be bound by these terms.</p>
+
+        <!-- Signature Tabs -->
+        <div class="sig-tabs">
+          <button class="sig-tab active" data-tab="draw" onclick="switchTab('draw')">Draw Signature</button>
+          <button class="sig-tab" data-tab="type" onclick="switchTab('type')">Type Signature</button>
+        </div>
+
+        <!-- Draw Panel -->
+        <div id="panel-draw" class="sig-panel active">
+          <div class="sig-canvas-wrap">
+            <canvas id="sig-canvas"></canvas>
+            <button class="sig-canvas-clear" onclick="clearCanvas()">Clear</button>
+          </div>
+        </div>
+
+        <!-- Type Panel -->
+        <div id="panel-type" class="sig-panel">
+          <input type="text" class="sig-type-input" id="sig-type-input" placeholder="Type your full name..." oninput="updateTypePreview()">
+          <div class="sig-type-preview" id="sig-type-preview"></div>
+        </div>
+
+        <div class="sig-row">
+          <div class="sig-field">
+            <label>Full Name</label>
+            <div class="value" id="sig-fullname"></div>
+          </div>
+          <div class="sig-field">
+            <label>Date</label>
+            <div class="value" id="sig-date"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- eLab Signature Block -->
+      <div class="sig-section">
+        <h3>On Behalf of eLab Solutions International LLC</h3>
+        <div class="elab-sig-preview">Samuel Olatunji</div>
+        <div class="sig-row">
+          <div class="sig-field">
+            <label>Name</label>
+            <div class="value">Samuel Olatunji</div>
+          </div>
+          <div class="sig-field">
+            <label>Title</label>
+            <div class="value">Director</div>
+          </div>
+          <div class="sig-field">
+            <label>Date</label>
+            <div class="value" id="elab-sig-date"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agreement Checkbox & Sign Button -->
+      <div class="agree-row">
+        <input type="checkbox" id="agree-check" onchange="updateSignButton()">
+        <label for="agree-check">I have read and agree to all terms of this Service Agreement</label>
+      </div>
+
+      <button class="btn-sign" id="btn-sign" disabled onclick="signAgreement()">Sign Agreement &rarr;</button>
+    </div>
+  </div>
+
+  <!-- Hidden canvas for typed signature rendering -->
+  <canvas id="hidden-canvas" class="hidden-canvas" width="600" height="150"></canvas>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+
+  <script>
+    // ── State ──────────────────────────────────────────
+    var contractData = null;
+    var activeTab = 'draw';
+    var hasDrawn = false;
+    var signedPdfBlob = null;
+    var currentToken = null;
+
+    // ── Date helper ────────────────────────────────────
+    function formatDate(d) {
+      var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      var date = d ? new Date(d) : new Date();
+      return months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+    }
+
+    // ── Show/hide states ───────────────────────────────
+    function showState(id) {
+      document.querySelectorAll('.state-screen').forEach(function(el) { el.classList.remove('active'); });
+      document.getElementById('agreement-wrapper').classList.remove('active');
+      if (id === 'agreement') {
+        document.getElementById('agreement-wrapper').classList.add('active');
+      } else {
+        document.getElementById('state-' + id).classList.add('active');
+      }
+    }
+
+    function showError(title, message) {
+      document.getElementById('error-title').textContent = title || 'Contract Not Found';
+      document.getElementById('error-message').textContent = message || 'The contract link is invalid or has expired. Please contact your eLab representative.';
+      showState('error');
+    }
+
+    function showAlreadySigned(data) {
+      document.getElementById('signed-date').textContent = formatDate(data.signed_at);
+      contractData = data;
+      showState('signed');
+    }
+
+    // ── Render agreement ───────────────────────────────
+    function renderAgreement(data) {
+      contractData = data;
+      var today = formatDate();
+
+      document.getElementById('party-candidate').textContent = data.candidate_name;
+      document.getElementById('agreement-date').textContent = today;
+      document.getElementById('agreement-destination').textContent = data.destination;
+
+      // Fill destination placeholders
+      document.querySelectorAll('.dest-placeholder').forEach(function(el) {
+        el.textContent = data.destination;
+      });
+
+      // Signature block
+      document.getElementById('sig-candidate-name').textContent = data.candidate_name;
+      document.getElementById('sig-fullname').textContent = data.candidate_name;
+      document.getElementById('sig-date').textContent = today;
+      document.getElementById('elab-sig-date').textContent = today;
+
+      showState('agreement');
+      initCanvas();
+    }
+
+    // ── Signature Tabs ─────────────────────────────────
+    function switchTab(tab) {
+      activeTab = tab;
+      document.querySelectorAll('.sig-tab').forEach(function(el) {
+        el.classList.toggle('active', el.getAttribute('data-tab') === tab);
+      });
+      document.getElementById('panel-draw').classList.toggle('active', tab === 'draw');
+      document.getElementById('panel-type').classList.toggle('active', tab === 'type');
+      updateSignButton();
+    }
+
+    // ── Type signature preview ─────────────────────────
+    function updateTypePreview() {
+      var val = document.getElementById('sig-type-input').value;
+      document.getElementById('sig-type-preview').textContent = val;
+      updateSignButton();
+    }
+
+    // ── Sign button state ──────────────────────────────
+    function updateSignButton() {
+      var checked = document.getElementById('agree-check').checked;
+      var hasSig = false;
+      if (activeTab === 'draw') {
+        hasSig = hasDrawn;
+      } else {
+        hasSig = document.getElementById('sig-type-input').value.trim().length > 0;
+      }
+      document.getElementById('btn-sign').disabled = !(checked && hasSig);
+    }
+
+    // ── Canvas (Draw Signature) ────────────────────────
+    var canvas, ctx, drawing = false, lastX, lastY;
+
+    function initCanvas() {
+      canvas = document.getElementById('sig-canvas');
+      ctx = canvas.getContext('2d');
+
+      // Set actual pixel dimensions
+      var rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * 2;
+      canvas.height = rect.height * 2;
+      ctx.scale(2, 2);
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = '#1a1a2e';
+
+      // Mouse events
+      canvas.addEventListener('mousedown', function(e) { startDraw(e.offsetX, e.offsetY); });
+      canvas.addEventListener('mousemove', function(e) { draw(e.offsetX, e.offsetY); });
+      canvas.addEventListener('mouseup', stopDraw);
+      canvas.addEventListener('mouseleave', stopDraw);
+
+      // Touch events
+      canvas.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        var t = e.touches[0];
+        var r = canvas.getBoundingClientRect();
+        startDraw(t.clientX - r.left, t.clientY - r.top);
+      }, { passive: false });
+      canvas.addEventListener('touchmove', function(e) {
+        e.preventDefault();
+        var t = e.touches[0];
+        var r = canvas.getBoundingClientRect();
+        draw(t.clientX - r.left, t.clientY - r.top);
+      }, { passive: false });
+      canvas.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        stopDraw();
+      }, { passive: false });
+    }
+
+    function startDraw(x, y) {
+      drawing = true;
+      lastX = x;
+      lastY = y;
+    }
+
+    function draw(x, y) {
+      if (!drawing) return;
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      lastX = x;
+      lastY = y;
+      hasDrawn = true;
+      updateSignButton();
+    }
+
+    function stopDraw() {
+      drawing = false;
+    }
+
+    function clearCanvas() {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      hasDrawn = false;
+      updateSignButton();
+    }
+
+    // ── Get signature as base64 PNG ────────────────────
+    function getSignatureData() {
+      if (activeTab === 'draw') {
+        return canvas.toDataURL('image/png');
+      } else {
+        // Render typed text onto hidden canvas
+        var hc = document.getElementById('hidden-canvas');
+        var hctx = hc.getContext('2d');
+        hctx.clearRect(0, 0, hc.width, hc.height);
+        hctx.fillStyle = '#ffffff';
+        hctx.fillRect(0, 0, hc.width, hc.height);
+        hctx.font = '700 48px "Dancing Script", cursive';
+        hctx.fillStyle = '#1a1a2e';
+        hctx.textAlign = 'center';
+        hctx.textBaseline = 'middle';
+        hctx.fillText(document.getElementById('sig-type-input').value.trim(), hc.width / 2, hc.height / 2);
+        return hc.toDataURL('image/png');
+      }
+    }
+
+    // ── PDF Generation ─────────────────────────────────
+    function generatePDF(data, signatureDataURL) {
+      var jsPDF = window.jspdf.jsPDF;
+      var doc = new jsPDF({ unit: 'mm', format: 'a4' });
+      var pageW = 210;
+      var margin = 20;
+      var contentW = pageW - margin * 2;
+      var y = 20;
+      var lineH = 5.5;
+
+      function checkPage(needed) {
+        if (y + needed > 280) {
+          doc.addPage();
+          y = 20;
+        }
+      }
+
+      function addTitle(text) {
+        checkPage(12);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(16);
+        doc.text(text, pageW / 2, y, { align: 'center' });
+        y += 12;
+      }
+
+      function addHeading(text) {
+        checkPage(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.text(text, margin, y);
+        y += 7;
+      }
+
+      function addParagraph(text) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        var lines = doc.splitTextToSize(text, contentW);
+        checkPage(lines.length * lineH + 4);
+        doc.text(lines, margin, y);
+        y += lines.length * lineH + 3;
+      }
+
+      function addBullet(text) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        var bulletIndent = margin + 5;
+        var bulletW = contentW - 5;
+        var lines = doc.splitTextToSize(text, bulletW);
+        checkPage(lines.length * lineH + 2);
+        doc.text('\u2022', margin + 1, y);
+        doc.text(lines, bulletIndent, y);
+        y += lines.length * lineH + 1;
+      }
+
+      var today = formatDate();
+
+      // Header
+      addTitle('ELAB COMPLETE SERVICE AGREEMENT');
+
+      // Parties
+      addParagraph('Between:');
+      addBullet('eLab Solutions International LLC ("eLab", "we", "us")');
+      addBullet(data.candidate_name + ' ("Candidate", "you")');
+      y += 2;
+      addParagraph('Date: ' + today);
+      addParagraph('Program: eLab Complete \u2014 ' + data.destination);
+
+      // Divider
+      checkPage(4);
+      doc.setDrawColor(180);
+      doc.line(margin, y, pageW - margin, y);
+      y += 6;
+
+      // Section 1
+      addHeading('1. PROGRAM DESCRIPTION');
+      addParagraph('eLab Complete is a guaranteed end-to-end nursing placement program. eLab will manage all processes required to place the Candidate in a nursing role in ' + data.destination + ', including but not limited to:');
+      var s1Items = [
+        'DataFlow verification (education, license, work experience, background check)',
+        'NMCN fee processing and institutional verification',
+        'Prometric exam booking and exam fees',
+        'eLab Academy enrollment for exam preparation (study materials, tutoring, coordination)',
+        'Professional licensing registration (Mumaris/SCFHS for Saudi Arabia; QCHP evaluation for Qatar)',
+        'CV preparation and interview coaching',
+        'Job matching with employers and interview coordination',
+        'Visa processing support',
+        'Exam travel support'
+      ];
+      s1Items.forEach(function(item) { addBullet(item); });
+
+      // Section 2
+      addHeading('2. TIMELINE');
+      addParagraph('eLab commits to completing the entire process \u2014 from enrollment to job placement \u2014 within 4 to 9 months from the date of enrollment. All stages will run concurrently where possible to minimize total timeline.');
+
+      // Section 3
+      addHeading('3. PAYMENT TERMS');
+      addBullet('The Candidate shall make full payment of the agreed program fee prior to commencement of any services.');
+      addBullet('Payment is due upon signing this agreement.');
+      addBullet('Payment activates the Placement Guarantee (Section 4).');
+      addBullet('The program fee covers all services listed in Section 1, including third-party fees paid on the Candidate\'s behalf.');
+
+      // Section 4
+      addHeading('4. PLACEMENT GUARANTEE');
+      addParagraph('eLab guarantees that the Candidate will be placed in a nursing role in ' + data.destination + ' within 9 months of enrollment.');
+      addParagraph('If eLab fails to place the Candidate within 9 months of enrollment, the Candidate shall receive a full refund of the program fee minus Tangible Costs (Section 5) already spent on the Candidate\'s behalf.');
+
+      // Section 5
+      addHeading('5. TANGIBLE COSTS (NON-REFUNDABLE)');
+      addParagraph('The following third-party costs, once incurred on the Candidate\'s behalf, are non-refundable under any circumstance:');
+      ['DataFlow verification fees','NMCN fees','Institutional verification fees','Prometric exam fees','Mumaris/SCFHS or QCHP registration fees','Exam travel costs (flights, accommodation) if already booked or completed'].forEach(function(item) { addBullet(item); });
+
+      // Section 6
+      addHeading('6. EXAM FAILURE');
+      addBullet('First attempt failure: No refund. eLab will provide free resit preparation through eLab Academy. The Candidate shall pay the exam rebooking fee and eLab\'s rebooking coordination fee.');
+      addBullet('Second attempt failure: No refund. The Candidate shall pay the exam rebooking fee and eLab\'s rebooking coordination fee. The program continues.');
+
+      // Section 7
+      addHeading('7. VOLUNTARY WITHDRAWAL');
+      addParagraph('The Candidate may withdraw from the program at any time by providing written notice.');
+      addParagraph('Upon voluntary withdrawal, the Candidate shall receive a refund of the program fee minus:');
+      addBullet('All Tangible Costs (Section 5) already spent on the Candidate\'s behalf; AND');
+      addBullet('A 15% administrative penalty of the total program fee.');
+
+      // Section 8
+      addHeading('8. DISQUALIFICATION');
+      addParagraph('eLab may terminate this agreement immediately and without refund if the Candidate:');
+      addBullet('Provides false, fraudulent, or forged documents');
+      addBullet('Fails the required medical screening');
+      addBullet('Is found to have a criminal record not disclosed during consultation');
+      addBullet('Repeatedly fails to meet the obligations set out in Section 9');
+
+      // Section 9
+      addHeading('9. CANDIDATE OBLIGATIONS');
+      addParagraph('The Candidate agrees to:');
+      ['Attend all scheduled eLab Academy sessions and complete assigned preparation work','Respond to all communications from eLab within 48 hours','Attend all scheduled employer interviews arranged by eLab','Provide only authentic and genuine documents','Complete the required medical screening prior to enrollment','Not accept placement from any other recruitment agency, employer, or third party outside of eLab\'s matching process during the duration of this program (Non-Compete \u2014 Section 11)'].forEach(function(item) { addBullet(item); });
+
+      // Section 10
+      addHeading('10. ELAB OBLIGATIONS');
+      addParagraph('eLab agrees to:');
+      ['Process all verifications and registrations in a timely manner','Provide comprehensive exam preparation through eLab Academy','Actively match the Candidate with suitable employers in the selected destination','Coordinate visa processing and travel arrangements','Provide regular progress updates to the Candidate'].forEach(function(item) { addBullet(item); });
+
+      // Section 11
+      addHeading('11. NON-COMPETE');
+      addParagraph('During the duration of this program (from enrollment until placement is completed or the agreement is terminated), the Candidate agrees not to:');
+      addBullet('Accept a job offer arranged by another recruitment agency or third party');
+      addBullet('Independently apply for or accept employment in the selected destination outside of eLab\'s matching process');
+      addParagraph('Violation of this clause shall be treated as Voluntary Withdrawal (Section 7), and the withdrawal refund terms shall apply.');
+
+      // Section 12
+      addHeading('12. LIMITATION OF LIABILITY');
+      addParagraph('eLab\'s total liability under this agreement shall not exceed the program fee paid by the Candidate. eLab shall not be liable for delays caused by third-party government agencies, regulatory bodies, or circumstances beyond its reasonable control.');
+
+      // Section 13
+      addHeading('13. GOVERNING LAW');
+      addParagraph('This agreement shall be governed by and construed in accordance with the laws of the Federal Republic of Nigeria.');
+
+      // Section 14
+      addHeading('14. ENTIRE AGREEMENT');
+      addParagraph('This document constitutes the entire agreement between the parties. Any amendments must be made in writing and signed by both parties.');
+
+      // ── Signature page ───────────────────────────────
+      doc.addPage();
+      y = 25;
+
+      // Candidate acknowledgment
+      addHeading('CANDIDATE ACKNOWLEDGMENT');
+      y += 2;
+      addParagraph('I, ' + data.candidate_name + ', have read and understood all terms of this Service Agreement. I agree to be bound by these terms.');
+      y += 4;
+
+      // Candidate signature image
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text('Signature:', margin, y);
+      y += 3;
+      try {
+        doc.addImage(signatureDataURL, 'PNG', margin, y, 60, 18);
+      } catch(e) {}
+      y += 22;
+
+      doc.text('Full Name: ' + data.candidate_name, margin, y);
+      y += 6;
+      doc.text('Date: ' + today, margin, y);
+      y += 20;
+
+      // Divider
+      doc.setDrawColor(180);
+      doc.line(margin, y, pageW - margin, y);
+      y += 10;
+
+      // eLab signature
+      addHeading('ON BEHALF OF ELAB SOLUTIONS INTERNATIONAL LLC');
+      y += 4;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text('Signature:', margin, y);
+      y += 3;
+
+      // Render eLab signature text in italic as substitute for cursive
+      doc.setFont('helvetica', 'bolditalic');
+      doc.setFontSize(20);
+      doc.text('Samuel Olatunji', margin, y + 10);
+      y += 22;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text('Name: Samuel Olatunji', margin, y);
+      y += 6;
+      doc.text('Title: Director', margin, y);
+      y += 6;
+      doc.text('Date: ' + today, margin, y);
+
+      return doc;
+    }
+
+    // ── Sign agreement ─────────────────────────────────
+    async function signAgreement() {
+      var btn = document.getElementById('btn-sign');
+      btn.disabled = true;
+
+      document.getElementById('signing-overlay').classList.add('active');
+
+      try {
+        var signatureData = getSignatureData();
+
+        // Generate PDF
+        var pdf = generatePDF(contractData, signatureData);
+        var pdfBlob = pdf.output('blob');
+        signedPdfBlob = pdfBlob;
+
+        // Upload PDF to Supabase storage
+        var filePath = currentToken + '/signed-agreement.pdf';
+        var uploadResult = await window.ghSupabase.storage
+          .from('elab-complete-contracts')
+          .upload(filePath, pdfBlob, { contentType: 'application/pdf', upsert: true });
+
+        if (uploadResult.error) {
+          console.error('Upload error:', uploadResult.error);
+          // Continue anyway — record the signature even if upload fails
+        }
+
+        // Update contract record
+        var updateResult = await window.ghSupabase
+          .from('elab_complete_contracts')
+          .update({
+            status: 'signed',
+            signature_data: signatureData,
+            signature_type: activeTab,
+            signed_at: new Date().toISOString(),
+            pdf_path: filePath
+          })
+          .eq('token', currentToken);
+
+        if (updateResult.error) {
+          throw new Error('Failed to update contract: ' + updateResult.error.message);
+        }
+
+        document.getElementById('signing-overlay').classList.remove('active');
+        showState('success');
+
+      } catch (err) {
+        document.getElementById('signing-overlay').classList.remove('active');
+        alert('Error signing agreement: ' + err.message + '. Please try again.');
+        btn.disabled = false;
+        updateSignButton();
+      }
+    }
+
+    // ── Download PDF helpers ───────────────────────────
+    function downloadSuccessPDF() {
+      if (signedPdfBlob) {
+        var url = URL.createObjectURL(signedPdfBlob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'eLab-Complete-Agreement-Signed.pdf';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    }
+
+    async function downloadSignedPDF() {
+      if (!contractData || !contractData.pdf_path) {
+        alert('PDF not available. Please contact your eLab representative.');
+        return;
+      }
+      try {
+        var result = await window.ghSupabase.storage
+          .from('elab-complete-contracts')
+          .download(contractData.pdf_path);
+
+        if (result.error) throw result.error;
+
+        var url = URL.createObjectURL(result.data);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'eLab-Complete-Agreement-Signed.pdf';
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        alert('Error downloading PDF: ' + err.message);
+      }
+    }
+
+    // ── Init ───────────────────────────────────────────
+    async function init() {
+      var params = new URLSearchParams(window.location.search);
+      var token = params.get('token');
+      currentToken = token;
+
+      if (!token) {
+        showError('Invalid Contract Link', 'No contract token was provided. Please use the link sent to your email.');
+        return;
+      }
+
+      try {
+        var result = await window.ghSupabase
+          .from('elab_complete_contracts')
+          .select('*')
+          .eq('token', token)
+          .single();
+
+        if (result.error || !result.data) {
+          showError('Contract Not Found', 'This contract link is invalid or has expired. Please contact your eLab representative.');
+          return;
+        }
+
+        if (result.data.status === 'signed') {
+          showAlreadySigned(result.data);
+          return;
+        }
+
+        renderAgreement(result.data);
+
+      } catch (err) {
+        showError('Something Went Wrong', 'Unable to load the agreement. Please try again or contact support.');
+      }
+    }
+
+    // Wait for Supabase client to be ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() { setTimeout(init, 200); });
+    } else {
+      setTimeout(init, 200);
+    }
+  </script>
+</body>
+</html>
