@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book a Free Consultation — eLab Complete | GlobalHire by eLab Solutions</title>
+  <meta name="description" content="Schedule a free Google Meet consultation with the eLab Complete team. Guaranteed nursing placement in Qatar and Saudi Arabia.">
+  <link rel="canonical" href="https://globalhire.elabsolution.org/elab-complete-booking.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Book a Free Consultation — eLab Complete | GlobalHire by eLab Solutions">
+  <meta property="og:description" content="Take the first step toward your guaranteed nursing career in the Middle East. Book a free consultation today.">
+  <meta property="og:url" content="https://globalhire.elabsolution.org/elab-complete-booking.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset & Base ──────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #0a0f1a;
+      color: #94a3b8;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    button { font-family: inherit; }
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+    }
+
+    /* ── Design Tokens ─────────────────────────────── */
+    :root {
+      --bg: #0a0f1a;
+      --card-bg: rgba(255,255,255,0.04);
+      --card-border: rgba(255,255,255,0.08);
+      --emerald: #059669;
+      --emerald-light: #34d399;
+      --gold: #d4a84b;
+      --gold-light: #f0d78c;
+      --white: #FFFFFF;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --radius: 12px;
+    }
+
+    /* ── Animations ────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Typography ────────────────────────────────── */
+    .h1 {
+      font-size: clamp(2.2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+    .h2 {
+      font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+    .body-text {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* ── Section Container ─────────────────────────── */
+    .section-pad {
+      padding: 80px 24px;
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    /* ── Buttons ───────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 32px;
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 15px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+      color: var(--white);
+      box-shadow: 0 4px 24px rgba(5,150,105,0.3);
+    }
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: #1a1a2e;
+      box-shadow: 0 4px 24px rgba(212,168,75,0.25);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--text-primary);
+      border: 2px solid var(--card-border);
+    }
+    .btn-full { width: 100%; justify-content: center; }
+
+    /* ── Header ────────────────────────────────────── */
+    .gh-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(10,15,26,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 0 24px;
+    }
+    .gh-header-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      height: 60px;
+    }
+    .gh-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .gh-logo-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--emerald), var(--gold));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--white);
+    }
+    .gh-logo-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    /* ── Page Hero ─────────────────────────────────── */
+    .page-hero {
+      padding-top: 120px;
+      padding-bottom: 60px;
+      background: linear-gradient(180deg, var(--bg) 0%, rgba(5,150,105,0.06) 100%);
+      border-bottom: 1px solid var(--card-border);
+      text-align: center;
+    }
+    .page-hero-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 50px;
+      background: rgba(5,150,105,0.1);
+      border: 1px solid rgba(5,150,105,0.25);
+      margin-bottom: 24px;
+    }
+    .badge-pill span {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--emerald);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── Form Section ──────────────────────────────── */
+    .form-section {
+      background: var(--bg);
+      padding: 80px 24px;
+    }
+    .form-section-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    /* ── Booking Card ──────────────────────────────── */
+    .booking-card {
+      max-width: 760px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 24px;
+      border: 1px solid var(--card-border);
+      padding: 48px 40px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+      animation: fadeUp 0.5s ease both;
+    }
+
+    /* ── Section Group Header ──────────────────────── */
+    .group-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .group-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 14px;
+      font-weight: 800;
+    }
+    .group-number-emerald {
+      background: rgba(5,150,105,0.15);
+      color: var(--emerald);
+    }
+    .group-number-gold {
+      background: rgba(212,168,75,0.15);
+      color: var(--gold);
+    }
+    .group-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    /* ── Field Grid ────────────────────────────────── */
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    /* ── Form Fields ───────────────────────────────── */
+    .field-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      display: block;
+    }
+    .field-label .req { color: var(--emerald); }
+    .field-label .icon { margin-right: 4px; vertical-align: middle; }
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--card-border);
+      background: rgba(255,255,255,0.05);
+      font-size: 14px;
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--text-primary);
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.15s;
+    }
+    .form-input::placeholder { color: var(--text-muted); }
+    .form-input:focus { border-color: var(--emerald); }
+    select.form-input { padding-right: 40px; }
+    input[type="date"].form-input::-webkit-calendar-picker-indicator {
+      filter: invert(0.5);
+      cursor: pointer;
+    }
+
+    /* ── Error Banner ──────────────────────────────── */
+    .error-banner {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.2);
+      margin-bottom: 20px;
+    }
+    .error-banner.show { display: flex; }
+    .error-banner span {
+      font-size: 14px;
+      color: #ef4444;
+    }
+
+    /* ── Submit Button ─────────────────────────────── */
+    .submit-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 16px 32px;
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 16px;
+      font-family: 'Inter', system-ui, sans-serif;
+      cursor: pointer;
+      border: none;
+      background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+      color: var(--white);
+      box-shadow: 0 4px 24px rgba(5,150,105,0.5);
+      transition: all 0.2s;
+    }
+    .submit-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(5,150,105,0.5); }
+    .submit-btn:disabled {
+      background: rgba(5,150,105,0.4);
+      box-shadow: none;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    .submit-btn .spinner {
+      width: 18px;
+      height: 18px;
+      animation: spin 1s linear infinite;
+    }
+    .submit-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    /* ── WhatsApp fallback link ────────────────────── */
+    .wa-fallback {
+      text-align: center;
+      margin-top: 32px;
+    }
+    .wa-fallback p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .wa-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--emerald);
+      text-decoration: none;
+    }
+    .wa-link:hover { color: var(--emerald-light); }
+
+    /* ── Success Card ──────────────────────────────── */
+    .success-card {
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 24px;
+      border: 2px solid rgba(5,150,105,0.3);
+      padding: 56px 40px;
+      text-align: center;
+      animation: fadeUp 0.4s ease both;
+      display: none;
+    }
+    .success-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      margin: 0 auto 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(5,150,105,0.15);
+      border: 2px solid rgba(5,150,105,0.3);
+    }
+    .success-email-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: var(--radius);
+      background: rgba(5,150,105,0.08);
+      border: 1px solid rgba(5,150,105,0.2);
+      margin-bottom: 24px;
+    }
+    .success-email-box span { font-size: 14px; color: var(--text-secondary); }
+    .success-email-box strong { color: var(--text-primary); }
+    .success-meet-box {
+      padding: 16px 20px;
+      border-radius: var(--radius);
+      background: rgba(212,168,75,0.08);
+      border: 1px solid rgba(212,168,75,0.2);
+      margin-bottom: 24px;
+      display: none;
+    }
+    .success-meet-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+    .success-meet-link {
+      font-size: 14px;
+      color: var(--emerald-light);
+      word-break: break-all;
+    }
+    .what-to-expect {
+      padding: 20px 24px;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--card-border);
+      margin-bottom: 32px;
+      text-align: left;
+    }
+    .what-to-expect-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .what-to-expect p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin: 0;
+    }
+    .success-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    /* ── Sticky WhatsApp FAB ───────────────────────── */
+    .wa-fab {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #25d366, #128c7e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(37,211,102,0.4);
+      z-index: 50;
+      text-decoration: none;
+      transition: transform 0.15s;
+    }
+    .wa-fab:hover { transform: scale(1.05); }
+
+    /* ── Footer ────────────────────────────────────── */
+    .gh-footer {
+      padding: 32px 24px;
+      border-top: 1px solid var(--card-border);
+      text-align: center;
+    }
+    .gh-footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ── Responsive ────────────────────────────────── */
+    @media (max-width: 600px) {
+      .booking-card { padding: 32px 20px; }
+      .success-card { padding: 40px 24px; }
+      .field-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ HEADER ═══════════════════════════════════════ -->
+  <header class="gh-header">
+    <div class="gh-header-inner">
+      <a href="index.html" class="gh-logo">
+        <div class="gh-logo-mark">G</div>
+        <span class="gh-logo-text">GlobalHire</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ═══ PAGE HERO ════════════════════════════════════ -->
+  <section class="page-hero">
+    <div class="page-hero-inner reveal">
+      <div class="badge-pill">
+        <!-- video icon -->
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+        <span>Free Google Meet Consultation</span>
+      </div>
+      <h1 class="h1" style="margin-bottom: 20px;">
+        Book Your <span class="gradient-text">Free Consultation</span>
+      </h1>
+      <p class="body-text" style="font-size: 1.15rem; max-width: 600px; margin: 0 auto;">
+        Take the first step towards your guaranteed nursing career in the Middle East.
+        Schedule a free Google Meet consultation with our team.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══ FORM SECTION ═════════════════════════════════ -->
+  <section class="form-section">
+    <div class="form-section-inner">
+
+      <!-- BOOKING FORM -->
+      <div id="booking-form-wrap" class="booking-card">
+
+        <!-- ── Section 1: Personal Information ── -->
+        <div class="group-header">
+          <div class="group-number group-number-emerald">1</div>
+          <span class="group-title">Personal Information</span>
+        </div>
+
+        <div class="field-grid">
+          <div>
+            <label class="field-label" for="full-name">
+              Full Name <span class="req">*</span>
+            </label>
+            <input class="form-input" id="full-name" type="text" placeholder="John Doe" autocomplete="name">
+          </div>
+
+          <div>
+            <label class="field-label" for="email">
+              Email <span class="req">*</span>
+            </label>
+            <input class="form-input" id="email" type="email" placeholder="you@email.com" autocomplete="email">
+          </div>
+
+          <div>
+            <label class="field-label" for="phone">
+              Phone / WhatsApp <span class="req">*</span>
+            </label>
+            <input class="form-input" id="phone" type="tel" placeholder="+234 ..." autocomplete="tel">
+          </div>
+
+          <div>
+            <label class="field-label" for="country">
+              Country of Residence <span class="req">*</span>
+            </label>
+            <input class="form-input" id="country" type="text" placeholder="e.g. Nigeria" autocomplete="country-name">
+          </div>
+        </div>
+
+        <!-- ── Section 2: Professional Background ── -->
+        <div class="group-header">
+          <div class="group-number group-number-gold">2</div>
+          <span class="group-title">Professional Background</span>
+        </div>
+
+        <div class="field-grid">
+          <div>
+            <label class="field-label" for="qualification">
+              Nursing Qualification <span class="req">*</span>
+            </label>
+            <select class="form-input" id="qualification">
+              <option value="">Select...</option>
+              <option value="RN">RN — Registered Nurse</option>
+              <option value="RM">RM — Registered Midwife</option>
+              <option value="BNSc">BNSc — Bachelor of Nursing Science</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="field-label" for="years-exp">
+              Years of Experience <span class="req">*</span>
+            </label>
+            <select class="form-input" id="years-exp">
+              <option value="">Select...</option>
+              <option value="less_than_1">Less than 1 year</option>
+              <option value="1_2">1-2 years</option>
+              <option value="3_5">3-5 years</option>
+              <option value="6_10">6-10 years</option>
+              <option value="10_plus">10+ years</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="field-label" for="destination">
+              Preferred Destination <span class="req">*</span>
+            </label>
+            <select class="form-input" id="destination">
+              <option value="">Select...</option>
+              <option value="Qatar">Qatar</option>
+              <option value="Saudi Arabia">Saudi Arabia</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- ── Section 3: Schedule ── -->
+        <div class="group-header">
+          <div class="group-number group-number-emerald">3</div>
+          <span class="group-title">Schedule Your Consultation</span>
+        </div>
+
+        <div class="field-grid">
+          <div>
+            <label class="field-label" for="consult-date">
+              <!-- calendar icon -->
+              <svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Preferred Consultation Date <span class="req">*</span>
+            </label>
+            <input class="form-input" id="consult-date" type="date">
+          </div>
+
+          <div>
+            <label class="field-label" for="consult-time">
+              <!-- clock icon -->
+              <svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Preferred Time <span class="req">*</span>
+            </label>
+            <select class="form-input" id="consult-time">
+              <option value="">Select...</option>
+              <option value="9:00 AM (WAT)">9:00 AM (WAT)</option>
+              <option value="10:00 AM (WAT)">10:00 AM (WAT)</option>
+              <option value="11:00 AM (WAT)">11:00 AM (WAT)</option>
+              <option value="12:00 PM (WAT)">12:00 PM (WAT)</option>
+              <option value="1:00 PM (WAT)">1:00 PM (WAT)</option>
+              <option value="2:00 PM (WAT)">2:00 PM (WAT)</option>
+              <option value="3:00 PM (WAT)">3:00 PM (WAT)</option>
+              <option value="4:00 PM (WAT)">4:00 PM (WAT)</option>
+              <option value="5:00 PM (WAT)">5:00 PM (WAT)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- ── Error Banner ── -->
+        <div id="error-banner" class="error-banner">
+          <!-- warning icon -->
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="m10.29 3.86-8.28 14.32A1 1 0 0 0 2.87 20h16.26a1 1 0 0 0 .86-1.48L11.71 3.86a1 1 0 0 0-1.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span id="error-text"></span>
+        </div>
+
+        <!-- ── Submit Button ── -->
+        <button id="submit-btn" class="submit-btn" onclick="handleSubmit()">
+          Book Consultation
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </button>
+
+        <p class="submit-hint">Your information is secure. We'll send a Google Meet link to your email.</p>
+      </div>
+
+      <!-- WhatsApp fallback (under form) -->
+      <div id="wa-fallback" class="wa-fallback reveal">
+        <p>Prefer WhatsApp?</p>
+        <a href="https://wa.me/19294192327?text=Hi%20eLab%2C%20I%E2%80%99m%20interested%20in%20the%20eLab%20Complete%20guaranteed%20placement%20program." target="_blank" rel="noopener noreferrer" class="wa-link">
+          <!-- message circle icon -->
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Chat with us directly on WhatsApp
+        </a>
+      </div>
+
+      <!-- SUCCESS CARD (hidden until submission) -->
+      <div id="success-card" class="success-card">
+        <div class="success-icon">
+          <!-- check circle icon -->
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+
+        <h2 class="h2" style="margin-bottom: 12px;">Consultation Booked!</h2>
+
+        <p class="body-text" style="margin-bottom: 16px;">
+          Your consultation is confirmed for
+          <strong id="confirm-date" style="color: #f1f5f9;"></strong>
+          at
+          <strong id="confirm-time" style="color: #f1f5f9;"></strong>
+        </p>
+
+        <div class="success-email-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span>A confirmation email has been sent to <strong id="confirm-email"></strong></span>
+        </div>
+
+        <!-- Meet link (shown if edge function returns one) -->
+        <div id="meet-link-box" class="success-meet-box">
+          <p class="success-meet-label">Your Google Meet Link</p>
+          <a id="meet-link-anchor" href="#" target="_blank" rel="noopener noreferrer" class="success-meet-link"></a>
+        </div>
+
+        <div class="what-to-expect">
+          <p class="what-to-expect-title">What to Expect</p>
+          <p>During the call, we'll assess your eligibility, walk you through the eLab Complete program, and answer all your questions.</p>
+        </div>
+
+        <div class="success-actions">
+          <a href="elab-complete.html" class="btn btn-primary">
+            Back to eLab Complete
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+          <a href="https://wa.me/19294192327?text=Hi%20eLab%2C%20I%E2%80%99m%20interested%20in%20the%20eLab%20Complete%20guaranteed%20placement%20program." target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Chat on WhatsApp
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ════════════════════════════════════════ -->
+  <footer class="gh-footer">
+    <p>&copy; 2025 GlobalHire by eLab Solutions. All rights reserved.</p>
+  </footer>
+
+  <!-- ═══ STICKY WHATSAPP FAB ══════════════════════════ -->
+  <a href="https://wa.me/19294192327?text=Hi%20eLab%2C%20I%E2%80%99m%20interested%20in%20the%20eLab%20Complete%20guaranteed%20placement%20program."
+     target="_blank" rel="noopener noreferrer" aria-label="WhatsApp us" class="wa-fab">
+    <!-- WhatsApp icon -->
+    <svg width="26" height="26" viewBox="0 0 32 32" fill="#fff" xmlns="http://www.w3.org/2000/svg">
+      <path d="M16 2.9C8.8 2.9 3 8.7 3 15.9c0 2.3.6 4.5 1.8 6.5L3 29l6.8-1.8c1.9 1.1 4 1.7 6.2 1.7 7.2 0 13-5.8 13-13S23.2 2.9 16 2.9zm6.3 18.4c-.3.8-1.6 1.5-2.2 1.6-.6.1-1.3.1-4.2-1.1-3.5-1.4-5.7-5-5.9-5.2-.2-.2-1.5-2-.5-3.9.5-1 1.2-1.4 1.6-1.4.4 0 .8 0 1.1.1.4.1.8.2 1.1 1 .4.9 1.2 2.9 1.3 3.1.1.2.2.4.1.7-.1.2-.2.4-.4.6l-.6.7c-.2.2-.4.4-.2.7.2.3 1 1.6 2.2 2.6 1.5 1.3 2.8 1.7 3.2 1.9.3.1.7.1.9-.2.3-.3 1-1.2 1.3-1.6.3-.4.6-.3 1-.2.4.1 2.6 1.2 3 1.4.4.2.7.3.8.5.1.4.1 1.3-.2 2.2z"/>
+    </svg>
+  </a>
+
+  <!-- ═══ SCRIPTS ═══════════════════════════════════════ -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script>
+    /* ── Set tomorrow as minimum date ── */
+    (function() {
+      var d = new Date();
+      d.setDate(d.getDate() + 1);
+      var iso = d.toISOString().split('T')[0];
+      document.getElementById('consult-date').min = iso;
+    })();
+
+    /* ── Reveal on scroll ── */
+    (function() {
+      var els = document.querySelectorAll('.reveal');
+      var io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.1, rootMargin: '-40px' });
+      els.forEach(function(el) { io.observe(el); });
+    })();
+
+    /* ── Form Submission ── */
+    async function handleSubmit() {
+      var errorBanner = document.getElementById('error-banner');
+      var errorText   = document.getElementById('error-text');
+      var submitBtn   = document.getElementById('submit-btn');
+
+      // Hide any prior error
+      errorBanner.classList.remove('show');
+
+      // Collect values
+      var fullName    = document.getElementById('full-name').value.trim();
+      var email       = document.getElementById('email').value.trim();
+      var phone       = document.getElementById('phone').value.trim();
+      var country     = document.getElementById('country').value.trim();
+      var qualification = document.getElementById('qualification').value;
+      var yearsExp    = document.getElementById('years-exp').value;
+      var destination = document.getElementById('destination').value;
+      var date        = document.getElementById('consult-date').value;
+      var time        = document.getElementById('consult-time').value;
+
+      // Validation
+      if (!fullName || !email || !phone || !country || !qualification || !yearsExp || !destination || !date || !time) {
+        errorText.textContent = 'Please fill in all required fields.';
+        errorBanner.classList.add('show');
+        errorBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        return;
+      }
+
+      // Set loading state
+      submitBtn.disabled = true;
+      submitBtn.innerHTML =
+        '<svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>' +
+        'Booking Consultation...';
+
+      try {
+        // 1. Insert into database
+        var result = await window.ghSupabase
+          .from('elab_complete_consultations')
+          .insert({
+            full_name: fullName,
+            email: email,
+            phone: phone,
+            country: country,
+            qualification: qualification,
+            years_experience: yearsExp,
+            preferred_destination: destination,
+            consultation_date: date,
+            consultation_time: time,
+            status: 'pending',
+          })
+          .select()
+          .single();
+
+        if (result.error) throw result.error;
+
+        // 2. Fire-and-forget edge function call
+        window.ghSupabase.functions.invoke('create-consultation-meet', {
+          body: {
+            consultation_id: result.data.id,
+            full_name: fullName,
+            email: email,
+            consultation_date: date,
+            consultation_time: time,
+            preferred_destination: destination,
+          },
+        }).then(function(res) {
+          if (res.data && res.data.meet_link) {
+            var meetBox    = document.getElementById('meet-link-box');
+            var meetAnchor = document.getElementById('meet-link-anchor');
+            meetAnchor.href        = res.data.meet_link;
+            meetAnchor.textContent = res.data.meet_link;
+            meetBox.style.display  = 'block';
+          }
+        }).catch(function(e) { console.warn('Meet creation failed:', e); });
+
+        // 3. Show success state
+        document.getElementById('confirm-date').textContent  = date;
+        document.getElementById('confirm-time').textContent  = time;
+        document.getElementById('confirm-email').textContent = email;
+
+        document.getElementById('booking-form-wrap').style.display = 'none';
+        document.getElementById('wa-fallback').style.display       = 'none';
+        document.getElementById('success-card').style.display      = 'block';
+
+      } catch (err) {
+        console.error(err);
+        errorText.textContent = (err && err.message)
+          ? err.message
+          : 'Something went wrong. Please try WhatsApp instead.';
+        errorBanner.classList.add('show');
+        errorBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+        // Reset button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML =
+          'Book Consultation' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>';
+      }
+    }
+  </script>
+</body>
+</html>
