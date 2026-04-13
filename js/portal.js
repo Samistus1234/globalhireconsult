@@ -300,7 +300,12 @@
       { type: 'license', label: 'Professional License', icon: 'shield' },
       { type: 'degree', label: 'Degree Certificate', icon: 'award' },
       { type: 'passport', label: 'Passport Copy', icon: 'globe' },
-      { type: 'cv', label: 'CV / Resume', icon: 'file-text' }
+      { type: 'cv', label: 'CV / Resume', icon: 'file-text' },
+      { type: 'diploma', label: 'Diploma Certificate', icon: 'award' },
+      { type: 'transcript', label: 'Transcript', icon: 'file-text' },
+      { type: 'passport_photo', label: 'Passport Photo', icon: 'globe' },
+      { type: 'prometric_certificate', label: 'Prometric Certificate', icon: 'shield' },
+      { type: 'dataflow_certificate', label: 'DataFlow Certificate', icon: 'shield' }
     ];
 
     const { data: docs } = await ghFrom('documents')
