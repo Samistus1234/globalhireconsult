@@ -415,21 +415,93 @@
     othersHtml += '</div>';
     grid.innerHTML += othersHtml;
 
-    // Bind "Add Document" button
+    // Bind "Add Document" button — show inline form
     const addBtn = document.getElementById('btn-add-other-doc');
+    const otherFormContainer = document.getElementById('other-doc-form-container');
     if (addBtn) {
       addBtn.addEventListener('click', () => {
-        const docName = prompt('Enter a name for this document (e.g., "Medical Certificate", "Reference Letter"):');
-        if (!docName || !docName.trim()) return;
-        const docType = docName.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
-        if (!docType) return;
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.pdf,.jpg,.jpeg,.png,.webp';
-        input.addEventListener('change', () => {
-          if (input.files[0]) uploadFile(docType, input.files[0]);
+        // Toggle inline form
+        if (otherFormContainer) {
+          otherFormContainer.remove();
+          return;
+        }
+        const formDiv = document.createElement('div');
+        formDiv.id = 'other-doc-form-container';
+        formDiv.style.cssText = 'margin-top:var(--space-3);padding:var(--space-4);background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-md);';
+        formDiv.innerHTML = `
+          <div style="margin-bottom:var(--space-3);">
+            <label style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary);display:block;margin-bottom:var(--space-2);">Document Name</label>
+            <input type="text" id="other-doc-name" placeholder="e.g. Medical Certificate, Reference Letter"
+              style="width:100%;padding:var(--space-3);background:var(--bg-deep);border:1px solid var(--border-subtle);border-radius:var(--radius-md);color:var(--text-primary);font-size:var(--text-sm);outline:none;">
+          </div>
+          <div style="margin-bottom:var(--space-3);">
+            <label style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary);display:block;margin-bottom:var(--space-2);">Upload File</label>
+            <div class="doc-dropzone" id="other-doc-dropzone" style="padding:var(--space-4);border:2px dashed var(--border-subtle);border-radius:var(--radius-md);text-align:center;cursor:pointer;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2" stroke-linecap="round" style="margin:0 auto var(--space-2);display:block;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <p style="font-size:var(--text-sm);color:var(--text-tertiary);">Click to select file or drag & drop</p>
+              <span style="font-size:var(--text-xs);color:var(--text-tertiary);">PDF, JPEG, PNG up to 10MB</span>
+            </div>
+            <input type="file" id="other-doc-file" accept=".pdf,.jpg,.jpeg,.png,.webp" hidden>
+            <div id="other-doc-selected" style="display:none;margin-top:var(--space-2);padding:var(--space-2) var(--space-3);background:var(--bg-deep);border-radius:var(--radius-sm);font-size:var(--text-sm);color:var(--text-primary);"></div>
+          </div>
+          <div style="display:flex;gap:var(--space-2);">
+            <button class="btn btn-primary btn-sm" id="other-doc-upload-btn" disabled>Upload Document</button>
+            <button class="btn btn-ghost btn-sm" id="other-doc-cancel-btn">Cancel</button>
+          </div>
+        `;
+        addBtn.parentElement.parentElement.appendChild(formDiv);
+
+        // Wire up the form
+        const nameInput = document.getElementById('other-doc-name');
+        const fileInput = document.getElementById('other-doc-file');
+        const dropzone = document.getElementById('other-doc-dropzone');
+        const selectedDiv = document.getElementById('other-doc-selected');
+        const uploadBtn = document.getElementById('other-doc-upload-btn');
+        const cancelBtn = document.getElementById('other-doc-cancel-btn');
+        let selectedFile = null;
+
+        function updateUploadBtn() {
+          uploadBtn.disabled = !(nameInput.value.trim() && selectedFile);
+        }
+
+        nameInput.addEventListener('input', updateUploadBtn);
+
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.borderColor = 'var(--primary)'; });
+        dropzone.addEventListener('dragleave', () => { dropzone.style.borderColor = 'var(--border-subtle)'; });
+        dropzone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          dropzone.style.borderColor = 'var(--border-subtle)';
+          if (e.dataTransfer.files[0]) {
+            selectedFile = e.dataTransfer.files[0];
+            selectedDiv.textContent = '📎 ' + selectedFile.name;
+            selectedDiv.style.display = 'block';
+            dropzone.style.display = 'none';
+            updateUploadBtn();
+          }
         });
-        input.click();
+
+        fileInput.addEventListener('change', () => {
+          if (fileInput.files[0]) {
+            selectedFile = fileInput.files[0];
+            selectedDiv.textContent = '📎 ' + selectedFile.name;
+            selectedDiv.style.display = 'block';
+            dropzone.style.display = 'none';
+            updateUploadBtn();
+          }
+        });
+
+        cancelBtn.addEventListener('click', () => formDiv.remove());
+
+        uploadBtn.addEventListener('click', async () => {
+          if (!nameInput.value.trim() || !selectedFile) return;
+          const docType = nameInput.value.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+          if (!docType) { alert('Please enter a valid document name.'); return; }
+          uploadBtn.disabled = true;
+          uploadBtn.textContent = 'Uploading...';
+          await uploadFile(docType, selectedFile);
+          formDiv.remove();
+        });
       });
     }
 
