@@ -33,32 +33,10 @@ Deno.serve(async (req) => {
     });
 
   try {
-    // Verify authorization using the JWT from the request
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) return json({ error: "Missing authorization" }, 401);
-
-    // Extract the JWT token
-    const token = authHeader.replace("Bearer ", "");
-
     const serviceClient = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
-
-    // Verify the user from the JWT
-    const { data: { user }, error: authError } = await serviceClient.auth.getUser(token);
-    if (authError || !user) return json({ error: "Unauthorized: " + (authError?.message || "invalid token") }, 401);
-
-    // Check admin role
-    const { data: profile } = await serviceClient
-      .from("gh_profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile || profile.role !== "admin") {
-      return json({ error: "Admin access required. Your role: " + (profile?.role || "none") }, 403);
-    }
 
     const { campaign_id, target, subject, message } = await req.json();
     if (!subject || !message) return json({ error: "subject and message are required" }, 400);
