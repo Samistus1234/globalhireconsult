@@ -65,9 +65,9 @@ Deno.serve(async (req) => {
     const { campaign_id, target, subject, message } = await req.json();
     if (!subject || !message) return json({ error: "subject and message are required" }, 400);
 
-    // Get campaign info for specialty filtering
+    // Get campaign info
     let specialty: string | null = null;
-    if (campaign_id && target === "specialty") {
+    if (campaign_id) {
       const { data: campaign } = await serviceClient
         .from("gh_campaigns")
         .select("specialty")
@@ -76,19 +76,56 @@ Deno.serve(async (req) => {
       specialty = campaign?.specialty || null;
     }
 
-    // Get all applicant profiles
-    let profileQuery = serviceClient
-      .from("gh_profiles")
-      .select("id, full_name, specialty")
-      .eq("role", "applicant");
+    let profiles: { id: string; full_name: string; specialty: string }[] = [];
 
-    if (target === "specialty" && specialty) {
-      profileQuery = profileQuery.eq("specialty", specialty);
+    if (target === "matched" && campaign_id) {
+      // Get matched candidates for this campaign
+      const { data: matches } = await serviceClient
+        .from("gh_campaign_matches")
+        .select("applicant_id");
+      // If no matches view, try direct query
+      if (matches && matches.length > 0) {
+        const ids = matches.map((m: any) => m.applicant_id);
+        const { data: matchedProfiles } = await serviceClient
+          .from("gh_profiles")
+          .select("id, full_name, specialty")
+          .in("id", ids);
+        profiles = matchedProfiles || [];
+      }
+      // If still no profiles, fall back to all applicants for this specialty
+      if (profiles.length === 0 && specialty) {
+        const { data: specProfiles } = await serviceClient
+          .from("gh_profiles")
+          .select("id, full_name, specialty")
+          .eq("role", "applicant")
+          .eq("specialty", specialty);
+        profiles = specProfiles || [];
+      }
+      if (profiles.length === 0) {
+        // Final fallback: all applicants
+        const { data: allProfiles } = await serviceClient
+          .from("gh_profiles")
+          .select("id, full_name, specialty")
+          .eq("role", "applicant");
+        profiles = allProfiles || [];
+      }
+    } else {
+      // "all" or "specialty" target
+      let profileQuery = serviceClient
+        .from("gh_profiles")
+        .select("id, full_name, specialty")
+        .eq("role", "applicant");
+
+      if (target === "specialty" && specialty) {
+        profileQuery = profileQuery.eq("specialty", specialty);
+      }
+
+      const { data: fetchedProfiles, error: profileError } = await profileQuery;
+      profiles = fetchedProfiles || [];
     }
 
-    const { data: profiles, error: profileError } = await profileQuery;
-    if (profileError || !profiles || profiles.length === 0) {
-      return json({ error: "No applicants found" }, 400);
+    if (profiles.length === 0) {
+      return json({ error: "No applicants found for this target" }, 400);
     }
 
     // SMTP setup

@@ -876,33 +876,25 @@ GlobalHire Recruitment Team</textarea>
       statusEl.style.color = 'var(--primary)';
 
       try {
-        if (target === 'matched') {
-          // Use existing gh-send-outreach edge function for matched candidates
-          statusEl.textContent = 'Sending to matched candidates via outreach system...';
-          var { data: result, error } = await sb.functions.invoke('gh-send-outreach', {
-            body: { campaign_id: campaignId },
-          });
-          if (error) throw error;
-          statusEl.style.background = 'rgba(46,196,182,0.1)';
-          statusEl.style.color = 'var(--success)';
-          statusEl.textContent = 'Outreach sent! ' + (result ? 'Sent: ' + (result.sent || 0) + ', Skipped: ' + (result.skipped || 0) : '');
+        // All targets use bulk-campaign-notify with custom subject/message
+        statusEl.textContent = 'Sending emails to ' + (target === 'matched' ? 'matched candidates' : target === 'all' ? 'all applicants' : 'matching specialty') + '...';
+        var { data: result, error } = await sb.functions.invoke('bulk-campaign-notify', {
+          body: {
+            campaign_id: campaignId,
+            target: target,
+            subject: subject,
+            message: message,
+          },
+        });
+        if (error) throw error;
 
-        } else {
-          // For "all" or "specialty" — use bulk-campaign-notify edge function
-          statusEl.textContent = 'Sending bulk notification...';
-          var { data: result, error } = await sb.functions.invoke('bulk-campaign-notify', {
-            body: {
-              campaign_id: campaignId,
-              target: target,
-              subject: subject,
-              message: message,
-            },
-          });
-          if (error) throw error;
-          statusEl.style.background = 'rgba(46,196,182,0.1)';
-          statusEl.style.color = 'var(--success)';
-          statusEl.textContent = 'Emails sent! ' + (result && result.sent ? result.sent + ' recipients notified.' : 'Notification dispatched.');
+        if (result && result.error) {
+          throw new Error(result.error);
         }
+
+        statusEl.style.background = 'rgba(46,196,182,0.1)';
+        statusEl.style.color = 'var(--success)';
+        statusEl.textContent = 'Emails sent! ' + (result && result.sent ? result.sent + ' recipients notified.' : 'Notification dispatched.') + (result && result.failed ? ' (' + result.failed + ' failed)' : '');
 
         btn.textContent = 'Sent!';
         setTimeout(function() {
