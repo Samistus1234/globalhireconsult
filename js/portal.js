@@ -234,13 +234,28 @@
     if (!form) return;
 
     // Fill form
-    const fields = ['full_name', 'phone', 'specialty', 'country_of_origin', 'years_of_experience', 'license_number'];
+    const fields = ['full_name', 'phone', 'specialty', 'country_of_origin', 'years_of_experience', 'license_number', 'dataflow_number', 'dataflow_country'];
     fields.forEach(f => {
       const el = form.querySelector(`[name="${f}"]`);
       if (el && currentProfile[f] !== null && currentProfile[f] !== undefined) {
         el.value = currentProfile[f];
       }
     });
+
+    // DataFlow checkboxes
+    const dfCompleted = form.querySelector('[name="dataflow_completed"]');
+    if (dfCompleted) dfCompleted.checked = !!currentProfile.dataflow_completed;
+    const dfElab = form.querySelector('[name="dataflow_via_elab"]');
+    if (dfElab) dfElab.checked = !!currentProfile.dataflow_via_elab;
+
+    // Show/hide DataFlow details based on checkbox
+    const dfDetails = document.getElementById('dataflow-details');
+    if (dfCompleted && dfDetails) {
+      dfDetails.style.display = dfCompleted.checked ? 'grid' : 'none';
+      dfCompleted.addEventListener('change', function() {
+        dfDetails.style.display = this.checked ? 'grid' : 'none';
+      });
+    }
 
     // Preferred destinations checkboxes
     if (currentProfile.preferred_destinations) {
@@ -269,7 +284,11 @@
         years_of_experience: parseInt(form.years_of_experience.value) || 0,
         license_number: form.license_number.value.trim(),
         preferred_destinations: destinations,
-        profile_completed: !!(form.specialty.value && form.country_of_origin.value && form.phone.value.trim())
+        profile_completed: !!(form.specialty.value && form.country_of_origin.value && form.phone.value.trim()),
+        dataflow_completed: !!form.querySelector('[name="dataflow_completed"]')?.checked,
+        dataflow_number: (form.querySelector('[name="dataflow_number"]')?.value || '').trim() || null,
+        dataflow_country: (form.querySelector('[name="dataflow_country"]')?.value || '').trim() || null,
+        dataflow_via_elab: !!form.querySelector('[name="dataflow_via_elab"]')?.checked,
       };
 
       // Update initials

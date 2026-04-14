@@ -470,6 +470,7 @@
       { label: 'Experience', value: profile.years_of_experience != null ? profile.years_of_experience + ' years' : null },
       { label: 'License No.', value: profile.license_number },
       { label: 'Specialty Detail', value: profile.specialty_detail },
+      { label: 'DataFlow', value: profile.dataflow_completed ? ('Yes — ' + (profile.dataflow_country || '') + (profile.dataflow_number ? ' (' + profile.dataflow_number + ')' : '') + (profile.dataflow_via_elab ? ' [via eLab]' : '')) : 'No' },
       { label: 'Availability', value: profile.availability_status || 'active' },
       { label: 'Profile Complete', value: profile.profile_completed ? 'Yes' : 'No' },
       { label: 'Joined', value: profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '-' },
