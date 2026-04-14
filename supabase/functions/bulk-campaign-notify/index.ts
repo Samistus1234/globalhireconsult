@@ -33,23 +33,21 @@ Deno.serve(async (req) => {
     });
 
   try {
-    // Verify authorization
+    // Verify authorization using the JWT from the request
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) return json({ error: "Missing authorization" }, 401);
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) return json({ error: "Unauthorized" }, 401);
+    // Extract the JWT token
+    const token = authHeader.replace("Bearer ", "");
 
     const serviceClient = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
+
+    // Verify the user from the JWT
+    const { data: { user }, error: authError } = await serviceClient.auth.getUser(token);
+    if (authError || !user) return json({ error: "Unauthorized: " + (authError?.message || "invalid token") }, 401);
 
     // Check admin role
     const { data: profile } = await serviceClient
@@ -59,7 +57,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (!profile || profile.role !== "admin") {
-      return json({ error: "Admin access required" }, 403);
+      return json({ error: "Admin access required. Your role: " + (profile?.role || "none") }, 403);
     }
 
     const { campaign_id, target, subject, message } = await req.json();
