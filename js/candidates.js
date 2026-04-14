@@ -317,6 +317,7 @@
         '<td><span class="tag">' + GHE.escapeHtml(a.country_of_origin || '-') + '</span></td>' +
         '<td>' + GHE.escapeHtml((a.preferred_destinations || []).join(', ') || '-') + '</td>' +
         '<td>' + exp + '</td>' +
+        '<td>' + (a.dataflow_completed ? '<span class="badge badge-primary badge-dot" title="' + GHE.escapeHtml((a.dataflow_country || '') + (a.dataflow_via_elab ? ' [eLab]' : '')) + '">' + GHE.escapeHtml(a.dataflow_country || 'Yes') + '</span>' : '<span style="color:var(--text-tertiary);">No</span>') + '</td>' +
         '<td>' + docs + '</td>' +
         '<td><span class="badge ' + st.badge + ' badge-dot">' + st.label + '</span></td>' +
         '<td><span class="badge ' + av.badge + ' badge-dot">' + av.label + '</span></td>' +
