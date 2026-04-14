@@ -834,26 +834,112 @@ eLab Solutions International
 GlobalHire Recruitment Team</textarea>
         </div>
 
+        <div id="notify-preview" style="display:none;margin-bottom:var(--space-3);padding:var(--space-3);background:var(--bg-deep);border:1px solid var(--border-subtle);border-radius:var(--radius-md);font-size:var(--text-sm);max-height:200px;overflow-y:auto;"></div>
+
         <div id="notify-status" style="display:none;margin-bottom:var(--space-3);padding:var(--space-3);border-radius:var(--radius-md);font-size:var(--text-sm);"></div>
 
         <div style="display:flex;gap:var(--space-3);justify-content:flex-end;">
           <button class="btn btn-ghost btn-sm" onclick="document.getElementById('notify-modal').remove()">Cancel</button>
-          <button class="btn btn-primary btn-sm" id="btn-send-notify" onclick="CampaignNotify.send('${campaignId}')">
+          <button class="btn btn-secondary btn-sm" id="btn-preview-notify" onclick="CampaignNotify.preview('${campaignId}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Preview Recipients
+          </button>
+          <button class="btn btn-primary btn-sm" id="btn-send-notify" onclick="CampaignNotify.send('${campaignId}')" style="display:none;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            Send Emails
+            Confirm & Send Emails
           </button>
         </div>
       </div>
     `;
 
     document.body.appendChild(modal);
+
+    // Reset preview when target changes
+    document.getElementById('notify-target').addEventListener('change', function() {
+      document.getElementById('notify-preview').style.display = 'none';
+      document.getElementById('notify-preview').innerHTML = '';
+      document.getElementById('btn-send-notify').style.display = 'none';
+    });
+
     modal.addEventListener('click', function(e) {
       if (e.target === modal) modal.remove();
     });
   }
 
-  // ── Send notification emails ──
+  // ── Notify applicants — preview + send ──
   window.CampaignNotify = {
+    preview: async function(campaignId) {
+      var previewEl = document.getElementById('notify-preview');
+      var previewBtn = document.getElementById('btn-preview-notify');
+      var sendBtn = document.getElementById('btn-send-notify');
+      var target = document.getElementById('notify-target').value;
+
+      previewBtn.disabled = true;
+      previewBtn.textContent = 'Loading...';
+      previewEl.style.display = 'block';
+      previewEl.innerHTML = '<div style="color:var(--text-tertiary);text-align:center;padding:var(--space-4);">Fetching recipients...</div>';
+
+      try {
+        // Fetch recipients from the same logic the edge function uses — but locally
+        var recipients = [];
+
+        if (target === 'matched') {
+          var { data: matches } = await ghFrom('campaign_matches')
+            .select('applicant_id, full_name, match_score')
+            .eq('campaign_id', campaignId);
+          if (matches && matches.length > 0) {
+            recipients = matches.map(function(m) { return { name: m.full_name || 'Unknown', score: m.match_score, id: m.applicant_id }; });
+          }
+        } else if (target === 'specialty') {
+          // Get campaign specialty
+          var { data: camp } = await ghFrom('campaigns').select('specialty').eq('id', campaignId).single();
+          var spec = camp ? camp.specialty : null;
+          if (spec) {
+            var { data: profiles } = await ghFrom('profiles').select('id, full_name, specialty').eq('role', 'applicant').eq('specialty', spec);
+            if (profiles) {
+              recipients = profiles.map(function(p) { return { name: p.full_name || 'Unknown', specialty: p.specialty, id: p.id }; });
+            }
+          }
+        } else {
+          // All applicants
+          var { data: profiles } = await ghFrom('profiles').select('id, full_name, specialty').eq('role', 'applicant');
+          if (profiles) {
+            recipients = profiles.map(function(p) { return { name: p.full_name || 'Unknown', specialty: p.specialty, id: p.id }; });
+          }
+        }
+
+        if (recipients.length === 0) {
+          previewEl.innerHTML = '<div style="color:var(--warning);text-align:center;padding:var(--space-4);">' +
+            (target === 'matched' ? 'No matched candidates found for this campaign. Run AI Matching first.' : 'No applicants found for this criteria.') +
+            '</div>';
+          previewBtn.disabled = false;
+          previewBtn.textContent = 'Preview Recipients';
+          return;
+        }
+
+        var html = '<div style="font-weight:600;color:var(--text-primary);margin-bottom:8px;">' + recipients.length + ' recipients will receive this email:</div>';
+        recipients.forEach(function(r, i) {
+          html += '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;' + (i < recipients.length - 1 ? 'border-bottom:1px solid var(--border-subtle);' : '') + '">';
+          html += '<span style="width:20px;text-align:center;color:var(--text-tertiary);font-size:11px;">' + (i + 1) + '</span>';
+          html += '<span style="flex:1;color:var(--text-primary);font-size:13px;">' + escapeHtml(r.name) + '</span>';
+          if (r.score) html += '<span style="color:var(--primary);font-size:11px;font-weight:600;">' + r.score + '% match</span>';
+          if (r.specialty) html += '<span style="color:var(--text-tertiary);font-size:11px;">' + escapeHtml(r.specialty) + '</span>';
+          html += '</div>';
+        });
+        previewEl.innerHTML = html;
+
+        // Show send button
+        sendBtn.style.display = 'inline-flex';
+        previewBtn.disabled = false;
+        previewBtn.textContent = 'Preview Recipients';
+
+      } catch (err) {
+        previewEl.innerHTML = '<div style="color:var(--error);">Failed to load recipients: ' + escapeHtml(err.message || 'Unknown error') + '</div>';
+        previewBtn.disabled = false;
+        previewBtn.textContent = 'Preview Recipients';
+      }
+    },
+
     send: async function(campaignId) {
       var btn = document.getElementById('btn-send-notify');
       var statusEl = document.getElementById('notify-status');
