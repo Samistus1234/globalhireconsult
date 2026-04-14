@@ -76,6 +76,143 @@
     showView('view-form');
   });
 
+  // ── Sync featured listings as campaigns ──
+  document.getElementById('btn-sync-listings')?.addEventListener('click', async () => {
+    var syncBtn = document.getElementById('btn-sync-listings');
+    syncBtn.disabled = true;
+    syncBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" class="spin-icon"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/></svg> Syncing...';
+
+    // Featured listings from jobs.js — define them here too
+    var featuredListings = [
+      {
+        title: 'Elderly Caregiver',
+        employer_name: 'Qatar Healthcare Employer',
+        destination_country: 'Qatar',
+        specialty: 'Elderly Care',
+        positions: 3,
+        salary_display: '2,500 QAR/month',
+        min_experience: 2,
+        visa_sponsored: true,
+        description: 'Provide daily living assistance, medication reminders, mobility support, and companionship for elderly patients in Qatar.',
+      },
+      {
+        title: 'Paediatric Caregiver',
+        employer_name: 'Qatar Healthcare Employer',
+        destination_country: 'Qatar',
+        specialty: 'Paediatric Care',
+        positions: 2,
+        salary_display: '2,500 QAR/month',
+        min_experience: 2,
+        visa_sponsored: true,
+        description: 'Provide child care, developmental support, feeding, bathing, health monitoring, and age-appropriate activities.',
+      },
+      {
+        title: 'Work in Albania (Europe) — D Visa',
+        employer_name: 'eLab Solutions International',
+        destination_country: 'Albania',
+        specialty: 'General / Multiple Roles',
+        positions: 0,
+        salary_display: '600–850 EUR/month',
+        min_experience: 0,
+        visa_sponsored: true,
+        description: 'Work legally in Europe with a Type D working visa and residence permit. Earn in Euros, with accommodation and meals included.',
+      },
+      {
+        title: 'Registered Nurse — 2-Year Contract',
+        employer_name: 'Qatar Hospital',
+        destination_country: 'Qatar',
+        specialty: 'General Nursing',
+        positions: 0,
+        salary_display: '4,500 QAR/month',
+        min_experience: 0,
+        visa_sponsored: true,
+        description: 'Nursing positions in Qatar with a 2-year contract. Salary of 4,500 QAR/month with accommodation, flight, and visa fully covered. Interviews starting in 1 week.',
+      },
+      {
+        title: 'Registered Nurse — 5-Year Contract',
+        employer_name: 'Qatar Hospital',
+        destination_country: 'Qatar',
+        specialty: 'General Nursing',
+        positions: 0,
+        salary_display: '4,400 QAR/month',
+        min_experience: 0,
+        visa_sponsored: true,
+        description: 'Long-term nursing positions in Qatar with a 5-year contract. Salary of 4,400 QAR/month with accommodation, flight, and visa fully covered.',
+      },
+      {
+        title: 'ENT Surgeon / Otorhinolaryngologist',
+        employer_name: 'Private Hospital — Saudi Arabia',
+        destination_country: 'Saudi Arabia',
+        specialty: 'Otorhinolaryngology (ENT)',
+        positions: 1,
+        salary_display: 'Competitive Tax-Free',
+        min_experience: 2,
+        visa_sponsored: true,
+        description: 'A leading private hospital in Saudi Arabia is recruiting an ENT Specialist. Must have DataFlow, Mumaris (SCFHS), and Prometric.',
+      },
+      {
+        title: 'eLab Complete — Guaranteed Nursing Placement',
+        employer_name: 'eLab Solutions International',
+        destination_country: 'Qatar & Saudi Arabia',
+        specialty: 'General Nursing',
+        positions: 0,
+        salary_display: 'Guaranteed Placement',
+        min_experience: 0,
+        visa_sponsored: true,
+        description: 'End-to-end guaranteed nursing placement program. We handle everything from verification to deployment. Money-back guarantee.',
+      },
+    ];
+
+    var synced = 0;
+    var skipped = 0;
+
+    for (var listing of featuredListings) {
+      // Check if campaign with same title already exists
+      var { data: existing } = await ghFrom('campaigns')
+        .select('id')
+        .eq('title', listing.title)
+        .limit(1);
+
+      if (existing && existing.length > 0) {
+        skipped++;
+        continue;
+      }
+
+      // Insert as active campaign
+      var { error } = await ghFrom('campaigns')
+        .insert({
+          title: listing.title,
+          specialty: listing.specialty,
+          destination_country: listing.destination_country,
+          min_experience: listing.min_experience,
+          positions: listing.positions || 1,
+          salary_display: listing.salary_display,
+          employer_name: listing.employer_name,
+          visa_sponsored: listing.visa_sponsored,
+          description: listing.description,
+          status: 'active',
+          created_by: currentSession.user.id,
+          matched_count: 0,
+          contacted_count: 0,
+          interested_count: 0,
+          declined_count: 0,
+          maybe_later_count: 0,
+        });
+
+      if (error) {
+        console.warn('Sync error for ' + listing.title + ':', error);
+      } else {
+        synced++;
+      }
+    }
+
+    syncBtn.disabled = false;
+    syncBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg> Sync Listings';
+
+    alert('Sync complete! ' + synced + ' new campaigns created, ' + skipped + ' already existed.');
+    await loadCampaigns();
+  });
+
   document.getElementById('btn-back-form')?.addEventListener('click', () => {
     showView('view-list');
   });
