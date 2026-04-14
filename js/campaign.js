@@ -894,13 +894,19 @@ GlobalHire Recruitment Team</textarea>
 
         statusEl.style.background = 'rgba(46,196,182,0.1)';
         statusEl.style.color = 'var(--success)';
-        statusEl.textContent = 'Emails sent! ' + (result && result.sent ? result.sent + ' recipients notified.' : 'Notification dispatched.') + (result && result.failed ? ' (' + result.failed + ' failed)' : '');
+        var summary = 'Emails sent successfully!';
+        if (result) {
+          summary += '\n\nSent: ' + (result.sent || 0) + ' recipients';
+          if (result.failed) summary += '\nFailed: ' + result.failed;
+          if (result.total) summary += '\nTotal applicants found: ' + result.total;
+        }
+        statusEl.style.whiteSpace = 'pre-line';
+        statusEl.textContent = summary;
 
         btn.textContent = 'Sent!';
-        setTimeout(function() {
-          var modal = document.getElementById('notify-modal');
-          if (modal) modal.remove();
-        }, 3000);
+        btn.style.background = 'var(--success)';
+        btn.style.borderColor = 'var(--success)';
+        // Don't auto-close — let user read the result and close manually
 
       } catch (err) {
         console.error('Notify error:', err);
