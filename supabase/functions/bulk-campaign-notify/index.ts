@@ -55,11 +55,12 @@ Deno.serve(async (req) => {
     let profiles: { id: string; full_name: string; specialty: string }[] = [];
 
     if (target === "matched" && campaign_id) {
-      // Get matched candidates for this campaign
+      // Get ONLY matched candidates for THIS specific campaign — no fallbacks
       const { data: matches } = await serviceClient
         .from("gh_campaign_matches")
-        .select("applicant_id");
-      // If no matches view, try direct query
+        .select("applicant_id")
+        .eq("campaign_id", campaign_id);
+
       if (matches && matches.length > 0) {
         const ids = matches.map((m: any) => m.applicant_id);
         const { data: matchedProfiles } = await serviceClient
@@ -68,22 +69,9 @@ Deno.serve(async (req) => {
           .in("id", ids);
         profiles = matchedProfiles || [];
       }
-      // If still no profiles, fall back to all applicants for this specialty
-      if (profiles.length === 0 && specialty) {
-        const { data: specProfiles } = await serviceClient
-          .from("gh_profiles")
-          .select("id, full_name, specialty")
-          .eq("role", "applicant")
-          .eq("specialty", specialty);
-        profiles = specProfiles || [];
-      }
+
       if (profiles.length === 0) {
-        // Final fallback: all applicants
-        const { data: allProfiles } = await serviceClient
-          .from("gh_profiles")
-          .select("id, full_name, specialty")
-          .eq("role", "applicant");
-        profiles = allProfiles || [];
+        return json({ error: "No matched candidates found for this campaign. Run AI Matching first to find matching applicants." }, 400);
       }
     } else {
       // "all" or "specialty" target
@@ -118,12 +106,14 @@ Deno.serve(async (req) => {
 
     let sentCount = 0;
     let failCount = 0;
+    const recipients: { name: string; email: string; status: string }[] = [];
 
     for (const p of profiles) {
       try {
         // Get email from auth.users
         const { data: authUser } = await serviceClient.auth.admin.getUserById(p.id);
         if (!authUser?.user?.email) {
+          recipients.push({ name: p.full_name || "Unknown", email: "no email found", status: "failed" });
           failCount++;
           continue;
         }
@@ -144,8 +134,10 @@ Deno.serve(async (req) => {
           html: htmlBody,
         });
 
+        recipients.push({ name, email, status: "sent" });
         sentCount++;
       } catch (emailErr) {
+        recipients.push({ name: p.full_name || "Unknown", email: "error", status: "failed" });
         console.error(`Failed to send to ${p.id}:`, emailErr);
         failCount++;
       }
@@ -153,7 +145,7 @@ Deno.serve(async (req) => {
 
     transport.close();
 
-    return json({ success: true, sent: sentCount, failed: failCount, total: profiles.length });
+    return json({ success: true, sent: sentCount, failed: failCount, total: profiles.length, recipients });
 
   } catch (err) {
     console.error("bulk-campaign-notify error:", err);

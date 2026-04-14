@@ -892,16 +892,30 @@ GlobalHire Recruitment Team</textarea>
           throw new Error(result.error);
         }
 
-        statusEl.style.background = 'rgba(46,196,182,0.1)';
-        statusEl.style.color = 'var(--success)';
-        var summary = 'Emails sent successfully!';
-        if (result) {
-          summary += '\n\nSent: ' + (result.sent || 0) + ' recipients';
-          if (result.failed) summary += '\nFailed: ' + result.failed;
-          if (result.total) summary += '\nTotal applicants found: ' + result.total;
+        statusEl.style.background = 'rgba(46,196,182,0.08)';
+        statusEl.style.color = 'var(--text-primary)';
+        statusEl.style.border = '1px solid rgba(46,196,182,0.3)';
+        statusEl.style.whiteSpace = 'normal';
+
+        var summaryHtml = '<div style="font-weight:700;color:var(--success);margin-bottom:8px;">Emails sent successfully!</div>';
+        summaryHtml += '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">Sent: ' + (result.sent || 0) + ' | Failed: ' + (result.failed || 0) + ' | Total: ' + (result.total || 0) + '</div>';
+
+        if (result.recipients && result.recipients.length > 0) {
+          summaryHtml += '<div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">Recipients:</div>';
+          summaryHtml += '<div style="max-height:150px;overflow-y:auto;font-size:12px;">';
+          result.recipients.forEach(function(r) {
+            var statusIcon = r.status === 'sent' ? '✓' : '✗';
+            var statusColor = r.status === 'sent' ? 'var(--success)' : 'var(--error)';
+            summaryHtml += '<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--border-subtle);">';
+            summaryHtml += '<span style="color:' + statusColor + ';font-weight:700;">' + statusIcon + '</span>';
+            summaryHtml += '<span style="color:var(--text-primary);">' + escapeHtml(r.name) + '</span>';
+            summaryHtml += '<span style="color:var(--text-tertiary);font-size:11px;margin-left:auto;">' + escapeHtml(r.email) + '</span>';
+            summaryHtml += '</div>';
+          });
+          summaryHtml += '</div>';
         }
-        statusEl.style.whiteSpace = 'pre-line';
-        statusEl.textContent = summary;
+
+        statusEl.innerHTML = summaryHtml;
 
         btn.textContent = 'Sent!';
         btn.style.background = 'var(--success)';
