@@ -435,6 +435,16 @@
 
     docs = docs || [];
 
+    // Fetch merged-PDF record (admin feature)
+    var mergedRec = null;
+    try {
+      var mRes = await ghFrom('merged_documents')
+        .select('file_path, generated_at')
+        .eq('applicant_id', candidateId)
+        .maybeSingle();
+      if (!mRes.error && mRes.data) mergedRec = mRes.data;
+    } catch (_) { /* table may not exist in dev — non-fatal */ }
+
     // Fetch recruiter notes for this candidate
     var { data: recruiterNotes } = await ghFrom('recruiter_notes')
       .select('id, note, created_at, recruiter_id')
@@ -499,7 +509,25 @@
 
     // Documents section
     html += '<div style="border-top:1px solid var(--border-subtle);padding-top:var(--space-5);margin-top:var(--space-2);">';
-    html += '<div style="font-size:var(--text-base);font-weight:700;color:var(--text-primary);margin-bottom:var(--space-4);">Documents (' + docs.length + ')</div>';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);margin-bottom:var(--space-4);">';
+    html += '<div style="font-size:var(--text-base);font-weight:700;color:var(--text-primary);">Documents (' + docs.length + ')</div>';
+    if (docs.length > 0) {
+      html += '<button id="btn-merge-docs" class="btn btn-secondary btn-sm" style="font-size:12px;">Merge documents</button>';
+    }
+    html += '</div>';
+
+    if (mergedRec && mergedRec.file_path) {
+      var genLabel = mergedRec.generated_at
+        ? new Date(mergedRec.generated_at).toLocaleString()
+        : '';
+      html += '<div id="merged-pdf-link" style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);padding:var(--space-3);background:var(--success-muted,#d1fae5);border:1px solid var(--success,#059669);border-radius:var(--radius-md);margin-bottom:var(--space-3);">';
+      html += '<div>';
+      html += '<div style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary);">Merged PDF ready</div>';
+      html += '<div style="font-size:11px;color:var(--text-tertiary);">Generated ' + GHE.escapeHtml(genLabel) + '</div>';
+      html += '</div>';
+      html += '<button class="btn btn-ghost btn-sm btn-dl-merged" data-path="' + GHE.escapeHtml(mergedRec.file_path) + '" style="font-size:11px;">Download</button>';
+      html += '</div>';
+    }
 
     if (docs.length === 0) {
       html += '<p style="color:var(--text-tertiary);font-size:var(--text-sm);">No documents uploaded yet.</p>';
@@ -746,6 +774,31 @@
         }
       });
     });
+
+    // Bind merged-PDF download button
+    panelContentEl.querySelectorAll('.btn-dl-merged').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        var { data, error } = await sb.storage.from('gh-applicant-documents').createSignedUrl(btn.dataset.path, 3600);
+        if (data && data.signedUrl) {
+          window.open(data.signedUrl, '_blank');
+        } else {
+          alert('Could not generate download link.');
+        }
+      });
+    });
+
+    // Bind Merge documents button
+    var mergeBtn = panelContentEl.querySelector('#btn-merge-docs');
+    if (mergeBtn && window.GHMergeDocs) {
+      mergeBtn.addEventListener('click', function () {
+        GHMergeDocs.open(candidateId, {
+          onSaved: function () {
+            // Re-open panel to refresh merged-PDF banner
+            openCandidatePanel(candidateId);
+          }
+        });
+      });
+    }
 
     // ── Assign / Unassign buttons ──
     panelContentEl.querySelectorAll('.btn-assign, .btn-unassign').forEach(function (btn) {

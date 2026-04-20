@@ -92,10 +92,10 @@ All lazy-loaded; unaffected admins never pay the bytes.
 Merged file written to:
 
 ```
-gh-applicant-documents/{applicantId}/merged/merged.pdf
+gh-applicant-documents/merged/{applicantId}/merged.pdf
 ```
 
-Separate `merged/` subfolder so it is easy to distinguish from raw uploads in the bucket listing and in RLS expressions.
+The top-level `merged/` segment isolates these files from applicant-uploaded docs. Critically, the existing applicant SELECT policy on this bucket is `foldername[1] = auth.uid()`, which does not match `"merged"` — so applicants cannot read merged files via that policy. Only the admin read/write policies apply, which matches the admin-only access requirement.
 
 ### 5. DB — new table `globalhire.merged_documents`
 
@@ -139,7 +139,7 @@ Storage RLS: extend existing admin read/write policies on `gh-applicant-document
    - "Generated: {YYYY-MM-DD HH:mm} UTC"
    - Numbered list of included docs: "1. Passport (passport.pdf)", "2. CV (resume.docx)", etc.
 6. Assemble final `PDFDocument`: cover page → docs in selected order.
-7. `sb.storage.from('gh-applicant-documents').upload('{applicantId}/merged/merged.pdf', bytes, { upsert: true, contentType: 'application/pdf' })`.
+7. `sb.storage.from('gh-applicant-documents').upload('merged/{applicantId}/merged.pdf', bytes, { upsert: true, contentType: 'application/pdf' })`.
 8. Upsert into `globalhire.merged_documents` on conflict `(applicant_id)` — replace `file_path`, `source_doc_ids`, `generated_at`, `generated_by`.
 9. Trigger browser download via `URL.createObjectURL(blob)` + anchor click.
 10. Close modal, refresh drawer so the **Download merged PDF** link appears/updates.
