@@ -1430,18 +1430,17 @@
           userId = user.id;
         }
 
-        // 2. Check if profile already exists + role guard.
-        //    Refuse if existing row has role != 'applicant' so we never
-        //    downgrade an admin/recruiter account.
+        // 2. Role guard. A trigger on auth.users auto-creates a profile row
+        //    so profile-presence alone is not a reliable "returning user"
+        //    signal — only the session-reuse step above is. We use this
+        //    read purely to refuse if the profile carries a non-applicant
+        //    role so we never downgrade an admin/recruiter account.
         var profileResult = await window.ghSupabase.from('gh_profiles').select('id, role').eq('id', userId).maybeSingle();
-        if (profileResult.data) {
-          isExistingUser = true;
-          if (profileResult.data.role && profileResult.data.role !== 'applicant') {
-            errorText.textContent = 'This account is registered with a non-applicant role. Please use a personal email, or contact us on WhatsApp.';
-            errorEl.style.display = 'flex';
-            resetButton();
-            return;
-          }
+        if (profileResult.data && profileResult.data.role && profileResult.data.role !== 'applicant') {
+          errorText.textContent = 'This account is registered with a non-applicant role. Please use a personal email, or contact us on WhatsApp.';
+          errorEl.style.display = 'flex';
+          resetButton();
+          return;
         }
 
         // 3. Upsert profile (no source column)
