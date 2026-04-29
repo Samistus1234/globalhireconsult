@@ -8,13 +8,124 @@ const corsHeaders = {
 };
 
 /*
-  welcome-applicant — Called from landing pages (Albania, etc.) after signUp + doc upload.
+  welcome-applicant — Called from landing pages after signUp + doc upload.
   Sends a branded welcome email with a password-reset link via Gmail SMTP.
 
   Body: { email: string, name: string, source?: string }
   No auth required (called from public landing pages).
   Uses service role key to generate a password recovery link.
+
+  Variants are selected by `source`:
+    - tech-*  (e.g. tech-careers-middle-east)  → tech recruitment copy
+    - everything else                           → healthcare default
 */
+
+type Variant = {
+  badgeText: string;
+  badgeColor: string;     // hex
+  introPara: string;      // sentence 1 (HTML allowed)
+  setupPara: string;      // sentence 2 (HTML allowed) — leads into CTA
+  footerSubtitle: string; // bottom-of-email tagline
+  subject: string;
+};
+
+const HEALTHCARE_LABELS: Record<string, string> = {
+  "albania-work-visa":  "Albania Work Visa",
+  "saudi-ent-surgeon":  "Saudi ENT Surgeon Placement",
+  "saudi-fast-track":   "Saudi Fast Track",
+  "qatar-caregivers":   "Qatar Caregivers",
+};
+
+function variantFor(source: string | undefined): Variant {
+  // ── Tech recruitment branch ──
+  if (source && source.startsWith("tech-")) {
+    return {
+      badgeText: "APPLICATION RECEIVED",
+      badgeColor: "#0077B6",
+      introPara:
+        'Thank you for applying through Global Hire for senior technology roles in the Middle East. ' +
+        'We have received your CV, and our recruitment desk reviews every application — you can expect a ' +
+        'response within 72 hours on confirmed-fit profiles.',
+      setupPara:
+        'We\'ve created your Global Hire portal account. Click the button below to ' +
+        '<strong style="color:#0F172A;">set your password</strong> and access your portal, ' +
+        'where you can track this application and submit additional materials at any time.',
+      footerSubtitle: "Global Hire — International Recruitment",
+      subject: "Welcome to Global Hire — Set Your Password",
+    };
+  }
+
+  // ── Healthcare default (preserves existing behaviour) ──
+  const label = HEALTHCARE_LABELS[source ?? ""] ?? "GlobalHire";
+  return {
+    badgeText: "DOCUMENTS RECEIVED",
+    badgeColor: "#2EC4B6",
+    introPara:
+      'Thank you for applying to the <strong style="color:#0F172A;">' + esc(label) + '</strong> program. ' +
+      'We have received your documents and our team will review them within 48 hours.',
+    setupPara:
+      'We\'ve created your GlobalHire portal account. Click the button below to ' +
+      '<strong style="color:#0F172A;">set your password</strong> and access your portal where you can ' +
+      'track your application and manage your documents.',
+    footerSubtitle: "GlobalHire@eLab — International Healthcare Recruitment",
+    subject: "Welcome to GlobalHire — Set Your Password",
+  };
+}
+
+function buildEmail(applicantName: string, resetLink: string, portalOrigin: string, v: Variant): { html: string; text: string } {
+  const safeName = esc(applicantName);
+
+  const html = [
+    '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>',
+    '<body style="margin:0;padding:0;background:#F0F4F8;font-family:Segoe UI,Roboto,Helvetica Neue,sans-serif;color:#0F172A;">',
+    '<table width="100%" cellpadding="0" cellspacing="0" style="background:#F0F4F8;padding:40px 20px;"><tr><td align="center">',
+    '<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;">',
+
+    // Header
+    '<tr><td style="padding:28px 40px 20px;border-bottom:1px solid #E2E8F0;"><table width="100%"><tr>',
+    '<td><span style="display:inline-block;width:34px;height:34px;background:#0077B6;border-radius:8px;text-align:center;line-height:34px;font-weight:800;color:#fff;font-size:14px;">G</span></td>',
+    '<td style="padding-left:12px;font-size:18px;font-weight:800;color:#0F172A;letter-spacing:-0.3px;">Global<span style="color:#0077B6;">Hire</span></td>',
+    '</tr></table></td></tr>',
+
+    // Badge
+    '<tr><td style="padding:24px 40px 0;"><span style="display:inline-block;padding:5px 14px;border-radius:50px;font-size:11px;font-weight:700;letter-spacing:1px;color:' + v.badgeColor + ';background:' + v.badgeColor + '15;border:1px solid ' + v.badgeColor + '30;">' + v.badgeText + '</span></td></tr>',
+
+    // Body
+    '<tr><td style="padding:20px 40px 32px;">',
+    '<p style="margin:0 0 20px;font-size:15px;color:#475569;">Hi <strong style="color:#0F172A;">' + safeName + '</strong>,</p>',
+    '<p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#475569;">' + v.introPara + '</p>',
+    '<p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#475569;">' + v.setupPara + '</p>',
+
+    // CTA Button
+    '<div style="margin:28px 0;">',
+    '<a href="' + resetLink + '" style="display:inline-block;padding:14px 36px;background:#0077B6;color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;border-radius:8px;">Set Your Password & Access Portal</a>',
+    '</div>',
+
+    '<p style="margin:0 0 8px;font-size:13px;color:#94A3B8;">This link expires in 24 hours. If it expires, go to the login page and click "Forgot Password" to get a new link.</p>',
+    '<p style="margin:0 0 0;font-size:13px;color:#94A3B8;">Portal: <a href="' + portalOrigin + '/login.html" style="color:#0077B6;">' + portalOrigin + '/login.html</a></p>',
+
+    '</td></tr>',
+
+    // Footer
+    '<tr><td style="padding:20px 40px;border-top:1px solid #E2E8F0;text-align:center;">',
+    '<p style="margin:0 0 4px;font-size:12px;color:#94A3B8;">' + v.footerSubtitle + '</p>',
+    '<p style="margin:0;font-size:11px;color:#CBD5E1;">eLab Solutions International LLC</p>',
+    '</td></tr></table></td></tr></table></body></html>',
+  ].join("\n");
+
+  const stripTags = (s: string) =>
+    s.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+
+  const text =
+    `Hi ${applicantName},\n\n` +
+    `${stripTags(v.introPara)}\n\n` +
+    `${stripTags(v.setupPara)}\n\n` +
+    `Set your password and access your portal:\n${resetLink}\n\n` +
+    `This link expires in 24 hours.\n\n` +
+    `— ${stripTags(v.footerSubtitle)}`;
+
+  return { html, text };
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -49,64 +160,22 @@ Deno.serve(async (req) => {
       return json({ error: "Failed to generate recovery link" }, 500);
     }
 
-    // The action_link contains the full recovery URL
     const resetLink = linkData?.properties?.action_link;
     if (!resetLink) {
       return json({ error: "No recovery link generated" }, 500);
     }
 
-    // ── Build email ──
+    // ── Pick variant + build email ──
     const applicantName = name || "there";
-    const sourceLabel = source === "albania-work-visa" ? "Albania Work Visa"
-      : source === "saudi-ent-surgeon" ? "Saudi ENT Surgeon Placement"
-      : source === "saudi-fast-track" ? "Saudi Fast Track"
-      : source === "qatar-caregivers" ? "Qatar Caregivers"
-      : "GlobalHire";
-
-    const fullHtml = [
-      '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>',
-      '<body style="margin:0;padding:0;background:#F0F4F8;font-family:Segoe UI,Roboto,Helvetica Neue,sans-serif;color:#0F172A;">',
-      '<table width="100%" cellpadding="0" cellspacing="0" style="background:#F0F4F8;padding:40px 20px;"><tr><td align="center">',
-      '<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;">',
-
-      // Header
-      '<tr><td style="padding:28px 40px 20px;border-bottom:1px solid #E2E8F0;"><table width="100%"><tr>',
-      '<td><span style="display:inline-block;width:34px;height:34px;background:#0077B6;border-radius:8px;text-align:center;line-height:34px;font-weight:800;color:#fff;font-size:14px;">G</span></td>',
-      '<td style="padding-left:12px;font-size:18px;font-weight:800;color:#0F172A;letter-spacing:-0.3px;">Global<span style="color:#0077B6;">Hire</span></td>',
-      '</tr></table></td></tr>',
-
-      // Badge
-      '<tr><td style="padding:24px 40px 0;"><span style="display:inline-block;padding:5px 14px;border-radius:50px;font-size:11px;font-weight:700;letter-spacing:1px;color:#2EC4B6;background:#2EC4B615;border:1px solid #2EC4B630;">DOCUMENTS RECEIVED</span></td></tr>',
-
-      // Body
-      '<tr><td style="padding:20px 40px 32px;">',
-      '<p style="margin:0 0 20px;font-size:15px;color:#475569;">Hi <strong style="color:#0F172A;">' + esc(applicantName) + '</strong>,</p>',
-      '<p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#475569;">Thank you for applying to the <strong style="color:#0F172A;">' + esc(sourceLabel) + '</strong> program. We have received your documents and our team will review them within 48 hours.</p>',
-      '<p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#475569;">We\'ve created your GlobalHire portal account. Click the button below to <strong style="color:#0F172A;">set your password</strong> and access your portal where you can track your application and manage your documents.</p>',
-
-      // CTA Button
-      '<div style="margin:28px 0;">',
-      '<a href="' + resetLink + '" style="display:inline-block;padding:14px 36px;background:#0077B6;color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;border-radius:8px;">Set Your Password & Access Portal</a>',
-      '</div>',
-
-      '<p style="margin:0 0 8px;font-size:13px;color:#94A3B8;">This link expires in 24 hours. If it expires, go to the login page and click "Forgot Password" to get a new link.</p>',
-      '<p style="margin:0 0 0;font-size:13px;color:#94A3B8;">Portal: <a href="' + portalOrigin + '/login.html" style="color:#0077B6;">' + portalOrigin + '/login.html</a></p>',
-
-      '</td></tr>',
-
-      // Footer
-      '<tr><td style="padding:20px 40px;border-top:1px solid #E2E8F0;text-align:center;">',
-      '<p style="margin:0 0 4px;font-size:12px;color:#94A3B8;">GlobalHire@eLab \u2014 International Healthcare Recruitment</p>',
-      '<p style="margin:0;font-size:11px;color:#CBD5E1;">eLab Solutions International LLC</p>',
-      '</td></tr></table></td></tr></table></body></html>',
-    ].join("\n");
-
-    const plainText = `Hi ${applicantName},\n\nThank you for applying to the ${sourceLabel} program. We received your documents and will review them within 48 hours.\n\nSet your password and access your portal:\n${resetLink}\n\nThis link expires in 24 hours.\n\n— GlobalHire@eLab`;
+    const variant = variantFor(source);
+    const { html, text } = buildEmail(applicantName, resetLink, portalOrigin, variant);
 
     // ── Send via Gmail SMTP ──
     const smtpUser = Deno.env.get("GMAIL_USER") || Deno.env.get("SMTP_USER") || "support@elabsolution.org";
     const smtpPass = Deno.env.get("GMAIL_APP_PASSWORD") || Deno.env.get("SMTP_PASS");
     if (!smtpPass) return json({ error: "SMTP credentials not configured" }, 500);
+
+    const fromName = source && source.startsWith("tech-") ? "Global Hire" : "GlobalHire@eLab";
 
     const transport = nodemailer.createTransport({
       host: "smtp.gmail.com",
@@ -116,16 +185,16 @@ Deno.serve(async (req) => {
     });
 
     await transport.sendMail({
-      from: '"GlobalHire@eLab" <' + smtpUser + '>',
+      from: '"' + fromName + '" <' + smtpUser + '>',
       to: email,
-      subject: "Welcome to GlobalHire \u2014 Set Your Password",
-      text: plainText,
-      html: fullHtml,
+      subject: variant.subject,
+      text,
+      html,
     });
 
     transport.close();
 
-    return json({ success: true, sent_to: email });
+    return json({ success: true, sent_to: email, variant: source && source.startsWith("tech-") ? "tech" : "healthcare" });
 
   } catch (err) {
     console.error("welcome-applicant error:", err);
