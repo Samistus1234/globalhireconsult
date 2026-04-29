@@ -1441,12 +1441,24 @@
         let userId;
         let isExistingUser = false;
 
-        // 1. Existing session?
+        // 1. Existing session — but only reuse if it belongs to THIS email.
+        //    Otherwise the form would attach the application to whoever was
+        //    already logged in (e.g. an admin testing the page) and silently
+        //    overwrite their profile. So we only reuse on email match; on
+        //    mismatch we sign that session out and fall through to signUp.
         const sessionRes = await window.ghSupabase.auth.getSession();
-        if (sessionRes.data && sessionRes.data.session && sessionRes.data.session.user) {
-          userId = sessionRes.data.session.user.id;
+        const sess       = sessionRes.data && sessionRes.data.session;
+        const sessEmail  = sess && sess.user ? (sess.user.email || '').toLowerCase() : '';
+        const typedEmail = email.toLowerCase();
+
+        if (sess && sess.user && sessEmail === typedEmail) {
+          // Same person returning — reuse session
+          userId = sess.user.id;
           isExistingUser = true;
         } else {
+          if (sess) {
+            try { await window.ghSupabase.auth.signOut(); } catch (e) { console.warn('signOut failed:', e); }
+          }
           // 2. signUp with random password
           const randomPwd = (
             crypto.randomUUID
@@ -1489,9 +1501,18 @@
           userId = u.id;
         }
 
-        // 3. Profile already there?
-        const profileRes = await window.ghSupabase.from('gh_profiles').select('id').eq('id', userId).maybeSingle();
-        if (profileRes.data) isExistingUser = true;
+        // 3. Profile already there? + role guard.
+        //    If a row exists with role != 'applicant' (admin, recruiter, …),
+        //    refuse — never downgrade a non-applicant account.
+        const profileRes = await window.ghSupabase.from('gh_profiles').select('id, role').eq('id', userId).maybeSingle();
+        if (profileRes.data) {
+          isExistingUser = true;
+          if (profileRes.data.role && profileRes.data.role !== 'applicant') {
+            showError('This account is registered with a non-applicant role. Please use a personal email, or contact us at headoffice@elabsolution.org.');
+            setSubmitting(false);
+            return;
+          }
+        }
 
         // 4. Upsert profile
         const upsertRes = await window.ghFrom('profiles').upsert({
