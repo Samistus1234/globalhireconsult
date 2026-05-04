@@ -65,7 +65,7 @@
       console.error('Failed to load candidates:', error);
       var tbody = document.getElementById('candidates-tbody');
       if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:var(--space-8);color:var(--error);">Failed to load candidates. Please refresh.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:var(--space-8);color:var(--error);">Failed to load candidates. Please refresh.</td></tr>';
       }
       return;
     }
@@ -248,7 +248,7 @@
     var pageData = filteredApplicants.slice(startIdx, startIdx + pageSize);
 
     if (pageData.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">No candidates match the current filters.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">No candidates match the current filters.</td></tr>';
       return;
     }
 
@@ -302,6 +302,11 @@
         ? '<button class="btn btn-primary btn-sm btn-reactivate" data-id="' + a.id + '">Reactivate</button>'
         : '<button class="btn btn-ghost btn-sm btn-view" data-id="' + a.id + '">View</button>';
 
+      // Applied date
+      var appliedDate = a.created_at
+        ? new Date(a.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+        : '-';
+
       return '<tr>' +
         '<td>' +
           '<div class="applicant-row">' +
@@ -321,6 +326,7 @@
         '<td>' + docs + '</td>' +
         '<td><span class="badge ' + st.badge + ' badge-dot">' + st.label + '</span></td>' +
         '<td><span class="badge ' + av.badge + ' badge-dot">' + av.label + '</span></td>' +
+        '<td style="white-space:nowrap;color:var(--text-secondary);font-size:13px;">' + appliedDate + '</td>' +
         '<td>' + actionHtml + '</td>' +
       '</tr>';
     }).join('');
@@ -1089,7 +1095,7 @@
   // ── Export: CSV ──
   document.getElementById('export-csv')?.addEventListener('click', function () {
     exportMenu.style.display = 'none';
-    var rows = [['Name', 'Email', 'Specialty', 'Origin', 'Destination', 'Experience', 'Docs', 'Pipeline', 'Availability', 'Source']];
+    var rows = [['Name', 'Email', 'Specialty', 'Origin', 'Destination', 'Experience', 'Docs', 'Pipeline', 'Availability', 'Source', 'Applied']];
     filteredApplicants.forEach(function (a) {
       rows.push([
         a.full_name || '',
@@ -1101,7 +1107,8 @@
         (a.total_docs != null ? a.total_docs : 0) + ' docs',
         a.pipeline_status || '',
         a.availability_status || 'active',
-        a.source || 'direct'
+        a.source || 'direct',
+        a.created_at ? a.created_at.slice(0, 10) : ''
       ]);
     });
     var csv = rows.map(function (r) {
@@ -1128,7 +1135,8 @@
         a.years_of_experience != null ? a.years_of_experience + ' yrs' : '-',
         (a.total_docs != null ? a.total_docs : 0) + ' docs',
         a.pipeline_status || '-',
-        a.source || 'direct'
+        a.source || 'direct',
+        a.created_at ? new Date(a.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'
       ];
     });
 
@@ -1146,7 +1154,7 @@
     printWin.document.write('</style></head><body>');
     printWin.document.write('<h1>GlobalHire@eLab — Candidates Report</h1>');
     printWin.document.write('<p class="sub">Generated: ' + new Date().toLocaleString() + ' &bull; ' + rows.length + ' candidates</p>');
-    printWin.document.write('<table><thead><tr><th>Name</th><th>Specialty</th><th>Origin</th><th>Destination</th><th>Exp</th><th>Docs</th><th>Pipeline</th><th>Source</th></tr></thead><tbody>');
+    printWin.document.write('<table><thead><tr><th>Name</th><th>Specialty</th><th>Origin</th><th>Destination</th><th>Exp</th><th>Docs</th><th>Pipeline</th><th>Source</th><th>Applied</th></tr></thead><tbody>');
     rows.forEach(function (r) {
       printWin.document.write('<tr>' + r.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>');
     });

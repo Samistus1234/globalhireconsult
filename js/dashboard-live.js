@@ -72,7 +72,7 @@
 
     if (error || !data || data.length === 0) {
       tbody.innerHTML = `
-        <tr><td colspan="7" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">
+        <tr><td colspan="8" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">
           No applicants yet. They will appear here once they sign up.
         </td></tr>`;
       return;
@@ -102,6 +102,10 @@
         ? `<button class="btn btn-primary btn-sm btn-reactivate" data-id="${a.id}">Reactivate</button>`
         : `<button class="btn btn-ghost btn-sm">Review</button>`;
 
+      const appliedDate = a.created_at
+        ? new Date(a.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })
+        : '-';
+
       return `
         <tr>
           <td>
@@ -118,6 +122,7 @@
           <td>${a.total_docs}/4 docs</td>
           <td><span class="badge ${st.badge} badge-dot">${st.label}</span></td>
           <td><span class="badge ${av.badge} badge-dot">${av.label}</span></td>
+          <td style="white-space:nowrap;color:var(--text-secondary);font-size:13px;">${appliedDate}</td>
           <td>${actionHtml}</td>
         </tr>`;
     }).join('');
