@@ -280,6 +280,34 @@
     </main>
   </div>
 
+  <!-- Reschedule Modal -->
+  <div id="reschedule-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(15,23,42,0.65);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;">
+    <div style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);width:100%;max-width:460px;box-shadow:0 20px 50px rgba(0,0,0,0.4);">
+      <div style="padding:20px 24px;border-bottom:1px solid var(--border-subtle);">
+        <h3 style="margin:0;font-size:17px;font-weight:700;color:var(--text-primary);">Reschedule Consultation</h3>
+        <p id="reschedule-target" style="margin:6px 0 0;font-size:13px;color:var(--text-tertiary);"></p>
+      </div>
+      <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px;">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">New Date</label>
+          <input type="date" id="reschedule-date" style="width:100%;padding:10px 12px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-primary);font-size:14px;">
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">New Time</label>
+          <input type="time" id="reschedule-time" style="width:100%;padding:10px 12px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-primary);font-size:14px;">
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">Note to candidate <span style="text-transform:none;font-weight:400;color:var(--text-tertiary);">(optional)</span></label>
+          <textarea id="reschedule-note" rows="3" placeholder="e.g. Our consultant is unavailable at the original time. We apologise for the change." style="width:100%;padding:10px 12px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-primary);font-size:14px;font-family:inherit;resize:vertical;"></textarea>
+        </div>
+      </div>
+      <div style="padding:16px 24px;border-top:1px solid var(--border-subtle);display:flex;justify-content:flex-end;gap:10px;">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="closeRescheduleModal()">Cancel</button>
+        <button type="button" id="reschedule-submit" class="btn btn-primary btn-sm" onclick="submitReschedule()">Send & Update</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
@@ -310,10 +338,11 @@
     function statusBadge(status, type) {
       var map = {
         // consultation statuses
-        pending:   'badge badge-warning',
-        confirmed: 'badge badge-info',
-        completed: 'badge badge-primary',
-        cancelled: 'badge badge-danger',
+        pending:     'badge badge-warning',
+        confirmed:   'badge badge-info',
+        completed:   'badge badge-primary',
+        cancelled:   'badge badge-danger',
+        rescheduled: 'badge badge-warning',
         // contract statuses
         draft:  'badge badge-neutral',
         sent:   'badge badge-info',
@@ -437,6 +466,9 @@
         }
         if (c.status === 'confirmed') {
           actions += '<button class="btn btn-ghost btn-sm" onclick="markComplete(' + i + ')">Mark Complete</button> ';
+        }
+        if (c.status === 'confirmed' || c.status === 'rescheduled') {
+          actions += '<button class="btn btn-ghost btn-sm" onclick="openRescheduleModal(' + i + ')">Reschedule</button> ';
         }
         if (c.status === 'pending') {
           actions += '<button class="btn btn-ghost btn-sm" style="color:var(--accent-coral);" onclick="cancelConsultation(' + i + ')">Cancel</button>';
@@ -574,6 +606,80 @@
 
       showToast('Consultation cancelled');
       await loadData();
+    }
+
+    var pendingRescheduleIdx = null;
+
+    function openRescheduleModal(idx) {
+      var row = consultations[idx];
+      if (!row) return;
+      pendingRescheduleIdx = idx;
+
+      // Pre-fill with current values so admin only changes what's needed
+      document.getElementById('reschedule-date').value = row.consultation_date || '';
+      document.getElementById('reschedule-time').value = (row.consultation_time || '').slice(0, 5);
+      document.getElementById('reschedule-note').value = '';
+      document.getElementById('reschedule-target').textContent =
+        (row.full_name || row.candidate_name || 'Candidate') + ' — ' + (row.email || '');
+
+      var modal = document.getElementById('reschedule-modal');
+      modal.style.display = 'flex';
+    }
+
+    function closeRescheduleModal() {
+      document.getElementById('reschedule-modal').style.display = 'none';
+      pendingRescheduleIdx = null;
+    }
+
+    async function submitReschedule() {
+      if (pendingRescheduleIdx == null) return;
+      var row = consultations[pendingRescheduleIdx];
+      if (!row) return;
+
+      var newDate = document.getElementById('reschedule-date').value;
+      var newTime = document.getElementById('reschedule-time').value;
+      var note    = document.getElementById('reschedule-note').value.trim();
+
+      if (!newDate || !newTime) {
+        showToast('Please choose a new date and time');
+        return;
+      }
+      if (newDate === row.consultation_date && newTime === (row.consultation_time || '').slice(0, 5)) {
+        showToast('That is the same date and time');
+        return;
+      }
+
+      var btn = document.getElementById('reschedule-submit');
+      var orig = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+
+      try {
+        var { data, error } = await window.ghSupabase.functions.invoke('reschedule-consultation', {
+          body: {
+            consultation_id: row.id,
+            new_date: newDate,
+            new_time: newTime,
+            note: note || undefined
+          }
+        });
+
+        if (error || (data && data.error)) {
+          var msg = (error && error.message) || (data && data.error) || 'Failed to reschedule';
+          showToast('Error: ' + msg);
+          return;
+        }
+
+        showToast('Rescheduled — email sent to ' + (data && data.sent_to ? data.sent_to : row.email));
+        closeRescheduleModal();
+        await loadData();
+      } catch (e) {
+        console.error('Reschedule error:', e);
+        showToast('Error: ' + (e.message || 'Failed to reschedule'));
+      } finally {
+        btn.disabled = false;
+        btn.textContent = orig;
+      }
     }
 
     function copyLink(btn) {
