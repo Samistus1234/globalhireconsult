@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
     const SITE_URL =
       Deno.env.get("GLOBALHIRE_SITE_URL") ||
       Deno.env.get("SITE_URL") ||
-      "https://globalhireconsult.vercel.app";
+      "https://globalhire.elabsolution.org";
     const portalUrl = `${SITE_URL}/portal.html#tab-documents`;
     const loginUrl = `${SITE_URL}/login.html?redirect=portal.html%23tab-documents`;
 
