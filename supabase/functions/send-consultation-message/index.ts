@@ -86,6 +86,48 @@ Deno.serve(async (req) => {
     const trimmedSubject = String(subject).trim();
     const trimmedBody = String(body).trim();
 
+    // ── Portal CTA: only for document-request templates ──
+    // For these, we want the candidate to upload via the GlobalHire portal
+    // (My Documents tab) instead of replying with attachments.
+    const docTemplateKeys = new Set(["passport", "cv", "education_cert", "reference_letter"]);
+    const isDocRequest = docTemplateKeys.has(template_key || "");
+
+    const SITE_URL =
+      Deno.env.get("GLOBALHIRE_SITE_URL") ||
+      Deno.env.get("SITE_URL") ||
+      "https://globalhireconsult.vercel.app";
+    const portalUrl = `${SITE_URL}/portal.html#tab-documents`;
+    const loginUrl = `${SITE_URL}/login.html?redirect=portal.html%23tab-documents`;
+
+    let portalActionUrl = loginUrl;
+    let isNewAccount = false;
+
+    if (isDocRequest) {
+      // Try to invite the candidate to GlobalHire. generateLink with type
+      // "invite" creates the user + returns an action_link without sending
+      // Supabase's branded email — so we can embed it inside our own.
+      // If the user already exists, the call errors and we just use a
+      // plain login link instead.
+      try {
+        const { data: linkData, error: linkErr } = await sb.auth.admin.generateLink({
+          type: "invite",
+          email: existing.email,
+          options: {
+            redirectTo: portalUrl,
+            data: { full_name: existing.full_name || "" },
+          },
+        });
+
+        if (!linkErr && linkData?.properties?.action_link) {
+          portalActionUrl = linkData.properties.action_link;
+          isNewAccount = true;
+        }
+      } catch (inviteErr) {
+        // Either user exists or invite failed — fall back to plain login.
+        console.log("Invite skipped:", (inviteErr as Error).message);
+      }
+    }
+
     // ── Build email ──
     const greeting = `Dear ${fullName},`;
     const signoff = [
@@ -94,12 +136,25 @@ Deno.serve(async (req) => {
       "www.elabsolution.org",
     ].join("\n");
 
+    const portalPlainBlock = isDocRequest
+      ? [
+          "",
+          "── Upload via your GlobalHire portal ──",
+          isNewAccount
+            ? "We have created a GlobalHire account for you. Click the link below to set your password, then upload the document under \"My Documents\":"
+            : "Log in to your GlobalHire portal and upload the document under \"My Documents\":",
+          portalActionUrl,
+          "",
+          "If you have any trouble, reply to this email or message us on WhatsApp at +1 (929) 419-2327.",
+        ].join("\n")
+      : "If you have any questions, reply to this email or message us on WhatsApp at +1 (929) 419-2327.";
+
     const candidatePlain = [
       greeting,
       "",
       trimmedBody,
       "",
-      "If you have any questions, reply to this email or message us on WhatsApp at +1 (929) 419-2327.",
+      portalPlainBlock,
       "",
       signoff,
     ].join("\n");
@@ -122,6 +177,24 @@ Deno.serve(async (req) => {
       '<tr><td style="padding:28px 40px 32px;">',
       '<p style="margin:0 0 18px;font-size:15px;color:#475569;">Dear <strong style="color:#0F172A;">' + esc(fullName) + '</strong>,</p>',
       '<div style="margin:0 0 22px;font-size:15px;line-height:1.7;color:#334155;">' + bodyHtml + '</div>',
+
+      // Portal CTA — only on document-request templates
+      isDocRequest
+        ? [
+            '<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:22px 24px;margin:0 0 22px;">',
+            '<p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#0077B6;">Upload via your GlobalHire portal</p>',
+            '<p style="margin:0 0 16px;font-size:14px;color:#475569;line-height:1.6;">',
+            isNewAccount
+              ? 'We have created a GlobalHire account for you. Click below to set your password, then upload the document under <strong style="color:#0F172A;">My Documents</strong>.'
+              : 'Log in to your GlobalHire portal and upload the document under <strong style="color:#0F172A;">My Documents</strong>.',
+            '</p>',
+            '<a href="' + portalActionUrl + '" style="display:inline-block;padding:13px 32px;background:#0077B6;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;border-radius:8px;">' +
+              (isNewAccount ? 'Set up my account' : 'Log in &amp; upload') +
+            '</a>',
+            '</div>',
+          ].join('')
+        : '',
+
       '<p style="margin:0 0 4px;font-size:13px;color:#94A3B8;">If you have any questions, reply to this email or message us on WhatsApp at <strong style="color:#475569;">+1 (929) 419-2327</strong>.</p>',
       '</td></tr>',
 

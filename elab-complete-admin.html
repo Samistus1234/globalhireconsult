@@ -377,6 +377,7 @@
     var consultations = [];
     var contracts = [];
     var messageCounts = {}; // consultation_id → number of messages sent
+    var docCounts = {};     // consultation_id → { count, last_upload_at }
 
     // ── Helpers ──
 
@@ -431,7 +432,12 @@
     // ── Data Loading ──
 
     async function loadData() {
-      await Promise.all([loadConsultations(), loadContracts(), loadMessageCounts()]);
+      await Promise.all([
+        loadConsultations(),
+        loadContracts(),
+        loadMessageCounts(),
+        loadDocCounts()
+      ]);
       updateKPIs();
     }
 
@@ -447,6 +453,24 @@
       }
       (data || []).forEach(function(row) {
         messageCounts[row.consultation_id] = (messageCounts[row.consultation_id] || 0) + 1;
+      });
+    }
+
+    async function loadDocCounts() {
+      var { data, error } = await window.ghSupabase
+        .rpc('gh_admin_consultation_doc_counts');
+
+      docCounts = {};
+      if (error) {
+        // Function may not be deployed yet on first run — fail soft.
+        console.warn('Doc counts unavailable:', error.message);
+        return;
+      }
+      (data || []).forEach(function(row) {
+        docCounts[row.consultation_id] = {
+          count: row.document_count || 0,
+          last_upload_at: row.last_upload_at
+        };
       });
     }
 
@@ -517,7 +541,12 @@
       var html = '';
       for (var i = 0; i < consultations.length; i++) {
         var c = consultations[i];
-        var name = escHtml(c.full_name || c.candidate_name || '--');
+        var rawName = escHtml(c.full_name || c.candidate_name || '--');
+        var docs = docCounts[c.id];
+        var docBadge = (docs && docs.count > 0)
+          ? ' <span title="' + docs.count + ' document(s) uploaded to portal" style="display:inline-block;margin-left:6px;padding:2px 8px;border-radius:10px;background:#0077B6;color:#fff;font-size:11px;font-weight:700;vertical-align:middle;">📎 ' + docs.count + '</span>'
+          : '';
+        var name = rawName + docBadge;
         var email = escHtml(c.email || '--');
         var phone = escHtml(c.phone || '--');
         var dest = escHtml(c.preferred_destination || c.destination || '--');
@@ -793,44 +822,44 @@
 
     var MESSAGE_TEMPLATES = {
       passport: {
-        subject: 'Action needed — please send your International Passport',
+        subject: 'Action needed — please upload your International Passport',
         body:
           'To proceed with your placement, we need a clear scan or photo of your International Passport biodata page.\n\n' +
           'Please make sure that:\n' +
           '• All four corners of the page are visible\n' +
           '• The text is sharp and readable (no glare or blur)\n' +
           '• The passport is valid for at least 6 more months\n\n' +
-          'You can reply to this email with the file attached, or send it on WhatsApp at +1 (929) 419-2327.'
+          'Use the button below to log in to your GlobalHire portal and upload the file under "My Documents → Passport Copy".'
       },
       cv: {
-        subject: 'Action needed — please send your CV / Resume',
+        subject: 'Action needed — please upload your CV / Resume',
         body:
           'To move forward with employer matching, we need an up-to-date copy of your CV / Resume.\n\n' +
           'Please share it as a PDF or Word document and make sure it includes:\n' +
           '• Your full work history with dates\n' +
           '• Your nursing qualification(s) and licences\n' +
           '• Contact details (phone + email)\n\n' +
-          'You can reply to this email with the file attached, or send it on WhatsApp at +1 (929) 419-2327.'
+          'Use the button below to log in to your GlobalHire portal and upload the file under "My Documents → CV / Resume".'
       },
       education_cert: {
-        subject: 'Action needed — please send your Educational Certificate',
+        subject: 'Action needed — please upload your Educational Certificate',
         body:
           'To complete your file, we need a scanned copy of your Educational Certificate (e.g. Nursing diploma / degree).\n\n' +
           'Please make sure that:\n' +
           '• The full certificate is visible (do not crop the borders)\n' +
           '• Your name, the institution, and the date of issue are clearly readable\n' +
           '• The scan is in colour where possible\n\n' +
-          'You can reply to this email with the file attached, or send it on WhatsApp at +1 (929) 419-2327.'
+          'Use the button below to log in to your GlobalHire portal and upload the file under "My Documents → Degree Certificate" (or Diploma).'
       },
       reference_letter: {
-        subject: 'Action needed — please send a Reference Letter',
+        subject: 'Action needed — please upload a Reference Letter',
         body:
           'As part of your placement file, we need a Reference Letter from your most recent employer or supervisor.\n\n' +
           'The letter should confirm:\n' +
           '• Your job title and dates of employment\n' +
           '• Your area of practice (e.g. ER, ICU, Med-Surg)\n' +
           '• A short statement of your conduct and competence\n\n' +
-          'It should be on official letterhead and signed. Reply to this email with the file attached, or send it on WhatsApp at +1 (929) 419-2327.'
+          'It should be on official letterhead and signed. Use the button below to log in to your GlobalHire portal and upload it under "My Documents".'
       },
       custom: {
         subject: '',
