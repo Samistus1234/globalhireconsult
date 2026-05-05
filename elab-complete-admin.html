@@ -308,6 +308,57 @@
     </div>
   </div>
 
+  <!-- Send Message Modal -->
+  <div id="send-message-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(15,23,42,0.65);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;">
+    <div style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);width:100%;max-width:560px;box-shadow:0 20px 50px rgba(0,0,0,0.4);">
+      <div style="padding:20px 24px;border-bottom:1px solid var(--border-subtle);">
+        <h3 style="margin:0;font-size:17px;font-weight:700;color:var(--text-primary);">Send Message</h3>
+        <p id="send-message-target" style="margin:6px 0 0;font-size:13px;color:var(--text-tertiary);"></p>
+      </div>
+      <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px;">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">Template</label>
+          <select id="send-message-template" onchange="applyMessageTemplate()" style="width:100%;padding:10px 12px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-primary);font-size:14px;">
+            <option value="passport">Request International Passport</option>
+            <option value="cv">Request CV / Resume</option>
+            <option value="education_cert">Request Educational Certificate</option>
+            <option value="reference_letter">Request Reference Letter</option>
+            <option value="custom">Custom message</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">Subject</label>
+          <input type="text" id="send-message-subject" style="width:100%;padding:10px 12px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-primary);font-size:14px;">
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">Message</label>
+          <textarea id="send-message-body" rows="8" style="width:100%;padding:10px 12px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-primary);font-size:14px;font-family:inherit;resize:vertical;line-height:1.6;"></textarea>
+          <p style="margin:6px 0 0;font-size:12px;color:var(--text-tertiary);">The candidate's name and an eLab signature are added automatically. Plain text only — line breaks are preserved.</p>
+        </div>
+      </div>
+      <div style="padding:16px 24px;border-top:1px solid var(--border-subtle);display:flex;justify-content:flex-end;gap:10px;">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="closeSendMessageModal()">Cancel</button>
+        <button type="button" id="send-message-submit" class="btn btn-primary btn-sm" onclick="submitSendMessage()">Send Email</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message History Modal -->
+  <div id="history-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(15,23,42,0.65);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;">
+    <div style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);width:100%;max-width:640px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,0.4);">
+      <div style="padding:20px 24px;border-bottom:1px solid var(--border-subtle);">
+        <h3 style="margin:0;font-size:17px;font-weight:700;color:var(--text-primary);">Message History</h3>
+        <p id="history-target" style="margin:6px 0 0;font-size:13px;color:var(--text-tertiary);"></p>
+      </div>
+      <div id="history-body" style="padding:20px 24px;overflow-y:auto;flex:1;">
+        <p style="margin:0;font-size:13px;color:var(--text-tertiary);">Loading…</p>
+      </div>
+      <div style="padding:16px 24px;border-top:1px solid var(--border-subtle);display:flex;justify-content:flex-end;gap:10px;">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="closeHistoryModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
@@ -325,6 +376,7 @@
 
     var consultations = [];
     var contracts = [];
+    var messageCounts = {}; // consultation_id → number of messages sent
 
     // ── Helpers ──
 
@@ -379,8 +431,23 @@
     // ── Data Loading ──
 
     async function loadData() {
-      await Promise.all([loadConsultations(), loadContracts()]);
+      await Promise.all([loadConsultations(), loadContracts(), loadMessageCounts()]);
       updateKPIs();
+    }
+
+    async function loadMessageCounts() {
+      var { data, error } = await window.ghSupabase
+        .from('elab_complete_messages')
+        .select('consultation_id');
+
+      messageCounts = {};
+      if (error) {
+        console.error('Error loading message counts:', error);
+        return;
+      }
+      (data || []).forEach(function(row) {
+        messageCounts[row.consultation_id] = (messageCounts[row.consultation_id] || 0) + 1;
+      });
     }
 
     async function loadConsultations() {
@@ -470,6 +537,13 @@
         if (c.status === 'confirmed' || c.status === 'rescheduled') {
           actions += '<button class="btn btn-ghost btn-sm" onclick="openRescheduleModal(' + i + ')">Reschedule</button> ';
         }
+        if (c.status !== 'cancelled') {
+          actions += '<button class="btn btn-ghost btn-sm" onclick="openSendMessageModal(' + i + ')">Send Message</button> ';
+        }
+        var msgCount = messageCounts[c.id] || 0;
+        actions += '<button class="btn btn-ghost btn-sm" onclick="openHistoryModal(' + i + ')">History' +
+          (msgCount > 0 ? ' (' + msgCount + ')' : '') +
+          '</button> ';
         if (c.status === 'pending') {
           actions += '<button class="btn btn-ghost btn-sm" style="color:var(--accent-coral);" onclick="cancelConsultation(' + i + ')">Cancel</button>';
         }
@@ -711,6 +785,203 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+    }
+
+    // ── Send Message (ad-hoc) ──
+
+    var pendingMessageIdx = null;
+
+    var MESSAGE_TEMPLATES = {
+      passport: {
+        subject: 'Action needed — please send your International Passport',
+        body:
+          'To proceed with your placement, we need a clear scan or photo of your International Passport biodata page.\n\n' +
+          'Please make sure that:\n' +
+          '• All four corners of the page are visible\n' +
+          '• The text is sharp and readable (no glare or blur)\n' +
+          '• The passport is valid for at least 6 more months\n\n' +
+          'You can reply to this email with the file attached, or send it on WhatsApp at +1 (929) 419-2327.'
+      },
+      cv: {
+        subject: 'Action needed — please send your CV / Resume',
+        body:
+          'To move forward with employer matching, we need an up-to-date copy of your CV / Resume.\n\n' +
+          'Please share it as a PDF or Word document and make sure it includes:\n' +
+          '• Your full work history with dates\n' +
+          '• Your nursing qualification(s) and licences\n' +
+          '• Contact details (phone + email)\n\n' +
+          'You can reply to this email with the file attached, or send it on WhatsApp at +1 (929) 419-2327.'
+      },
+      education_cert: {
+        subject: 'Action needed — please send your Educational Certificate',
+        body:
+          'To complete your file, we need a scanned copy of your Educational Certificate (e.g. Nursing diploma / degree).\n\n' +
+          'Please make sure that:\n' +
+          '• The full certificate is visible (do not crop the borders)\n' +
+          '• Your name, the institution, and the date of issue are clearly readable\n' +
+          '• The scan is in colour where possible\n\n' +
+          'You can reply to this email with the file attached, or send it on WhatsApp at +1 (929) 419-2327.'
+      },
+      reference_letter: {
+        subject: 'Action needed — please send a Reference Letter',
+        body:
+          'As part of your placement file, we need a Reference Letter from your most recent employer or supervisor.\n\n' +
+          'The letter should confirm:\n' +
+          '• Your job title and dates of employment\n' +
+          '• Your area of practice (e.g. ER, ICU, Med-Surg)\n' +
+          '• A short statement of your conduct and competence\n\n' +
+          'It should be on official letterhead and signed. Reply to this email with the file attached, or send it on WhatsApp at +1 (929) 419-2327.'
+      },
+      custom: {
+        subject: '',
+        body: ''
+      }
+    };
+
+    function applyMessageTemplate() {
+      var key = document.getElementById('send-message-template').value;
+      var tpl = MESSAGE_TEMPLATES[key] || MESSAGE_TEMPLATES.custom;
+      document.getElementById('send-message-subject').value = tpl.subject;
+      document.getElementById('send-message-body').value = tpl.body;
+    }
+
+    function openSendMessageModal(idx) {
+      var row = consultations[idx];
+      if (!row) return;
+      pendingMessageIdx = idx;
+
+      document.getElementById('send-message-target').textContent =
+        (row.full_name || row.candidate_name || 'Candidate') + ' — ' + (row.email || '');
+
+      // Default to the most common case: requesting the passport
+      document.getElementById('send-message-template').value = 'passport';
+      applyMessageTemplate();
+
+      var modal = document.getElementById('send-message-modal');
+      modal.style.display = 'flex';
+    }
+
+    function closeSendMessageModal() {
+      document.getElementById('send-message-modal').style.display = 'none';
+      pendingMessageIdx = null;
+    }
+
+    async function submitSendMessage() {
+      if (pendingMessageIdx == null) return;
+      var row = consultations[pendingMessageIdx];
+      if (!row) return;
+
+      var subject = document.getElementById('send-message-subject').value.trim();
+      var body    = document.getElementById('send-message-body').value.trim();
+      var tplKey  = document.getElementById('send-message-template').value || 'custom';
+
+      if (!subject) { showToast('Please enter a subject'); return; }
+      if (!body)    { showToast('Please enter a message'); return; }
+
+      var btn = document.getElementById('send-message-submit');
+      var orig = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+
+      try {
+        var { data, error } = await window.ghSupabase.functions.invoke('send-consultation-message', {
+          body: {
+            consultation_id: row.id,
+            subject: subject,
+            body: body,
+            template_key: tplKey
+          }
+        });
+
+        if (error || (data && data.error)) {
+          var msg = (error && error.message) || (data && data.error) || 'Failed to send message';
+          showToast('Error: ' + msg);
+          return;
+        }
+
+        showToast('Message sent to ' + (data && data.sent_to ? data.sent_to : row.email));
+        closeSendMessageModal();
+        await loadMessageCounts();
+        renderConsultations();
+      } catch (e) {
+        console.error('Send message error:', e);
+        showToast('Error: ' + (e.message || 'Failed to send message'));
+      } finally {
+        btn.disabled = false;
+        btn.textContent = orig;
+      }
+    }
+
+    // ── Message History ──
+
+    async function openHistoryModal(idx) {
+      var row = consultations[idx];
+      if (!row) return;
+
+      document.getElementById('history-target').textContent =
+        (row.full_name || row.candidate_name || 'Candidate') + ' — ' + (row.email || '');
+      document.getElementById('history-body').innerHTML =
+        '<p style="margin:0;font-size:13px;color:var(--text-tertiary);">Loading…</p>';
+
+      var modal = document.getElementById('history-modal');
+      modal.style.display = 'flex';
+
+      var { data, error } = await window.ghSupabase
+        .from('elab_complete_messages')
+        .select('id, subject, body, template_key, sent_to, sent_at')
+        .eq('consultation_id', row.id)
+        .order('sent_at', { ascending: false });
+
+      var bodyEl = document.getElementById('history-body');
+
+      if (error) {
+        console.error('Error loading messages:', error);
+        bodyEl.innerHTML =
+          '<p style="margin:0;font-size:13px;color:var(--accent-coral);">Failed to load history: ' +
+          escHtml(error.message || 'unknown error') + '</p>';
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        bodyEl.innerHTML =
+          '<p style="margin:0;font-size:13px;color:var(--text-tertiary);">No messages sent to this candidate yet.</p>';
+        return;
+      }
+
+      var labels = {
+        passport: 'Passport request',
+        cv: 'CV request',
+        education_cert: 'Educational certificate request',
+        reference_letter: 'Reference letter request',
+        custom: 'Custom message'
+      };
+
+      var html = '';
+      for (var i = 0; i < data.length; i++) {
+        var m = data[i];
+        var when = new Date(m.sent_at).toLocaleString('en-GB', {
+          day: '2-digit', month: 'short', year: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+        var label = labels[m.template_key] || 'Message';
+        var bodyHtml = escHtml(m.body || '').replace(/\n/g, '<br>');
+
+        html +=
+          '<div style="border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:12px;background:var(--bg-elevated);">' +
+            '<div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:6px;">' +
+              '<span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-tertiary);">' + escHtml(label) + '</span>' +
+              '<span style="font-size:12px;color:var(--text-tertiary);">' + escHtml(when) + '</span>' +
+            '</div>' +
+            '<div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">' + escHtml(m.subject || '') + '</div>' +
+            '<div style="font-size:13px;color:var(--text-secondary);line-height:1.6;">' + bodyHtml + '</div>' +
+            '<div style="margin-top:10px;font-size:11px;color:var(--text-tertiary);">Sent to ' + escHtml(m.sent_to || '') + '</div>' +
+          '</div>';
+      }
+      bodyEl.innerHTML = html;
+    }
+
+    function closeHistoryModal() {
+      document.getElementById('history-modal').style.display = 'none';
     }
 
     // ── Init ──
