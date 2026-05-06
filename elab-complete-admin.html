@@ -210,12 +210,28 @@
 
         <!-- Consultation Bookings Table -->
         <div class="panel" style="margin-bottom:var(--space-6);">
-          <div class="panel-header">
+          <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);">
             <span class="panel-title" style="display:flex;align-items:center;gap:var(--space-2);">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
               Consultation Bookings
               <span id="consultations-count" class="badge badge-primary badge-dot" style="display:none;">0</span>
             </span>
+            <div style="position:relative;display:inline-block;" id="ec-export-wrapper">
+              <button class="btn btn-ghost btn-sm" id="ec-btn-export">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export
+              </button>
+              <div id="ec-export-menu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:0 8px 24px rgba(0,0,0,0.3);z-index:100;min-width:170px;overflow:hidden;">
+                <button id="ec-export-csv" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:none;color:var(--text-primary);font-size:13px;font-weight:600;cursor:pointer;text-align:left;font-family:inherit;" onmouseover="this.style.background='var(--bg-surface)'" onmouseout="this.style.background=''">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+                  Export as CSV
+                </button>
+                <button id="ec-export-pdf" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:none;color:var(--text-primary);font-size:13px;font-weight:600;cursor:pointer;text-align:left;font-family:inherit;" onmouseover="this.style.background='var(--bg-surface)'" onmouseout="this.style.background=''">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+                  Export as PDF
+                </button>
+              </div>
+            </div>
           </div>
           <div class="panel-body-flush">
             <table class="table">
@@ -1013,6 +1029,116 @@
       document.getElementById('history-modal').style.display = 'none';
     }
 
+    // ── Export: helpers ──
+
+    var EC_STAGE_LABELS = {
+      inquiry: 'Inquiry',
+      docs_pending: 'Docs',
+      dataflow: 'DataFlow',
+      prometric: 'Prometric',
+      license_application: 'License',
+      visa: 'Visa',
+      placed: 'Placed',
+      other: 'Other'
+    };
+    var EC_MILESTONE_LABEL = {
+      mumaris_plus: 'Mumaris+', sheryan: 'Sheryan', omsb: 'OMSB',
+      nclex: 'NCLEX', ielts: 'IELTS', oet: 'OET'
+    };
+    var EC_COUNTRY_LABEL = {
+      saudi: 'KSA', qatar: 'QA', uae: 'UAE', oman: 'OM', bahrain: 'BH', kuwait: 'KW',
+      haad: 'HAAD', dha: 'DHA'
+    };
+
+    function ecMilestonesText(ms) {
+      if (!ms || typeof ms !== 'object') return '';
+      var parts = [];
+      if (ms.dataflow && typeof ms.dataflow === 'object') {
+        var df = Object.keys(ms.dataflow).map(function(c) { return EC_COUNTRY_LABEL[c] || c.toUpperCase(); }).join('/');
+        if (df) parts.push('DataFlow:' + df);
+      }
+      if (ms.prometric && typeof ms.prometric === 'object') {
+        var pm = Object.keys(ms.prometric).map(function(c) { return EC_COUNTRY_LABEL[c] || c.toUpperCase(); }).join('/');
+        if (pm) parts.push('Prometric:' + pm);
+      }
+      Object.keys(EC_MILESTONE_LABEL).forEach(function(k) {
+        if (ms[k]) parts.push(EC_MILESTONE_LABEL[k]);
+      });
+      return parts.join('; ');
+    }
+
+    function ecExportRows() {
+      return consultations.map(function(c) {
+        var docs = docCounts[c.id];
+        return {
+          name: c.full_name || c.candidate_name || '',
+          email: c.email || '',
+          phone: c.phone || '',
+          country: c.country || '',
+          qualification: c.qualification || '',
+          experience: c.years_experience || '',
+          destination: c.preferred_destination || c.destination || '',
+          stage: EC_STAGE_LABELS[c.current_stage] || c.current_stage || '',
+          milestones: ecMilestonesText(c.migration_status),
+          docs_uploaded: docs && docs.count ? docs.count : 0,
+          status: c.status || '',
+          consultation_date: c.consultation_date || '',
+          consultation_time: c.consultation_time || '',
+          booked_on: c.created_at ? c.created_at.slice(0, 10) : '',
+          messages_sent: messageCounts[c.id] || 0
+        };
+      });
+    }
+
+    function ecExportCSV() {
+      var rows = ecExportRows();
+      var headers = ['Name','Email','Phone','Country','Qualification','Experience','Destination','Stage','Milestones','Docs Uploaded','Status','Consultation Date','Consultation Time','Booked On','Messages Sent'];
+      var keys    = ['name','email','phone','country','qualification','experience','destination','stage','milestones','docs_uploaded','status','consultation_date','consultation_time','booked_on','messages_sent'];
+      var lines = [headers.join(',')];
+      rows.forEach(function(r) {
+        lines.push(keys.map(function(k) {
+          var v = r[k] == null ? '' : String(r[k]);
+          return '"' + v.replace(/"/g, '""') + '"';
+        }).join(','));
+      });
+      var blob = new Blob(['﻿' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'elab-complete-consultations-' + new Date().toISOString().slice(0,10) + '.csv';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function ecExportPDF() {
+      var rows = ecExportRows();
+      var w = window.open('', '_blank');
+      w.document.write('<!DOCTYPE html><html><head><title>eLab Complete — Consultations</title>');
+      w.document.write('<style>body{font-family:Arial,sans-serif;margin:18px;color:#111;}h1{font-size:18px;margin-bottom:4px;}p.sub{font-size:12px;color:#666;margin-bottom:14px;}table{width:100%;border-collapse:collapse;font-size:10px;}th{background:#0077B6;color:#fff;padding:6px 8px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:0.4px;}td{padding:5px 8px;border-bottom:1px solid #e5e7eb;vertical-align:top;}tr:nth-child(even){background:#f9fafb;}@media print{body{margin:0;}@page{margin:8mm;size:landscape;}}</style></head><body>');
+      w.document.write('<h1>eLab Complete — Consultations Report</h1>');
+      w.document.write('<p class="sub">Generated: ' + new Date().toLocaleString() + ' &bull; ' + rows.length + ' consultations</p>');
+      w.document.write('<table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Destination</th><th>Stage</th><th>Milestones</th><th>Docs</th><th>Status</th><th>Date</th><th>Time</th><th>Booked</th></tr></thead><tbody>');
+      rows.forEach(function(r) {
+        w.document.write(
+          '<tr>' +
+            '<td>' + escHtml(r.name) + '</td>' +
+            '<td>' + escHtml(r.email) + '</td>' +
+            '<td>' + escHtml(r.phone) + '</td>' +
+            '<td>' + escHtml(r.destination) + '</td>' +
+            '<td>' + escHtml(r.stage) + '</td>' +
+            '<td>' + escHtml(r.milestones) + '</td>' +
+            '<td>' + escHtml(String(r.docs_uploaded)) + '</td>' +
+            '<td>' + escHtml(r.status) + '</td>' +
+            '<td>' + escHtml(r.consultation_date) + '</td>' +
+            '<td>' + escHtml(r.consultation_time) + '</td>' +
+            '<td>' + escHtml(r.booked_on) + '</td>' +
+          '</tr>'
+        );
+      });
+      w.document.write('</tbody></table></body></html>');
+      w.document.close();
+      setTimeout(function() { w.print(); }, 300);
+    }
+
     // ── Init ──
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -1023,6 +1149,28 @@
           loadData();
         }
       }, 100);
+
+      // Export menu wiring
+      var exportBtn  = document.getElementById('ec-btn-export');
+      var exportMenu = document.getElementById('ec-export-menu');
+      if (exportBtn && exportMenu) {
+        exportBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          exportMenu.style.display = exportMenu.style.display === 'none' ? 'block' : 'none';
+        });
+        document.addEventListener('click', function(e) {
+          var wrap = document.getElementById('ec-export-wrapper');
+          if (wrap && !wrap.contains(e.target)) exportMenu.style.display = 'none';
+        });
+        document.getElementById('ec-export-csv').addEventListener('click', function() {
+          exportMenu.style.display = 'none';
+          ecExportCSV();
+        });
+        document.getElementById('ec-export-pdf').addEventListener('click', function() {
+          exportMenu.style.display = 'none';
+          ecExportPDF();
+        });
+      }
     });
   </script>
 </body>

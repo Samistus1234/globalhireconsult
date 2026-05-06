@@ -253,13 +253,17 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.disabled = true;
       btn.textContent = 'Sending...';
 
-      const { error } = await sb.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin + '/login.html'
+      // Use our own edge function — bypasses Supabase's built-in mailer
+      // rate limit and routes through Gmail SMTP (same path as
+      // send-consultation-message). Always reports success to avoid
+      // leaking whether the email is registered.
+      const { error } = await sb.functions.invoke('send-password-reset', {
+        body: { email }
       });
 
       msg.textContent = error
-        ? error.message
-        : 'Password reset link sent! Check your email.';
+        ? 'Could not send reset link. Please try again or contact support.'
+        : 'If that email is registered, a reset link has been sent. Check your inbox (and spam).';
       msg.style.color = error ? 'var(--error)' : 'var(--success)';
       msg.style.display = 'block';
       btn.disabled = false;

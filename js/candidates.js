@@ -65,7 +65,7 @@
       console.error('Failed to load candidates:', error);
       var tbody = document.getElementById('candidates-tbody');
       if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:var(--space-8);color:var(--error);">Failed to load candidates. Please refresh.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:var(--space-8);color:var(--error);">Failed to load candidates. Please refresh.</td></tr>';
       }
       return;
     }
@@ -239,6 +239,59 @@
     if (subVerified) subVerified.textContent = verified === 0 ? 'None yet' : 'Ready for placement';
   }
 
+  // ── Migration milestone helpers ──
+  var STAGE_LABELS = {
+    inquiry:              { label: 'Inquiry',          color: '#94A3B8' },
+    docs_pending:         { label: 'Docs',             color: '#D4A84B' },
+    dataflow:             { label: 'DataFlow',         color: '#0096C7' },
+    prometric:            { label: 'Prometric',        color: '#7C3AED' },
+    license_application:  { label: 'License',          color: '#0EA5E9' },
+    visa:                 { label: 'Visa',             color: '#059669' },
+    placed:               { label: 'Placed',           color: '#16A34A' },
+    other:                { label: 'Other',            color: '#94A3B8' }
+  };
+
+  var MILESTONE_LABEL = {
+    mumaris_plus: 'Mumaris+',
+    sheryan:      'Sheryan',
+    omsb:         'OMSB',
+    nclex:        'NCLEX',
+    ielts:        'IELTS',
+    oet:          'OET'
+  };
+  var COUNTRY_LABEL = {
+    saudi: 'KSA', qatar: 'QA', uae: 'UAE', oman: 'OM', bahrain: 'BH', kuwait: 'KW',
+    haad: 'HAAD', dha: 'DHA'
+  };
+
+  function stageLabel(stage) {
+    if (!stage) return '<span style="color:var(--text-tertiary);">—</span>';
+    var info = STAGE_LABELS[stage] || { label: stage, color: '#94A3B8' };
+    return '<span style="display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;color:' + info.color + ';background:' + info.color + '1f;letter-spacing:0.02em;">' + GHE.escapeHtml(info.label) + '</span>';
+  }
+
+  function renderMilestoneChips(ms) {
+    if (!ms || typeof ms !== 'object') return '<span style="color:var(--text-tertiary);">—</span>';
+    var chips = [];
+    if (ms.dataflow && typeof ms.dataflow === 'object') {
+      Object.keys(ms.dataflow).forEach(function(c) {
+        chips.push('DF·' + (COUNTRY_LABEL[c] || c.toUpperCase()));
+      });
+    }
+    if (ms.prometric && typeof ms.prometric === 'object') {
+      Object.keys(ms.prometric).forEach(function(c) {
+        chips.push('PM·' + (COUNTRY_LABEL[c] || c.toUpperCase()));
+      });
+    }
+    Object.keys(MILESTONE_LABEL).forEach(function(k) {
+      if (ms[k]) chips.push(MILESTONE_LABEL[k]);
+    });
+    if (!chips.length) return '<span style="color:var(--text-tertiary);">—</span>';
+    return chips.map(function(c) {
+      return '<span style="display:inline-block;padding:2px 7px;margin:1px 2px;border-radius:6px;font-size:10px;font-weight:600;background:rgba(0,150,199,0.12);color:#0096C7;">' + GHE.escapeHtml(c) + '</span>';
+    }).join('');
+  }
+
   // ── Render table rows ──
   function renderTable() {
     var tbody = document.getElementById('candidates-tbody');
@@ -248,7 +301,7 @@
     var pageData = filteredApplicants.slice(startIdx, startIdx + pageSize);
 
     if (pageData.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">No candidates match the current filters.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">No candidates match the current filters.</td></tr>';
       return;
     }
 
@@ -307,6 +360,10 @@
         ? new Date(a.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
         : '-';
 
+      // Migration stage + milestone chips
+      var stageInfo = stageLabel(a.current_stage);
+      var milestoneChips = renderMilestoneChips(a.migration_status);
+
       return '<tr>' +
         '<td>' +
           '<div class="applicant-row">' +
@@ -323,6 +380,8 @@
         '<td>' + GHE.escapeHtml((a.preferred_destinations || []).join(', ') || '-') + '</td>' +
         '<td>' + exp + '</td>' +
         '<td>' + (a.dataflow_completed ? '<span class="badge badge-primary badge-dot" title="' + GHE.escapeHtml((a.dataflow_country || '') + (a.dataflow_via_elab ? ' [eLab]' : '')) + '">' + GHE.escapeHtml(a.dataflow_country || 'Yes') + '</span>' : '<span style="color:var(--text-tertiary);">No</span>') + '</td>' +
+        '<td>' + stageInfo + '</td>' +
+        '<td>' + milestoneChips + '</td>' +
         '<td>' + docs + '</td>' +
         '<td><span class="badge ' + st.badge + ' badge-dot">' + st.label + '</span></td>' +
         '<td><span class="badge ' + av.badge + ' badge-dot">' + av.label + '</span></td>' +
@@ -511,6 +570,23 @@
         html += '<span class="tag">' + GHE.escapeHtml(d) + '</span>';
       });
       html += '</div></div>';
+    }
+
+    // Migration milestones
+    var hasMilestones = profile.current_stage || (profile.migration_status && Object.keys(profile.migration_status).length);
+    if (hasMilestones) {
+      html += '<div style="margin-bottom:var(--space-6);padding:var(--space-4);background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-md);">';
+      html += '<div style="font-size:12px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:var(--space-3);">Migration Milestones</div>';
+      if (profile.current_stage) {
+        html += '<div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-3);">';
+        html += '<span style="font-size:11px;color:var(--text-tertiary);font-weight:600;">CURRENT STAGE</span>';
+        html += stageLabel(profile.current_stage);
+        html += '</div>';
+      }
+      if (profile.migration_status) {
+        html += '<div style="display:flex;flex-wrap:wrap;gap:var(--space-1);">' + renderMilestoneChips(profile.migration_status) + '</div>';
+      }
+      html += '</div>';
     }
 
     // Documents section
@@ -1095,7 +1171,7 @@
   // ── Export: CSV ──
   document.getElementById('export-csv')?.addEventListener('click', function () {
     exportMenu.style.display = 'none';
-    var rows = [['Name', 'Email', 'Specialty', 'Origin', 'Destination', 'Experience', 'Docs', 'Pipeline', 'Availability', 'Source', 'Applied']];
+    var rows = [['Name', 'Email', 'Specialty', 'Origin', 'Destination', 'Experience', 'DataFlow', 'Stage', 'Milestones', 'Docs', 'Pipeline', 'Availability', 'Source', 'Applied']];
     filteredApplicants.forEach(function (a) {
       rows.push([
         a.full_name || '',
@@ -1104,6 +1180,9 @@
         a.country_of_origin || '',
         (a.preferred_destinations || []).join('; '),
         a.years_of_experience != null ? a.years_of_experience + ' yrs' : '',
+        a.dataflow_completed ? ('Yes' + (a.dataflow_country ? ' — ' + a.dataflow_country : '')) : 'No',
+        STAGE_LABELS[a.current_stage] ? STAGE_LABELS[a.current_stage].label : (a.current_stage || ''),
+        milestonesAsText(a.migration_status),
         (a.total_docs != null ? a.total_docs : 0) + ' docs',
         a.pipeline_status || '',
         a.availability_status || 'active',
@@ -1133,6 +1212,9 @@
         a.country_of_origin || '-',
         (a.preferred_destinations || []).join(', ') || '-',
         a.years_of_experience != null ? a.years_of_experience + ' yrs' : '-',
+        a.dataflow_completed ? ('Yes — ' + (a.dataflow_country || '')).trim() : 'No',
+        STAGE_LABELS[a.current_stage] ? STAGE_LABELS[a.current_stage].label : (a.current_stage || '-'),
+        milestonesAsText(a.migration_status) || '-',
         (a.total_docs != null ? a.total_docs : 0) + ' docs',
         a.pipeline_status || '-',
         a.source || 'direct',
@@ -1146,21 +1228,39 @@
     printWin.document.write('body{font-family:Arial,sans-serif;margin:24px;color:#111;}');
     printWin.document.write('h1{font-size:18px;margin-bottom:4px;}');
     printWin.document.write('p.sub{font-size:12px;color:#666;margin-bottom:16px;}');
-    printWin.document.write('table{width:100%;border-collapse:collapse;font-size:11px;}');
-    printWin.document.write('th{background:#0077B6;color:#fff;padding:8px 10px;text-align:left;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;}');
-    printWin.document.write('td{padding:7px 10px;border-bottom:1px solid #e5e7eb;}');
+    printWin.document.write('table{width:100%;border-collapse:collapse;font-size:10px;}');
+    printWin.document.write('th{background:#0077B6;color:#fff;padding:7px 8px;text-align:left;font-weight:700;font-size:9px;text-transform:uppercase;letter-spacing:0.5px;}');
+    printWin.document.write('td{padding:6px 8px;border-bottom:1px solid #e5e7eb;vertical-align:top;}');
     printWin.document.write('tr:nth-child(even){background:#f9fafb;}');
-    printWin.document.write('@media print{body{margin:0;} @page{margin:12mm;}}');
+    printWin.document.write('@media print{body{margin:0;} @page{margin:10mm;size:landscape;}}');
     printWin.document.write('</style></head><body>');
     printWin.document.write('<h1>GlobalHire@eLab — Candidates Report</h1>');
     printWin.document.write('<p class="sub">Generated: ' + new Date().toLocaleString() + ' &bull; ' + rows.length + ' candidates</p>');
-    printWin.document.write('<table><thead><tr><th>Name</th><th>Specialty</th><th>Origin</th><th>Destination</th><th>Exp</th><th>Docs</th><th>Pipeline</th><th>Source</th><th>Applied</th></tr></thead><tbody>');
+    printWin.document.write('<table><thead><tr><th>Name</th><th>Specialty</th><th>Origin</th><th>Destination</th><th>Exp</th><th>DataFlow</th><th>Stage</th><th>Milestones</th><th>Docs</th><th>Pipeline</th><th>Source</th><th>Applied</th></tr></thead><tbody>');
     rows.forEach(function (r) {
-      printWin.document.write('<tr>' + r.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>');
+      printWin.document.write('<tr>' + r.map(function (c) { return '<td>' + GHE.escapeHtml(String(c)) + '</td>'; }).join('') + '</tr>');
     });
     printWin.document.write('</tbody></table></body></html>');
     printWin.document.close();
     setTimeout(function () { printWin.print(); }, 300);
   });
+
+  // ── Plain-text milestone summary for exports ──
+  function milestonesAsText(ms) {
+    if (!ms || typeof ms !== 'object') return '';
+    var parts = [];
+    if (ms.dataflow && typeof ms.dataflow === 'object') {
+      var df = Object.keys(ms.dataflow).map(function(c) { return COUNTRY_LABEL[c] || c.toUpperCase(); }).join('/');
+      if (df) parts.push('DataFlow:' + df);
+    }
+    if (ms.prometric && typeof ms.prometric === 'object') {
+      var pm = Object.keys(ms.prometric).map(function(c) { return COUNTRY_LABEL[c] || c.toUpperCase(); }).join('/');
+      if (pm) parts.push('Prometric:' + pm);
+    }
+    Object.keys(MILESTONE_LABEL).forEach(function(k) {
+      if (ms[k]) parts.push(MILESTONE_LABEL[k]);
+    });
+    return parts.join('; ');
+  }
 
 })();

@@ -279,6 +279,67 @@
       margin-bottom: 32px;
     }
 
+    /* ── Migration Milestone Pills ─────────────────── */
+    .group-number-cyan {
+      background: rgba(0,180,216,0.15);
+      color: #0096C7;
+    }
+    .milestone-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin: -16px 0 16px;
+    }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .pill-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--card-border);
+      background: rgba(255,255,255,0.04);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s;
+    }
+    .pill-check input { display: none; }
+    .pill-check:hover { border-color: rgba(0,180,216,0.5); color: var(--text-primary); }
+    .pill-check.checked {
+      background: rgba(0,180,216,0.18);
+      border-color: #0096C7;
+      color: #0096C7;
+    }
+    .pill-check .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.55;
+    }
+    .pill-check.checked .pill-dot { opacity: 1; }
+    .milestone-block {
+      margin-bottom: 22px;
+    }
+    .milestone-block-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+    .milestone-block-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
     /* ── Form Fields ───────────────────────────────── */
     .field-label {
       font-size: 13px;
@@ -627,9 +688,70 @@
           </div>
         </div>
 
-        <!-- ── Section 3: Schedule ── -->
+        <!-- ── Section 3: Migration Milestones (optional) ── -->
         <div class="group-header">
-          <div class="group-number group-number-emerald">3</div>
+          <div class="group-number group-number-cyan">3</div>
+          <span class="group-title">Migration Milestones <span style="font-weight:500;color:var(--text-muted);font-size:13px;">(optional — tick what you've already done)</span></span>
+        </div>
+
+        <p class="milestone-hint">This helps our team skip what's already done and prepare a faster, more accurate plan for you. Leave empty if none apply.</p>
+
+        <div class="milestone-block">
+          <div class="milestone-block-label">DataFlow Verification</div>
+          <div class="milestone-block-sub">Tick the country where you've completed (or are currently doing) DataFlow.</div>
+          <div class="pill-row" data-milestone="dataflow">
+            <label class="pill-check"><input type="checkbox" value="saudi"><span class="pill-dot"></span>Saudi Arabia</label>
+            <label class="pill-check"><input type="checkbox" value="qatar"><span class="pill-dot"></span>Qatar</label>
+            <label class="pill-check"><input type="checkbox" value="uae"><span class="pill-dot"></span>UAE</label>
+            <label class="pill-check"><input type="checkbox" value="oman"><span class="pill-dot"></span>Oman</label>
+            <label class="pill-check"><input type="checkbox" value="bahrain"><span class="pill-dot"></span>Bahrain</label>
+            <label class="pill-check"><input type="checkbox" value="kuwait"><span class="pill-dot"></span>Kuwait</label>
+          </div>
+        </div>
+
+        <div class="milestone-block">
+          <div class="milestone-block-label">Prometric Exam</div>
+          <div class="milestone-block-sub">Tick the exam you've already passed.</div>
+          <div class="pill-row" data-milestone="prometric">
+            <label class="pill-check"><input type="checkbox" value="saudi"><span class="pill-dot"></span>Saudi (SCFHS)</label>
+            <label class="pill-check"><input type="checkbox" value="qatar"><span class="pill-dot"></span>QCHP (Qatar)</label>
+            <label class="pill-check"><input type="checkbox" value="haad"><span class="pill-dot"></span>HAAD (Abu Dhabi)</label>
+            <label class="pill-check"><input type="checkbox" value="dha"><span class="pill-dot"></span>DHA (Dubai)</label>
+          </div>
+        </div>
+
+        <div class="milestone-block">
+          <div class="milestone-block-label">Other Credentials</div>
+          <div class="milestone-block-sub">Tick everything you've completed.</div>
+          <div class="pill-row" data-milestone="other">
+            <label class="pill-check"><input type="checkbox" value="mumaris_plus"><span class="pill-dot"></span>Mumaris+</label>
+            <label class="pill-check"><input type="checkbox" value="sheryan"><span class="pill-dot"></span>Sheryan</label>
+            <label class="pill-check"><input type="checkbox" value="omsb"><span class="pill-dot"></span>OMSB (Oman)</label>
+            <label class="pill-check"><input type="checkbox" value="nclex"><span class="pill-dot"></span>NCLEX</label>
+            <label class="pill-check"><input type="checkbox" value="ielts"><span class="pill-dot"></span>IELTS</label>
+            <label class="pill-check"><input type="checkbox" value="oet"><span class="pill-dot"></span>OET</label>
+          </div>
+        </div>
+
+        <div class="milestone-block" style="margin-bottom:32px;">
+          <div class="milestone-block-label">Where are you in the journey?</div>
+          <div class="milestone-block-sub">Pick the stage that best describes you right now.</div>
+          <select class="form-input" id="current-stage">
+            <option value="">Select your current stage...</option>
+            <option value="inquiry">Just exploring / inquiry</option>
+            <option value="docs_pending">Gathering my documents</option>
+            <option value="dataflow">Doing DataFlow</option>
+            <option value="prometric">Preparing / writing Prometric</option>
+            <option value="license_application">License application in progress</option>
+            <option value="visa">Visa / employer matching stage</option>
+            <option value="placed">Already placed (just need support)</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <!-- ── Section 4: Schedule ── -->
+        <div class="group-header">
+          <div class="group-number group-number-emerald">4</div>
           <span class="group-title">Schedule Your Consultation</span>
         </div>
 
@@ -774,6 +896,36 @@
       els.forEach(function(el) { io.observe(el); });
     })();
 
+    /* ── Migration Milestone pills: toggle .checked on click ── */
+    (function() {
+      document.querySelectorAll('.pill-check input[type="checkbox"]').forEach(function(input) {
+        input.addEventListener('change', function() {
+          this.parentElement.classList.toggle('checked', this.checked);
+        });
+      });
+    })();
+
+    /* ── Read milestone selections into the JSONB shape ── */
+    function collectMigrationStatus() {
+      function pillsFor(key) {
+        var arr = [];
+        document.querySelectorAll('[data-milestone="' + key + '"] input[type="checkbox"]:checked')
+          .forEach(function(i) { arr.push(i.value); });
+        return arr;
+      }
+      var dataflow  = pillsFor('dataflow');
+      var prometric = pillsFor('prometric');
+      var other     = pillsFor('other');
+
+      // Build only non-empty branches so we don't store a noisy empty object.
+      var status = {};
+      if (dataflow.length)  status.dataflow  = Object.fromEntries(dataflow.map(function(c)  { return [c, 'done']; }));
+      if (prometric.length) status.prometric = Object.fromEntries(prometric.map(function(c) { return [c, 'passed']; }));
+      other.forEach(function(k) { status[k] = 'done'; });
+
+      return Object.keys(status).length ? status : null;
+    }
+
     /* ── Form Submission ── */
     async function handleSubmit() {
       var errorBanner = document.getElementById('error-banner');
@@ -808,6 +960,10 @@
         '<svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>' +
         'Booking Consultation...';
 
+      // Optional migration milestones (no validation — all fields optional)
+      var migrationStatus = collectMigrationStatus();
+      var currentStage    = document.getElementById('current-stage').value || null;
+
       try {
         // 1. Insert into database
         var result = await window.ghSupabase
@@ -822,6 +978,8 @@
             preferred_destination: destination,
             consultation_date: date,
             consultation_time: time,
+            migration_status: migrationStatus,
+            current_stage: currentStage,
             status: 'pending',
           })
           .select()

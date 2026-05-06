@@ -93,13 +93,42 @@
     </div>
   </div>
 
+  <!-- Set New Password Modal (shown when arriving from a recovery link) -->
+  <div class="forgot-modal" id="reset-modal">
+    <div class="forgot-card">
+      <h3 style="margin-bottom:var(--space-3);">Set a new password</h3>
+      <p>Choose a new password for your GlobalHire account.</p>
+      <form id="reset-form">
+        <div class="form-group">
+          <label class="form-label" for="reset-pw1">New password</label>
+          <input type="password" class="form-input" id="reset-pw1" placeholder="At least 8 characters" required minlength="8">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reset-pw2">Confirm password</label>
+          <input type="password" class="form-input" id="reset-pw2" placeholder="Type it again" required minlength="8">
+        </div>
+        <div id="reset-message" style="font-size:var(--text-sm);margin-bottom:var(--space-3);display:none;"></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Update password</button>
+      </form>
+    </div>
+  </div>
+
   <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
 
-  <!-- Auto-redirect if already logged in + propagate ?redirect= -->
+  <!-- Auto-redirect if already logged in + propagate ?redirect= + handle recovery -->
   <script>
+    // Detect Supabase recovery callback. The link from email lands at
+    // login.html with #access_token=...&type=recovery&... in the hash.
+    function isRecoveryCallback() {
+      if (!window.location.hash) return false;
+      var hash = window.location.hash.replace(/^#/, '');
+      var params = new URLSearchParams(hash);
+      return params.get('type') === 'recovery';
+    }
+
     (function() {
       var params = new URLSearchParams(window.location.search);
       var redirectParam = params.get('redirect');
@@ -112,6 +141,74 @@
     })();
 
     (async function() {
+      // If this is a recovery callback, show the password reset modal
+      // and skip the normal auto-redirect (Supabase JS will have created
+      // a recovery-scoped session already).
+      if (isRecoveryCallback()) {
+        var modal = document.getElementById('reset-modal');
+        if (modal) modal.classList.add('visible');
+
+        var sb = window.ghSupabase;
+        var resetForm = document.getElementById('reset-form');
+        var resetMsg = document.getElementById('reset-message');
+
+        if (resetForm && sb) {
+          resetForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            var pw1 = document.getElementById('reset-pw1').value;
+            var pw2 = document.getElementById('reset-pw2').value;
+            if (pw1 !== pw2) {
+              resetMsg.textContent = 'Passwords do not match.';
+              resetMsg.style.color = 'var(--error)';
+              resetMsg.style.display = 'block';
+              return;
+            }
+            if (pw1.length < 8) {
+              resetMsg.textContent = 'Password must be at least 8 characters.';
+              resetMsg.style.color = 'var(--error)';
+              resetMsg.style.display = 'block';
+              return;
+            }
+            var btn = resetForm.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = 'Updating...';
+
+            var { error } = await sb.auth.updateUser({ password: pw1 });
+            if (error) {
+              resetMsg.textContent = error.message;
+              resetMsg.style.color = 'var(--error)';
+              resetMsg.style.display = 'block';
+              btn.disabled = false;
+              btn.textContent = 'Update password';
+              return;
+            }
+
+            resetMsg.textContent = 'Password updated! Signing you in...';
+            resetMsg.style.color = 'var(--success)';
+            resetMsg.style.display = 'block';
+
+            // Strip the hash so we don't re-trigger this flow on next load.
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+
+            // Send to the appropriate destination.
+            try {
+              var s = await sb.auth.getSession();
+              var p = s.data && s.data.session
+                ? await ghFrom('profiles').select('role').eq('id', s.data.session.user.id).single()
+                : null;
+              if (p && p.data && p.data.role === 'admin') {
+                window.location.replace('dashboard.html');
+              } else {
+                window.location.replace('portal.html');
+              }
+            } catch (e) {
+              window.location.replace('portal.html');
+            }
+          });
+        }
+        return; // skip the normal auto-redirect path
+      }
+
       try {
         var sb = window.ghSupabase;
         if (!sb) return;
