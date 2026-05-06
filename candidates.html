@@ -400,6 +400,105 @@
     </div>
   </div>
 
+  <!-- Edit Milestones Modal -->
+  <div id="milestones-overlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.65);backdrop-filter:blur(4px);z-index:500;"></div>
+  <div id="milestones-modal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg-base);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);width:100%;max-width:580px;max-height:85vh;overflow-y:auto;z-index:501;box-shadow:0 20px 50px rgba(0,0,0,0.4);">
+    <div style="padding:20px 24px;border-bottom:1px solid var(--border-subtle);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--bg-base);z-index:2;">
+      <div>
+        <h3 style="margin:0;font-size:17px;font-weight:700;color:var(--text-primary);">Edit Migration Milestones</h3>
+        <p id="milestones-target" style="margin:6px 0 0;font-size:13px;color:var(--text-tertiary);"></p>
+      </div>
+      <button id="milestones-close" style="background:none;border:none;cursor:pointer;padding:6px;color:var(--text-tertiary);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div style="padding:20px 24px;display:flex;flex-direction:column;gap:18px;">
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">Current stage</div>
+        <select id="ms-stage" style="width:100%;padding:10px 12px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-primary);font-size:14px;">
+          <option value="">— not set —</option>
+          <option value="inquiry">Inquiry / exploring</option>
+          <option value="docs_pending">Gathering documents</option>
+          <option value="dataflow">DataFlow</option>
+          <option value="prometric">Prometric</option>
+          <option value="license_application">License application</option>
+          <option value="visa">Visa / employer matching</option>
+          <option value="placed">Placed</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">DataFlow Verification</div>
+        <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:8px;">Tick countries the candidate has completed DataFlow for.</div>
+        <div class="ms-pill-row" data-key="dataflow" style="display:flex;flex-wrap:wrap;gap:6px;">
+          <label class="ms-pill"><input type="checkbox" value="saudi"><span>Saudi Arabia</span></label>
+          <label class="ms-pill"><input type="checkbox" value="qatar"><span>Qatar</span></label>
+          <label class="ms-pill"><input type="checkbox" value="uae"><span>UAE</span></label>
+          <label class="ms-pill"><input type="checkbox" value="oman"><span>Oman</span></label>
+          <label class="ms-pill"><input type="checkbox" value="bahrain"><span>Bahrain</span></label>
+          <label class="ms-pill"><input type="checkbox" value="kuwait"><span>Kuwait</span></label>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">Prometric Exam</div>
+        <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:8px;">Tick the exam(s) the candidate has passed.</div>
+        <div class="ms-pill-row" data-key="prometric" style="display:flex;flex-wrap:wrap;gap:6px;">
+          <label class="ms-pill"><input type="checkbox" value="saudi"><span>Saudi (SCFHS)</span></label>
+          <label class="ms-pill"><input type="checkbox" value="qatar"><span>QCHP (Qatar)</span></label>
+          <label class="ms-pill"><input type="checkbox" value="haad"><span>HAAD (Abu Dhabi)</span></label>
+          <label class="ms-pill"><input type="checkbox" value="dha"><span>DHA (Dubai)</span></label>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">Other Credentials</div>
+        <div class="ms-pill-row" data-key="other" style="display:flex;flex-wrap:wrap;gap:6px;">
+          <label class="ms-pill"><input type="checkbox" value="mumaris_plus"><span>Mumaris+</span></label>
+          <label class="ms-pill"><input type="checkbox" value="sheryan"><span>Sheryan</span></label>
+          <label class="ms-pill"><input type="checkbox" value="omsb"><span>OMSB (Oman)</span></label>
+          <label class="ms-pill"><input type="checkbox" value="nclex"><span>NCLEX</span></label>
+          <label class="ms-pill"><input type="checkbox" value="ielts"><span>IELTS</span></label>
+          <label class="ms-pill"><input type="checkbox" value="oet"><span>OET</span></label>
+        </div>
+      </div>
+
+      <div id="ms-error" style="display:none;font-size:13px;color:var(--error);"></div>
+    </div>
+
+    <div style="padding:14px 24px;border-top:1px solid var(--border-subtle);display:flex;justify-content:flex-end;gap:10px;">
+      <button id="milestones-cancel" class="btn btn-ghost btn-sm">Cancel</button>
+      <button id="milestones-save"   class="btn btn-primary btn-sm">Save</button>
+    </div>
+  </div>
+
+  <style>
+    .ms-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-elevated);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s;
+    }
+    .ms-pill input { display: none; }
+    .ms-pill:hover { border-color: rgba(0,150,199,0.55); color: var(--text-primary); }
+    .ms-pill.checked {
+      background: rgba(0,150,199,0.15);
+      border-color: #0096C7;
+      color: #0096C7;
+    }
+  </style>
+
   <!-- Scripts -->
   <script src="js/core.js"></script>
   <script src="js/dashboard.js"></script>

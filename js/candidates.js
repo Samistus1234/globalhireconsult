@@ -572,22 +572,27 @@
       html += '</div></div>';
     }
 
-    // Migration milestones
+    // Migration milestones — always render so admin has an Edit button
     var hasMilestones = profile.current_stage || (profile.migration_status && Object.keys(profile.migration_status).length);
-    if (hasMilestones) {
-      html += '<div style="margin-bottom:var(--space-6);padding:var(--space-4);background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-md);">';
-      html += '<div style="font-size:12px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:var(--space-3);">Migration Milestones</div>';
-      if (profile.current_stage) {
-        html += '<div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-3);">';
-        html += '<span style="font-size:11px;color:var(--text-tertiary);font-weight:600;">CURRENT STAGE</span>';
-        html += stageLabel(profile.current_stage);
-        html += '</div>';
-      }
-      if (profile.migration_status) {
-        html += '<div style="display:flex;flex-wrap:wrap;gap:var(--space-1);">' + renderMilestoneChips(profile.migration_status) + '</div>';
-      }
+    html += '<div style="margin-bottom:var(--space-6);padding:var(--space-4);background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-md);">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);margin-bottom:var(--space-3);">';
+    html += '<div style="font-size:12px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.06em;">Migration Milestones</div>';
+    html += '<button id="btn-edit-milestones" data-id="' + profile.id + '" class="btn btn-ghost btn-sm" style="font-size:11px;padding:4px 10px;">Edit</button>';
+    html += '</div>';
+
+    if (profile.current_stage) {
+      html += '<div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-3);">';
+      html += '<span style="font-size:11px;color:var(--text-tertiary);font-weight:600;">CURRENT STAGE</span>';
+      html += stageLabel(profile.current_stage);
       html += '</div>';
     }
+    if (profile.migration_status) {
+      html += '<div style="display:flex;flex-wrap:wrap;gap:var(--space-1);">' + renderMilestoneChips(profile.migration_status) + '</div>';
+    }
+    if (!hasMilestones) {
+      html += '<p style="margin:0;font-size:13px;color:var(--text-tertiary);">No milestones recorded yet — click <strong>Edit</strong> to add them.</p>';
+    }
+    html += '</div>';
 
     // Documents section
     html += '<div style="border-top:1px solid var(--border-subtle);padding-top:var(--space-5);margin-top:var(--space-2);">';
@@ -801,6 +806,25 @@
     html += '</div>';
 
     panelContentEl.innerHTML = html;
+
+    // Bind Edit Milestones button
+    var editMilestonesBtn = panelContentEl.querySelector('#btn-edit-milestones');
+    if (editMilestonesBtn) {
+      editMilestonesBtn.addEventListener('click', function () {
+        openMilestonesModal({
+          target: 'profile',
+          id: profile.id,
+          name: profile.full_name || profile.email || 'this candidate',
+          migration_status: profile.migration_status,
+          current_stage: profile.current_stage,
+          onSaved: async function () {
+            // Reload the candidate panel with fresh data + refresh the table row
+            await loadAllCandidates();
+            openCandidatePanel(profile.id);
+          }
+        });
+      });
+    }
 
     // Bind pipeline stage selector
     var stageSelect = document.getElementById('pipeline-stage-select');
@@ -1262,5 +1286,123 @@
     });
     return parts.join('; ');
   }
+
+  // ── Edit Milestones modal ──
+  // ctx: { target: 'profile'|'consultation', id, name, migration_status, current_stage, onSaved() }
+  // Exported on window so the eLab Complete admin page can reuse the same UI.
+  function openMilestonesModal(ctx) {
+    var modal   = document.getElementById('milestones-modal');
+    var overlay = document.getElementById('milestones-overlay');
+    if (!modal || !overlay) return;
+
+    document.getElementById('milestones-target').textContent = 'For ' + (ctx.name || '');
+    document.getElementById('ms-error').style.display = 'none';
+
+    // Stage select
+    var stageSelect = document.getElementById('ms-stage');
+    stageSelect.value = ctx.current_stage || '';
+
+    // Reset all pills, then check from existing migration_status
+    var ms = ctx.migration_status && typeof ctx.migration_status === 'object' ? ctx.migration_status : {};
+    document.querySelectorAll('.ms-pill input[type="checkbox"]').forEach(function(input) {
+      input.checked = false;
+      input.parentElement.classList.remove('checked');
+    });
+
+    function tickRow(key, valueMap) {
+      document.querySelectorAll('[data-key="' + key + '"] input[type="checkbox"]').forEach(function(input) {
+        if (valueMap && valueMap[input.value]) {
+          input.checked = true;
+          input.parentElement.classList.add('checked');
+        }
+      });
+    }
+    tickRow('dataflow', ms.dataflow);
+    tickRow('prometric', ms.prometric);
+
+    // 'other' pills are top-level keys (mumaris_plus, sheryan, ...)
+    document.querySelectorAll('[data-key="other"] input[type="checkbox"]').forEach(function(input) {
+      if (ms[input.value]) {
+        input.checked = true;
+        input.parentElement.classList.add('checked');
+      }
+    });
+
+    overlay.style.display = 'block';
+    modal.style.display = 'block';
+
+    // Pill toggle on click (rebind every open is fine — addEventListener is idempotent for same fn)
+    document.querySelectorAll('.ms-pill input[type="checkbox"]').forEach(function(input) {
+      input.onchange = function() {
+        this.parentElement.classList.toggle('checked', this.checked);
+      };
+    });
+
+    function close() {
+      overlay.style.display = 'none';
+      modal.style.display = 'none';
+    }
+    document.getElementById('milestones-close').onclick = close;
+    document.getElementById('milestones-cancel').onclick = close;
+    overlay.onclick = close;
+
+    document.getElementById('milestones-save').onclick = async function() {
+      // Build the JSONB payload
+      function pillsFor(key) {
+        var arr = [];
+        document.querySelectorAll('[data-key="' + key + '"] input[type="checkbox"]:checked')
+          .forEach(function(i) { arr.push(i.value); });
+        return arr;
+      }
+      var dataflow  = pillsFor('dataflow');
+      var prometric = pillsFor('prometric');
+      var other     = pillsFor('other');
+
+      var status = {};
+      if (dataflow.length)  status.dataflow  = Object.fromEntries(dataflow.map(function(c)  { return [c, 'done']; }));
+      if (prometric.length) status.prometric = Object.fromEntries(prometric.map(function(c) { return [c, 'passed']; }));
+      other.forEach(function(k) { status[k] = 'done'; });
+
+      var payload = {
+        migration_status: Object.keys(status).length ? status : null,
+        current_stage: stageSelect.value || null
+      };
+
+      var saveBtn = document.getElementById('milestones-save');
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving...';
+
+      var error;
+      if (ctx.target === 'consultation') {
+        // Direct write to public.elab_complete_consultations
+        var res = await window.ghSupabase
+          .from('elab_complete_consultations')
+          .update(payload)
+          .eq('id', ctx.id);
+        error = res.error;
+      } else {
+        // Default: profile
+        var res2 = await ghFrom('profiles').update(payload).eq('id', ctx.id);
+        error = res2.error;
+      }
+
+      if (error) {
+        var errEl = document.getElementById('ms-error');
+        errEl.textContent = error.message || 'Failed to save.';
+        errEl.style.display = 'block';
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save';
+        return;
+      }
+
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save';
+      close();
+      if (typeof ctx.onSaved === 'function') ctx.onSaved();
+    };
+  }
+
+  // Expose for cross-page reuse (elab-complete-admin.html)
+  window.openMilestonesModal = openMilestonesModal;
 
 })();
