@@ -8,6 +8,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="image" href="/assets/visa/img/visa-about-hero.jpg" fetchpriority="high">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/tokens.css">
@@ -20,40 +21,79 @@
   <div class="page-bg" aria-hidden="true"></div>
   <div id="gnav-placeholder"></div>
 
-  <main>
-    <section class="container" style="padding: var(--space-8) 0;">
-      <h1>About our Visa Services</h1>
-      <p style="max-width: 720px;">ELAB Visa Services helps individuals and families obtain Saudi Arabian visas — Tourist, Umrah, Family Visit, and Family Residence in our launch lineup, with more visa types arriving soon. Every application is submitted by our licensed Saudi visa partner; ELAB owns your end-to-end experience.</p>
+  <main class="visa-main">
 
-      <h2>Our partner</h2>
-      <div style="display: grid; grid-template-columns: auto 1fr; gap: var(--space-4); align-items: start; max-width: 720px; padding: var(--space-5); background: var(--bg-surface); border-radius: 10px; margin: var(--space-4) 0;">
-        <div style="width: 80px; height: 80px; background: var(--bg-elevated); border-radius: 8px; display: grid; place-items: center; color: var(--text-secondary); font-size: 0.75rem;">[Logo]</div>
+    <section class="visa-hero visa-hero--detail">
+      <div class="visa-hero__bg">
+        <picture>
+          <source type="image/avif" srcset="/assets/visa/img/visa-about-hero.avif">
+          <source type="image/webp" srcset="/assets/visa/img/visa-about-hero.webp">
+          <img src="/assets/visa/img/visa-about-hero.jpg" alt="Diriyah heritage architecture" fetchpriority="high">
+        </picture>
+      </div>
+      <div class="visa-hero__overlay"></div>
+      <div class="visa-hero__content">
+        <p class="visa-kicker">— About this service —</p>
+        <h1 class="visa-h1">Two names on every receipt.<br><em>ELAB and your visa specialist.</em></h1>
+        <p class="visa-lede">You talk to ELAB. The application is submitted by a MoFA-licensed Saudi visa specialist. One accountable team, regulated paperwork.</p>
+      </div>
+    </section>
+
+    <section class="visa-section visa-section--walnut visa-reveal">
+      <div style="display: grid; grid-template-columns: 100px 1fr; gap: 1.5rem; max-width: 720px; margin: 0 auto;">
+        <div style="background: var(--on-dark); color: var(--walnut); border-radius: 4px; aspect-ratio: 1; display: grid; place-items: center; font-family: 'Cormorant Garamond', serif; font-size: 0.875rem;">[Partner<br>logo]</div>
         <div>
-          <p style="margin: 0;"><strong>[Partner Name]</strong></p>
-          <p style="color: var(--text-secondary); font-size: 0.875rem; margin: 4px 0;">MoFA Licence #[XXXX]</p>
-          <p style="margin-top: var(--space-2);">[Partner bio paragraph — to be supplied by partner during onboarding. Should cover years in business, geographic coverage, key visa types, and any notable accreditations.]</p>
+          <p style="font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; margin: 0;">[Partner Name]</p>
+          <p style="font-size: 0.8125rem; opacity: 0.8; margin: 0.25rem 0;">MoFA Licence #[XXXX] · Riyadh</p>
+          <p style="margin-top: 0.75rem; line-height: 1.7;">[Partner bio paragraph — supplied during onboarding. Cover years in business, geographic coverage, key visa types, accreditations.]</p>
         </div>
       </div>
-
-      <h2>How it works</h2>
-      <ol style="max-width: 720px; line-height: 1.7;">
-        <li>You complete the free eligibility check on our visa hub.</li>
-        <li>If you're eligible, you sign up for a GlobalHire account and upload your documents.</li>
-        <li>You pay a $50 deposit to start your case.</li>
-        <li>Our intake team reviews your documents within 24 hours and either accepts them or asks for revisions.</li>
-        <li>Once your file is clean, we submit it to our MoFA-licensed partner who processes the application with the Saudi authorities.</li>
-        <li>You receive WhatsApp and email updates at every stage. When the visa is approved, you pay the balance and download your visa PDF from your dashboard.</li>
-      </ol>
-
-      <h2>Refund policy</h2>
-      <p style="max-width: 720px;">If we determine you're ineligible at intake — before submitting to the partner — your $50 deposit is fully refundable. After submission, partner-side fees are non-refundable. If a visa is rejected by the Saudi authorities for reasons we did not flag, we refund the balance and retain only the deposit as our service fee.</p>
-
-      <h2>Contact</h2>
-      <p style="max-width: 720px;">WhatsApp: <a href="https://wa.me/9295419232" style="color: var(--primary-light);">+1 (929) 419-2327</a> · Email: <a href="mailto:visas@globalhire-elab.com" style="color: var(--primary-light);">visas@globalhire-elab.com</a></p>
     </section>
+
+    <section class="visa-section visa-section--ivory visa-reveal">
+      <p class="visa-kicker">— How it works —</p>
+      <h2 class="visa-h2">Six steps from <em>question to PDF.</em></h2>
+      <ol style="counter-reset: step; list-style: none; padding: 0; margin-top: 1.5rem; max-width: 680px;">
+        <li style="padding: 1rem 0; border-bottom: 1px solid rgba(107,78,44,0.15); counter-increment: step;">
+          <span style="font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: var(--gold); display: inline-block; width: 3rem;">01</span>
+          Complete the free eligibility check on our visa hub.
+        </li>
+        <li style="padding: 1rem 0; border-bottom: 1px solid rgba(107,78,44,0.15); counter-increment: step;">
+          <span style="font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: var(--gold); display: inline-block; width: 3rem;">02</span>
+          Sign up for a GlobalHire account and upload your documents.
+        </li>
+        <li style="padding: 1rem 0; border-bottom: 1px solid rgba(107,78,44,0.15); counter-increment: step;">
+          <span style="font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: var(--gold); display: inline-block; width: 3rem;">03</span>
+          Pay a $50 deposit to start your case.
+        </li>
+        <li style="padding: 1rem 0; border-bottom: 1px solid rgba(107,78,44,0.15); counter-increment: step;">
+          <span style="font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: var(--gold); display: inline-block; width: 3rem;">04</span>
+          Our intake team reviews your documents within 24 hours.
+        </li>
+        <li style="padding: 1rem 0; border-bottom: 1px solid rgba(107,78,44,0.15); counter-increment: step;">
+          <span style="font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: var(--gold); display: inline-block; width: 3rem;">05</span>
+          We submit to our MoFA-licensed partner.
+        </li>
+        <li style="padding: 1rem 0; counter-increment: step;">
+          <span style="font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: var(--gold); display: inline-block; width: 3rem;">06</span>
+          You pay the balance when approved, and download your visa PDF from your dashboard.
+        </li>
+      </ol>
+    </section>
+
+    <section class="visa-section visa-section--sand visa-reveal" style="font-size: 0.75rem; opacity: 0.85;">
+      <p class="visa-kicker">— Image attribution —</p>
+      <p style="margin-top: 0.5rem;">Visa pages use imagery from Pexels, Unsplash, and Wikimedia Commons under their respective licences. Full attribution list at <a href="docs/visa-imagery-attribution.md" style="color: var(--bronze);">docs/visa-imagery-attribution.md</a>.</p>
+    </section>
+
   </main>
 
   <div id="gfooter-placeholder"></div>
   <script src="js/nav-global.js" data-active-page="visa-about"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.45/dist/lenis.min.js" defer></script>
+  <script type="module" src="js/visa-motion.js"></script>
+  <script type="module" src="js/visa-hero-video.js"></script>
 </body>
 </html>
