@@ -42,8 +42,8 @@
 
     // Timeline (immutable events)
     document.getElementById('case-timeline').innerHTML = events.length
-      ? events.map(function (e) { return '<div style="padding: var(--space-2) 0; border-bottom: 1px solid rgba(255,255,255,.06);"><strong>' + e.event_type + '</strong> · ' + new Date(e.created_at).toLocaleString() + '</div>'; }).join('')
-      : '<p style="color: var(--text-secondary);">No events yet.</p>';
+      ? events.map(function (e) { return '<div class="visa-timeline__item"><strong>' + e.event_type + '</strong> <time>' + new Date(e.created_at).toLocaleString() + '</time></div>'; }).join('')
+      : '<p style="opacity:.55;">No events yet.</p>';
 
     // Documents
     document.getElementById('case-documents').innerHTML = docs.length

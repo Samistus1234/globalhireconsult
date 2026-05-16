@@ -30,19 +30,18 @@
     var list = document.getElementById('admin-cases-list');
     if (!rows.length) { list.innerHTML = '<p>No cases match the filters.</p>'; return; }
     list.innerHTML =
-      '<table style="width:100%; border-collapse: collapse;">' +
-        '<thead><tr style="text-align:left; border-bottom: 1px solid rgba(255,255,255,.15);">' +
-          '<th style="padding:8px;">Case</th><th>Visa</th><th>Status</th><th>Started</th>' +
-        '</tr></thead><tbody>' +
+      '<table class="visa-queue">' +
+        '<thead><tr><th>Case</th><th>Visa</th><th>Status</th><th>Started</th></tr></thead>' +
+        '<tbody>' +
         rows.map(function (r) {
-          return '<tr style="border-bottom: 1px solid rgba(255,255,255,.06);">' +
-            '<td style="padding:8px;"><a href="admin-visa-case.html?id=' + r.id + '" style="color: var(--primary-light);">' + r.id.slice(0,8) + '…</a></td>' +
+          return '<tr>' +
+            '<td><a class="case-id" href="admin-visa-case.html?id=' + r.id + '">' + r.id.slice(0,8) + '…</a></td>' +
             '<td>' + r.visa_type.replace(/_/g,' ') + '</td>' +
-            '<td>' + r.status.replace(/_/g,' ') + '</td>' +
+            '<td><span class="visa-pill visa-pill--neutral">' + r.status.replace(/_/g,' ') + '</span></td>' +
             '<td>' + new Date(r.created_at).toLocaleString() + '</td>' +
           '</tr>';
         }).join('') +
-      '</tbody></table>';
+        '</tbody></table>';
   }
 
   function refresh() {
