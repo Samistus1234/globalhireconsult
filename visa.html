@@ -8,6 +8,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="image" href="/assets/visa/img/visa-hub-poster.jpg" fetchpriority="high">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/tokens.css">
@@ -22,88 +23,132 @@
   <div class="page-bg" aria-hidden="true"></div>
   <div id="gnav-placeholder"></div>
 
-  <main>
-    <section class="visa-hero">
-      <div class="container">
-        <p class="visa-cobrand-line">In partnership with [Partner Name] · MoFA-licensed</p>
-        <h1>Find your Saudi visa in 30 seconds.</h1>
-        <p class="lede">From $135 · No hidden fees · Submitted by licensed specialists.</p>
+  <main class="visa-main">
 
-        <div class="visa-wizard">
-          <label>I want to…</label>
-          <div class="visa-outcome-chips" role="group" aria-label="Choose your goal">
-            <button type="button" class="visa-outcome-chip" data-outcome="visit-saudi"      aria-selected="false">visit Saudi</button>
-            <button type="button" class="visa-outcome-chip" data-outcome="go-for-umrah"     aria-selected="false">go for Umrah</button>
-            <button type="button" class="visa-outcome-chip" data-outcome="perform-hajj"     aria-selected="false">perform Hajj</button>
-            <button type="button" class="visa-outcome-chip" data-outcome="bring-my-family"  aria-selected="false">bring my family</button>
-            <button type="button" class="visa-outcome-chip" data-outcome="live-with-family" aria-selected="false">live with my family</button>
-            <button type="button" class="visa-outcome-chip" data-outcome="work-in-ksa"      aria-selected="false">work in KSA</button>
-            <button type="button" class="visa-outcome-chip" data-outcome="hire-a-helper"    aria-selected="false">hire a helper</button>
-            <button type="button" class="visa-outcome-chip" data-outcome="do-business"      aria-selected="false">do business</button>
-            <button type="button" class="visa-outcome-chip" data-outcome="live-permanently" aria-selected="false">live permanently</button>
-          </div>
-          <div id="wizard-deflection" class="section" hidden style="margin-top: var(--space-4);"></div>
+    <!-- HERO -->
+    <section class="visa-hero visa-hero--hub">
+      <div class="visa-hero__bg"
+           data-video-webm="/assets/visa/video/saudi-montage.webm"
+           data-video-mp4="/assets/visa/video/saudi-montage.mp4"
+           data-poster="/assets/visa/img/visa-hub-poster.jpg">
+        <picture>
+          <source type="image/avif" srcset="/assets/visa/img/visa-hub-poster.avif">
+          <source type="image/webp" srcset="/assets/visa/img/visa-hub-poster.webp">
+          <img src="/assets/visa/img/visa-hub-poster.jpg" alt="" fetchpriority="high">
+        </picture>
+      </div>
+      <div class="visa-hero__overlay"></div>
+      <svg class="visa-hero__silhouette" height="120" viewBox="0 0 400 120" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0,120 L0,80 Q40,40 80,70 Q120,30 160,60 Q200,20 240,55 Q280,15 320,50 Q360,25 400,60 L400,120 Z" fill="#1a0f05" opacity="0.6"/>
+      </svg>
+      <div class="visa-hero__content">
+        <p class="visa-kicker">— in partnership with [Partner Name] · MoFA-licensed —</p>
+        <h1 class="visa-h1">Your Saudi visa,<br><em>handled.</em></h1>
+        <p class="visa-lede">Tourist · Umrah · Family Visit · Family Residence. From $135 all-in. Submitted by a licensed Saudi visa specialist.</p>
+        <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a class="visa-btn visa-btn--primary" href="#wizard">Find my visa →</a>
+          <a class="visa-btn visa-btn--outline" href="visa-about.html">Watch how it works</a>
+        </div>
+      </div>
+      <div class="visa-hero__scroll-cue">▼ SCROLL</div>
+    </section>
+
+    <!-- WIZARD -->
+    <section id="wizard" class="visa-section visa-section--ivory visa-reveal">
+      <p class="visa-kicker">Step 1 of 3</p>
+      <h2 class="visa-h2">Tell us why you're going.</h2>
+      <div class="visa-wizard-grid">
+        <button type="button" class="visa-wizard-chip" data-outcome="visit-saudi">
+          <span class="title">Visit Saudi</span><span class="sub">Tourism · AlUla · events</span>
+        </button>
+        <button type="button" class="visa-wizard-chip" data-outcome="go-for-umrah">
+          <span class="title">Go for Umrah</span><span class="sub">Religious pilgrimage</span>
+        </button>
+        <button type="button" class="visa-wizard-chip" data-outcome="bring-my-family">
+          <span class="title">Bring my family</span><span class="sub">Iqama-holder visit</span>
+        </button>
+        <button type="button" class="visa-wizard-chip" data-outcome="live-with-family">
+          <span class="title">Live with family</span><span class="sub">Family Residence</span>
+        </button>
+        <button type="button" class="visa-wizard-chip visa-wizard-chip--more" data-outcome="more">
+          <span class="title">More options</span><span class="sub">Hajj · Work · Business · Domestic Worker · Premium Residency</span>
+        </button>
+      </div>
+      <div id="wizard-deflection" hidden style="margin-top: 1.5rem;"></div>
+    </section>
+
+    <!-- PINNED STORY -->
+    <section class="visa-section visa-section--espresso visa-reveal">
+      <p class="visa-kicker" style="opacity: 0.6;">— Why us —</p>
+      <h2 class="visa-h2" style="max-width: 720px;">A licensed Saudi specialist <em>behind every application</em>, and ELAB on your side from intake to issued.</h2>
+      <div class="visa-stats">
+        <div>
+          <span class="visa-stats__num"><span data-visa-counter="5">$0</span> days</span>
+          <span class="visa-stats__label">average for tourist eVisa</span>
+        </div>
+        <div>
+          <span class="visa-stats__num"><span data-visa-counter="50">$0</span></span>
+          <span class="visa-stats__label">refundable deposit to start</span>
+        </div>
+        <div>
+          <span class="visa-stats__num">7/7</span>
+          <span class="visa-stats__label">WhatsApp human support</span>
         </div>
       </div>
     </section>
 
-    <section class="container" style="padding-bottom: var(--space-8);">
-      <p class="label" style="margin-bottom: var(--space-3);">Or browse all visa types</p>
+    <!-- CATALOG -->
+    <section class="visa-section visa-section--ivory visa-reveal">
+      <p class="visa-kicker">— Browse —</p>
+      <h2 class="visa-h2">All Saudi visas we issue.</h2>
       <div class="visa-catalog">
-        <a class="visa-catalog-card" href="visa-tourist-evisa.html">
-          <h3>Tourist eVisa</h3>
-          <div class="price">From $185</div>
-          <div class="meta">5–7 days · Single or multi-entry</div>
+        <a class="visa-catalog-card visa-catalog-card--tourist" href="visa-tourist-evisa.html">
+          <div class="visa-catalog-card__strip"></div>
+          <div class="visa-catalog-card__body">
+            <h3 class="visa-catalog-card__title">Tourist eVisa</h3>
+            <p class="visa-catalog-card__meta">5–7 days · From <strong>$185</strong></p>
+          </div>
         </a>
-        <a class="visa-catalog-card" href="visa-umrah.html">
-          <h3>Umrah Visa</h3>
-          <div class="price">From $295</div>
-          <div class="meta">3–5 days · Year-round</div>
+        <a class="visa-catalog-card visa-catalog-card--umrah" href="visa-umrah.html">
+          <div class="visa-catalog-card__strip"></div>
+          <div class="visa-catalog-card__body">
+            <h3 class="visa-catalog-card__title">Umrah</h3>
+            <p class="visa-catalog-card__meta">3–5 days · From <strong>$295</strong></p>
+          </div>
         </a>
-        <a class="visa-catalog-card" href="visa-family-visit.html">
-          <h3>Family Visit</h3>
-          <div class="price">From $210</div>
-          <div class="meta">7–14 days · Up to 90-day stay</div>
+        <a class="visa-catalog-card visa-catalog-card--family" href="visa-family-visit.html">
+          <div class="visa-catalog-card__strip"></div>
+          <div class="visa-catalog-card__body">
+            <h3 class="visa-catalog-card__title">Family Visit</h3>
+            <p class="visa-catalog-card__meta">7–14 days · From <strong>$210</strong></p>
+          </div>
         </a>
-        <a class="visa-catalog-card" href="visa-family-residence.html">
-          <h3>Family Residence</h3>
-          <div class="price">From $320</div>
-          <div class="meta">4–8 weeks · Iqama dependents</div>
+        <a class="visa-catalog-card visa-catalog-card--residence" href="visa-family-residence.html">
+          <div class="visa-catalog-card__strip"></div>
+          <div class="visa-catalog-card__body">
+            <h3 class="visa-catalog-card__title">Family Residence</h3>
+            <p class="visa-catalog-card__meta">4–8 wks · From <strong>$320</strong></p>
+          </div>
         </a>
-        <div class="visa-catalog-card" data-status="coming-soon">
-          <h3>Hajj</h3>
-          <div class="price">Coming soon</div>
-          <div class="meta">Quota-controlled · Annual</div>
+        <div class="visa-catalog-card visa-catalog-card--more">
+          <div>
+            <p class="visa-catalog-card__title">+5 more</p>
+            <p class="visa-catalog-card__meta">Hajj · Business · Work · Domestic Worker · Premium Residency</p>
+          </div>
         </div>
-        <div class="visa-catalog-card" data-status="coming-soon">
-          <h3>Business Visit</h3>
-          <div class="price">Coming soon</div>
-          <div class="meta">5–10 days · Commercial</div>
-        </div>
-        <div class="visa-catalog-card" data-status="coming-soon">
-          <h3>Work &amp; Iqama</h3>
-          <div class="price">Coming soon</div>
-          <div class="meta">With DataFlow + Mumarisplus</div>
-        </div>
-        <div class="visa-catalog-card" data-status="coming-soon">
-          <h3>Domestic Worker</h3>
-          <div class="price">Coming soon</div>
-          <div class="meta">3–6 weeks</div>
-        </div>
-        <div class="visa-catalog-card" data-status="coming-soon">
-          <h3>Premium Residency</h3>
-          <div class="price">Coming soon</div>
-          <div class="meta">2–6 months</div>
-        </div>
-      </div>
-
-      <div class="visa-trust-strip">
-        <div class="visa-trust-item"><strong>✓ MoFA-licensed</strong>Submitted under partner licence #[XXXX]</div>
-        <div class="visa-trust-item"><strong>✓ Tracked in your dashboard</strong>Real status, not fake ETAs</div>
-        <div class="visa-trust-item"><strong>✓ Refundable deposit</strong>Full refund if ineligible at intake</div>
-        <div class="visa-trust-item"><strong>✓ WhatsApp support 7 days</strong>Real humans, 7am–10pm</div>
       </div>
     </section>
+
+    <!-- TRUST STRIP -->
+    <section class="visa-section--walnut" style="padding: 1.25rem 0;">
+      <div class="visa-trust">
+        <div class="visa-trust__item"><strong>✓ MoFA-licensed</strong>Partner licence #[XXXX]</div>
+        <div class="visa-trust__item"><strong>✓ Real-time status</strong>Tracked in your dashboard</div>
+        <div class="visa-trust__item"><strong>✓ Refundable deposit</strong>Full refund if ineligible</div>
+        <div class="visa-trust__item"><strong>✓ WhatsApp 7 days</strong>Real humans, 7am–10pm</div>
+      </div>
+    </section>
+
   </main>
 
   <div id="gfooter-placeholder"></div>
@@ -112,5 +157,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/visa-wizard.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.45/dist/lenis.min.js" defer></script>
+  <script type="module" src="js/visa-motion.js"></script>
+  <script type="module" src="js/visa-hero-video.js"></script>
 </body>
 </html>
