@@ -71,9 +71,11 @@ Search-and-replace these placeholders across `visa*.html` and `visa-about.html`:
 | Partner bio paragraph | /visa/about |
 | Wholesale prices behind "From $X" anchors | `js/visa-intake.js` ESTIMATES + each visa-detail HTML "From $X" + breakdown |
 
-### Trust strip placeholder
+### Trust strip status (already clean — confirmed 2026-05-16)
 
-`visa.html` trust strip has `[N+ candidates placed across GCC]`. Either verify a real number from GlobalHire's records and substitute, or remove that tile entirely. **Do not ship the fabricated 10,000+ figure.**
+`visa.html` trust strip ships with four non-numeric claims (MoFA-licensed, dashboard-tracked, refundable deposit, WhatsApp 7-day support). No fabricated migrant-placement number anywhere. The only remaining placeholder is the partner's MoFA licence number `#[XXXX]` on the first tile, filled in via the partner-data step below.
+
+If you later want a placement-count tile, GlobalHire's `globalhire.profiles` currently has 203 candidates registered and 0 with `current_stage='placed'`, so any such claim would be fabrication today — wait until you have real placements before adding that tile.
 
 ### Per-visa content review
 
