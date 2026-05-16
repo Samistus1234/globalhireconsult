@@ -1,205 +1,438 @@
 /* ============================================
-   GLOBALHIRE@ELAB — Visa Services styles
-   Builds on tokens.css; warm gold accent for visa CTAs.
+   GLOBALHIRE@ELAB — Visa Services CSS
+   Cinematic redesign — gold/ivory/walnut palette.
+   Spec: docs/superpowers/specs/2026-05-16-saudi-visa-services-redesign.md
+   Loaded on /visa* marketing pages. Functional pages also load
+   css/visa-functional.css on top of this file.
    ============================================ */
 
-.visa-hero {
-  padding: var(--space-12) 0 var(--space-8);
-  background: radial-gradient(ellipse at top, var(--secondary-muted), transparent 70%);
+:root {
+  --ivory:       #FAF6EE;
+  --sand:        #F0E6D0;
+  --gold:        #D4A85A;
+  --gold-soft:   #FCD34D;
+  --bronze:      #A87830;
+  --walnut:      #6B4E2C;
+  --espresso:    #3D2818;
+  --midnight:    #1A0F05;
+  --on-dark:     #FEF3C7;
+
+  /* Reuse globalhire semantic colours for status pills */
+  --visa-success: #2EC4B6;
+  --visa-warning: #F4A261;
+  --visa-error:   #E63946;
+  --visa-info:    #48CAE4;
+
+  --visa-hero-overlay: linear-gradient(180deg, rgba(26,15,5,0.1) 30%, rgba(26,15,5,0.75) 100%);
+  --visa-card-shadow:  0 4px 16px rgba(107,78,44,0.08);
+  --visa-card-shadow-lg: 0 8px 32px rgba(107,78,44,0.12);
 }
 
-.visa-cobrand-line {
-  font-size: 0.75rem;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  text-align: center;
-  margin-bottom: var(--space-3);
+/* ── Layout reset for visa main ── */
+body:has(.visa-main) {
+  background: var(--ivory);
+  color: var(--espresso);
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
-.visa-hero h1 {
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 800;
-  line-height: 1.15;
-  text-align: center;
-  margin-bottom: var(--space-2);
+.visa-main {
+  --section-padding: clamp(3rem, 8vw, 6rem);
 }
 
-.visa-hero .lede {
-  text-align: center;
-  color: var(--text-secondary);
-  margin-bottom: var(--space-6);
+/* ── Type ── */
+.visa-h1 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  margin: 0;
 }
+.visa-h1 em { font-style: italic; color: var(--gold-soft); }
 
-.visa-wizard {
-  background: var(--bg-surface);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px;
-  padding: var(--space-6);
-  max-width: 720px;
-  margin: 0 auto;
-}
-
-.visa-wizard label {
-  display: block;
-  color: var(--text-primary);
-  margin-bottom: var(--space-3);
+.visa-h2 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
   font-weight: 500;
+  font-size: clamp(1.5rem, 4vw, 2.75rem);
+  line-height: 1.1;
+  margin: 0;
+}
+.visa-h2 em { font-style: italic; color: var(--gold-soft); }
+
+.visa-kicker {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.125em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin: 0 0 0.5rem;
 }
 
-.visa-outcome-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+.visa-lede {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  line-height: 1.65;
+  max-width: 65ch;
+  opacity: 0.9;
 }
 
-.visa-outcome-chip {
-  padding: var(--space-2) var(--space-3);
-  background: var(--bg-elevated);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 999px;
-  cursor: pointer;
-  font-size: 0.875rem;
-  transition: all 0.15s ease;
+.visa-price-display {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 500;
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--bronze);
+  line-height: 1;
 }
 
-.visa-outcome-chip:hover {
-  background: var(--bg-hover);
-  border-color: var(--secondary);
-}
+/* ── Section bands ── */
+.visa-section { padding: var(--section-padding) clamp(1rem, 5vw, 3rem); }
+.visa-section--ivory   { background: var(--ivory); color: var(--espresso); }
+.visa-section--sand    { background: var(--sand);  color: var(--espresso); }
+.visa-section--walnut  { background: var(--walnut); color: var(--on-dark); }
+.visa-section--espresso{ background: var(--espresso); color: var(--on-dark); }
+.visa-section--midnight{ background: var(--midnight); color: var(--on-dark); }
 
-.visa-outcome-chip[aria-selected="true"] {
-  background: var(--secondary-muted);
-  border-color: var(--secondary);
-  color: var(--secondary-light);
-}
-
-.visa-wizard .field-row {
+/* ── Hero (cinematic, with ken-burns) ── */
+.visa-hero {
+  position: relative;
+  min-height: 560px;
+  height: 100vh;
+  max-height: 800px;
+  overflow: hidden;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3);
-  margin-top: var(--space-4);
+  align-items: end;
+  color: var(--on-dark);
+}
+.visa-hero--detail {
+  height: 60vh;
+  min-height: 400px;
+  max-height: 600px;
 }
 
-.visa-wizard input[type="text"],
-.visa-wizard input[type="email"],
-.visa-wizard input[type="tel"],
-.visa-wizard input[type="date"],
-.visa-wizard select {
+.visa-hero__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+.visa-hero__bg img,
+.visa-hero__bg video {
   width: 100%;
-  padding: var(--space-2) var(--space-3);
-  background: var(--bg-elevated);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 6px;
-  color: var(--text-primary);
-  font-family: inherit;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  will-change: transform;
+}
+.visa-hero__bg img { animation: visa-ken-burns 18s ease-in-out infinite alternate; }
+.visa-hero__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--visa-hero-overlay);
+}
+.visa-hero__silhouette {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+.visa-hero__content {
+  position: relative;
+  z-index: 3;
+  padding: clamp(2rem, 6vw, 5rem) clamp(1rem, 5vw, 3rem);
+  max-width: 720px;
+}
+.visa-hero__scroll-cue {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 3;
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  color: rgba(254,243,199,0.6);
 }
 
-.visa-wizard input:focus,
-.visa-wizard select:focus {
-  outline: none;
-  border-color: var(--secondary);
-  box-shadow: 0 0 0 3px var(--secondary-muted);
+@keyframes visa-ken-burns {
+  from { transform: scale(1)   translate(0,0); }
+  to   { transform: scale(1.08) translate(-1%,-1%); }
 }
 
-.visa-cta-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-5);
-  background: var(--secondary);
-  color: var(--text-inverse);
-  border-radius: 8px;
+/* ── Mouse-tracking spotlight (hub hero only) ── */
+.visa-hero--hub::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(
+    600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(252,211,77,0.15) 0%,
+    transparent 60%
+  );
+  transition: opacity 0.3s ease;
+}
+
+/* ── Buttons ── */
+.visa-btn {
+  display: inline-block;
+  padding: 0.875rem 1.5rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8125rem;
   font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   text-decoration: none;
-  transition: all 0.15s ease;
   border: none;
   cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
 }
-
-.visa-cta-primary:hover {
-  background: var(--secondary-light);
+.visa-btn--primary {
+  background: var(--gold-soft);
+  color: var(--espresso);
 }
-
-.visa-cta-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.visa-btn--primary:hover { background: #ffe066; transform: translateY(-1px); }
+.visa-btn--outline {
+  background: transparent;
+  border: 1px solid rgba(254,243,199,0.4);
+  color: var(--on-dark);
 }
+.visa-btn--outline:hover { background: rgba(254,243,199,0.1); }
 
-.visa-trust-strip {
+/* ── Wizard chips (hub) ── */
+.visa-wizard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: var(--space-3);
-  margin: var(--space-8) 0;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
 }
-
-.visa-trust-item {
-  padding: var(--space-3) var(--space-4);
-  background: var(--bg-surface);
-  border-left: 3px solid var(--accent-teal);
+.visa-wizard-chip {
+  padding: 1rem 1.25rem;
+  background: white;
+  border: 1px solid var(--sand);
   border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  text-align: left;
+  font-family: 'Inter', sans-serif;
+  color: var(--espresso);
+}
+.visa-wizard-chip:hover { transform: translateY(-2px); border-color: var(--gold); }
+.visa-wizard-chip .title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.125rem;
+  display: block;
+}
+.visa-wizard-chip .sub {
+  font-size: 0.75rem;
+  opacity: 0.65;
+  display: block;
+  margin-top: 0.25rem;
+}
+.visa-wizard-chip--more {
+  background: #FAF0D0;
+  border-color: var(--gold);
+}
+.visa-wizard-chip--more .title,
+.visa-wizard-chip--more .sub { color: var(--walnut); }
+
+/* ── Story counter stats ── */
+.visa-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: clamp(1rem, 3vw, 2rem);
+  margin-top: 1.5rem;
+}
+.visa-stats__num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: var(--gold-soft);
+  font-weight: 400;
+  line-height: 1;
+  display: block;
+}
+.visa-stats__label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8125rem;
+  opacity: 0.8;
+  margin-top: 0.25rem;
+  display: block;
 }
 
-.visa-trust-item strong { color: var(--accent-teal); display: block; margin-bottom: 4px; }
-
+/* ── Catalog cards ── */
 .visa-catalog {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: var(--space-4);
-  margin-top: var(--space-6);
+  gap: 1rem;
+  margin-top: 1.5rem;
 }
-
 .visa-catalog-card {
-  padding: var(--space-4);
-  background: var(--bg-card);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 10px;
+  background: white;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: var(--visa-card-shadow);
   text-decoration: none;
-  color: var(--text-primary);
-  transition: transform 0.15s ease, border-color 0.15s ease;
+  color: var(--espresso);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: block;
 }
-
 .visa-catalog-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--secondary);
+  transform: translateY(-3px);
+  box-shadow: var(--visa-card-shadow-lg);
+}
+.visa-catalog-card__strip {
+  height: 80px;
+  background: linear-gradient(135deg, var(--gold), var(--walnut));
+}
+.visa-catalog-card--tourist  .visa-catalog-card__strip { background: linear-gradient(135deg, #f4d4a0, #c08850); }
+.visa-catalog-card--umrah    .visa-catalog-card__strip { background: linear-gradient(135deg, #2c4a70, #0e2842); }
+.visa-catalog-card--family   .visa-catalog-card__strip { background: linear-gradient(135deg, #c9a570, #6b4e2c); }
+.visa-catalog-card--residence .visa-catalog-card__strip { background: linear-gradient(135deg, #b88c50, #5a3a18); }
+.visa-catalog-card__body { padding: 1rem; }
+.visa-catalog-card__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin: 0;
+}
+.visa-catalog-card__meta {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin-top: 0.25rem;
+}
+.visa-catalog-card__meta strong { color: var(--bronze); }
+.visa-catalog-card--coming { opacity: 0.55; cursor: not-allowed; }
+.visa-catalog-card--more {
+  background: var(--sand);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 1rem;
 }
 
-.visa-catalog-card[data-status="coming-soon"] {
-  opacity: 0.55;
-  cursor: not-allowed;
+/* ── Trust strip ── */
+.visa-trust {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  padding: 1rem clamp(1rem, 5vw, 3rem);
+}
+.visa-trust__item {
+  font-size: 0.75rem;
+}
+.visa-trust__item strong {
+  display: block;
+  color: var(--gold-soft);
+  font-size: 0.8125rem;
+  margin-bottom: 0.25rem;
 }
 
-.visa-catalog-card h3 { margin: 0 0 var(--space-1); font-size: 1.125rem; }
-.visa-catalog-card .price { color: var(--secondary-light); font-weight: 600; }
-.visa-catalog-card .meta { color: var(--text-secondary); font-size: 0.875rem; }
-
-/* ── Visa detail page ── */
-.visa-detail {
+/* ── Visa-detail two-column ── */
+.visa-detail-layout {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: var(--space-6);
-  padding: var(--space-8) 0;
+  gap: clamp(1rem, 4vw, 2.5rem);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+@media (max-width: 720px) { .visa-detail-layout { grid-template-columns: 1fr; } }
+
+.visa-detail-body h2 { font-family: 'Cormorant Garamond', serif; }
+.visa-detail-body ul {
+  padding-left: 1.25rem;
+  line-height: 1.7;
+  font-size: 0.9375rem;
 }
 
-@media (max-width: 720px) {
-  .visa-detail { grid-template-columns: 1fr; }
-  .visa-wizard .field-row { grid-template-columns: 1fr; }
-}
-
-.visa-detail-content h1 { margin-top: 0; }
-.visa-detail-content h2 { margin-top: var(--space-6); font-size: 1.25rem; }
-.visa-detail-content ul { padding-left: 1.25rem; line-height: 1.7; }
-
+/* Price card (used on visa-detail + visa-start sticky aside) */
 .visa-price-card {
   position: sticky;
   top: 100px;
-  padding: var(--space-5);
-  background: var(--bg-surface);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px;
+  background: white;
+  border-top: 3px solid var(--gold);
+  padding: 1.25rem;
+  box-shadow: var(--visa-card-shadow);
   height: fit-content;
 }
+.visa-price-card__from {
+  font-size: 0.6875rem;
+  letter-spacing: 0.125em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+.visa-price-card__breakdown {
+  font-size: 0.75rem;
+  opacity: 0.6;
+  margin-top: 0.25rem;
+}
+.visa-price-card__cta {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 1rem;
+}
+.visa-price-card__footnote {
+  font-size: 0.6875rem;
+  opacity: 0.6;
+  margin-top: 0.75rem;
+  line-height: 1.5;
+}
 
-.visa-price-card .from { color: var(--text-secondary); font-size: 0.875rem; }
-.visa-price-card .price { font-size: 2rem; font-weight: 700; color: var(--secondary-light); margin: 4px 0; }
-.visa-price-card .breakdown { color: var(--text-secondary); font-size: 0.8125rem; margin-bottom: var(--space-3); }
+/* ── FAQ accordion ── */
+.visa-faq details {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(107,78,44,0.15);
+}
+.visa-faq summary {
+  cursor: pointer;
+  font-weight: 500;
+  list-style: none;
+}
+.visa-faq summary::after {
+  content: "+";
+  float: right;
+  color: var(--gold);
+  font-weight: 400;
+  font-size: 1.25rem;
+}
+.visa-faq details[open] summary::after { content: "−"; }
+.visa-faq details p {
+  margin-top: 0.5rem;
+  opacity: 0.85;
+  line-height: 1.7;
+}
+
+/* ── Scroll reveal: opacity + slide-up via IO ── */
+.visa-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.visa-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── View Transitions API anchor ── */
+.visa-hero { view-transition-name: visa-hero; }
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .visa-hero__bg img { animation: none; }
+  .visa-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .visa-hero--hub::before { background: none; }
+  .visa-catalog-card,
+  .visa-wizard-chip {
+    transition: none;
+  }
+  .visa-catalog-card:hover,
+  .visa-wizard-chip:hover {
+    transform: none;
+  }
+}
