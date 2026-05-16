@@ -25,7 +25,11 @@ CREATE TYPE globalhire.visa_case_status AS ENUM (
 CREATE TABLE globalhire.visa_leads (
   id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   created_at      timestamptz NOT NULL DEFAULT now(),
-  outcome         text NOT NULL,
+  outcome text NOT NULL CHECK (outcome IN (
+    'visit-saudi','go-for-umrah','perform-hajj',
+    'bring-my-family','live-with-family','work-in-ksa',
+    'hire-a-helper','do-business','live-permanently'
+  )),
   suggested_visa  globalhire.visa_type,
   nationality     text,
   sponsor_iqama   text,
@@ -37,6 +41,10 @@ CREATE TABLE globalhire.visa_leads (
   session_id      text,
   passed_eligibility boolean DEFAULT false
 );
+
+CREATE INDEX visa_leads_created_idx       ON globalhire.visa_leads (created_at DESC);
+CREATE INDEX visa_leads_contact_email_idx ON globalhire.visa_leads (contact_email);
+CREATE INDEX visa_leads_utm_campaign_idx  ON globalhire.visa_leads (utm_campaign, created_at DESC);
 
 -- ── 3. visa_cases ──
 CREATE TABLE globalhire.visa_cases (
@@ -77,6 +85,7 @@ CREATE TABLE globalhire.visa_case_documents (
 CREATE INDEX visa_case_documents_case_idx ON globalhire.visa_case_documents (case_id);
 
 -- ── 5. visa_case_events (immutable audit log) ──
+-- TODO(P1-T2): enforce immutability via RLS (no UPDATE/DELETE policies).
 CREATE TABLE globalhire.visa_case_events (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   case_id     uuid NOT NULL REFERENCES globalhire.visa_cases(id) ON DELETE CASCADE,
@@ -89,6 +98,7 @@ CREATE TABLE globalhire.visa_case_events (
 CREATE INDEX visa_case_events_case_idx ON globalhire.visa_case_events (case_id, created_at DESC);
 
 -- ── 6. visa_invoices ──
+-- TODO(P1-T2): RLS — service-role-only INSERT/UPDATE; candidate SELECT scoped via case ownership.
 CREATE TABLE globalhire.visa_invoices (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   case_id       uuid NOT NULL REFERENCES globalhire.visa_cases(id) ON DELETE RESTRICT,
@@ -137,5 +147,8 @@ SELECT
   (SELECT count(*) FROM pg_type WHERE typname IN ('visa_type','visa_case_status') AND typnamespace = 'globalhire'::regnamespace) AS enums_created,
   (SELECT count(*) FROM information_schema.tables
      WHERE table_schema = 'globalhire'
-       AND table_name IN ('visa_leads','visa_cases','visa_case_documents','visa_case_events','visa_invoices','partner_submissions')) AS tables_created;
--- Expected: enums_created=2, tables_created=6
+       AND table_name IN ('visa_leads','visa_cases','visa_case_documents','visa_case_events','visa_invoices','partner_submissions')) AS tables_created
+,(SELECT count(*) FROM pg_indexes
+    WHERE schemaname = 'globalhire'
+      AND tablename IN ('visa_leads','visa_cases','visa_case_documents','visa_case_events','visa_invoices','partner_submissions')) AS indexes_created;
+-- Expected: enums_created=2, tables_created=6, indexes_created>=9
