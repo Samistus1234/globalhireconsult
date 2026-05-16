@@ -14,7 +14,12 @@ ALTER TABLE globalhire.partner_submissions    ENABLE ROW LEVEL SECURITY;
 -- Helper: is the caller a globalhire admin?
 -- Reuses existing globalhire.profiles.is_admin column (already in schema).
 CREATE OR REPLACE FUNCTION globalhire.is_admin()
-RETURNS boolean LANGUAGE sql SECURITY DEFINER STABLE AS $$
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+STABLE
+SET search_path = globalhire, pg_catalog
+AS $$
   SELECT COALESCE((SELECT is_admin FROM globalhire.profiles WHERE id = auth.uid()), false);
 $$;
 
