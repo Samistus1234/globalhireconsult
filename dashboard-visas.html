@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Visa Cases — GlobalHire@eLab</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/nav-global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/visa.css">
+</head>
+<body class="dashboard-body">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div id="gnav-placeholder"></div>
+
+  <main class="dashboard-main">
+    <div class="container" style="padding: var(--space-6) 0;">
+      <h1>My Visa Cases</h1>
+      <p class="lede" style="color: var(--text-secondary);">Saudi visa applications you've started. Click any case for the timeline, documents, and invoices.</p>
+
+      <div id="visa-cases-empty" hidden style="padding: var(--space-6); background: var(--bg-surface); border-radius: 10px; text-align: center; margin-top: var(--space-4);">
+        <p>No visa cases yet.</p>
+        <a class="visa-cta-primary" href="visa.html">Start a visa application</a>
+      </div>
+
+      <div id="visa-cases-list" style="display: grid; gap: var(--space-3); margin-top: var(--space-4);"></div>
+    </div>
+  </main>
+
+  <div id="gfooter-placeholder"></div>
+  <script src="js/nav-global.js" data-active-page="dashboard"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/dashboard-visas.js"></script>
+</body>
+</html>

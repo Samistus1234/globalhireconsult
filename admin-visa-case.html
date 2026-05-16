@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin · Case Detail — GlobalHire@eLab</title>
+
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/nav-global.css">
+  <link rel="stylesheet" href="css/visa.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="page-bg" aria-hidden="true"></div>
+  <div id="gnav-placeholder"></div>
+
+  <main>
+    <section class="container" style="padding: var(--space-6) 0;">
+      <p class="label"><a href="admin-visas.html" style="color: var(--text-secondary);">← Queue</a></p>
+      <h1 id="admin-case-title">Case</h1>
+      <p class="lede" id="admin-case-meta" style="color: var(--text-secondary);"></p>
+
+      <div class="visa-detail">
+        <div class="visa-detail-content">
+          <h2>Documents</h2>
+          <div id="admin-docs"></div>
+
+          <h2 style="margin-top: var(--space-6);">Timeline</h2>
+          <div id="admin-events"></div>
+        </div>
+
+        <aside class="visa-price-card">
+          <p style="font-weight: 600;">Actions</p>
+          <button class="visa-cta-primary" id="btn-submit-partner" style="margin-top: var(--space-2); display: block; width: 100%;">Submit to partner</button>
+          <button class="visa-cta-primary" id="btn-request-revision" style="margin-top: var(--space-2); display: block; width: 100%; background: var(--accent-amber);">Request revision</button>
+          <button class="visa-cta-primary" id="btn-mark-issued" style="margin-top: var(--space-2); display: block; width: 100%; background: var(--accent-teal);">Mark issued</button>
+          <button class="visa-cta-primary" id="btn-reject-intake" style="margin-top: var(--space-2); display: block; width: 100%; background: var(--error);">Reject &amp; refund</button>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/nav-global.js" data-active-page="admin"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/admin-visa-case.js"></script>
+</body>
+</html>

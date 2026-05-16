@@ -89,6 +89,21 @@
             '</div>' +
           '</div>' +
 
+          /* Visas dropdown */
+          '<div class="gnav-group" data-group="visas">' +
+            '<button class="gnav-group-trigger">Visas ' + chevronSVG + '</button>' +
+            '<div class="gnav-group-menu">' +
+              '<a href="visa.html"' + isActive(activePage, 'visa') + '>' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>' +
+                'All Visa Services</a>' +
+              '<a href="visa-tourist-evisa.html"' + isActive(activePage, 'visa-tourist') + '>Tourist eVisa</a>' +
+              '<a href="visa-umrah.html"' + isActive(activePage, 'visa-umrah') + '>Umrah Visa</a>' +
+              '<a href="visa-family-visit.html"' + isActive(activePage, 'visa-family-visit') + '>Family Visit</a>' +
+              '<a href="visa-family-residence.html"' + isActive(activePage, 'visa-family-residence') + '>Family Residence</a>' +
+              '<a href="visa-about.html"' + isActive(activePage, 'visa-about') + '>About this service</a>' +
+            '</div>' +
+          '</div>' +
+
           /* Scholarships — top-level link */
           '<a href="scholarships.html"' + isActive(activePage, 'scholarships') + '>Scholarships</a>' +
 

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visa Case — GlobalHire@eLab</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/nav-global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/visa.css">
+</head>
+<body>
+  <div class="page-bg" aria-hidden="true"></div>
+  <div id="gnav-placeholder"></div>
+
+  <main>
+    <section class="container" style="padding: var(--space-6) 0;">
+      <p class="label"><a href="dashboard-visas.html" style="color: var(--text-secondary);">← All cases</a></p>
+      <h1 id="case-title">Visa Case</h1>
+      <p class="lede" id="case-subtitle" style="color: var(--text-secondary);"></p>
+
+      <div class="visa-detail">
+        <div class="visa-detail-content">
+          <h2>Timeline</h2>
+          <div id="case-timeline"></div>
+
+          <h2 style="margin-top: var(--space-6);">Documents</h2>
+          <div id="case-documents"></div>
+
+          <h2 style="margin-top: var(--space-6);">Invoices</h2>
+          <div id="case-invoices"></div>
+        </div>
+
+        <aside class="visa-price-card">
+          <p style="font-weight: 600;">Status</p>
+          <p id="case-status-pill" style="font-size: 0.875rem;"></p>
+          <p id="case-next-action" style="color: var(--text-secondary); font-size: 0.875rem;"></p>
+          <a id="case-pdf-link" hidden class="visa-cta-primary" style="margin-top: var(--space-3); display: block; text-align: center;">Download visa PDF</a>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <div id="gfooter-placeholder"></div>
+  <script src="js/nav-global.js" data-active-page="dashboard"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/dashboard-visa-case.js"></script>
+</body>
+</html>

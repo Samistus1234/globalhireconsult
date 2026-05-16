@@ -1,0 +1,205 @@
+/* ============================================
+   GLOBALHIRE@ELAB — Visa Services styles
+   Builds on tokens.css; warm gold accent for visa CTAs.
+   ============================================ */
+
+.visa-hero {
+  padding: var(--space-12) 0 var(--space-8);
+  background: radial-gradient(ellipse at top, var(--secondary-muted), transparent 70%);
+}
+
+.visa-cobrand-line {
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: var(--space-3);
+}
+
+.visa-hero h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1.15;
+  text-align: center;
+  margin-bottom: var(--space-2);
+}
+
+.visa-hero .lede {
+  text-align: center;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-6);
+}
+
+.visa-wizard {
+  background: var(--bg-surface);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: var(--space-6);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.visa-wizard label {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: var(--space-3);
+  font-weight: 500;
+}
+
+.visa-outcome-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.visa-outcome-chip {
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-elevated);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.15s ease;
+}
+
+.visa-outcome-chip:hover {
+  background: var(--bg-hover);
+  border-color: var(--secondary);
+}
+
+.visa-outcome-chip[aria-selected="true"] {
+  background: var(--secondary-muted);
+  border-color: var(--secondary);
+  color: var(--secondary-light);
+}
+
+.visa-wizard .field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.visa-wizard input[type="text"],
+.visa-wizard input[type="email"],
+.visa-wizard input[type="tel"],
+.visa-wizard input[type="date"],
+.visa-wizard select {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-elevated);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+.visa-wizard input:focus,
+.visa-wizard select:focus {
+  outline: none;
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px var(--secondary-muted);
+}
+
+.visa-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  background: var(--secondary);
+  color: var(--text-inverse);
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.visa-cta-primary:hover {
+  background: var(--secondary-light);
+}
+
+.visa-cta-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.visa-trust-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-8) 0;
+}
+
+.visa-trust-item {
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-surface);
+  border-left: 3px solid var(--accent-teal);
+  border-radius: 4px;
+}
+
+.visa-trust-item strong { color: var(--accent-teal); display: block; margin-bottom: 4px; }
+
+.visa-catalog {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+.visa-catalog-card {
+  padding: var(--space-4);
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.visa-catalog-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--secondary);
+}
+
+.visa-catalog-card[data-status="coming-soon"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.visa-catalog-card h3 { margin: 0 0 var(--space-1); font-size: 1.125rem; }
+.visa-catalog-card .price { color: var(--secondary-light); font-weight: 600; }
+.visa-catalog-card .meta { color: var(--text-secondary); font-size: 0.875rem; }
+
+/* ── Visa detail page ── */
+.visa-detail {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space-6);
+  padding: var(--space-8) 0;
+}
+
+@media (max-width: 720px) {
+  .visa-detail { grid-template-columns: 1fr; }
+  .visa-wizard .field-row { grid-template-columns: 1fr; }
+}
+
+.visa-detail-content h1 { margin-top: 0; }
+.visa-detail-content h2 { margin-top: var(--space-6); font-size: 1.25rem; }
+.visa-detail-content ul { padding-left: 1.25rem; line-height: 1.7; }
+
+.visa-price-card {
+  position: sticky;
+  top: 100px;
+  padding: var(--space-5);
+  background: var(--bg-surface);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  height: fit-content;
+}
+
+.visa-price-card .from { color: var(--text-secondary); font-size: 0.875rem; }
+.visa-price-card .price { font-size: 2rem; font-weight: 700; color: var(--secondary-light); margin: 4px 0; }
+.visa-price-card .breakdown { color: var(--text-secondary); font-size: 0.8125rem; margin-bottom: var(--space-3); }

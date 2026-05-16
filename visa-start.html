@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Start your visa case — GlobalHire@eLab</title>
+  <meta name="description" content="Confirm your details, upload documents, and pay your $50 deposit to start your Saudi visa case.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/nav-global.css">
+  <link rel="stylesheet" href="css/visa.css">
+</head>
+<body>
+  <div class="page-bg" aria-hidden="true"></div>
+  <div id="gnav-placeholder"></div>
+
+  <main>
+    <section class="container" style="padding: var(--space-6) 0;">
+      <p class="label" style="opacity: .7;">Step 3 of 3 · Eligibility ✓ · Documents · <strong>Confirm &amp; pay</strong></p>
+      <h1 id="visa-start-title">Start your visa case</h1>
+
+      <div id="visa-start-error" class="section" hidden style="padding: var(--space-3); background: rgba(230,57,70,.1); border-left: 3px solid var(--error); border-radius: 4px;"></div>
+
+      <div class="visa-detail" style="margin-top: var(--space-4);">
+        <div class="visa-detail-content">
+          <form id="visa-intake-form">
+            <fieldset>
+              <legend><strong>Applicant</strong></legend>
+              <div class="field-row">
+                <input type="text"  name="applicant_name"        placeholder="Full name (as on passport)" required>
+                <input type="text"  name="passport_number"       placeholder="Passport number"            required>
+              </div>
+              <div class="field-row">
+                <input type="text"  name="nationality"           placeholder="Nationality (country code, e.g. NG)" required>
+                <input type="tel"   name="contact_phone"         placeholder="WhatsApp number">
+              </div>
+            </fieldset>
+
+            <fieldset id="sponsor-fieldset" style="margin-top: var(--space-4);">
+              <legend><strong>Sponsor in Saudi</strong></legend>
+              <div class="field-row">
+                <input type="text" name="sponsor_name"      placeholder="Sponsor full name">
+                <input type="text" name="sponsor_iqama"     placeholder="Sponsor Iqama number">
+              </div>
+              <div class="field-row">
+                <select name="sponsor_relationship">
+                  <option value="">Relationship to sponsor</option>
+                  <option value="spouse">Spouse</option>
+                  <option value="child">Child</option>
+                  <option value="parent">Parent</option>
+                </select>
+              </div>
+            </fieldset>
+
+            <fieldset style="margin-top: var(--space-4);">
+              <legend><strong>Travel</strong></legend>
+              <div class="field-row">
+                <input type="date"   name="arrival"     placeholder="Intended arrival">
+                <input type="number" name="stay_days"   placeholder="Stay (days)" min="1" max="365">
+              </div>
+            </fieldset>
+
+            <fieldset style="margin-top: var(--space-4);">
+              <legend><strong>Documents</strong></legend>
+              <p class="meta" style="color: var(--text-secondary);">Upload each required document. JPG, PNG, WEBP, or PDF, up to 20 MB each.</p>
+              <div id="doc-uploads"></div>
+            </fieldset>
+
+            <button id="visa-pay-btn" class="visa-cta-primary" type="submit" style="margin-top: var(--space-5);" disabled>
+              Pay $50 &amp; start case
+            </button>
+            <p class="meta" style="margin-top: var(--space-2); color: var(--text-secondary); font-size: 0.8125rem;">
+              Refundable if ineligible at intake.
+            </p>
+          </form>
+        </div>
+
+        <aside class="visa-price-card">
+          <p style="font-weight: 600;">Pay to start your case</p>
+          <p><span>Deposit today</span> <strong style="float:right;">$50</strong></p>
+          <p style="color: var(--text-secondary);"><span>Balance after review</span> <span style="float:right;" id="estimated-balance">~$160</span></p>
+          <p style="border-top: 1px solid rgba(255,255,255,.1); padding-top: var(--space-2);">
+            <span>Estimated total</span> <strong style="float:right;" id="estimated-total">$210</strong>
+          </p>
+          <p class="meta" style="margin-top: var(--space-3);">
+            <label style="display: block; margin-bottom: 4px;">Pay with</label>
+            <select id="provider-select" name="provider">
+              <option value="paystack">Paystack (NGN cards)</option>
+              <option value="stripe">Stripe (USD cards)</option>
+            </select>
+          </p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <div id="gfooter-placeholder"></div>
+  <script src="js/nav-global.js" data-active-page="visa"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/visa-intake.js"></script>
+</body>
+</html>
