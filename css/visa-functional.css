@@ -1,0 +1,178 @@
+/* ============================================
+   GLOBALHIRE@ELAB — Visa Functional CSS
+   Restrained palette for intake/dashboard/admin.
+   Loaded ON TOP OF css/visa.css.
+   Spec §5 (restraint rules)
+   ============================================ */
+
+/* Functional pages get a slim ivory band where marketing has a full hero */
+.visa-fn-header {
+  background: var(--ivory);
+  padding: 1.25rem clamp(1rem, 5vw, 3rem) 1rem;
+  border-bottom: 1px solid var(--sand);
+}
+.visa-fn-header__kicker {
+  font-size: 0.6875rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.125em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin: 0;
+}
+.visa-fn-header__kicker strong { color: var(--bronze); opacity: 1; }
+.visa-fn-header__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 400;
+  font-size: clamp(1.5rem, 3vw, 1.75rem);
+  margin: 0.25rem 0 0;
+  color: var(--espresso);
+}
+
+.visa-fn-body {
+  background: var(--ivory);
+  color: var(--espresso);
+  padding: clamp(1rem, 3vw, 2rem) clamp(1rem, 5vw, 3rem);
+}
+
+/* ── Form fields (intake) ── */
+.visa-field {
+  display: block;
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  background: white;
+  border: 1px solid var(--sand);
+  border-radius: 3px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  color: var(--espresso);
+}
+.visa-field:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212,168,90,0.15);
+}
+
+/* ── Doc upload tile ── */
+.visa-doc-upload {
+  padding: 0.625rem 0.75rem;
+  background: white;
+  border: 1px dashed var(--gold);
+  border-radius: 3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8125rem;
+  color: var(--walnut);
+  margin-bottom: 0.375rem;
+  cursor: pointer;
+}
+.visa-doc-upload__badge {
+  padding: 0.125rem 0.375rem;
+  background: var(--gold);
+  color: white;
+  border-radius: 2px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ── Status pills ── */
+.visa-pill {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.visa-pill--success  { background: var(--visa-success); color: white; }
+.visa-pill--warning  { background: var(--visa-warning); color: var(--espresso); }
+.visa-pill--error    { background: var(--visa-error);   color: white; }
+.visa-pill--neutral  { background: var(--walnut);       color: var(--on-dark); }
+
+/* ── Dashboard case card ── */
+.visa-case-card {
+  display: block;
+  padding: 0.75rem 1rem;
+  background: white;
+  border-left: 3px solid var(--gold);
+  border-radius: 0 3px 3px 0;
+  text-decoration: none;
+  color: var(--espresso);
+  margin-bottom: 0.5rem;
+}
+.visa-case-card:hover { background: var(--sand); }
+.visa-case-card__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  font-weight: 500;
+}
+.visa-case-card__meta {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.visa-case-card__meta time { opacity: 0.55; }
+
+/* ── Timeline (case detail) ── */
+.visa-timeline {
+  padding-left: 1rem;
+  border-left: 2px solid var(--gold);
+}
+.visa-timeline__item {
+  padding: 0.5rem 0;
+  font-size: 0.8125rem;
+}
+.visa-timeline__item strong { display: inline; }
+.visa-timeline__item time { opacity: 0.55; margin-left: 0.5rem; }
+.visa-timeline__item--current { color: var(--bronze); }
+
+/* ── Admin queue table ── */
+.visa-queue {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+.visa-queue thead th {
+  text-align: left;
+  padding: 0.5rem 1rem;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.125em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  border-bottom: 2px solid var(--gold);
+}
+.visa-queue tbody td {
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid var(--sand);
+}
+.visa-queue tbody tr:hover { background: var(--sand); }
+.visa-queue .case-id { color: var(--bronze); font-weight: 600; }
+
+/* ── Admin action card ── */
+.visa-actions {
+  background: white;
+  border-top: 3px solid var(--gold);
+  padding: 1rem;
+  box-shadow: var(--visa-card-shadow);
+  display: grid;
+  gap: 0.5rem;
+}
+.visa-actions .visa-btn {
+  width: 100%;
+  text-align: center;
+}
+.visa-actions .visa-btn--revision { background: var(--visa-warning); color: var(--espresso); }
+.visa-actions .visa-btn--issued   { background: var(--visa-success); color: white; }
+.visa-actions .visa-btn--reject   { background: var(--visa-error);   color: white; }
+
+/* Functional pages explicitly disable cinematic motion regardless of reduced-motion */
+.visa-fn-body * {
+  view-transition-name: none;
+}
