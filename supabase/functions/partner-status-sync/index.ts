@@ -29,8 +29,8 @@ async function authIsAdminOrPartner(req: Request, supabase: any): Promise<boolea
   if (!auth.startsWith('Bearer ')) return false;
   const { data: u } = await supabase.auth.getUser(auth.replace('Bearer ', ''));
   if (!u?.user) return false;
-  const { data: p } = await supabase.from('profiles').select('is_admin').eq('id', u.user.id).single();
-  return !!p?.is_admin;
+  const { data: p } = await supabase.from('profiles').select('role').eq('id', u.user.id).single();
+  return p?.role === 'admin';
 }
 
 Deno.serve(async (req) => {

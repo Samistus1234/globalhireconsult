@@ -26,8 +26,8 @@ Deno.serve(async (req) => {
 
   const { data: u } = await supabase.auth.getUser(auth.replace('Bearer ', ''));
   if (!u?.user) return new Response('invalid token', { status: 401 });
-  const { data: prof } = await supabase.from('profiles').select('is_admin').eq('id', u.user.id).single();
-  if (!prof?.is_admin) return new Response('admin only', { status: 403 });
+  const { data: prof } = await supabase.from('profiles').select('role').eq('id', u.user.id).single();
+  if (prof?.role !== 'admin') return new Response('admin only', { status: 403 });
 
   const body = await req.json().catch(() => null);
   if (!body?.action || !body?.case_id) return new Response('action + case_id required', { status: 400 });
