@@ -8,6 +8,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="image" href="/assets/visa/img/visa-tourist-hero.jpg" fetchpriority="high">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/tokens.css">
@@ -20,50 +21,79 @@
   <div class="page-bg" aria-hidden="true"></div>
   <div id="gnav-placeholder"></div>
 
-  <main>
-    <section class="container">
-      <div class="visa-detail">
-        <div class="visa-detail-content">
-          <p class="label" style="opacity:.7;">Visas › Tourism › <strong>Tourist eVisa</strong></p>
-          <h1>Saudi Tourist eVisa</h1>
-          <p>1-year multiple-entry visa for tourism — leisure travel, AlUla, Red Sea, Saudi Season events. Up to 90 days per stay.</p>
+  <main class="visa-main">
 
-          <h2>What's included</h2>
+    <section class="visa-hero visa-hero--detail">
+      <div class="visa-hero__bg">
+        <picture>
+          <source type="image/avif" srcset="/assets/visa/img/visa-tourist-hero.avif">
+          <source type="image/webp" srcset="/assets/visa/img/visa-tourist-hero.webp">
+          <img src="/assets/visa/img/visa-tourist-hero.jpg" alt="AlUla rock formations at sunset" fetchpriority="high">
+        </picture>
+      </div>
+      <div class="visa-hero__overlay"></div>
+      <div class="visa-hero__content">
+        <p class="visa-kicker">Tourism › <strong>Tourist eVisa</strong></p>
+        <h1 class="visa-h1">Saudi Tourist <em>eVisa.</em></h1>
+        <p class="visa-lede">1-year multiple-entry visa for tourism — AlUla, the Red Sea, Saudi Season events. Up to 90 days per stay.</p>
+      </div>
+    </section>
+
+    <section class="visa-section visa-section--ivory">
+      <div class="visa-detail-layout">
+        <div class="visa-detail-body visa-reveal">
+          <p class="visa-kicker">— What's included —</p>
           <ul>
             <li>eVisa application submitted by our MoFA-licensed partner</li>
             <li>Document review &amp; eligibility verification</li>
             <li>WhatsApp + email status updates</li>
             <li>Visa PDF delivered to your dashboard</li>
           </ul>
-
-          <h2>What you'll need</h2>
+          <p class="visa-kicker" style="margin-top: 2rem;">— What you'll need —</p>
           <ul>
             <li>Passport bio page scan (valid 6+ months)</li>
             <li>Recent passport-style photo</li>
           </ul>
-
-          <h2>Eligible nationalities</h2>
-          <p>The Saudi tourist eVisa is available to citizens of approximately 60 countries. Common eligible nationalities in our markets include: Nigerian (with secondary residence in eligible country), British, US, EU, GCC residents, and many more. Our eligibility check confirms in seconds.</p>
-
-          <h2>FAQ</h2>
-          <p><strong>Processing time:</strong> 5–7 working days from clean submission.</p>
-          <p><strong>How long can I stay?</strong> Up to 90 days per visit, 180 days total per year.</p>
-          <p><strong>Refunds:</strong> $50 deposit fully refunded if we determine you're ineligible at intake. After submission, partner-side fees are non-refundable.</p>
+          <p class="visa-kicker" style="margin-top: 2rem;">— FAQ —</p>
+          <div class="visa-faq">
+            <details open>
+              <summary>How long does it take?</summary>
+              <p>5–7 working days from clean submission.</p>
+            </details>
+            <details>
+              <summary>How long can I stay?</summary>
+              <p>Up to 90 days per visit, 180 days total per year.</p>
+            </details>
+            <details>
+              <summary>Refunds?</summary>
+              <p>$50 deposit fully refunded if you're ineligible at intake. After submission, partner-side fees are non-refundable.</p>
+            </details>
+          </div>
         </div>
-
         <aside class="visa-price-card">
-          <div class="from">From</div>
-          <div class="price">$185</div>
-          <div class="breakdown">Government fee $135 + ELAB service $50</div>
-          <a class="visa-cta-primary" href="visa.html#wizard" style="display:block; text-align:center;">Check eligibility (free)</a>
-          <a href="https://wa.me/9295419232" style="display:block; text-align:center; margin-top: var(--space-2); color: var(--text-secondary); font-size: 0.875rem;">Chat on WhatsApp</a>
-          <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: var(--space-3); line-height:1.5;">No payment until eligibility confirmed. $50 deposit unlocks your case. Final invoice after document review.</p>
+          <p class="visa-price-card__from">From</p>
+          <p class="visa-price-display">$<span data-visa-counter="185">185</span></p>
+          <p class="visa-price-card__breakdown">Government $135 + ELAB $50</p>
+          <a class="visa-btn visa-btn--primary visa-price-card__cta" href="visa.html#wizard">Check eligibility →</a>
+          <a class="visa-btn visa-btn--outline visa-price-card__cta" style="color: var(--walnut); border-color: var(--walnut); margin-top: 0.5rem;" href="https://wa.me/9295419232">WhatsApp us</a>
+          <p class="visa-price-card__footnote">No payment until eligibility confirmed. $50 deposit. Refundable if ineligible at intake.</p>
         </aside>
       </div>
     </section>
+
+    <section class="visa-section visa-section--espresso visa-reveal">
+      <p class="visa-kicker" style="opacity: 0.6;">— Saudi is open —</p>
+      <h2 class="visa-h2" style="max-width: 700px;">From <em>AlUla's rock formations</em> to the Red Sea coast, your tourist visa unlocks all of it.</h2>
+    </section>
+
   </main>
 
   <div id="gfooter-placeholder"></div>
   <script src="js/nav-global.js" data-active-page="visa-tourist"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.45/dist/lenis.min.js" defer></script>
+  <script type="module" src="js/visa-motion.js"></script>
+  <script type="module" src="js/visa-hero-video.js"></script>
 </body>
 </html>
