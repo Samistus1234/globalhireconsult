@@ -45,5 +45,9 @@ CREATE POLICY visa_docs_admin_delete ON storage.objects
   );
 
 -- VERIFICATION:
-SELECT id, name, public FROM storage.buckets WHERE id = 'visa-documents';
-SELECT count(*) AS storage_policies FROM storage.policies WHERE bucket_id = 'visa-documents';
+SELECT
+  (SELECT count(*) FROM storage.buckets WHERE id = 'visa-documents') AS bucket_count,
+  (SELECT count(*) FROM pg_policies
+     WHERE schemaname = 'storage' AND tablename = 'objects'
+       AND policyname LIKE 'visa_docs_%') AS visa_storage_policies;
+-- Expected: bucket_count=1, visa_storage_policies=4
