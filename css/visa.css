@@ -436,3 +436,202 @@ body:has(.visa-main) {
     transform: none;
   }
 }
+
+/* ── Umrah package schedule (visa-umrah.html) ── */
+.umrah-stat-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1px;
+  background: var(--gold);
+  margin-top: 2rem;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: var(--visa-card-shadow);
+}
+.umrah-stat-bar > div {
+  background: white;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.umrah-stat-bar .label {
+  font-size: 0.625rem;
+  letter-spacing: 0.125em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+.umrah-stat-bar .value {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--espresso);
+  line-height: 1.1;
+}
+.umrah-stat-bar .sub {
+  font-size: 0.75rem;
+  color: var(--bronze);
+  font-weight: 600;
+}
+
+.umrah-package-banner {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 1.75rem;
+  background: var(--walnut);
+  color: var(--on-dark);
+  padding: 1.5rem 1.75rem;
+  margin-top: 1.5rem;
+  border-radius: 4px;
+}
+@media (max-width: 720px) {
+  .umrah-package-banner { grid-template-columns: 1fr; gap: 1rem; padding: 1.25rem; }
+}
+.umrah-package-banner .label {
+  font-size: 0.6875rem;
+  letter-spacing: 0.125em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.umrah-package-banner ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem 1rem;
+  font-size: 0.875rem;
+}
+.umrah-package-banner ul li::before {
+  content: '✓ ';
+  color: var(--gold-soft);
+  font-weight: 700;
+}
+.umrah-package-banner .quote { display: flex; flex-direction: column; justify-content: space-between; }
+.umrah-package-banner .quote p {
+  font-size: 0.8125rem;
+  opacity: 0.85;
+  line-height: 1.55;
+  margin: 0 0 0.75rem;
+}
+
+.umrah-month-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 2rem 0 1rem;
+  align-items: center;
+}
+.umrah-month-filter .label {
+  font-size: 0.625rem;
+  letter-spacing: 0.125em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-right: 4px;
+}
+.umrah-month-filter button {
+  padding: 6px 14px;
+  background: white;
+  border: 1px solid var(--sand);
+  border-radius: 999px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--walnut);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.umrah-month-filter button:hover { border-color: var(--gold); }
+.umrah-month-filter button[aria-selected="true"] {
+  background: var(--gold);
+  color: white;
+  border-color: var(--gold);
+}
+
+.umrah-departures {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+.umrah-card {
+  background: white;
+  border-radius: 4px;
+  padding: 1.25rem;
+  box-shadow: var(--visa-card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.umrah-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--visa-card-shadow-lg);
+}
+.umrah-card[hidden] { display: none; }
+.umrah-card.is-past { opacity: 0.5; }
+.umrah-card__month {
+  font-size: 0.625rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  color: var(--walnut);
+}
+.umrah-card__depart {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 3rem;
+  font-weight: 400;
+  line-height: 0.95;
+  color: var(--espresso);
+  margin: 0;
+}
+.umrah-card__route {
+  font-size: 0.75rem;
+  opacity: 0.65;
+  margin: 0;
+}
+.umrah-card__return {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--sand);
+  margin-top: 0.25rem;
+}
+.umrah-card__return-label {
+  font-size: 0.625rem;
+  letter-spacing: 0.125em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+.umrah-card__return-date {
+  font-size: 0.8125rem;
+  color: var(--bronze);
+  font-weight: 600;
+}
+.umrah-card__badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(212,168,90,0.14);
+  color: var(--bronze);
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  align-self: flex-start;
+}
+.umrah-card__badge.is-past { background: rgba(0,0,0,0.06); color: var(--walnut); }
+.umrah-card__cta {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-decoration: none;
+  padding-top: 0.25rem;
+}
+.umrah-card__cta:hover { color: var(--bronze); }
+
+@media (prefers-reduced-motion: reduce) {
+  .umrah-card { transition: none; }
+  .umrah-card:hover { transform: none; }
+}
