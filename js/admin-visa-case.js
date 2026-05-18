@@ -77,7 +77,7 @@
     document.getElementById('admin-case-meta').textContent  = 'Case ' + c.id + ' · candidate ' + c.candidate_id;
     renderDocs(docs);
     document.getElementById('admin-events').innerHTML = events.map(function (e) {
-      return '<div style="padding:6px 0; border-bottom: 1px solid rgba(255,255,255,.06);"><strong>' + e.event_type + '</strong> · ' + new Date(e.created_at).toLocaleString() + '</div>';
+      return '<div class="visa-timeline__item"><strong>' + e.event_type + '</strong> <time>' + new Date(e.created_at).toLocaleString() + '</time></div>';
     }).join('');
   }
 

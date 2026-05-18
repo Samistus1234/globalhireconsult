@@ -8,7 +8,8 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="/assets/visa/img/visa-family-visit-hero.jpg" fetchpriority="high">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/base.css">
@@ -20,23 +21,34 @@
   <div class="page-bg" aria-hidden="true"></div>
   <div id="gnav-placeholder"></div>
 
-  <main>
-    <section class="container">
-      <div class="visa-detail">
-        <div class="visa-detail-content">
-          <p class="label" style="opacity:.7;">Visas › Family › <strong>Family Visit Visa</strong></p>
-          <h1>Saudi Family Visit Visa</h1>
-          <p>For Iqama-holders inviting spouse, children, or parents to Saudi Arabia for up to 90 days (extendable).</p>
+  <main class="visa-main">
 
-          <h2>What's included</h2>
+    <section class="visa-hero visa-hero--detail">
+      <div class="visa-hero__bg">
+        <picture>
+          <source media="(max-width: 750px)" srcset="/assets/visa/img/visa-family-visit-hero-mobile.jpg">
+          <img src="/assets/visa/img/visa-family-visit-hero.jpg" alt="Family reunion at airport arrivals" fetchpriority="high">
+        </picture>
+      </div>
+      <div class="visa-hero__overlay"></div>
+      <div class="visa-hero__content">
+        <p class="visa-kicker">Family › <strong>Family Visit Visa</strong></p>
+        <h1 class="visa-h1">Bring your family <em>to Saudi.</em></h1>
+        <p class="visa-lede">For Iqama-holders inviting spouse, children, or parents. Up to 90 days, extendable in-country.</p>
+      </div>
+    </section>
+
+    <section class="visa-section visa-section--ivory">
+      <div class="visa-detail-layout">
+        <div class="visa-detail-body visa-reveal">
+          <p class="visa-kicker">— What's included —</p>
           <ul>
-            <li>MoFA application submitted by our licensed partner</li>
+            <li>MoFA application submitted by our licensed Saudi visa team</li>
             <li>Document review &amp; sponsor verification</li>
             <li>WhatsApp + email status updates</li>
             <li>Visa PDF delivered to your dashboard</li>
           </ul>
-
-          <h2>What you'll need</h2>
+          <p class="visa-kicker" style="margin-top: 2rem;">— What you'll need —</p>
           <ul>
             <li>Visitor's passport bio page (valid 6+ months)</li>
             <li>Recent passport-style photo</li>
@@ -44,27 +56,46 @@
             <li>Sponsor's salary certificate (recent, employer letterhead)</li>
             <li>Family relationship proof — marriage certificate, birth certificate, etc.</li>
           </ul>
-
-          <h2>FAQ</h2>
-          <p><strong>Processing:</strong> 7–14 working days from clean submission.</p>
-          <p><strong>Stay:</strong> Up to 90 days, extendable in-country once.</p>
-          <p><strong>Conversion to Iqama:</strong> Family Visit cannot be directly converted; you'd apply for Family Residence (a separate service we offer).</p>
-          <p><strong>Refunds:</strong> $50 deposit refunded if ineligible at intake. Partner-side fees non-refundable after submission.</p>
+          <p class="visa-kicker" style="margin-top: 2rem;">— FAQ —</p>
+          <div class="visa-faq">
+            <details open>
+              <summary>Processing time?</summary>
+              <p>7–14 working days from clean submission.</p>
+            </details>
+            <details>
+              <summary>Can it be extended to a residence visa?</summary>
+              <p>Family Visit cannot be directly converted. You'd apply for Family Residence (a separate service we offer).</p>
+            </details>
+            <details>
+              <summary>Refunds?</summary>
+              <p>$50 deposit refunded if ineligible at intake. Government and processing fees non-refundable after submission.</p>
+            </details>
+          </div>
         </div>
-
         <aside class="visa-price-card">
-          <div class="from">From</div>
-          <div class="price">$210</div>
-          <div class="breakdown">Government fee $160 + ELAB service $50</div>
-          <a class="visa-cta-primary" href="visa.html#wizard" style="display:block; text-align:center;">Check eligibility (free)</a>
-          <a href="https://wa.me/9295419232" style="display:block; text-align:center; margin-top: var(--space-2); color: var(--text-secondary); font-size: 0.875rem;">Chat on WhatsApp</a>
-          <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: var(--space-3); line-height:1.5;">No payment until eligibility confirmed. $50 deposit unlocks your case. Final invoice after document review.</p>
+          <p class="visa-price-card__from">From</p>
+          <p class="visa-price-display">$<span data-visa-counter="210">210</span></p>
+          <p class="visa-price-card__breakdown">Government $160 + ELAB $50</p>
+          <a class="visa-btn visa-btn--primary visa-price-card__cta" href="visa.html#wizard">Check eligibility →</a>
+          <a class="visa-btn visa-btn--outline visa-price-card__cta" style="color: var(--walnut); border-color: var(--walnut); margin-top: 0.5rem;" href="https://wa.me/9295419232">WhatsApp us</a>
+          <p class="visa-price-card__footnote">$50 deposit. Refundable if ineligible at intake.</p>
         </aside>
       </div>
     </section>
+
+    <section class="visa-section visa-section--espresso visa-reveal">
+      <p class="visa-kicker" style="opacity: 0.6;">— Together —</p>
+      <h2 class="visa-h2" style="max-width: 700px;">From <em>the arrivals hall</em> to the dinner table, ninety days you both deserve.</h2>
+    </section>
+
   </main>
 
   <div id="gfooter-placeholder"></div>
   <script src="js/nav-global.js" data-active-page="visa-family-visit"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.45/dist/lenis.min.js" defer></script>
+  <script type="module" src="js/visa-motion.js"></script>
+  <script type="module" src="js/visa-hero-video.js"></script>
 </body>
 </html>

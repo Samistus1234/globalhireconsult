@@ -8,7 +8,8 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="/assets/visa/img/visa-family-residence-hero.jpg" fetchpriority="high">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/base.css">
@@ -20,24 +21,35 @@
   <div class="page-bg" aria-hidden="true"></div>
   <div id="gnav-placeholder"></div>
 
-  <main>
-    <section class="container">
-      <div class="visa-detail">
-        <div class="visa-detail-content">
-          <p class="label" style="opacity:.7;">Visas › Family › <strong>Family Residence Visa</strong></p>
-          <h1>Saudi Family Residence Visa (Iqama Dependents)</h1>
-          <p>Permanent dependent residency for spouse and children of an Iqama-holder who meets the income and profession criteria. Processed via MoFA + Jawazat.</p>
+  <main class="visa-main">
 
-          <h2>What's included</h2>
+    <section class="visa-hero visa-hero--detail">
+      <div class="visa-hero__bg">
+        <picture>
+          <source media="(max-width: 750px)" srcset="/assets/visa/img/visa-family-residence-hero-mobile.jpg">
+          <img src="/assets/visa/img/visa-family-residence-hero.jpg" alt="Saudi neighbourhood at dusk" fetchpriority="high">
+        </picture>
+      </div>
+      <div class="visa-hero__overlay"></div>
+      <div class="visa-hero__content">
+        <p class="visa-kicker">Family › <strong>Family Residence</strong></p>
+        <h1 class="visa-h1">Live in Saudi, <em>together.</em></h1>
+        <p class="visa-lede">Permanent dependent residency for spouse and children of an Iqama holder. Processed via MoFA + Jawazat.</p>
+      </div>
+    </section>
+
+    <section class="visa-section visa-section--ivory">
+      <div class="visa-detail-layout">
+        <div class="visa-detail-body visa-reveal">
+          <p class="visa-kicker">— What's included —</p>
           <ul>
-            <li>MoFA + Jawazat application by our licensed partner</li>
+            <li>MoFA + Jawazat application by our licensed Saudi visa team</li>
             <li>Sponsor eligibility check (income, profession category)</li>
             <li>Document review</li>
             <li>WhatsApp + email status updates</li>
             <li>Visa PDF delivered to your dashboard</li>
           </ul>
-
-          <h2>What you'll need</h2>
+          <p class="visa-kicker" style="margin-top: 2rem;">— What you'll need —</p>
           <ul>
             <li>Each dependent's passport bio page (valid 6+ months)</li>
             <li>Recent passport-style photos</li>
@@ -47,27 +59,46 @@
             <li>Marriage certificate (for spouse)</li>
             <li>Birth certificates (for children)</li>
           </ul>
-
-          <h2>FAQ</h2>
-          <p><strong>Processing:</strong> 4–8 weeks. Variable depending on sponsor's profession category and Jawazat workload.</p>
-          <p><strong>Eligibility:</strong> Sponsor's profession must be on the Family Residence eligibility list (most healthcare professionals qualify). Our intake check confirms.</p>
-          <p><strong>Pricing:</strong> Final price varies by number of dependents. From $320 covers one dependent; each additional dependent ~$120.</p>
-          <p><strong>Refunds:</strong> $50 deposit refunded if ineligible at intake. Partner-side fees non-refundable after submission.</p>
+          <p class="visa-kicker" style="margin-top: 2rem;">— FAQ —</p>
+          <div class="visa-faq">
+            <details open>
+              <summary>Processing time?</summary>
+              <p>4–8 weeks. Variable by sponsor's profession category and Jawazat workload.</p>
+            </details>
+            <details>
+              <summary>Pricing per dependent?</summary>
+              <p>From $320 covers one dependent. Each additional dependent ~$120.</p>
+            </details>
+            <details>
+              <summary>Refunds?</summary>
+              <p>$50 deposit refunded if ineligible at intake. Government and processing fees non-refundable after submission.</p>
+            </details>
+          </div>
         </div>
-
         <aside class="visa-price-card">
-          <div class="from">From</div>
-          <div class="price">$320</div>
-          <div class="breakdown">One dependent · government + service fees</div>
-          <a class="visa-cta-primary" href="visa.html#wizard" style="display:block; text-align:center;">Check eligibility (free)</a>
-          <a href="https://wa.me/9295419232" style="display:block; text-align:center; margin-top: var(--space-2); color: var(--text-secondary); font-size: 0.875rem;">Chat on WhatsApp</a>
-          <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: var(--space-3); line-height:1.5;">Final price depends on dependents &amp; sponsor docs. $50 deposit unlocks your case. Balance invoiced after document review.</p>
+          <p class="visa-price-card__from">From</p>
+          <p class="visa-price-display">$<span data-visa-counter="320">320</span></p>
+          <p class="visa-price-card__breakdown">One dependent · gov + service fees</p>
+          <a class="visa-btn visa-btn--primary visa-price-card__cta" href="visa.html#wizard">Check eligibility →</a>
+          <a class="visa-btn visa-btn--outline visa-price-card__cta" style="color: var(--walnut); border-color: var(--walnut); margin-top: 0.5rem;" href="https://wa.me/9295419232">WhatsApp us</a>
+          <p class="visa-price-card__footnote">$50 deposit. Refundable if ineligible at intake.</p>
         </aside>
       </div>
     </section>
+
+    <section class="visa-section visa-section--espresso visa-reveal">
+      <p class="visa-kicker" style="opacity: 0.6;">— Home —</p>
+      <h2 class="visa-h2" style="max-width: 700px;">Not a visit — <em>a life</em>, with paperwork that respects how big a step that is.</h2>
+    </section>
+
   </main>
 
   <div id="gfooter-placeholder"></div>
   <script src="js/nav-global.js" data-active-page="visa-family-residence"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.45/dist/lenis.min.js" defer></script>
+  <script type="module" src="js/visa-motion.js"></script>
+  <script type="module" src="js/visa-hero-video.js"></script>
 </body>
 </html>

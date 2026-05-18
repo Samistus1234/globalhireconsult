@@ -4,11 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Umrah Visa — GlobalHire@eLab</title>
-  <meta name="description" content="Saudi Umrah visa year-round. From $295 all-in. Free eligibility check. Issued via Nusuk by our MoFA-licensed partner.">
+  <meta name="description" content="Saudi Umrah visa year-round. From $295 all-in. Free eligibility check. Issued via Nusuk by our licensed Saudi visa team.">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="/assets/visa/img/visa-umrah-hero.jpg" fetchpriority="high">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/base.css">
@@ -20,49 +21,83 @@
   <div class="page-bg" aria-hidden="true"></div>
   <div id="gnav-placeholder"></div>
 
-  <main>
-    <section class="container">
-      <div class="visa-detail">
-        <div class="visa-detail-content">
-          <p class="label" style="opacity:.7;">Visas › Religious › <strong>Umrah Visa</strong></p>
-          <h1>Umrah Visa</h1>
-          <p>Religious pilgrimage visa for Umrah — year-round, single-entry, up to 30 days. Issued via Nusuk by our MoFA-licensed partner.</p>
+  <main class="visa-main">
 
-          <h2>What's included</h2>
+    <section class="visa-hero visa-hero--detail">
+      <div class="visa-hero__bg">
+        <picture>
+          <source media="(max-width: 750px)" srcset="/assets/visa/img/visa-umrah-hero-mobile.jpg">
+          <img src="/assets/visa/img/visa-umrah-hero.jpg" alt="Masjid al-Haram, Mecca" fetchpriority="high">
+        </picture>
+      </div>
+      <div class="visa-hero__overlay"></div>
+      <div class="visa-hero__content">
+        <p class="visa-kicker">Religious › <strong>Umrah Visa</strong></p>
+        <h1 class="visa-h1">Umrah, <em>year-round.</em></h1>
+        <p class="visa-lede">Single-entry pilgrimage visa, up to 30 days. Issued via Nusuk by our licensed Saudi visa team.</p>
+      </div>
+    </section>
+
+    <section class="visa-section visa-section--ivory">
+      <div class="visa-detail-layout">
+        <div class="visa-detail-body visa-reveal">
+          <p class="visa-kicker">— What's included —</p>
           <ul>
-            <li>Nusuk submission by our licensed Umrah operator</li>
+            <li>Nusuk submission by our licensed Saudi visa team</li>
             <li>Document review</li>
             <li>WhatsApp + email status updates</li>
             <li>Visa PDF delivered to your dashboard</li>
           </ul>
-
-          <h2>What you'll need</h2>
+          <p class="visa-kicker" style="margin-top: 2rem;">— What you'll need —</p>
           <ul>
             <li>Passport bio page (valid 6+ months from arrival)</li>
             <li>Recent passport-style photo</li>
             <li>Female pilgrims under 40 — Mahram declaration may be required (we'll guide you)</li>
           </ul>
-
-          <h2>FAQ</h2>
-          <p><strong>Processing:</strong> 3–5 working days.</p>
-          <p><strong>Stay:</strong> Up to 30 days for the purpose of Umrah pilgrimage.</p>
-          <p><strong>Hajj:</strong> Umrah visas do not permit Hajj participation. Hajj is quota-controlled and we'll launch dedicated Hajj packages soon.</p>
-          <p><strong>Refunds:</strong> $50 deposit refunded if ineligible at intake. Partner-side fees non-refundable after submission.</p>
+          <p class="visa-kicker" style="margin-top: 2rem;">— FAQ —</p>
+          <div class="visa-faq">
+            <details open>
+              <summary>Processing time?</summary>
+              <p>3–5 working days from clean submission.</p>
+            </details>
+            <details>
+              <summary>Can I perform Hajj on an Umrah visa?</summary>
+              <p>No. Hajj is quota-controlled and requires a separate visa. Our dedicated Hajj packages launch soon.</p>
+            </details>
+            <details>
+              <summary>Refunds?</summary>
+              <p>$50 deposit refunded if ineligible at intake. Government and processing fees non-refundable after submission.</p>
+            </details>
+          </div>
         </div>
-
         <aside class="visa-price-card">
-          <div class="from">From</div>
-          <div class="price">$295</div>
-          <div class="breakdown">Operator fee $245 + ELAB service $50</div>
-          <a class="visa-cta-primary" href="visa.html#wizard" style="display:block; text-align:center;">Check eligibility (free)</a>
-          <a href="https://wa.me/9295419232" style="display:block; text-align:center; margin-top: var(--space-2); color: var(--text-secondary); font-size: 0.875rem;">Chat on WhatsApp</a>
-          <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: var(--space-3); line-height:1.5;">No payment until eligibility confirmed. $50 deposit unlocks your case. Final invoice after document review.</p>
+          <div style="padding: 10px 12px; background: rgba(212,168,90,0.1); border-left: 3px solid var(--gold); margin-bottom: 12px; font-size: 0.8125rem; line-height: 1.5;">
+            <strong style="display:block; color: var(--bronze); margin-bottom: 4px;">Eligible if:</strong>
+            You're currently abroad with valid residence (Iqama, work or study permit, foreign residence). <strong>Currently in Nigeria?</strong> We offer Umrah <a href="https://wa.me/9295419232" style="color: var(--bronze); font-weight: 600;">full packages on WhatsApp</a>.
+          </div>
+          <p class="visa-price-card__from">From</p>
+          <p class="visa-price-display">$<span data-visa-counter="295">295</span></p>
+          <p class="visa-price-card__breakdown">Processing $245 + ELAB $50</p>
+          <a class="visa-btn visa-btn--primary visa-price-card__cta" href="visa.html#wizard">Check eligibility →</a>
+          <a class="visa-btn visa-btn--outline visa-price-card__cta" style="color: var(--walnut); border-color: var(--walnut); margin-top: 0.5rem;" href="https://wa.me/9295419232">WhatsApp us</a>
+          <p class="visa-price-card__footnote">$50 deposit. Refundable if ineligible at intake.</p>
         </aside>
       </div>
     </section>
+
+    <section class="visa-section visa-section--espresso visa-reveal">
+      <p class="visa-kicker" style="opacity: 0.6;">— With reverence —</p>
+      <h2 class="visa-h2" style="max-width: 700px;">Submitted by a <em>licensed Saudi visa team</em>, with the same dignity your pilgrimage deserves.</h2>
+    </section>
+
   </main>
 
   <div id="gfooter-placeholder"></div>
   <script src="js/nav-global.js" data-active-page="visa-umrah"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.45/dist/lenis.min.js" defer></script>
+  <script type="module" src="js/visa-motion.js"></script>
+  <script type="module" src="js/visa-hero-video.js"></script>
 </body>
 </html>

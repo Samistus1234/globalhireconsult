@@ -20,8 +20,7 @@
     'perform-hajj':       { comingSoon: true, label: 'Hajj' },
     'work-in-ksa':        { comingSoon: true, label: 'Work & Iqama' },
     'hire-a-helper':      { comingSoon: true, label: 'Domestic Worker' },
-    'do-business':        { comingSoon: true, label: 'Business Visit' },
-    'live-permanently':   { comingSoon: true, label: 'Premium Residency' },
+    'do-business':        { comingSoon: true, label: 'Business Visit (currently unavailable)' },
   };
 
   function $(sel, ctx) { return (ctx || document).querySelector(sel); }

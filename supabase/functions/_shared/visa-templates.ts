@@ -39,7 +39,7 @@ function shell(title: string, body: string, ctaLabel: string, ctaUrl: string): s
       '<p style="margin-top: 24px;">',
         '<a href="', ctaUrl, '" style="display:inline-block; padding:12px 20px; background:#0077B6; color:#fff; text-decoration:none; border-radius:6px;">', ctaLabel, '</a>',
       '</p>',
-      '<p style="color:#5A7190; font-size:12px; margin-top:32px;">From the ELAB Visa Services team — in partnership with [Partner Name].</p>',
+      '<p style="color:#5A7190; font-size:12px; margin-top:32px;">From the ELAB Visa Services team.</p>',
     '</div>',
   ].join('');
 }
@@ -59,13 +59,13 @@ export function renderTemplate(kind: TemplateKind, v: TemplateVars): RenderedTem
 
     case 'intake-passed':
       return {
-        email_subject: `${v.visa_label}: documents accepted — submitting to partner`,
+        email_subject: `${v.visa_label}: documents accepted — submitting now`,
         email_html: shell(
           `Hi ${v.candidate_name},`,
-          `<p>Your documents for the <strong>${v.visa_label}</strong> case look good. We're submitting to our MoFA-licensed partner now. We'll update you when the partner acknowledges.</p>`,
+          `<p>Your documents for the <strong>${v.visa_label}</strong> case look good. Our licensed Saudi visa team is submitting now. We'll update you as soon as it's acknowledged.</p>`,
           'View case', v.case_url,
         ),
-        whatsapp_text: `Hi ${v.candidate_name}, your ${v.visa_label} documents are accepted. Submitting to our partner now. ${v.case_url}`,
+        whatsapp_text: `Hi ${v.candidate_name}, your ${v.visa_label} documents are accepted. Submitting now. ${v.case_url}`,
       };
 
     case 'intake-needs-revision':
@@ -83,13 +83,13 @@ export function renderTemplate(kind: TemplateKind, v: TemplateVars): RenderedTem
 
     case 'submitted-to-partner':
       return {
-        email_subject: `${v.visa_label}: submitted to MoFA-licensed partner`,
+        email_subject: `${v.visa_label}: submitted to Saudi authorities`,
         email_html: shell(
           `Hi ${v.candidate_name},`,
-          `<p>Your <strong>${v.visa_label}</strong> case has been submitted to our partner${v.partner_reference ? ` (reference <code>${v.partner_reference}</code>)` : ''}. We'll keep you posted as the Saudi authorities process it.</p>`,
+          `<p>Your <strong>${v.visa_label}</strong> case has been submitted by our licensed Saudi visa team${v.partner_reference ? ` (reference <code>${v.partner_reference}</code>)` : ''}. We'll keep you posted as the Saudi authorities process it.</p>`,
           'View case', v.case_url,
         ),
-        whatsapp_text: `Hi ${v.candidate_name}, your ${v.visa_label} is now with our partner${v.partner_reference ? ` (ref ${v.partner_reference})` : ''}. ${v.case_url}`,
+        whatsapp_text: `Hi ${v.candidate_name}, your ${v.visa_label} has been submitted${v.partner_reference ? ` (ref ${v.partner_reference})` : ''}. ${v.case_url}`,
       };
 
     case 'approved-balance-due': {

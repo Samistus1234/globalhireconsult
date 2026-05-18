@@ -11,18 +11,18 @@
   var SUPABASE_ANON = window.SUPABASE_ANON_KEY || '';
 
   var STATUS_LABEL = {
-    deposit_pending:        ['Awaiting payment',   '#F4A261'],
-    intake_in_review:       ['Document review',    '#48CAE4'],
-    docs_revision:          ['Action needed',      '#F4A261'],
-    submitted_to_partner:   ['Submitted',          '#48CAE4'],
-    partner_processing:     ['At MoFA',            '#48CAE4'],
-    approved:               ['Approved — pay balance', '#2EC4B6'],
-    issued:                 ['Visa issued',        '#2EC4B6'],
-    rejected_intake:        ['Refunded — ineligible', '#8DA2BE'],
-    rejected_partner:       ['Rejected',           '#E63946'],
-    refunded:               ['Refunded',           '#8DA2BE'],
-    stale:                  ['Awaiting your action', '#F4A261'],
-    on_hold:                ['On hold',            '#8DA2BE'],
+    deposit_pending:        ['Awaiting payment',   'warning'],
+    intake_in_review:       ['Document review',    'success'],
+    docs_revision:          ['Action needed',      'warning'],
+    submitted_to_partner:   ['Submitted',          'success'],
+    partner_processing:     ['At MoFA',            'neutral'],
+    approved:               ['Approved — pay balance', 'success'],
+    issued:                 ['Visa issued',        'success'],
+    rejected_intake:        ['Refunded — ineligible', 'neutral'],
+    rejected_partner:       ['Rejected',           'error'],
+    refunded:               ['Refunded',           'neutral'],
+    stale:                  ['Awaiting your action', 'warning'],
+    on_hold:                ['On hold',            'neutral'],
   };
 
   var VISA_LABEL = {
@@ -56,15 +56,15 @@
     if (!cases.length) { empty.hidden = false; return; }
     empty.hidden = true;
     list.innerHTML = cases.map(function (c) {
-      var label = STATUS_LABEL[c.status] || [c.status, '#8DA2BE'];
+      var label = STATUS_LABEL[c.status] || [c.status, 'neutral'];
+      var pillClass = ({success:'success', warning:'warning', error:'error', neutral:'neutral'})[label[1]] || 'neutral';
       return (
-        '<a class="visa-catalog-card" href="dashboard-visa-case.html?id=' + c.id + '">' +
-          '<h3>' + (VISA_LABEL[c.visa_type] || c.visa_type) + '</h3>' +
-          '<div class="price">' + (c.estimated_total_usd ? '$' + c.estimated_total_usd : '—') + '</div>' +
-          '<div class="meta">' +
-            '<span style="display:inline-block; padding:2px 8px; border-radius:999px; background:' + label[1] + '20; color:' + label[1] + ';">' + label[0] + '</span>' +
-            '<span style="float:right;">' + new Date(c.created_at).toLocaleDateString() + '</span>' +
-          '</div>' +
+        '<a class="visa-case-card" href="dashboard-visa-case.html?id=' + c.id + '">' +
+          '<span class="visa-case-card__title">' + (VISA_LABEL[c.visa_type] || c.visa_type) + '</span>' +
+          '<span class="visa-case-card__meta">' +
+            '<span class="visa-pill visa-pill--' + pillClass + '">' + label[0] + '</span>' +
+            '<time>' + new Date(c.created_at).toLocaleDateString() + '</time>' +
+          '</span>' +
         '</a>'
       );
     }).join('');
