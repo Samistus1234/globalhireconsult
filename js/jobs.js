@@ -8,6 +8,19 @@
   var filtered     = [];   // after search / filter / sort
   var savedJobIds  = new Set(); // job IDs the current user has saved
 
+  function timeAgo(dateStr) {
+    if (!dateStr) return '';
+    var then = new Date(dateStr).getTime();
+    if (isNaN(then)) return '';
+    var days = Math.floor((Date.now() - then) / 86400000);
+    if (days <= 0) return 'Posted today';
+    if (days === 1) return 'Posted yesterday';
+    if (days < 7) return 'Posted ' + days + ' days ago';
+    if (days < 30) { var w = Math.floor(days / 7); return 'Posted ' + w + ' week' + (w > 1 ? 's' : '') + ' ago'; }
+    if (days < 365) { var m = Math.floor(days / 30); return 'Posted ' + m + ' month' + (m > 1 ? 's' : '') + ' ago'; }
+    var y = Math.floor(days / 365); return 'Posted ' + y + ' year' + (y > 1 ? 's' : '') + ' ago';
+  }
+
   /* ---------- Featured / Pinned listings ---------- */
   var WA_QATAR = 'https://wa.me/19294192327?text=Hi%20eLab%2C%20I%E2%80%99m%20interested%20in%20the%20Qatar%20Caregiver%20position.%20My%20name%20is%20____%20and%20I%20have%20____%20years%20of%20experience.';
   var WA_LINK = WA_QATAR;
@@ -16,6 +29,7 @@
   var featuredListings = [
     {
       id: 'featured-qatar-derm-consultant',
+      posted_at: '2026-06-06',
       title: 'Consultant Dermatologist',
       employer_name: 'Leading Healthcare Provider — Qatar',
       destination_country: 'Qatar',
@@ -34,6 +48,7 @@
     },
     {
       id: 'featured-qatar-plastics-consultant',
+      posted_at: '2026-06-06',
       title: 'Consultant Plastic Surgeon',
       employer_name: 'Leading Healthcare Provider — Qatar',
       destination_country: 'Qatar',
@@ -52,6 +67,7 @@
     },
     {
       id: 'featured-elderly-caregiver-qatar',
+      posted_at: '2026-05-05',
       title: 'Elderly Caregiver',
       employer_name: 'Qatar Healthcare Employer',
       destination_country: 'Qatar',
@@ -68,6 +84,7 @@
     },
     {
       id: 'featured-paediatric-caregiver-qatar',
+      posted_at: '2026-05-05',
       title: 'Paediatric Caregiver',
       employer_name: 'Qatar Healthcare Employer',
       destination_country: 'Qatar',
@@ -84,6 +101,7 @@
     },
     {
       id: 'featured-albania-work-visa',
+      posted_at: '2026-04-15',
       title: 'Work in Albania (Europe) — D Visa',
       employer_name: 'eLab Solutions International',
       destination_country: 'Albania',
@@ -102,6 +120,7 @@
     },
     {
       id: 'featured-qatar-nursing-2yr',
+      posted_at: '2026-04-08',
       title: 'Registered Nurse — 2-Year Contract',
       employer_name: 'Qatar Hospital',
       destination_country: 'Qatar',
@@ -120,6 +139,7 @@
     },
     {
       id: 'featured-qatar-nursing-5yr',
+      posted_at: '2026-04-08',
       title: 'Registered Nurse — 5-Year Contract',
       employer_name: 'Qatar Hospital',
       destination_country: 'Qatar',
@@ -138,6 +158,7 @@
     },
     {
       id: 'featured-saudi-ent-surgeon',
+      posted_at: '2026-05-20',
       title: 'ENT Surgeon / Otorhinolaryngologist',
       employer_name: 'Private Hospital — Saudi Arabia',
       destination_country: 'Saudi Arabia',
@@ -156,6 +177,7 @@
     },
     {
       id: 'featured-elab-complete',
+      posted_at: '2026-04-01',
       title: 'eLab Complete — Guaranteed Nursing Placement',
       employer_name: 'eLab Solutions International',
       destination_country: 'Qatar & Saudi Arabia',
@@ -405,6 +427,10 @@
               '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> ' +
               (c.positions || 0) + ' positions' +
             '</span>' +
+            (c.created_at ? '<span class="job-meta-item">' +
+              '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> ' +
+              timeAgo(c.created_at) +
+            '</span>' : '') +
           '</div>' +
           '<div class="job-tags">' +
             '<span class="tag">' + escHtml(c.specialty) + '</span>' +
@@ -468,6 +494,10 @@
               '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> ' +
               (f.positions > 0 ? f.positions + ' positions' : 'Multiple openings') +
             '</span>' +
+            (f.posted_at ? '<span class="job-meta-item">' +
+              '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> ' +
+              timeAgo(f.posted_at) +
+            '</span>' : '') +
           '</div>' +
           '<div class="job-tags">' +
             '<span class="tag">' + escHtml(f.specialty) + '</span>' +
