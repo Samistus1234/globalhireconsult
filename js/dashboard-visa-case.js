@@ -77,6 +77,42 @@
       link.hidden = false;
       link.href = SUPABASE_URL + '/storage/v1/object/sign/visa-documents/' + c.visa_pdf_path;
     }
+
+    // Pay balance button — visible when there is a pending balance invoice
+    var pendingBalance = invoices.find(function (i) { return i.kind === 'balance' && i.status === 'pending'; });
+    if (pendingBalance) {
+      var payBtn = document.getElementById('pay-balance-btn');
+      payBtn.hidden = false;
+      payBtn.addEventListener('click', async function () {
+        payBtn.disabled = true;
+        payBtn.textContent = 'Redirecting…';
+        try {
+          var resp = await fetch(
+            SUPABASE_URL + '/functions/v1/start-balance-payment',
+            {
+              method: 'POST',
+              headers: {
+                'content-type': 'application/json',
+                Authorization: authHeader(),
+              },
+              body: JSON.stringify({ case_id: id, provider: 'stripe' }),
+            },
+          );
+          var data = await resp.json();
+          if (!resp.ok || !data.payment_url) {
+            alert('Could not start payment: ' + (data.error || resp.status));
+            payBtn.disabled = false;
+            payBtn.textContent = 'Pay balance';
+            return;
+          }
+          location.href = data.payment_url;
+        } catch (err) {
+          alert('Network error. Please try again.');
+          payBtn.disabled = false;
+          payBtn.textContent = 'Pay balance';
+        }
+      });
+    }
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
