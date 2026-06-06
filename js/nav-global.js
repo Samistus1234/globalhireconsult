@@ -410,4 +410,19 @@
       }
     });
   }
+
+  /* ── Auto-init when the script tag carries data-active-page ──
+     Pages that already call GHNav.init('foo') in inline script keep working;
+     pages that only set data-active-page (visa surfaces, etc.) get init'd here. */
+  var thisScript = document.currentScript;
+  if (thisScript && thisScript.hasAttribute('data-active-page')) {
+    var activePage = thisScript.getAttribute('data-active-page') || '';
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () {
+        window.GHNav.init(activePage);
+      });
+    } else {
+      window.GHNav.init(activePage);
+    }
+  }
 })();
