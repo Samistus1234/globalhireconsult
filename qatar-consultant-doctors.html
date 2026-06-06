@@ -1212,6 +1212,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/supabase-client.js"></script>
   <script>
+    /* ── Page-view counter (records a visit to this offer page) ── */
+    try { if (window.ghSupabase) { window.ghSupabase.rpc('increment_page_view', { p_slug: 'qatar-consultant-doctors' }); } } catch (e) {}
+  </script>
+  <script>
     /* ── IntersectionObserver for scroll reveals ── */
     const observer = new IntersectionObserver(function(entries) {
       entries.forEach(function(entry) {
