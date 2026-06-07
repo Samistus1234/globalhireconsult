@@ -59,9 +59,10 @@
           My Applications
         </a>
 
-        <a class="portal-nav-item" href="dashboard-visas.html" style="position:relative;">
+        <a class="portal-nav-item" data-tab="tab-visa" style="position:relative;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
           My Visa
+          <span class="nav-badge" id="visa-badge" style="display:none">0</span>
         </a>
 
         <a class="portal-nav-item" data-tab="tab-opportunities" style="position:relative;">
@@ -547,6 +548,99 @@
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                   Send Reply
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ TAB: My Visa ═══ -->
+        <div class="portal-tab" id="tab-visa">
+          <!-- List view -->
+          <div class="panel" id="visa-list-panel">
+            <div class="panel-header">
+              <span class="panel-title">My Visa Cases</span>
+              <span class="badge badge-primary badge-dot" id="visa-cases-count" style="display:none">0 cases</span>
+            </div>
+            <div class="panel-body">
+              <div id="visa-cases-list">
+                <!-- filled by portal.js loadVisaCases() -->
+                <div style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">
+                  <div class="spinner" style="margin:0 auto var(--space-3);"></div>
+                  Loading…
+                </div>
+              </div>
+              <div id="visa-cases-empty" style="display:none;text-align:center;padding:var(--space-8);color:var(--text-tertiary);">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="opacity:0.4;margin-bottom:var(--space-3);"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                <p style="margin-bottom:var(--space-3);">No visa cases yet.</p>
+                <a href="visa-start.html" class="btn btn-primary btn-sm">Start a Visa Application</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detail view (hidden until a case is selected) -->
+          <div id="visa-case-detail" hidden>
+            <div style="margin-bottom:var(--space-4);">
+              <button class="btn btn-ghost btn-sm" id="visa-back-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                All cases
+              </button>
+            </div>
+
+            <!-- Status card -->
+            <div class="panel" style="margin-bottom:var(--space-4);">
+              <div class="panel-header">
+                <span class="panel-title" id="visa-detail-title">Visa Case</span>
+                <span class="badge badge-dot" id="visa-detail-status-badge"></span>
+              </div>
+              <div class="panel-body">
+                <div id="visa-detail-meta" style="font-size:var(--text-sm);color:var(--text-tertiary);margin-bottom:var(--space-3);"></div>
+                <div id="visa-detail-next-action" style="font-size:var(--text-sm);color:var(--text-primary);background:var(--bg-elevated);padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);border-left:3px solid var(--primary);line-height:1.6;margin-bottom:var(--space-4);"></div>
+                <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;">
+                  <a id="visa-pdf-link" hidden class="btn btn-primary btn-sm" target="_blank" rel="noopener">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Download Visa PDF
+                  </a>
+                  <button id="visa-pay-balance-btn" hidden class="btn btn-primary btn-sm">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    Pay Balance
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Documents -->
+            <div class="panel" style="margin-bottom:var(--space-4);">
+              <div class="panel-header">
+                <span class="panel-title">Documents</span>
+              </div>
+              <div class="panel-body">
+                <div id="visa-detail-documents">
+                  <div style="text-align:center;padding:var(--space-4);color:var(--text-tertiary);">Loading…</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Invoices -->
+            <div class="panel" style="margin-bottom:var(--space-4);">
+              <div class="panel-header">
+                <span class="panel-title">Invoices</span>
+              </div>
+              <div class="panel-body">
+                <div id="visa-detail-invoices">
+                  <div style="text-align:center;padding:var(--space-4);color:var(--text-tertiary);">Loading…</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="panel">
+              <div class="panel-header">
+                <span class="panel-title">Timeline</span>
+              </div>
+              <div class="panel-body">
+                <div id="visa-detail-timeline">
+                  <div style="text-align:center;padding:var(--space-4);color:var(--text-tertiary);">Loading…</div>
+                </div>
               </div>
             </div>
           </div>

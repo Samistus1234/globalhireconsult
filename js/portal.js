@@ -1491,4 +1491,383 @@
     d.textContent = str || '';
     return d.innerHTML;
   }
+
+  // ─────────────────────────────────────────
+  // ── My Visa tab ──────────────────────────
+  // ─────────────────────────────────────────
+
+  var VISA_STATUS_LABEL = {
+    deposit_pending:        ['Awaiting payment',           'warning'],
+    intake_in_review:       ['Document review',            'success'],
+    docs_revision:          ['Action needed',              'warning'],
+    submitted_to_partner:   ['Submitted',                  'success'],
+    partner_processing:     ['At MoFA',                    'neutral'],
+    approved:               ['Approved — pay balance',     'success'],
+    issued:                 ['Visa issued',                'success'],
+    rejected_intake:        ['Refunded — ineligible',      'neutral'],
+    rejected_partner:       ['Rejected',                   'error'],
+    refunded:               ['Refunded',                   'neutral'],
+    stale:                  ['Awaiting your action',       'warning'],
+    on_hold:                ['On hold',                    'neutral'],
+  };
+
+  var VISA_TYPE_LABEL = {
+    tourist:            'Tourist eVisa',
+    umrah:              'Umrah',
+    hajj:               'Hajj',
+    family_visit:       'Family Visit',
+    family_residence:   'Family Residence',
+    business:           'Business Visit',
+    work_iqama:         'Work & Iqama',
+    premium_residency:  'Premium Residency',
+    investor_misa:      'Investor (MISA)',
+    transit:            'Transit',
+    domestic_worker:    'Domestic Worker',
+  };
+
+  var VISA_NEXT_ACTION = {
+    deposit_pending:        'Awaiting your $50 deposit.',
+    intake_in_review:       'Our intake team is reviewing your documents — usually within 24 hours.',
+    docs_revision:          'Please re-upload the document we flagged.',
+    submitted_to_partner:   'Submitted to our MoFA-licensed partner.',
+    partner_processing:     'Being processed by Saudi authorities.',
+    approved:               'Approved — pay the balance to receive your visa PDF.',
+    issued:                 'Visa issued — download below.',
+    rejected_intake:        'We were unable to proceed. Your $50 deposit has been refunded.',
+    rejected_partner:       'The Saudi authorities did not approve this application. We have refunded the balance.',
+    refunded:               'Refunded.',
+    stale:                  'Please upload missing documents to proceed.',
+    on_hold:                'On hold.',
+  };
+
+  // Sentinel so we only attach the tab-active hook once
+  var _visaTabWired = false;
+  // Track whether the list has been loaded at least once (lazy-load on first activate)
+  var _visaLoaded = false;
+
+  function wireVisaTabHook() {
+    if (_visaTabWired) return;
+    _visaTabWired = true;
+
+    // Intercept clicks on the tab nav item
+    var visaNavItem = document.querySelector('.portal-nav-item[data-tab="tab-visa"]');
+    if (visaNavItem) {
+      visaNavItem.addEventListener('click', function () {
+        // Load on first activate; re-load on every subsequent activate to pick up new cases
+        loadVisaCases();
+      });
+    }
+  }
+
+  // Called once on gh:auth-ready; also called on every tab activate
+  async function loadVisaCases() {
+    var listEl = document.getElementById('visa-cases-list');
+    var emptyEl = document.getElementById('visa-cases-empty');
+    var countBadge = document.getElementById('visa-cases-count');
+
+    // Show the list panel, hide the detail panel
+    var listPanel = document.getElementById('visa-list-panel');
+    var detailPanel = document.getElementById('visa-case-detail');
+    if (listPanel) listPanel.hidden = false;
+    if (detailPanel) detailPanel.hidden = true;
+
+    if (!listEl) return;
+
+    // Show spinner while loading
+    listEl.innerHTML =
+      '<div style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">' +
+        '<div class="spinner" style="margin:0 auto var(--space-3);"></div>' +
+        'Loading…' +
+      '</div>';
+    if (emptyEl) emptyEl.style.display = 'none';
+
+    var { data: cases, error } = await ghFrom('visa_cases')
+      .select('id,visa_type,status,estimated_total_usd,created_at,current_state_changed_at')
+      .order('created_at', { ascending: false });
+
+    _visaLoaded = true;
+
+    if (error) {
+      listEl.innerHTML = '<div style="padding:var(--space-4);color:var(--accent-coral);">Could not load visa cases. Please refresh.</div>';
+      return;
+    }
+
+    cases = cases || [];
+
+    // Update count badge
+    if (countBadge) {
+      if (cases.length > 0) {
+        countBadge.textContent = cases.length + (cases.length === 1 ? ' case' : ' cases');
+        countBadge.style.display = '';
+      } else {
+        countBadge.style.display = 'none';
+      }
+    }
+
+    // Update nav badge (active/pending count)
+    var navBadge = document.getElementById('visa-badge');
+    var activeCases = cases.filter(function(c) {
+      return c.status !== 'issued' && c.status !== 'rejected_intake' && c.status !== 'rejected_partner' && c.status !== 'refunded';
+    }).length;
+    if (navBadge) {
+      navBadge.textContent = activeCases;
+      navBadge.style.display = activeCases > 0 ? '' : 'none';
+    }
+
+    if (cases.length === 0) {
+      listEl.innerHTML = '';
+      if (emptyEl) emptyEl.style.display = '';
+      return;
+    }
+
+    if (emptyEl) emptyEl.style.display = 'none';
+
+    listEl.innerHTML = cases.map(function(c) {
+      var labelArr = VISA_STATUS_LABEL[c.status] || [c.status, 'neutral'];
+      var badgeClass = {
+        success: 'badge-primary',
+        warning: 'badge-warning',
+        error:   'badge-error',
+        neutral: 'badge-info',
+      }[labelArr[1]] || 'badge-info';
+
+      var visaTypeLabel = VISA_TYPE_LABEL[c.visa_type] || c.visa_type.replace(/_/g, ' ');
+      var dateStr = new Date(c.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      var totalStr = c.estimated_total_usd ? '$' + c.estimated_total_usd : '';
+
+      return (
+        '<div class="application-item" style="margin-bottom:var(--space-3);cursor:pointer;" data-visa-case-id="' + escapeHtml(c.id) + '">' +
+          '<div class="application-header">' +
+            '<div style="width:44px;height:44px;border-radius:8px;background:var(--primary-muted);color:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
+              '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>' +
+            '</div>' +
+            '<div class="application-info" style="flex:1;">' +
+              '<h4>' + escapeHtml(visaTypeLabel) + '</h4>' +
+              '<span>Started ' + escapeHtml(dateStr) + (totalStr ? ' &middot; ' + escapeHtml(totalStr) : '') + '</span>' +
+            '</div>' +
+            '<span class="badge badge-dot ' + badgeClass + '">' + escapeHtml(labelArr[0]) + '</span>' +
+          '</div>' +
+        '</div>'
+      );
+    }).join('');
+
+    // Bind click-to-detail on each card
+    listEl.querySelectorAll('[data-visa-case-id]').forEach(function(card) {
+      card.addEventListener('click', function() {
+        showVisaCase(card.dataset.visaCaseId);
+      });
+    });
+  }
+
+  async function showVisaCase(caseId) {
+    var listPanel  = document.getElementById('visa-list-panel');
+    var detailPanel = document.getElementById('visa-case-detail');
+    if (listPanel)  listPanel.hidden  = true;
+    if (detailPanel) detailPanel.hidden = false;
+
+    // Scroll to top of content
+    var content = document.querySelector('.dash-content');
+    if (content) content.scrollTop = 0;
+
+    // Reset inner panels to loading state while we fetch
+    var titleEl      = document.getElementById('visa-detail-title');
+    var statusBadge  = document.getElementById('visa-detail-status-badge');
+    var metaEl       = document.getElementById('visa-detail-meta');
+    var nextActionEl = document.getElementById('visa-detail-next-action');
+    var pdfLink      = document.getElementById('visa-pdf-link');
+    var payBtn       = document.getElementById('visa-pay-balance-btn');
+    var docsEl       = document.getElementById('visa-detail-documents');
+    var invoicesEl   = document.getElementById('visa-detail-invoices');
+    var timelineEl   = document.getElementById('visa-detail-timeline');
+
+    if (titleEl)      titleEl.textContent = 'Loading…';
+    if (statusBadge)  { statusBadge.textContent = ''; statusBadge.className = 'badge badge-dot'; }
+    if (metaEl)       metaEl.textContent = '';
+    if (nextActionEl) nextActionEl.textContent = '';
+    if (pdfLink)      pdfLink.hidden = true;
+    if (payBtn)       { payBtn.hidden = true; payBtn.disabled = false; payBtn.textContent = 'Pay Balance'; }
+    if (docsEl)       docsEl.innerHTML = '<div style="text-align:center;padding:var(--space-4);color:var(--text-tertiary);">Loading…</div>';
+    if (invoicesEl)   invoicesEl.innerHTML = '<div style="text-align:center;padding:var(--space-4);color:var(--text-tertiary);">Loading…</div>';
+    if (timelineEl)   timelineEl.innerHTML = '<div style="text-align:center;padding:var(--space-4);color:var(--text-tertiary);">Loading…</div>';
+
+    // Wire back button (once — use a flag to avoid double-binding on subsequent opens)
+    var backBtn = document.getElementById('visa-back-btn');
+    if (backBtn && !backBtn._bound) {
+      backBtn._bound = true;
+      backBtn.addEventListener('click', function() {
+        if (listPanel)  listPanel.hidden  = false;
+        if (detailPanel) detailPanel.hidden = true;
+      });
+    }
+
+    try {
+      // Fetch case + related data in parallel
+      var results = await Promise.all([
+        ghFrom('visa_cases').select('*').eq('id', caseId),
+        ghFrom('visa_case_documents').select('*').eq('case_id', caseId),
+        ghFrom('visa_invoices').select('*').eq('case_id', caseId),
+        ghFrom('visa_case_events').select('*').eq('case_id', caseId).order('created_at', { ascending: true }),
+      ]);
+
+      var caseRow  = (results[0].data || [])[0];
+      var docs     = results[1].data || [];
+      var invoices = results[2].data || [];
+      var events   = results[3].data || [];
+
+      if (!caseRow) {
+        if (titleEl) titleEl.textContent = 'Case not found';
+        return;
+      }
+
+      // ── Status card ──
+      var visaTypeLabel = VISA_TYPE_LABEL[caseRow.visa_type] || caseRow.visa_type.replace(/_/g, ' ');
+      var labelArr = VISA_STATUS_LABEL[caseRow.status] || [caseRow.status, 'neutral'];
+      var badgeClass = {
+        success: 'badge-primary',
+        warning: 'badge-warning',
+        error:   'badge-error',
+        neutral: 'badge-info',
+      }[labelArr[1]] || 'badge-info';
+
+      if (titleEl)     titleEl.textContent = visaTypeLabel + ' Visa';
+      if (statusBadge) { statusBadge.textContent = labelArr[0]; statusBadge.className = 'badge badge-dot ' + badgeClass; }
+
+      var dateStr = new Date(caseRow.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      if (metaEl) {
+        metaEl.innerHTML =
+          '<span>Started ' + escapeHtml(dateStr) + '</span>' +
+          (caseRow.estimated_total_usd ? ' &middot; <span>Total: <strong>$' + caseRow.estimated_total_usd + '</strong></span>' : '');
+      }
+
+      var nextActionText = VISA_NEXT_ACTION[caseRow.status] || '';
+      if (nextActionEl && nextActionText) nextActionEl.textContent = nextActionText;
+      if (nextActionEl && !nextActionText) nextActionEl.style.display = 'none';
+
+      // ── PDF download ──
+      if (pdfLink && caseRow.visa_pdf_path) {
+        pdfLink.hidden = false;
+        pdfLink.href = SUPABASE_URL + '/storage/v1/object/sign/visa-documents/' + caseRow.visa_pdf_path;
+      }
+
+      // ── Pay balance button ──
+      var pendingBalance = invoices.find(function(i) { return i.kind === 'balance' && i.status === 'pending'; });
+      if (payBtn && pendingBalance) {
+        payBtn.hidden = false;
+        if (!payBtn._bound) {
+          payBtn._bound = true;
+          payBtn.addEventListener('click', async function() {
+            payBtn.disabled = true;
+            payBtn.textContent = 'Redirecting…';
+            try {
+              var session = await GHAuth.getSession();
+              if (!session) throw new Error('Not authenticated');
+              var resp = await fetch(SUPABASE_URL + '/functions/v1/start-balance-payment', {
+                method: 'POST',
+                headers: {
+                  'content-type': 'application/json',
+                  'Authorization': 'Bearer ' + session.access_token,
+                },
+                body: JSON.stringify({ case_id: caseId, provider: 'stripe' }),
+              });
+              var data = await resp.json();
+              if (!resp.ok || !data.payment_url) {
+                alert('Could not start payment: ' + (data.error || resp.status));
+                payBtn.disabled = false;
+                payBtn.textContent = 'Pay Balance';
+                return;
+              }
+              location.href = data.payment_url;
+            } catch (err) {
+              alert('Network error. Please try again.');
+              payBtn.disabled = false;
+              payBtn.textContent = 'Pay Balance';
+            }
+          });
+        }
+      }
+
+      // ── Documents ──
+      if (docsEl) {
+        if (!docs.length) {
+          docsEl.innerHTML = '<p style="color:var(--text-tertiary);font-size:var(--text-sm);">No documents uploaded yet.</p>';
+        } else {
+          docsEl.innerHTML = docs.map(function(d) {
+            var docKind = d.doc_kind ? d.doc_kind.replace(/_/g, ' ') : 'Document';
+            var reviewStatus = d.review_status || 'pending';
+            var statusClass = { approved: 'badge-primary', pending: 'badge-warning', rejected: 'badge-error', in_review: 'badge-info' }[reviewStatus] || 'badge-info';
+            return (
+              '<div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-2) 0;border-bottom:1px solid var(--border-subtle);">' +
+                '<div style="display:flex;align-items:center;gap:var(--space-3);">' +
+                  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>' +
+                  '<span style="font-size:var(--text-sm);color:var(--text-primary);font-weight:600;">' + escapeHtml(docKind) + '</span>' +
+                '</div>' +
+                '<span class="badge badge-dot ' + statusClass + '" style="font-size:var(--text-xs);">' + escapeHtml(reviewStatus.replace(/_/g, ' ')) + '</span>' +
+              '</div>'
+            );
+          }).join('');
+        }
+      }
+
+      // ── Invoices ──
+      if (invoicesEl) {
+        if (!invoices.length) {
+          invoicesEl.innerHTML = '<p style="color:var(--text-tertiary);font-size:var(--text-sm);">No invoices yet.</p>';
+        } else {
+          invoicesEl.innerHTML = invoices.map(function(inv) {
+            var kindLabel = (inv.kind || '').replace(/_/g, ' ');
+            var statusClass = { paid: 'badge-primary', pending: 'badge-warning', failed: 'badge-error', refunded: 'badge-info' }[inv.status] || 'badge-info';
+            var amountStr = inv.amount_usd ? '$' + inv.amount_usd : '—';
+            return (
+              '<div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-2) 0;border-bottom:1px solid var(--border-subtle);">' +
+                '<div>' +
+                  '<div style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary);">' + escapeHtml(kindLabel) + '</div>' +
+                  '<div style="font-size:var(--text-xs);color:var(--text-tertiary);">' + escapeHtml(inv.provider || '—') + '</div>' +
+                '</div>' +
+                '<div style="display:flex;align-items:center;gap:var(--space-3);">' +
+                  '<span style="font-size:var(--text-sm);font-weight:700;color:var(--text-primary);">' + escapeHtml(amountStr) + '</span>' +
+                  '<span class="badge badge-dot ' + statusClass + '" style="font-size:var(--text-xs);">' + escapeHtml(inv.status || '') + '</span>' +
+                '</div>' +
+              '</div>'
+            );
+          }).join('');
+        }
+      }
+
+      // ── Timeline ──
+      if (timelineEl) {
+        if (!events.length) {
+          timelineEl.innerHTML = '<p style="color:var(--text-tertiary);font-size:var(--text-sm);">No events yet.</p>';
+        } else {
+          timelineEl.innerHTML = events.map(function(ev) {
+            var timeStr = new Date(ev.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            var eventLabel = (ev.event_type || '').replace(/_/g, ' ');
+            return (
+              '<div style="display:flex;gap:var(--space-4);padding:var(--space-3) 0;border-bottom:1px solid var(--border-subtle);">' +
+                '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">' +
+                  '<div style="width:10px;height:10px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:3px;"></div>' +
+                '</div>' +
+                '<div style="flex:1;">' +
+                  '<div style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary);text-transform:capitalize;">' + escapeHtml(eventLabel) + '</div>' +
+                  (ev.note ? '<div style="font-size:var(--text-xs);color:var(--text-secondary);margin-top:2px;">' + escapeHtml(ev.note) + '</div>' : '') +
+                  '<time style="font-size:var(--text-xs);color:var(--text-tertiary);">' + timeStr + '</time>' +
+                '</div>' +
+              '</div>'
+            );
+          }).join('');
+        }
+      }
+
+    } catch (err) {
+      console.error('Visa case load error:', err);
+      if (titleEl) titleEl.textContent = 'Error loading case';
+    }
+  }
+
+  // Wire visa tab hook after DOM is ready
+  wireVisaTabHook();
+
+  // Expose for testing / programmatic use
+  window.loadVisaCases = loadVisaCases;
+  window.showVisaCase  = showVisaCase;
+
 })();
