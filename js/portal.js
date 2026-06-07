@@ -1575,6 +1575,8 @@
     if (h.indexOf('#visa') !== 0) return;
     if (_visaHashApplied && !force) return;
     _visaHashApplied = true;
+    // consume the hash so later events (token refresh, etc.) can never re-route/revert
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
     if (typeof switchToTab === 'function') switchToTab('tab-visa');
     var m = h.match(/^#visa-([0-9a-fA-F-]{36})$/);
     if (m) { showVisaCase(m[1]); } else { loadVisaCases(); }
