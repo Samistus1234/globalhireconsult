@@ -71,14 +71,44 @@
     return resp.json();
   }
 
+  // Open a private visa document in a new tab via a short-lived signed URL.
+  // RLS (visa_docs_owner_or_admin_read) lets is_admin() read any visa-documents object.
+  async function viewDoc(path) {
+    if (!path) { flash('This document has no file attached.', 'error'); return; }
+    // Open the tab synchronously so it isn't blocked as a pop-up after the await.
+    var w = window.open('', '_blank');
+    try {
+      var enc = path.split('/').map(encodeURIComponent).join('/');
+      var resp = await fetch(SUPABASE_URL + '/storage/v1/object/sign/visa-documents/' + enc, {
+        method: 'POST',
+        headers: { apikey: SUPABASE_ANON, Authorization: await authHeader(), 'content-type': 'application/json' },
+        body: JSON.stringify({ expiresIn: 3600 }),
+      });
+      if (!resp.ok) throw new Error('sign failed: ' + resp.status);
+      var data = await resp.json();
+      var signed = data.signedURL || data.signedUrl || data.url;
+      if (!signed) throw new Error('no signed URL returned');
+      var url = SUPABASE_URL + '/storage/v1' + signed;
+      if (w) w.location = url; else window.location.href = url;
+    } catch (e) {
+      if (w) w.close();
+      flash('Could not open document: ' + (e && e.message ? e.message : e), 'error');
+    }
+  }
+
   function renderDocs(docs) {
     document.getElementById('admin-docs').innerHTML = docs.length
       ? '<table style="width:100%; border-collapse: collapse;">' +
         docs.map(function (d) {
+          var kindLabel = (d.doc_kind || 'document').replace(/_/g, ' ');
+          var viewBtn = d.storage_path
+            ? '<button data-action="view_doc" data-path="' + escapeAttr(d.storage_path) + '" class="mock-button" style="margin-right:6px;">View</button>'
+            : '';
           return '<tr style="border-bottom: 1px solid rgba(255,255,255,.06);">' +
-            '<td style="padding:6px;"><strong>' + d.doc_kind + '</strong></td>' +
-            '<td>' + d.review_status + '</td>' +
+            '<td style="padding:6px;"><strong>' + escapeAttr(kindLabel) + '</strong></td>' +
+            '<td>' + escapeAttr(d.review_status || 'pending') + '</td>' +
             '<td>' +
+              viewBtn +
               '<button data-action="accept_doc" data-doc-id="' + d.id + '" class="mock-button" style="margin-right:6px;">Accept</button>' +
               '<button data-action="reject_doc" data-doc-id="' + d.id + '" class="mock-button">Reject</button>' +
             '</td>' +
@@ -88,10 +118,19 @@
 
     document.querySelectorAll('#admin-docs button[data-action]').forEach(function (b) {
       b.addEventListener('click', function () {
+        if (b.dataset.action === 'view_doc') { viewDoc(b.dataset.path); return; }
         var reason = b.dataset.action === 'reject_doc' ? prompt('Reason?') : null;
+        if (b.dataset.action === 'reject_doc' && !reason) return;
         callAction(b.dataset.action, { doc_id: b.dataset.docId, reason: reason }).then(load);
       });
     });
+  }
+
+  // Minimal attribute escaper (quotes/angle brackets) for values placed in HTML attrs/text.
+  function escapeAttr(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
   async function load() {
