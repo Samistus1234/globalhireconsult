@@ -46,9 +46,9 @@
   };
 
   // Lightweight Supabase client (PostgREST + Storage) without bringing the npm SDK
-  function authHeader() {
-    var token = sessionStorage.getItem('sb-access-token') || localStorage.getItem('sb-access-token');
-    return token ? 'Bearer ' + token : null;
+  async function authHeader() {
+    var session = (window.GHAuth ? await GHAuth.getSession() : null);
+    return session ? 'Bearer ' + session.access_token : null;
   }
 
   function getSlug() {
@@ -68,7 +68,7 @@
     var path = candidateId + '/' + caseId + '/' + kind + '/' + Date.now() + '-' + file.name;
     var resp = await fetch(SUPABASE_URL + '/storage/v1/object/visa-documents/' + path, {
       method: 'POST',
-      headers: { Authorization: authHeader(), 'content-type': file.type },
+      headers: { Authorization: await authHeader(), 'content-type': file.type },
       body: file,
     });
     if (!resp.ok) throw new Error('upload failed: ' + (await resp.text()));
@@ -77,7 +77,7 @@
       method: 'POST',
       headers: {
         apikey: SUPABASE_ANON,
-        Authorization: authHeader(),
+        Authorization: await authHeader(),
         'content-type': 'application/json',
         'Accept-Profile': 'globalhire',
         'Content-Profile': 'globalhire',
@@ -88,8 +88,8 @@
     if (!dbResp.ok) throw new Error('doc record failed');
   }
 
-  function init() {
-    if (!authHeader()) {
+  async function init() {
+    if (!(await authHeader())) {
       window.location.href = 'login.html?return=' + encodeURIComponent(location.pathname + location.search);
       return;
     }
@@ -136,7 +136,7 @@
         // Step 1: create the case
         var createResp = await fetch(FN_BASE + '/start-visa-case', {
           method: 'POST',
-          headers: { 'content-type': 'application/json', Authorization: authHeader() },
+          headers: { 'content-type': 'application/json', Authorization: await authHeader() },
           body: JSON.stringify({
             visa_type:            visaType,
             sponsor_iqama:        f.sponsor_iqama?.value || null,
@@ -151,7 +151,7 @@
 
         // Step 2: upload docs
         btn.textContent = 'Uploading documents…';
-        var candidateId = JSON.parse(atob(authHeader().split('.')[1])).sub;
+        var candidateId = JSON.parse(atob((await authHeader()).split('.')[1])).sub;
         var fileInputs = f.querySelectorAll('input[type=file]');
         for (var i = 0; i < fileInputs.length; i++) {
           var fi = fileInputs[i];

@@ -7,16 +7,16 @@
   var SUPABASE_ANON = window.SUPABASE_ANON_KEY || '';
   var FN_BASE = SUPABASE_URL + '/functions/v1';
 
-  function authHeader() {
-    var t = sessionStorage.getItem('sb-access-token') || localStorage.getItem('sb-access-token');
-    return t ? 'Bearer ' + t : null;
+  async function authHeader() {
+    var session = (window.GHAuth ? await GHAuth.getSession() : null);
+    return session ? 'Bearer ' + session.access_token : null;
   }
 
   function caseId() { return new URLSearchParams(location.search).get('id'); }
 
   async function rest(path) {
     var r = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
-      headers: { apikey: SUPABASE_ANON, Authorization: authHeader(), 'Accept-Profile': 'globalhire' },
+      headers: { apikey: SUPABASE_ANON, Authorization: await authHeader(), 'Accept-Profile': 'globalhire' },
     });
     if (!r.ok) throw new Error('rest fail');
     return r.json();
@@ -25,7 +25,7 @@
   async function callAction(action, extra) {
     var resp = await fetch(FN_BASE + '/visa-admin-action', {
       method: 'POST',
-      headers: { 'content-type': 'application/json', Authorization: authHeader() },
+      headers: { 'content-type': 'application/json', Authorization: await authHeader() },
       body: JSON.stringify(Object.assign({ action: action, case_id: caseId() }, extra || {})),
     });
     if (!resp.ok) throw new Error(action + ' failed: ' + (await resp.text()));
@@ -35,7 +35,7 @@
   async function callSubmitPartner() {
     var resp = await fetch(FN_BASE + '/submit-to-partner', {
       method: 'POST',
-      headers: { 'content-type': 'application/json', Authorization: authHeader() },
+      headers: { 'content-type': 'application/json', Authorization: await authHeader() },
       body: JSON.stringify({ case_id: caseId() }),
     });
     if (!resp.ok) throw new Error('submit-to-partner failed: ' + (await resp.text()));
@@ -81,8 +81,8 @@
     }).join('');
   }
 
-  function init() {
-    if (!authHeader() || !caseId()) { location.href = 'admin-visas.html'; return; }
+  async function init() {
+    if (!(await authHeader()) || !caseId()) { location.href = 'admin-visas.html'; return; }
 
     document.getElementById('btn-submit-partner')   .addEventListener('click', function () { if (confirm('Submit to partner?'))         callSubmitPartner().then(load); });
     document.getElementById('btn-request-revision') .addEventListener('click', function () { var r = prompt('Revision reason for candidate?'); if (r) callAction('request_revision', { reason: r }).then(load); });

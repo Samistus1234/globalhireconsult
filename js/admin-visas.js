@@ -6,16 +6,16 @@
   var SUPABASE_URL = window.SUPABASE_URL || 'https://evzhnsugmvtqgmvzwyix.supabase.co';
   var SUPABASE_ANON = window.SUPABASE_ANON_KEY || '';
 
-  function authHeader() {
-    var t = sessionStorage.getItem('sb-access-token') || localStorage.getItem('sb-access-token');
-    return t ? 'Bearer ' + t : null;
+  async function authHeader() {
+    var session = (window.GHAuth ? await GHAuth.getSession() : null);
+    return session ? 'Bearer ' + session.access_token : null;
   }
 
   async function fetchCases(status, q) {
     var url = SUPABASE_URL + '/rest/v1/visa_cases?select=id,visa_type,status,candidate_id,created_at&order=created_at.desc&limit=200';
     if (status) url += '&status=eq.' + status;
     var resp = await fetch(url, {
-      headers: { apikey: SUPABASE_ANON, Authorization: authHeader(), 'Accept-Profile': 'globalhire' },
+      headers: { apikey: SUPABASE_ANON, Authorization: await authHeader(), 'Accept-Profile': 'globalhire' },
     });
     if (!resp.ok) throw new Error('fetch failed');
     var rows = await resp.json();
@@ -52,8 +52,8 @@
     });
   }
 
-  function init() {
-    if (!authHeader()) { location.href = 'login.html?return=' + encodeURIComponent(location.pathname); return; }
+  async function init() {
+    if (!(await authHeader())) { location.href = 'login.html?return=' + encodeURIComponent(location.pathname); return; }
     document.getElementById('filter-status').addEventListener('change', refresh);
     document.getElementById('filter-q').addEventListener('input', function () {
       clearTimeout(window._adminQT);

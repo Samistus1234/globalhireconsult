@@ -299,6 +299,20 @@
             setupMobileMenu(activePage, true);
             bindUserDropdown();
             bindSignout();
+            // best-effort: admins get a "Visa Cases" link in the dropdown
+            if (window.ghFrom) {
+              ghFrom('profiles').select('role').eq('id', session.user.id).single().then(function(pr) {
+                if (!(pr && pr.data && pr.data.role === 'admin')) return;
+                var dd = document.getElementById('gnav-dropdown');
+                if (!dd || dd.querySelector('[data-admin-visa]')) return;
+                var div = dd.querySelector('.divider');
+                var a = document.createElement('a');
+                a.href = 'admin-visas.html';
+                a.setAttribute('data-admin-visa', '1');
+                a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Visa Cases (Admin)';
+                if (div) dd.insertBefore(a, div); else dd.appendChild(a);
+              }).catch(function(){});
+            }
           } else {
             setNavActions(actionsEl, false);
             setupMobileMenu(activePage, false);
