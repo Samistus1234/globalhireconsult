@@ -32,15 +32,18 @@ export function stateToTemplateKind(s: VisaCaseStatus): TemplateKind | null {
 }
 
 async function sendEmail(to: string, subject: string, html: string): Promise<void> {
+  // Match the proven-working sender used by welcome-applicant/etc.: authenticate as the
+  // real Gmail account and send FROM that same address (a mismatched/bogus FROM gets
+  // rejected or spam-filtered, which is why visas@globalhire-elab.com never arrived).
+  const smtpUser = Deno.env.get('GMAIL_USER') || Deno.env.get('SMTP_USER') || 'support@elabsolution.org';
+  const smtpPass = Deno.env.get('GMAIL_APP_PASSWORD') || Deno.env.get('SMTP_PASS');
+  if (!smtpPass) throw new Error('SMTP credentials not configured (set GMAIL_APP_PASSWORD)');
   const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com', port: 465, secure: true,
-    auth: {
-      user: Deno.env.get('SMTP_USER'),
-      pass: Deno.env.get('SMTP_PASS'),
-    },
+    auth: { user: smtpUser, pass: smtpPass },
   });
   await transporter.sendMail({
-    from: '"ELAB Visa Services" <visas@globalhire-elab.com>',
+    from: '"ELAB Visa Services" <' + smtpUser + '>',
     to, subject, html,
   });
 }
