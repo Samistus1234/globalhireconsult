@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Visa now lives inside the portal; send any old link (incl. payment callbacks) to the integrated tab -->
+  <script>(function(){var id=new URLSearchParams(location.search).get('id');location.replace('/portal#visa'+(id?'-'+id:''));})();</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Visa Case — GlobalHire@eLab</title>

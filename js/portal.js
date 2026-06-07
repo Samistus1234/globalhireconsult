@@ -1557,6 +1557,21 @@
         loadVisaCases();
       });
     }
+
+    // Deep-link support: /portal#visa opens the tab; /portal#visa-<id> opens a case.
+    // (The old standalone visa pages redirect here so there's one unified experience.)
+    applyVisaHash();
+    window.addEventListener('hashchange', applyVisaHash);
+    window.addEventListener('gh:auth-ready', applyVisaHash);
+  }
+
+  function applyVisaHash() {
+    var h = location.hash || '';
+    if (h.indexOf('#visa') !== 0) return;
+    if (typeof switchToTab === 'function') switchToTab('tab-visa');
+    loadVisaCases();
+    var m = h.match(/^#visa-([0-9a-fA-F-]{36})$/);
+    if (m) showVisaCase(m[1]);
   }
 
   // Called once on gh:auth-ready; also called on every tab activate
