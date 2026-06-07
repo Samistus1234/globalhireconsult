@@ -103,7 +103,7 @@ Deno.serve(async (req) => {
   const phone = profile?.phone;
   const candidate_name = profile?.full_name ?? authUser?.user?.user_metadata?.full_name ?? 'there';
 
-  const siteUrl = Deno.env.get('GH_SITE_URL') ?? 'https://globalhire-elab.vercel.app';
+  const siteUrl = Deno.env.get('GH_SITE_URL') ?? 'https://globalhire.elabsolution.org';
   const case_url = `${siteUrl}/dashboard-visa-case.html?id=${c.id}`;
   const visa_pdf_url = c.visa_pdf_path
     ? `${Deno.env.get('SUPABASE_URL')}/storage/v1/object/sign/visa-documents/${c.visa_pdf_path}`

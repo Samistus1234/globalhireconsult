@@ -36,7 +36,7 @@ async function paystackCheckout(amountUSD: number, caseId: string, email: string
       amount: amountUSD * 100,
       currency: 'USD',
       metadata: { case_id: caseId, kind: 'balance' },
-      callback_url: `${Deno.env.get('GH_SITE_URL') ?? 'https://globalhire-elab.vercel.app'}/dashboard-visa-case.html?id=${caseId}`,
+      callback_url: `${Deno.env.get('GH_SITE_URL') ?? 'https://globalhire.elabsolution.org'}/dashboard-visa-case.html?id=${caseId}`,
     }),
   });
   const json = await resp.json();
@@ -57,8 +57,8 @@ async function stripeCheckout(amountUSD: number, caseId: string, email: string):
   params.append('line_items[0][quantity]',                       '1');
   params.append('metadata[case_id]', caseId);
   params.append('metadata[kind]',    'balance');
-  params.append('success_url', `${Deno.env.get('GH_SITE_URL') ?? 'https://globalhire-elab.vercel.app'}/dashboard-visa-case.html?id=${caseId}&paid=1`);
-  params.append('cancel_url',  `${Deno.env.get('GH_SITE_URL') ?? 'https://globalhire-elab.vercel.app'}/dashboard-visa-case.html?id=${caseId}&paid=0`);
+  params.append('success_url', `${Deno.env.get('GH_SITE_URL') ?? 'https://globalhire.elabsolution.org'}/dashboard-visa-case.html?id=${caseId}&paid=1`);
+  params.append('cancel_url',  `${Deno.env.get('GH_SITE_URL') ?? 'https://globalhire.elabsolution.org'}/dashboard-visa-case.html?id=${caseId}&paid=0`);
 
   const resp = await fetch('https://api.stripe.com/v1/checkout/sessions', {
     method: 'POST',
