@@ -189,6 +189,8 @@ body:has(.visa-main) {
   cursor: pointer;
   transition: transform 0.15s ease, background 0.15s ease;
 }
+/* `hidden` attribute must win over the display above (else PDF/Pay-balance show in wrong states) */
+.visa-btn[hidden] { display: none !important; }
 .visa-btn--primary {
   background: var(--gold-soft);
   color: var(--espresso);
