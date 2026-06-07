@@ -1682,6 +1682,45 @@
     });
   }
 
+  // Re-upload a flagged visa document. RLS on globalhire.visa_case_documents allows
+  // INSERT (not UPDATE) for the case owner, so this creates a FRESH pending row for the
+  // same doc_kind — mirroring the intake upload path (js/visa-intake.js uploadDoc). The
+  // insert fires the GH→CC sync trigger, so staff see the resubmission automatically.
+  // Returns true on success, false (after alerting) on any failure.
+  async function reuploadVisaDoc(caseId, candidateId, docKind, file) {
+    var maxSize = 10 * 1024 * 1024;
+    var allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+    if (file.size > maxSize) { alert('File is too large. Maximum size is 10MB.'); return false; }
+    if (allowed.indexOf(file.type) === -1) { alert('Invalid file type. Please upload PDF, JPEG, PNG, or WEBP.'); return false; }
+
+    var session = await GHAuth.getSession();
+    if (!session) { alert('Your session expired. Please sign in again.'); return false; }
+    var bearer = 'Bearer ' + session.access_token;
+
+    var path = candidateId + '/' + caseId + '/' + docKind + '/' + Date.now() + '-' + file.name;
+    var up = await fetch(SUPABASE_URL + '/storage/v1/object/visa-documents/' + path, {
+      method: 'POST',
+      headers: { Authorization: bearer, 'content-type': file.type },
+      body: file,
+    });
+    if (!up.ok) { alert('Upload failed. Please try again.'); return false; }
+
+    var rec = await fetch(SUPABASE_URL + '/rest/v1/visa_case_documents', {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: bearer,
+        'content-type': 'application/json',
+        'Accept-Profile': 'globalhire',
+        'Content-Profile': 'globalhire',
+        Prefer: 'return=representation',
+      },
+      body: JSON.stringify({ case_id: caseId, doc_kind: docKind, storage_path: path }),
+    });
+    if (!rec.ok) { alert('Could not save the document record. Please try again.'); return false; }
+    return true;
+  }
+
   async function showVisaCase(caseId) {
     var listPanel  = document.getElementById('visa-list-panel');
     var detailPanel = document.getElementById('visa-case-detail');
@@ -1815,19 +1854,52 @@
           docsEl.innerHTML = '<p style="color:var(--text-tertiary);font-size:var(--text-sm);">No documents uploaded yet.</p>';
         } else {
           docsEl.innerHTML = docs.map(function(d) {
-            var docKind = d.doc_kind ? d.doc_kind.replace(/_/g, ' ') : 'Document';
+            var rawKind = d.doc_kind || 'document';
+            var docKind = rawKind.replace(/_/g, ' ');
             var reviewStatus = d.review_status || 'pending';
             var statusClass = { approved: 'badge-primary', pending: 'badge-warning', rejected: 'badge-error', in_review: 'badge-info' }[reviewStatus] || 'badge-info';
+            var reuploadBtn = reviewStatus === 'rejected'
+              ? '<button class="btn btn-primary btn-sm visa-reupload-btn" data-doc-kind="' + escapeHtml(rawKind) + '" style="margin-left:var(--space-2);">Re-upload</button>'
+              : '';
             return (
               '<div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-2) 0;border-bottom:1px solid var(--border-subtle);">' +
                 '<div style="display:flex;align-items:center;gap:var(--space-3);">' +
                   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>' +
                   '<span style="font-size:var(--text-sm);color:var(--text-primary);font-weight:600;">' + escapeHtml(docKind) + '</span>' +
                 '</div>' +
-                '<span class="badge badge-dot ' + statusClass + '" style="font-size:var(--text-xs);">' + escapeHtml(reviewStatus.replace(/_/g, ' ')) + '</span>' +
+                '<div style="display:flex;align-items:center;gap:var(--space-2);">' +
+                  '<span class="badge badge-dot ' + statusClass + '" style="font-size:var(--text-xs);">' + escapeHtml(reviewStatus.replace(/_/g, ' ')) + '</span>' +
+                  reuploadBtn +
+                '</div>' +
               '</div>'
             );
           }).join('');
+
+          // Wire re-upload buttons on rejected docs. Owner can INSERT a fresh row (RLS);
+          // a new pending row is created for the same doc_kind, then we refresh the case.
+          var candidateId = caseRow.candidate_id;
+          docsEl.querySelectorAll('.visa-reupload-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+              var docKind = btn.getAttribute('data-doc-kind');
+              var input = document.createElement('input');
+              input.type = 'file';
+              input.accept = '.pdf,.jpg,.jpeg,.png,.webp';
+              input.addEventListener('change', async function() {
+                var file = input.files && input.files[0];
+                if (!file) return;
+                btn.disabled = true;
+                btn.textContent = 'Uploading…';
+                var ok = await reuploadVisaDoc(caseId, candidateId, docKind, file);
+                if (ok) {
+                  showVisaCase(caseId); // refresh — resubmitted doc now shows as pending
+                } else {
+                  btn.disabled = false;
+                  btn.textContent = 'Re-upload';
+                }
+              });
+              input.click();
+            });
+          });
         }
       }
 
