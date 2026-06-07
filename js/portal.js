@@ -1540,6 +1540,29 @@
     on_hold:                'On hold.',
   };
 
+  // Required documents per visa type — mirrors js/visa-intake.js REQUIRED_DOCS so the
+  // case-detail Documents section can show every expected doc (and its upload control)
+  // even when nothing has been uploaded yet or a doc was flagged for revision.
+  var VISA_REQUIRED_DOCS = {
+    tourist:          [['passport_bio', 'Passport bio page'], ['passport_photo', 'Passport photo']],
+    umrah:            [['passport_bio', 'Passport bio page'], ['passport_photo', 'Passport photo']],
+    family_visit:     [
+      ['passport_bio',         'Visitor passport bio page'],
+      ['passport_photo',       'Visitor photo'],
+      ['sponsor_iqama',        "Sponsor's Iqama"],
+      ['salary_certificate',   "Sponsor's salary certificate"],
+      ['marriage_certificate', 'Marriage/birth certificate (proof of relationship)'],
+    ],
+    family_residence: [
+      ['passport_bio',         'Dependent passport bio page'],
+      ['passport_photo',       'Dependent photo'],
+      ['sponsor_iqama',        "Sponsor's Iqama"],
+      ['salary_certificate',   "Sponsor's salary certificate"],
+      ['marriage_certificate', 'Marriage certificate (for spouse)'],
+      ['birth_certificate',    'Birth certificate (for children)'],
+    ],
+  };
+
   // Sentinel so we only attach the tab-active hook once
   var _visaTabWired = false;
   // Track whether the list has been loaded at least once (lazy-load on first activate)
@@ -1848,39 +1871,64 @@
         }
       }
 
-      // ── Documents ──
+      // ── Documents (required-docs driven) ──
+      // Show every expected doc for this visa type with its review status + an upload
+      // control, so the applicant can always provide a doc — whether none exist yet or
+      // one was flagged for revision. Falls back to listing uploaded docs for visa types
+      // without a required-docs map.
       if (docsEl) {
-        if (!docs.length) {
-          docsEl.innerHTML = '<p style="color:var(--text-tertiary);font-size:var(--text-sm);">No documents uploaded yet.</p>';
+        var candidateId = caseRow.candidate_id;
+
+        // Latest uploaded row per doc_kind (multiple uploads per kind are allowed)
+        var latestByKind = {};
+        docs.forEach(function(d) {
+          var k = d.doc_kind || 'document';
+          var prev = latestByKind[k];
+          if (!prev || new Date(d.uploaded_at) > new Date(prev.uploaded_at)) latestByKind[k] = d;
+        });
+
+        var required = VISA_REQUIRED_DOCS[caseRow.visa_type] || [];
+        var rows = required.map(function(entry) {
+          return { kind: entry[0], label: entry[1], doc: latestByKind[entry[0]] || null };
+        });
+        // Append any uploaded docs whose kind isn't in the required list
+        Object.keys(latestByKind).forEach(function(k) {
+          var inRequired = required.some(function(e) { return e[0] === k; });
+          if (!inRequired) rows.push({ kind: k, label: k.replace(/_/g, ' '), doc: latestByKind[k] });
+        });
+
+        if (!rows.length) {
+          docsEl.innerHTML = '<p style="color:var(--text-tertiary);font-size:var(--text-sm);">No documents required for this case yet.</p>';
         } else {
-          docsEl.innerHTML = docs.map(function(d) {
-            var rawKind = d.doc_kind || 'document';
-            var docKind = rawKind.replace(/_/g, ' ');
-            var reviewStatus = d.review_status || 'pending';
-            var statusClass = { approved: 'badge-primary', pending: 'badge-warning', rejected: 'badge-error', in_review: 'badge-info' }[reviewStatus] || 'badge-info';
-            var reuploadBtn = reviewStatus === 'rejected'
-              ? '<button class="btn btn-primary btn-sm visa-reupload-btn" data-doc-kind="' + escapeHtml(rawKind) + '" style="margin-left:var(--space-2);">Re-upload</button>'
-              : '';
+          var badgeMap = { approved: 'badge-primary', pending: 'badge-warning', in_review: 'badge-info', rejected: 'badge-error' };
+          docsEl.innerHTML = rows.map(function(r) {
+            var status = r.doc ? (r.doc.review_status || 'pending') : 'missing';
+            var statusClass = status === 'missing' ? 'badge-info' : (badgeMap[status] || 'badge-info');
+            var statusText = status === 'missing' ? 'not uploaded' : status.replace(/_/g, ' ');
+            var btn = '';
+            if (status === 'missing') btn = '<button class="btn btn-primary btn-sm visa-doc-upload-btn" data-doc-kind="' + escapeHtml(r.kind) + '" style="margin-left:var(--space-2);">Upload</button>';
+            else if (status === 'rejected') btn = '<button class="btn btn-primary btn-sm visa-doc-upload-btn" data-doc-kind="' + escapeHtml(r.kind) + '" style="margin-left:var(--space-2);">Re-upload</button>';
+            var note = (r.doc && r.doc.reviewer_note) ? '<div style="font-size:var(--text-xs);color:var(--text-tertiary);margin-top:2px;">' + escapeHtml(r.doc.reviewer_note) + '</div>' : '';
             return (
               '<div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-2) 0;border-bottom:1px solid var(--border-subtle);">' +
-                '<div style="display:flex;align-items:center;gap:var(--space-3);">' +
-                  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>' +
-                  '<span style="font-size:var(--text-sm);color:var(--text-primary);font-weight:600;">' + escapeHtml(docKind) + '</span>' +
+                '<div style="display:flex;align-items:center;gap:var(--space-3);min-width:0;">' +
+                  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>' +
+                  '<div style="min-width:0;"><span style="font-size:var(--text-sm);color:var(--text-primary);font-weight:600;">' + escapeHtml(r.label) + '</span>' + note + '</div>' +
                 '</div>' +
-                '<div style="display:flex;align-items:center;gap:var(--space-2);">' +
-                  '<span class="badge badge-dot ' + statusClass + '" style="font-size:var(--text-xs);">' + escapeHtml(reviewStatus.replace(/_/g, ' ')) + '</span>' +
-                  reuploadBtn +
+                '<div style="display:flex;align-items:center;gap:var(--space-2);flex-shrink:0;">' +
+                  '<span class="badge badge-dot ' + statusClass + '" style="font-size:var(--text-xs);">' + escapeHtml(statusText) + '</span>' +
+                  btn +
                 '</div>' +
               '</div>'
             );
           }).join('');
 
-          // Wire re-upload buttons on rejected docs. Owner can INSERT a fresh row (RLS);
-          // a new pending row is created for the same doc_kind, then we refresh the case.
-          var candidateId = caseRow.candidate_id;
-          docsEl.querySelectorAll('.visa-reupload-btn').forEach(function(btn) {
+          // Wire upload / re-upload buttons. Owner can INSERT a fresh visa_case_documents
+          // row (RLS allows INSERT, not UPDATE); the insert fires the GH->CC sync trigger.
+          docsEl.querySelectorAll('.visa-doc-upload-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
               var docKind = btn.getAttribute('data-doc-kind');
+              var origText = btn.textContent;
               var input = document.createElement('input');
               input.type = 'file';
               input.accept = '.pdf,.jpg,.jpeg,.png,.webp';
@@ -1891,10 +1939,10 @@
                 btn.textContent = 'Uploading…';
                 var ok = await reuploadVisaDoc(caseId, candidateId, docKind, file);
                 if (ok) {
-                  showVisaCase(caseId); // refresh — resubmitted doc now shows as pending
+                  showVisaCase(caseId); // refresh — uploaded doc now shows as pending
                 } else {
                   btn.disabled = false;
-                  btn.textContent = 'Re-upload';
+                  btn.textContent = origText;
                 }
               });
               input.click();
