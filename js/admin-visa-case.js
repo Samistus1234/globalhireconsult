@@ -150,9 +150,41 @@
       (prof.full_name || 'Applicant') + (prof.email ? ' · ' + prof.email : '') + (prof.phone ? ' · ' + prof.phone : '') +
       ' · Ref ' + String(c.id).slice(0, 8).toUpperCase();
     renderDocs(docs);
-    document.getElementById('admin-events').innerHTML = events.map(function (e) {
-      return '<div class="visa-timeline__item"><strong>' + e.event_type + '</strong> <time>' + new Date(e.created_at).toLocaleString() + '</time></div>';
-    }).join('');
+    renderTimeline(events);
+  }
+
+  // The audit log (visa_case_events) is append-only and can grow long. Render newest-first
+  // and collapse to the most recent few, with a toggle to reveal the full history.
+  function renderTimeline(events) {
+    var COLLAPSE = 6;
+    var el = document.getElementById('admin-events');
+    if (!el) return;
+    var evs = events.slice().reverse(); // newest first
+
+    function evHtml(list) {
+      return list.map(function (e) {
+        var label = (e.event_type || '').replace(/_/g, ' ');
+        return '<div class="visa-timeline__item"><strong>' + escapeAttr(label) + '</strong> <time>' + escapeAttr(new Date(e.created_at).toLocaleString()) + '</time></div>';
+      }).join('');
+    }
+
+    if (evs.length <= COLLAPSE) {
+      el.innerHTML = evHtml(evs);
+      return;
+    }
+
+    el.innerHTML =
+      evHtml(evs.slice(0, COLLAPSE)) +
+      '<div id="admin-events-more" hidden>' + evHtml(evs.slice(COLLAPSE)) + '</div>' +
+      '<button id="admin-events-toggle" class="mock-button" style="margin-top:8px;">Show all ' + evs.length + ' events</button>';
+
+    var toggle = document.getElementById('admin-events-toggle');
+    var more = document.getElementById('admin-events-more');
+    toggle.addEventListener('click', function () {
+      var show = more.hidden;
+      more.hidden = !show;
+      toggle.textContent = show ? 'Show fewer' : 'Show all ' + evs.length + ' events';
+    });
   }
 
   async function init() {
