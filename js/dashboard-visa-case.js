@@ -6,9 +6,9 @@
   var SUPABASE_URL = window.SUPABASE_URL || 'https://evzhnsugmvtqgmvzwyix.supabase.co';
   var SUPABASE_ANON = window.SUPABASE_ANON_KEY || '';
 
-  function authHeader() {
-    var t = sessionStorage.getItem('sb-access-token') || localStorage.getItem('sb-access-token');
-    return t ? 'Bearer ' + t : null;
+  async function authHeader() {
+    var session = (window.GHAuth ? await GHAuth.getSession() : null);
+    return session ? 'Bearer ' + session.access_token : null;
   }
 
   function caseId() {
@@ -17,14 +17,14 @@
 
   async function rest(path) {
     var r = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
-      headers: { apikey: SUPABASE_ANON, Authorization: authHeader(), 'Accept-Profile': 'globalhire' },
+      headers: { apikey: SUPABASE_ANON, Authorization: await authHeader(), 'Accept-Profile': 'globalhire' },
     });
     if (!r.ok) throw new Error('fetch ' + path + ' failed');
     return r.json();
   }
 
   async function init() {
-    if (!authHeader() || !caseId()) { location.href = 'dashboard-visas.html'; return; }
+    if (!(await authHeader()) || !caseId()) { location.href = 'dashboard-visas.html'; return; }
     var id = caseId();
 
     var [cases, docs, invoices, events] = await Promise.all([
@@ -93,7 +93,7 @@
               method: 'POST',
               headers: {
                 'content-type': 'application/json',
-                Authorization: authHeader(),
+                Authorization: await authHeader(),
               },
               body: JSON.stringify({ case_id: id, provider: 'stripe' }),
             },

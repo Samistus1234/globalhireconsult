@@ -33,16 +33,16 @@
     transit: 'Transit', domestic_worker: 'Domestic Worker',
   };
 
-  function authHeader() {
-    var token = sessionStorage.getItem('sb-access-token') || localStorage.getItem('sb-access-token');
-    return token ? 'Bearer ' + token : null;
+  async function authHeader() {
+    var session = (window.GHAuth ? await GHAuth.getSession() : null);
+    return session ? 'Bearer ' + session.access_token : null;
   }
 
   async function fetchCases() {
     var resp = await fetch(SUPABASE_URL + '/rest/v1/visa_cases?select=id,visa_type,status,estimated_total_usd,created_at,current_state_changed_at&order=created_at.desc', {
       headers: {
         apikey: SUPABASE_ANON,
-        Authorization: authHeader(),
+        Authorization: await authHeader(),
         'Accept-Profile': 'globalhire',
       },
     });
@@ -70,8 +70,8 @@
     }).join('');
   }
 
-  function init() {
-    if (!authHeader()) {
+  async function init() {
+    if (!(await authHeader())) {
       location.href = 'login.html?return=' + encodeURIComponent(location.pathname);
       return;
     }
