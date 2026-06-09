@@ -1,0 +1,7 @@
+project_id = "globalhire-elab"
+
+# Public, token-gated endpoint hit by un-authenticated email recipients
+# (the unguessable response_token is the auth). Must NOT require a JWT, or the
+# "View Details & Respond" email links return "Invalid Link" at the gateway.
+[functions.gh-respond-token]
+verify_jwt = false
