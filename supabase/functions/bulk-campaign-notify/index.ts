@@ -38,8 +38,50 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const { campaign_id, target, subject, message } = await req.json();
+    const { campaign_id, target, subject, message, test_email } = await req.json();
     if (!subject || !message) return json({ error: "subject and message are required" }, 400);
+
+    // SMTP config (shared by the test-send short-circuit and the bulk path).
+    const smtpUser = Deno.env.get("GMAIL_USER") || Deno.env.get("SMTP_USER") || "support@elabsolution.org";
+    const smtpPass = Deno.env.get("GMAIL_APP_PASSWORD") || Deno.env.get("SMTP_PASS");
+    if (!smtpPass) return json({ error: "SMTP credentials not configured" }, 500);
+    const from = `"GlobalHire@eLab" <${smtpUser}>`;
+
+    // POOLED transport — keep ONE authenticated connection alive and reuse it for
+    // every message. A non-pooled transport opens a fresh connection + login per
+    // sendMail, which Gmail blocks after ~100 logins with
+    // "454-4.7.0 Too many login attempts". Pooling = a handful of logins total.
+    // rateLimit/maxConnections throttle the burst so we stay gentle on Gmail and
+    // finish well within the function's wall-clock limit.
+    const makeTransport = () => nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: { user: smtpUser, pass: smtpPass },
+      pool: true,
+      maxConnections: 3,
+      maxMessages: 500,
+      rateDelta: 1000,
+      rateLimit: 10, // ≤10 messages/sec across the pool
+    });
+
+    // Test-send short-circuit: send ONE email to a given address and return.
+    // Lets us verify SMTP login + delivery without touching the applicant list.
+    if (test_email) {
+      const transport = makeTransport();
+      try {
+        await transport.verify();
+        const msg = message.replace(/Dear Applicant/gi, "Dear Tester");
+        await transport.sendMail({ from, to: test_email, subject, text: msg, html: buildEmailHtml("Tester", subject, msg) });
+        transport.close();
+        console.log(`bulk-campaign-notify TEST sent to ${test_email}`);
+        return json({ success: true, sent: 1, failed: 0, total: 1, recipients: [{ name: "Test", email: test_email, status: "sent" }] });
+      } catch (testErr) {
+        transport.close();
+        console.error("bulk-campaign-notify test send failed:", testErr);
+        return json({ error: `Test send failed: ${(testErr as Error)?.message || testErr}` }, 502);
+      }
+    }
 
     // Get campaign info
     let specialty: string | null = null;
@@ -92,64 +134,67 @@ Deno.serve(async (req) => {
       return json({ error: "No applicants found for this target" }, 400);
     }
 
-    // SMTP setup
-    const smtpUser = Deno.env.get("GMAIL_USER") || Deno.env.get("SMTP_USER") || "support@elabsolution.org";
-    const smtpPass = Deno.env.get("GMAIL_APP_PASSWORD") || Deno.env.get("SMTP_PASS");
-    if (!smtpPass) return json({ error: "SMTP credentials not configured" }, 500);
+    const transport = makeTransport();
 
-    const transport = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
-      auth: { user: smtpUser, pass: smtpPass },
-    });
-
-    let sentCount = 0;
-    let failCount = 0;
-    const recipients: { name: string; email: string; status: string }[] = [];
-
-    for (const p of profiles) {
-      try {
-        // Get email from auth.users
-        const { data: authUser } = await serviceClient.auth.admin.getUserById(p.id);
-        if (!authUser?.user?.email) {
-          recipients.push({ name: p.full_name || "Unknown", email: "no email found", status: "failed" });
-          failCount++;
-          continue;
-        }
-
-        const name = p.full_name || "Healthcare Professional";
-        const email = authUser.user.email;
-
-        // Build personalized message (replace {{name}} placeholder)
-        const personalizedMessage = message.replace(/Dear Applicant/gi, `Dear ${name}`);
-
-        const htmlBody = buildEmailHtml(name, subject, personalizedMessage);
-
-        await transport.sendMail({
-          from: `"GlobalHire@eLab" <${smtpUser}>`,
-          to: email,
-          subject: subject,
-          text: personalizedMessage,
-          html: htmlBody,
-        });
-
-        recipients.push({ name, email, status: "sent" });
-        sentCount++;
-      } catch (emailErr) {
-        recipients.push({ name: p.full_name || "Unknown", email: "error", status: "failed" });
-        console.error(`Failed to send to ${p.id}:`, emailErr);
-        failCount++;
-      }
+    // Fail fast with a clear message if the login itself is rejected, instead of
+    // letting every single message fail one-by-one.
+    try {
+      await transport.verify();
+    } catch (verifyErr) {
+      transport.close();
+      console.error("bulk-campaign-notify SMTP verify failed:", verifyErr);
+      return json({ error: `SMTP login failed: ${(verifyErr as Error)?.message || verifyErr}` }, 502);
     }
 
+    // Resolve all applicant emails in ONE paginated pass over auth.users,
+    // instead of a per-recipient getUserById round-trip.
+    const emailById = new Map<string, string>();
+    for (let page = 1; page <= 50; page++) {
+      const { data: listed, error: listErr } = await serviceClient.auth.admin.listUsers({ page, perPage: 1000 });
+      if (listErr) { console.error("listUsers error:", listErr); break; }
+      const users = listed?.users ?? [];
+      for (const u of users) { if (u.email) emailById.set(u.id, u.email); }
+      if (users.length < 1000) break;
+    }
+
+    // Fire all sends through the pool concurrently; the pool caps real concurrency
+    // (maxConnections) and throughput (rateLimit). Order is preserved by index.
+    const settled = await Promise.allSettled(profiles.map(async (p) => {
+      const name = p.full_name || "Healthcare Professional";
+      const email = emailById.get(p.id);
+      if (!email) {
+        return { name, email: "no email found", status: "failed" as const };
+      }
+      const personalizedMessage = message.replace(/Dear Applicant/gi, `Dear ${name}`);
+      const htmlBody = buildEmailHtml(name, subject, personalizedMessage);
+      await transport.sendMail({
+        from,
+        to: email,
+        subject,
+        text: personalizedMessage,
+        html: htmlBody,
+      });
+      return { name, email, status: "sent" as const };
+    }));
+
     transport.close();
+
+    const recipients = settled.map((r, i) => {
+      if (r.status === "fulfilled") return r.value;
+      const p = profiles[i];
+      console.error(`Failed to send to ${p.id}:`, r.reason?.message || r.reason);
+      return { name: p.full_name || "Unknown", email: "error", status: "failed" as const };
+    });
+
+    const sentCount = recipients.filter((r) => r.status === "sent").length;
+    const failCount = recipients.length - sentCount;
+    console.log(`bulk-campaign-notify DONE — sent=${sentCount} failed=${failCount} total=${profiles.length}`);
 
     return json({ success: true, sent: sentCount, failed: failCount, total: profiles.length, recipients });
 
   } catch (err) {
     console.error("bulk-campaign-notify error:", err);
-    return json({ error: err.message || "Internal server error" }, 500);
+    return json({ error: (err as Error)?.message || "Internal server error" }, 500);
   }
 });
 

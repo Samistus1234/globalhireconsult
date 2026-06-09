@@ -7,47 +7,53 @@ Deno.serve(async (req) => {
   if (corsResp) return corsResp;
 
   try {
-    // Verify authorization
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Missing authorization" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    // Check caller is admin
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     const serviceClient = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Read profile from public view
-    const { data: profile } = await serviceClient
-      .from("gh_profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
+    // Authorize: either a logged-in admin (dashboard) OR the internal trigger
+    // secret (operator/automation path). The secret lives only in server env.
+    const internalSecret = Deno.env.get("INTERNAL_TRIGGER_SECRET");
+    const isInternal = !!internalSecret && req.headers.get("x-internal-secret") === internalSecret;
+    let actorId: string | null = null;
 
-    if (!profile || profile.role !== "admin") {
-      return new Response(JSON.stringify({ error: "Admin access required" }), {
-        status: 403,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (!isInternal) {
+      const authHeader = req.headers.get("Authorization");
+      if (!authHeader) {
+        return new Response(JSON.stringify({ error: "Missing authorization" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const supabase = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+        { global: { headers: { Authorization: authHeader } } }
+      );
+
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const { data: profile } = await serviceClient
+        .from("gh_profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+      if (!profile || profile.role !== "admin") {
+        return new Response(JSON.stringify({ error: "Admin access required" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      actorId = user.id;
     }
 
     const { campaign_id } = await req.json();
@@ -100,7 +106,7 @@ Deno.serve(async (req) => {
       campaign_id,
       event_type: "emails_sending",
       event_data: { total: matches.length },
-      actor_id: user.id,
+      actor_id: actorId,
     });
 
     // SMTP config from secrets
@@ -124,73 +130,84 @@ Deno.serve(async (req) => {
     let failCount = 0;
     let skipCount = 0;
 
-    // Create nodemailer transport (Gmail SMTP)
+    // POOLED transport — keep ONE authenticated connection and reuse it for every
+    // message. A non-pooled transport opens a fresh connection + login per send,
+    // which Gmail blocks after ~100 logins with "454 Too many login attempts".
+    // rateLimit/maxConnections throttle the burst and keep us within the function's
+    // wall-clock limit even for large match sets.
     const transport = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
       secure: true,
-      auth: {
-        user: smtpUser,
-        pass: smtpPass,
-      },
+      auth: { user: smtpUser, pass: smtpPass },
+      pool: true,
+      maxConnections: 3,
+      maxMessages: 500,
+      rateDelta: 1000,
+      rateLimit: 10, // ≤10 messages/sec across the pool
     });
+    try {
+      await transport.verify();
+    } catch (verifyErr) {
+      transport.close();
+      return new Response(
+        JSON.stringify({ error: `SMTP login failed: ${(verifyErr as Error)?.message || verifyErr}` }),
+        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
-    for (const match of matches) {
-      try {
-        // Safety guard: check if applicant is still active before sending
-        const { data: profileCheck } = await serviceClient
-          .from("gh_profiles")
-          .select("availability_status")
-          .eq("id", match.applicant_id)
-          .single();
+    // Batch-resolve applicant emails (one paginated listUsers instead of N
+    // getUserById calls) and availability (one query instead of N), so the
+    // per-recipient overhead doesn't blow the wall-clock limit.
+    const applicantIds = matches.map((m: any) => m.applicant_id);
+    const emailById = new Map<string, string>();
+    for (let page = 1; page <= 50; page++) {
+      const { data: listed, error: listErr } = await serviceClient.auth.admin.listUsers({ page, perPage: 1000 });
+      if (listErr) break;
+      const users = listed?.users ?? [];
+      for (const u of users) { if (u.email) emailById.set(u.id, u.email); }
+      if (users.length < 1000) break;
+    }
+    const { data: availRows } = await serviceClient
+      .from("gh_profiles")
+      .select("id, availability_status")
+      .in("id", applicantIds);
+    const availById = new Map<string, string>((availRows || []).map((r: any) => [r.id, r.availability_status]));
 
-        if (profileCheck?.availability_status !== 'active') {
-          await serviceClient.schema("globalhire").from("campaign_matches")
-            .update({ email_status: "skipped", email_error: `Applicant ${profileCheck?.availability_status || 'unknown'}` })
-            .eq("id", match.id);
-          skipCount++;
-          continue;
-        }
-
-        // Mark as sending (write to globalhire schema)
-        await serviceClient.schema("globalhire").from("campaign_matches")
-          .update({ email_status: "sending" })
+    // Fire all sends through the pool concurrently; the pool caps real concurrency
+    // and throughput. Each task also writes its own final status row.
+    const results = await Promise.allSettled(matches.map(async (match: any) => {
+      const avail = availById.get(match.applicant_id);
+      if (avail !== "active") {
+        await ghWrite.from("campaign_matches")
+          .update({ email_status: "skipped", email_error: `Applicant ${avail || "unknown"}` })
           .eq("id", match.id);
-
-        // Get applicant email from auth.users via service role
-        const { data: authUser } = await serviceClient.auth.admin.getUserById(
-          match.applicant_id
-        );
-
-        if (!authUser?.user?.email) {
-          await serviceClient.schema("globalhire").from("campaign_matches")
-            .update({ email_status: "failed", email_error: "No email found" })
-            .eq("id", match.id);
-          failCount++;
-          continue;
-        }
-
-        const applicantEmail = authUser.user.email;
-        const applicantName = match.full_name || "Healthcare Professional";
-        const responseUrl = `${baseUrl}/opportunity.html?token=${match.response_token}`;
-        const unsubscribeUrl = `${baseUrl}/opportunity.html?token=${match.response_token}&action=unsubscribe`;
-
-        // Build HTML email
-        const htmlBody = buildEmailHtml({
-          applicantName,
-          campaignTitle: campaign.title,
-          employer: campaign.employer_name || "Confidential Employer",
-          destination: campaign.destination_country,
-          salary: campaign.salary_display || "Competitive",
-          visa: campaign.visa_sponsored,
-          positions: campaign.positions,
-          matchScore: match.match_score,
-          description: campaign.description || "",
-          responseUrl,
-          unsubscribeUrl,
-        });
-
-        // Send email via nodemailer
+        return "skipped";
+      }
+      const applicantEmail = emailById.get(match.applicant_id);
+      if (!applicantEmail) {
+        await ghWrite.from("campaign_matches")
+          .update({ email_status: "failed", email_error: "No email found" })
+          .eq("id", match.id);
+        return "failed";
+      }
+      const applicantName = match.full_name || "Healthcare Professional";
+      const responseUrl = `${baseUrl}/opportunity.html?token=${match.response_token}`;
+      const unsubscribeUrl = `${baseUrl}/opportunity.html?token=${match.response_token}&action=unsubscribe`;
+      const htmlBody = buildEmailHtml({
+        applicantName,
+        campaignTitle: campaign.title,
+        employer: campaign.employer_name || "Confidential Employer",
+        destination: campaign.destination_country,
+        salary: campaign.salary_display || "Competitive",
+        visa: campaign.visa_sponsored,
+        positions: campaign.positions,
+        matchScore: match.match_score,
+        description: campaign.description || "",
+        responseUrl,
+        unsubscribeUrl,
+      });
+      try {
         await transport.sendMail({
           from: `"GlobalHire@eLab" <${smtpUser}>`,
           to: applicantEmail,
@@ -202,22 +219,29 @@ Deno.serve(async (req) => {
             'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
           },
         });
-
-        // Mark as sent (write to globalhire schema)
-        await serviceClient.schema("globalhire").from("campaign_matches")
+        await ghWrite.from("campaign_matches")
           .update({ email_status: "sent", email_sent_at: new Date().toISOString() })
           .eq("id", match.id);
-
-        sentCount++;
+        return "sent";
       } catch (emailErr) {
-        await serviceClient.schema("globalhire").from("campaign_matches")
+        await ghWrite.from("campaign_matches")
           .update({ email_status: "failed", email_error: String(emailErr) })
           .eq("id", match.id);
+        return "failed";
+      }
+    }));
+
+    transport.close();
+
+    for (const r of results) {
+      if (r.status === "fulfilled") {
+        if (r.value === "sent") sentCount++;
+        else if (r.value === "skipped") skipCount++;
+        else failCount++;
+      } else {
         failCount++;
       }
     }
-
-    transport.close();
 
     // Update campaign counters and status (write to globalhire schema)
     await serviceClient.schema("globalhire").from("campaigns")
@@ -232,7 +256,7 @@ Deno.serve(async (req) => {
       campaign_id,
       event_type: "emails_sent",
       event_data: { sent: sentCount, failed: failCount, skipped: skipCount },
-      actor_id: user.id,
+      actor_id: actorId,
     });
 
     return new Response(
@@ -243,7 +267,7 @@ Deno.serve(async (req) => {
       }
     );
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
+    return new Response(JSON.stringify({ error: (err as Error)?.message || "Internal server error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
