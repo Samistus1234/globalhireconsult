@@ -949,7 +949,7 @@
       </div>
       <div class="dataflow-note reveal">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        <p><strong>Please note:</strong> this opportunity is open to <strong>female nurses</strong> only. You'll also be asked for a short <strong>self-introduction video</strong> — you can record it on your phone, and our team will guide you on where to send it. Nurses who already hold Mumaris registration or a Saudi Council licence are given priority.</p>
+        <p><strong>Please note:</strong> this opportunity is open to <strong>female nurses aged 40 or below</strong>. You'll also be asked for a short <strong>self-introduction video</strong> — you can record it on your phone, and our team will guide you on where to send it. Nurses who already hold Mumaris registration or a Saudi Council licence are given priority.</p>
       </div>
     </div>
   </section>
@@ -1028,7 +1028,7 @@
       <div class="section-header reveal">
         <div class="section-label" style="color:var(--emerald)">GET STARTED</div>
         <h2 class="h2">Register Your Interest</h2>
-        <p style="max-width:500px;margin:8px auto 0">Fill in your details and upload your documents. Our team will review your application and be in touch promptly. Open to female nurses.</p>
+        <p style="max-width:500px;margin:8px auto 0">Fill in your details and upload your documents. Our team will review your application and be in touch promptly. Open to female nurses aged 40 or below.</p>
       </div>
 
       <!-- Success State (hidden by default) -->
@@ -1078,7 +1078,12 @@
             <label class="form-label">WhatsApp (if different)</label>
             <input class="form-input" id="f-whatsapp" type="tel" placeholder="+234 ...">
           </div>
-          <div class="full">
+          <div>
+            <label class="form-label">Age <span class="req">*</span></label>
+            <input class="form-input" id="f-age" type="number" min="18" max="60" placeholder="e.g. 32">
+            <div style="font-size:12px;color:var(--text-tertiary);margin-top:4px;">This role is open to applicants aged 40 or below.</div>
+          </div>
+          <div>
             <label class="form-label">Years of Nursing Experience</label>
             <select class="form-input" id="f-exp">
               <option value="">Select...</option>
@@ -1351,10 +1356,23 @@
       var phone = document.getElementById('f-phone').value.trim();
       var whatsapp = document.getElementById('f-whatsapp').value.trim();
       var yearsExp = document.getElementById('f-exp').value;
+      var age = parseInt(document.getElementById('f-age').value, 10);
 
       // Validate required text fields
       if (!fullName || !email || !phone) {
         errorText.textContent = 'Please fill in all required fields.';
+        errorEl.style.display = 'flex';
+        return;
+      }
+
+      // Validate age (required; this role is open to applicants aged 40 or below)
+      if (!age || isNaN(age) || age < 18) {
+        errorText.textContent = 'Please enter a valid age.';
+        errorEl.style.display = 'flex';
+        return;
+      }
+      if (age > 40) {
+        errorText.textContent = 'This opportunity is open to applicants aged 40 or below. Please contact us on WhatsApp about other roles.';
         errorEl.style.display = 'flex';
         return;
       }
@@ -1449,7 +1467,7 @@
           full_name: fullName,
           phone: phone,
           specialty: 'Nurse',
-          specialty_detail: 'Riyadh Private Hospital — Female Nurse (Mumaris / Saudi Council)',
+          specialty_detail: 'Riyadh Private Hospital — Female Nurse (Mumaris / Saudi Council), age ' + age,
           years_of_experience: parseInt(yearsExp) || 0,
           preferred_destinations: ['Saudi Arabia'],
           profile_completed: false
