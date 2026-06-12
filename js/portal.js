@@ -129,14 +129,24 @@
     const allDocs = docs || [];
 
     // ── Completion checklist ──
+    const items = [
+      { key: 'profile', label: 'Complete your profile' },
+      { key: 'license', label: 'Upload professional license' },
+      { key: 'degree', label: 'Upload degree certificate' },
+      { key: 'passport', label: 'Upload passport copy' },
+      { key: 'cv', label: 'Upload CV / Resume' }
+    ];
+
     const checks = {
-      profile: p.profile_completed,
+      profile: !!p.profile_completed,
       license: false, degree: false, passport: false, cv: false
     };
-    allDocs.forEach(d => { checks[d.doc_type] = true; });
+    // Only mark recognized doc types — unknown/extra types must not inflate the count.
+    allDocs.forEach(d => { if (d.doc_type in checks) checks[d.doc_type] = true; });
 
-    const totalSteps = 5;
-    const completedSteps = Object.values(checks).filter(Boolean).length;
+    // Count only the checklist items so numerator can never exceed the denominator.
+    const totalSteps = items.length;
+    const completedSteps = items.filter(i => checks[i.key]).length;
     const pct = Math.round((completedSteps / totalSteps) * 100);
 
     const progressFill = document.getElementById('completion-fill');
@@ -146,13 +156,6 @@
 
     const checklistEl = document.getElementById('completion-checklist');
     if (checklistEl) {
-      const items = [
-        { key: 'profile', label: 'Complete your profile' },
-        { key: 'license', label: 'Upload professional license' },
-        { key: 'degree', label: 'Upload degree certificate' },
-        { key: 'passport', label: 'Upload passport copy' },
-        { key: 'cv', label: 'Upload CV / Resume' }
-      ];
       const tabMap = { profile: 'tab-profile', license: 'tab-documents', degree: 'tab-documents', passport: 'tab-documents', cv: 'tab-documents' };
       checklistEl.innerHTML = items.map(i => `
         <div class="checklist-item ${checks[i.key] ? 'done' : ''}" data-goto="${tabMap[i.key] || ''}" style="cursor:pointer;">
