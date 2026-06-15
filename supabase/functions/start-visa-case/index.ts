@@ -23,6 +23,13 @@ const V1_PRICE_USD: Partial<Record<VisaType, number>> = {
 
 const DEPOSIT_USD = 50;
 
+// Paystack charges 3.9% (no cap) on USD/international cards. Gross up the charge so the
+// customer covers the fee and ELAB nets the full deposit. e.g. $50 -> $52.03 charged.
+const PAYSTACK_USD_FEE_RATE = 0.039;
+export function grossUpForPaystack(net: number): number {
+  return Math.round((net / (1 - PAYSTACK_USD_FEE_RATE)) * 100) / 100;
+}
+
 export function computeEstimatedTotal(visa: VisaType): number | null {
   return V1_PRICE_USD[visa] ?? null;
 }
@@ -163,7 +170,7 @@ Deno.serve(async (req) => {
   let payment_url: string;
   try {
     payment_url = body.provider === 'paystack'
-      ? await paystackCheckout(DEPOSIT_USD, created.id, user.email ?? '')
+      ? await paystackCheckout(grossUpForPaystack(DEPOSIT_USD), created.id, user.email ?? '')
       : await stripeCheckout(DEPOSIT_USD, created.id, user.email ?? '');
   } catch (e) {
     console.error('checkout init failed', e);

@@ -38,6 +38,12 @@
     ],
   };
 
+  var DEPOSIT_USD = 50;
+  // Mirror the server: Paystack USD fee is 3.9% (no cap); gross up so ELAB nets the deposit.
+  var PAYSTACK_FEE_RATE = 0.039;
+  function chargedTodayUSD() { return Math.round((DEPOSIT_USD / (1 - PAYSTACK_FEE_RATE)) * 100) / 100; }
+  function cardFeeUSD() { return Math.round((chargedTodayUSD() - DEPOSIT_USD) * 100) / 100; }
+
   var ESTIMATES = {
     tourist:          { total: 185, balance: 135 },
     umrah:            { total: 295, balance: 245 },
@@ -122,6 +128,12 @@
     var est = ESTIMATES[visaType];
     $('#estimated-balance').textContent = '~$' + est.balance;
     $('#estimated-total').textContent   = '$' + est.total;
+
+    // Card-fee breakdown (deposit is credited to total; the 3.9% is the customer's card fee)
+    var fee = cardFeeUSD(), charged = chargedTodayUSD();
+    if ($('#card-fee'))      $('#card-fee').textContent      = '$' + fee.toFixed(2);
+    if ($('#charged-today')) $('#charged-today').textContent = '$' + charged.toFixed(2);
+    $('#visa-pay-btn').textContent = 'Pay $' + charged.toFixed(2) + ' & start case';
     $('#visa-pay-btn').disabled = false;
 
     $('#visa-intake-form').addEventListener('submit', async function (e) {
@@ -164,7 +176,7 @@
         window.location.href = created.payment_url;
       } catch (err) {
         showError(err.message || 'Something went wrong. Please try again or message us on WhatsApp.');
-        btn.disabled = false; btn.textContent = 'Pay $50 & start case';
+        btn.disabled = false; btn.textContent = 'Pay $' + chargedTodayUSD().toFixed(2) + ' & start case';
       }
     });
   }

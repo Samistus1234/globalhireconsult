@@ -65,20 +65,19 @@
               <p style="font-size: 0.75rem; opacity: 0.65; margin: 0.25rem 0 0.5rem;">JPG, PNG, WEBP, or PDF — up to 20 MB each.</p>
               <div id="doc-uploads"></div>
             </fieldset>
-            <button id="visa-pay-btn" class="visa-btn visa-btn--primary" type="submit" style="margin-top: 2rem;" disabled>Pay $50 &amp; start case</button>
+            <button id="visa-pay-btn" class="visa-btn visa-btn--primary" type="submit" style="margin-top: 2rem;" disabled>Pay $52.03 &amp; start case</button>
             <p style="margin-top: 0.5rem; font-size: 0.75rem; opacity: 0.65;">Your $50 is credited toward your visa total — refunded if ineligible at intake.</p>
           </form>
         </div>
         <aside class="visa-price-card">
           <p style="font-weight: 600;">Pay to start your case</p>
-          <p style="display: flex; justify-content: space-between; margin: 0.5rem 0 0.25rem;"><span>Pay today (credited to total)</span><strong>$50</strong></p>
-          <p style="display: flex; justify-content: space-between; opacity: 0.7; margin: 0 0 0.25rem;"><span>Balance after review</span><span id="estimated-balance">~$160</span></p>
-          <p style="display: flex; justify-content: space-between; border-top: 1px solid var(--sand); padding-top: 0.5rem;"><span>Estimated total</span><strong class="visa-price-display" style="font-size: 1.5rem;" id="estimated-total">$210</strong></p>
-          <p class="visa-kicker" style="margin-top: 1rem;">Pay with</p>
-          <!-- Stripe option hidden until STRIPE_SECRET_KEY is configured (would 502 "checkout init failed"). -->
-          <select class="visa-field" id="provider-select" name="provider">
-            <option value="paystack">Paystack (cards, bank transfer)</option>
-          </select>
+          <p style="display: flex; justify-content: space-between; margin: 0.5rem 0 0.25rem;"><span>Deposit (credited to total)</span><strong>$50.00</strong></p>
+          <p id="card-fee-row" style="display: flex; justify-content: space-between; opacity: 0.75; margin: 0 0 0.25rem; font-size: 0.8125rem;"><span>Card processing fee (3.9%)</span><strong id="card-fee">$2.03</strong></p>
+          <p style="display: flex; justify-content: space-between; border-top: 1px solid var(--sand); padding-top: 0.5rem; margin-bottom: 0.75rem;"><span>Charged today</span><strong id="charged-today">$52.03</strong></p>
+          <p style="display: flex; justify-content: space-between; opacity: 0.7; margin: 0 0 0.25rem;"><span>Balance after review</span><span id="estimated-balance">~$493</span></p>
+          <p style="display: flex; justify-content: space-between;"><span>Estimated total</span><strong class="visa-price-display" style="font-size: 1.25rem;" id="estimated-total">$543</strong></p>
+          <p style="margin-top: 0.75rem; font-size: 0.7rem; opacity: 0.6;">The 3.9% fee is charged by the card processor, not ELAB. Paying by bank transfer avoids it.</p>
+          <input type="hidden" id="provider-select" name="provider" value="paystack">
         </aside>
       </div>
     </div>
