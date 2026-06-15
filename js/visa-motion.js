@@ -70,7 +70,10 @@ if (typeof window !== 'undefined') {
     const to = Number(el.dataset.visaCounter);
     if (!Number.isFinite(to)) return;
 
-    if (reducedMotion) { el.textContent = '$' + to; return; }
+    // Default prefix is '$'; non-currency counters (e.g. "5 days") set data-visa-prefix="".
+    const prefix = el.dataset.visaPrefix ?? '$';
+
+    if (reducedMotion) { el.textContent = prefix + to; return; }
 
     const io = new IntersectionObserver((entries) => {
       for (const e of entries) {
@@ -78,7 +81,7 @@ if (typeof window !== 'undefined') {
         io.disconnect();
         animatePriceCounter({
           from: 0, to, duration: 800,
-          onTick: (v) => { el.textContent = '$' + v; },
+          onTick: (v) => { el.textContent = prefix + v; },
         });
       }
     });
