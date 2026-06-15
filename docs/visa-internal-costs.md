@@ -2,11 +2,14 @@
 
 > Do NOT publish this file's contents on public visa pages. It exposes partner identity, vendor names, per-step margins, and our hospital partner. Customer-facing pages quote only the **all-in retail price**.
 
-Updated 2026-05-18. Source: Saudi visa partner cost breakdown shared 2026-05-18.
+Updated 2026-06-15. Source: Saudi visa partner cost breakdown shared 2026-05-18; ELAB fee + 50–69 Enjaz revised 2026-06-15 per CEO.
 
 ## ELAB margin
 
-**₦50,000 per person**, applied as a flat markup on top of the partner cost for both Family Residence and Family Visit.
+Flat markup on top of the partner cost, per person:
+
+- **Family Visit — ₦105,000 ($70)** per person (raised from ₦50,000 on 2026-06-15).
+- **Family Residence — ₦105,000 ($70)** per person (raised from ₦50,000 on 2026-06-15).
 
 ## Family Residence — partner cost per person
 
@@ -19,32 +22,32 @@ Updated 2026-05-18. Source: Saudi visa partner cost breakdown shared 2026-05-18.
 | Workmanship (post-issuance) | 20,000 | All ages. Paid to partner after visa is out. |
 | Foreign Affairs authentication | 2,000 / doc | Document-level. ~10 docs typical. |
 
-### Per-person totals (partner cost + ₦50,000 ELAB markup = retail)
+### Per-person totals (partner cost + ₦105,000 / $70 ELAB markup = retail)
 
-| Age | Partner cost | + ELAB | **Retail (NGN)** |
-|---|---:|---:|---:|
-| 1–5 | 319,000 | +50,000 | **369,000** |
-| 6–13 | 509,000 | +50,000 | **559,000** |
-| 14+ | 554,000 | +50,000 | **604,000** |
+| Age | Partner cost | + ELAB | **Retail (NGN)** | **≈ USD** |
+|---|---:|---:|---:|---:|
+| 1–5 | 319,000 | +105,000 | **424,000** | $283 |
+| 6–13 | 509,000 | +105,000 | **614,000** | $409 |
+| 14+ | 554,000 | +105,000 | **659,000** | $439 |
 
 ## Family Visit (1-year multi-entry or single) — partner cost per person
 
 | Step | Cost (NGN) | Notes |
 |---|---:|---|
-| Visa fee via Enjaz (Saudi platform) | 480,000 / 570,000 / 650,000 | Age-tiered (1–49 / 50–69 / 70–89). Older tiers reflect mandatory insurance. |
+| Visa fee via Enjaz (Saudi platform) | 480,000 / 510,000 / 650,000 | Age-tiered (1–49 / 50–69 / 70–89). Older tiers reflect mandatory insurance. 50–69 revised 570,000 → 510,000 on 2026-06-15. |
 | Submission via **Agic** | 160,000 | All ages. Vendor name internal. |
 | Visa biometric | 49,500 | All ages. |
 | Court affidavit (Abuja) | 10,000 | Document-level (one per family). |
 | Foreign Affairs authentication | 2,000 / doc | Document-level. |
 | Workmanship (post-stamp) | 20,000 | All ages. |
 
-### Per-person totals (partner cost + ₦50,000 ELAB markup = retail)
+### Per-person totals (partner cost + ₦105,000 / $70 ELAB markup = retail)
 
-| Age | Enjaz | + Agic | + Biometric | + Workmanship | Partner cost | + ELAB | **Retail (NGN)** |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| 1–49 | 480,000 | 160,000 | 49,500 | 20,000 | 709,500 | +50,000 | **759,500** |
-| 50–69 | 570,000 | 160,000 | 49,500 | 20,000 | 799,500 | +50,000 | **849,500** |
-| 70–89 | 650,000 | 160,000 | 49,500 | 20,000 | 879,500 | +50,000 | **929,500** |
+| Age | Enjaz | + Agic | + Biometric | + Workmanship | Partner cost | + ELAB | **Retail (NGN)** | **≈ USD** |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1–49 | 480,000 | 160,000 | 49,500 | 20,000 | 709,500 | +105,000 | **814,500** | $543 |
+| 50–69 | 510,000 | 160,000 | 49,500 | 20,000 | 739,500 | +105,000 | **844,500** | $563 |
+| 70–89 | 650,000 | 160,000 | 49,500 | 20,000 | 879,500 | +105,000 | **984,500** | $656 |
 
 Shared family-document fees (NOT per-person): court affidavit ₦10,000 + Foreign Affairs authentication ~₦20,000 ≈ **₦30,000 per family**.
 
@@ -64,6 +67,6 @@ All USD figures on public pages computed at **₦1,500 ≈ $1**. Refresh quarter
 
 - All-in retail price per person, age-tiered, in NGN with USD secondary
 - Shared family-documents fee (rounded ~₦30,000)
-- $50 USD deposit + balance after intake (existing model)
+- $50 USD to start — credited toward the visa total once the client proceeds, refunded if ineligible at intake (balance billed after intake)
 - Document checklist (passport, photo, Iqama, court affidavit, invitation letter)
 - Age-based requirements (which steps apply to which age band)

@@ -23,7 +23,7 @@
   --visa-error:   #E63946;
   --visa-info:    #48CAE4;
 
-  --visa-hero-overlay: linear-gradient(180deg, rgba(26,15,5,0.1) 30%, rgba(26,15,5,0.75) 100%);
+  --visa-hero-overlay: linear-gradient(175deg, rgba(26,15,5,0.22) 0%, rgba(26,15,5,0.04) 34%, rgba(61,40,24,0.45) 76%, rgba(26,15,5,0.88) 100%);
   --visa-card-shadow:  0 4px 16px rgba(107,78,44,0.08);
   --visa-card-shadow-lg: 0 8px 32px rgba(107,78,44,0.12);
 }
@@ -173,6 +173,38 @@ body:has(.visa-main) {
     transparent 60%
   );
   transition: opacity 0.3s ease;
+}
+
+/* ── Hero on phones ──
+   Without this the hub hero is a full 100vh image with all content pinned to the
+   bottom, leaving a large dark/empty band up top. Cap the height, give the content
+   a clear lower-third zone, and deepen the anchor gradient so it reads as a
+   deliberate cinematic frame rather than empty space. */
+@media (max-width: 720px) {
+  .visa-hero--hub {
+    height: auto;
+    min-height: 78vh;
+    max-height: none;
+  }
+  .visa-hero--detail {
+    height: auto;
+    min-height: 52vh;
+    max-height: none;
+  }
+  .visa-hero__content {
+    padding-top: 0;
+    padding-bottom: clamp(2.25rem, 9vw, 3.5rem);
+  }
+  .visa-hero__overlay {
+    background: linear-gradient(180deg,
+      rgba(26,15,5,0.30) 0%,
+      rgba(26,15,5,0.06) 28%,
+      rgba(61,40,24,0.55) 68%,
+      rgba(26,15,5,0.92) 100%);
+  }
+  .visa-hero__silhouette { height: 72px; }
+  .visa-hero__scroll-cue { bottom: 0.75rem; right: 0.75rem; }
+  .visa-stats { grid-template-columns: 1fr 1fr; }
 }
 
 /* ── Buttons ── */
