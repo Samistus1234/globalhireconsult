@@ -16,6 +16,7 @@ test('isNew: true within 14 days, false outside, false for bad input', () => {
   const now = 1_000 * DAY;
   assert.strictEqual(lo.isNew(new Date(now - 5 * DAY).toISOString(), now), true);
   assert.strictEqual(lo.isNew(new Date(now - 13 * DAY).toISOString(), now), true);
+  assert.strictEqual(lo.isNew(new Date(now - 14 * DAY).toISOString(), now), true);
   assert.strictEqual(lo.isNew(new Date(now - 20 * DAY).toISOString(), now), false);
   assert.strictEqual(lo.isNew('', now), false);
   assert.strictEqual(lo.isNew('not-a-date', now), false);
@@ -57,6 +58,7 @@ test('cardHtml renders fields, escapes, NEW pill, salary fallback, jobs.html lin
   assert.match(html, /Acme &amp; Co/);
   assert.match(html, /Qatar/);
   assert.match(html, /Dermatology/);
+  assert.match(html, /lo-tag">Dermatology/);
   assert.match(html, /Competitive/);
   assert.match(html, /lo-pill">NEW/);
   assert.match(html, /href="jobs\.html"/);

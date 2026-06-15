@@ -24,6 +24,7 @@
   }
 
   function salaryText(campaign) {
+    // Empty/missing salary_display falls back to 'Competitive'.
     return (campaign && campaign.salary_display) ? campaign.salary_display : 'Competitive';
   }
 
@@ -53,7 +54,8 @@
           tag +
         '</div>' +
         '<div class="lo-card-salary">' + escHtml(salaryText(c)) + '</div>' +
-        '<a class="lo-card-cta" href="jobs.html">View role &rarr;</a>' +
+          // Links to the full board (jobs.html) by design: live campaigns have no per-job detail page.
+          '<a class="lo-card-cta" href="jobs.html">View role &rarr;</a>' +
       '</article>';
   }
 
