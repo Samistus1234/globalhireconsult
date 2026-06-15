@@ -102,6 +102,24 @@
     </div>
   </section>
 
+  <!-- ===================== LATEST OPENINGS ===================== -->
+  <section class="latest-openings" id="latest-openings" aria-label="Latest job openings" hidden>
+    <div class="container">
+      <div class="lo-header">
+        <h2 class="lo-title">🔥 Latest Openings</h2>
+        <a class="lo-viewall" href="jobs.html">View all openings &rarr;</a>
+      </div>
+      <div class="lo-carousel">
+        <button class="lo-arrow lo-prev" type="button" aria-label="Previous openings">&#8249;</button>
+        <div class="lo-viewport">
+          <div class="lo-track"></div>
+        </div>
+        <button class="lo-arrow lo-next" type="button" aria-label="Next openings">&#8250;</button>
+      </div>
+      <div class="lo-dots" role="tablist" aria-label="Slide navigation"></div>
+    </div>
+  </section>
+
   <!-- ===================== STATS BAR ===================== -->
   <section class="stats-bar" id="stats">
     <div class="container">
@@ -485,6 +503,7 @@
   <script src="js/core.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/supabase-client.js"></script>
+  <script src="js/home-openings.js"></script>
   <script src="js/nav-global.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
