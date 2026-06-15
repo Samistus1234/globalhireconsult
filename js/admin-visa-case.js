@@ -151,6 +151,10 @@
       ' · Ref ' + String(c.id).slice(0, 8).toUpperCase();
     renderDocs(docs);
     renderTimeline(events);
+    var pdfStatus = document.getElementById('admin-visa-pdf-status');
+    if (pdfStatus) pdfStatus.textContent = c.visa_pdf_path
+      ? '✓ Visa PDF attached — the applicant can download it. Upload again to replace.'
+      : 'No visa PDF uploaded yet.';
   }
 
   // The audit log (visa_case_events) is append-only and can grow long. Render newest-first
@@ -201,6 +205,20 @@
     document.getElementById('btn-request-revision') .addEventListener('click', function () { var r = prompt('Revision reason for candidate?'); if (r) run(callAction('request_revision', { reason: r }), '✓ Revision requested — applicant emailed.'); });
     document.getElementById('btn-mark-issued')      .addEventListener('click', function () { if (confirm('Mark this case as issued?'))   run(callAction('mark_issued'), '✓ Marked issued — applicant emailed.'); });
     document.getElementById('btn-reject-intake')    .addEventListener('click', function () { var r = prompt('Rejection reason (will refund $50)?'); if (r) run(callAction('reject_intake', { reason: r }), '✓ Rejected & $50 deposit refunded — applicant emailed.'); });
+
+    document.getElementById('btn-upload-visa-pdf').addEventListener('click', function () {
+      var input = document.getElementById('admin-visa-pdf-input');
+      var f = input && input.files && input.files[0];
+      if (!f) { flash('Choose a PDF file first.', 'error'); return; }
+      run((async function () {
+        var resp = await fetch(FN_BASE + '/visa-upload-pdf?case_id=' + encodeURIComponent(caseId()) + '&filename=' + encodeURIComponent(f.name), {
+          method: 'POST',
+          headers: { Authorization: await authHeader(), 'content-type': f.type || 'application/pdf' },
+          body: f,
+        });
+        if (!resp.ok) throw new Error('upload failed: ' + (await resp.text()));
+      })(), '✓ Visa PDF uploaded — the applicant can now download it.');
+    });
 
     load();
   }
