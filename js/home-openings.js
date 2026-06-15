@@ -145,14 +145,19 @@
   }
 
   function onScroll() {
-    var p = Math.round(els.viewport.scrollLeft / els.viewport.clientWidth);
+    var w = els.viewport.clientWidth;
+    var pages = pageCount(state.jobs.length, state.perView);
+    if (!w || pages < 1) return;
+    var p = Math.min(Math.round(els.viewport.scrollLeft / w), pages - 1);
     if (p !== state.page) { state.page = p; syncDots(); }
   }
 
   function onResize() {
+    stopAuto();
     state.perView = slidesPerView(root.innerWidth);
     renderDots();
     go(state.page, false);
+    startAuto();
   }
 
   function bindEvents() {
@@ -165,7 +170,9 @@
     els.section.addEventListener('mouseenter', stopAuto);
     els.section.addEventListener('mouseleave', startAuto);
     els.section.addEventListener('focusin', stopAuto);
-    els.section.addEventListener('focusout', startAuto);
+    els.section.addEventListener('focusout', function (e) {
+      if (!els.section.contains(e.relatedTarget)) startAuto();
+    });
     els.viewport.addEventListener('scroll', onScroll, { passive: true });
     root.addEventListener('resize', onResize);
   }
