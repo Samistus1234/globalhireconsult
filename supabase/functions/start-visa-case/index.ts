@@ -17,8 +17,8 @@ export interface CaseRequest {
 const V1_PRICE_USD: Partial<Record<VisaType, number>> = {
   tourist:          185,
   umrah:            295,
-  family_visit:     210,
-  family_residence: 320,
+  family_visit:     543, // from-price, 1–49 tier (₦814,500 @ ₦1,500/$)
+  family_residence: 283, // from-price, 1–5 tier (₦424,000 @ ₦1,500/$)
 };
 
 const DEPOSIT_USD = 50;
@@ -105,13 +105,17 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ error: 'auth required' }), { status: 401, headers: corsHeaders });
   }
 
+  // Trusted server logic: use the service-role key so writes bypass RLS. We validate the
+  // user from their token below and set candidate_id to the verified uid. Do NOT pass the
+  // user JWT as a global header — that downgrades every query to role `authenticated`, and
+  // visa_cases has no INSERT policy, so the insert would be denied ("case create failed").
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-    { db: { schema: 'globalhire' }, global: { headers: { Authorization: authHeader } } },
+    { db: { schema: 'globalhire' } },
   );
 
-  // Resolve user
+  // Resolve user from their bearer token (independent of the client's service-role key).
   const { data: userResp } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
   if (!userResp?.user) {
     return new Response(JSON.stringify({ error: 'invalid token' }), { status: 401, headers: corsHeaders });
