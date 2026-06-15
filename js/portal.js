@@ -1849,10 +1849,22 @@
         }
       }
 
-      // ── PDF download ──
+      // ── PDF download ── visa-documents is a private bucket; mint a short-lived signed
+      // URL on click (the bare /object/sign/ path needs a ?token, so a static href 400s).
       if (pdfLink && caseRow.visa_pdf_path) {
         pdfLink.hidden = false;
-        pdfLink.href = SUPABASE_URL + '/storage/v1/object/sign/visa-documents/' + caseRow.visa_pdf_path;
+        pdfLink.href = '#';
+        pdfLink.onclick = async function (e) {
+          e.preventDefault();
+          try {
+            var res = await window.ghSupabase.storage.from('visa-documents')
+              .createSignedUrl(caseRow.visa_pdf_path, 3600);
+            if (res.error || !res.data || !res.data.signedUrl) throw (res.error || new Error('no signed url'));
+            window.open(res.data.signedUrl, '_blank');
+          } catch (err) {
+            alert('Could not open your visa PDF just now. Please try again, or contact support@elabsolution.org.');
+          }
+        };
       }
 
       // ── Pay balance button ──
