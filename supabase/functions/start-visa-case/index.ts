@@ -167,6 +167,22 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ error: 'invoice create failed' }), { status: 500, headers: corsHeaders });
   }
 
+  // Drain the sync outbox immediately so the Command Centre creates + emails the deposit
+  // invoice within seconds (instead of waiting for the ~5-min cron). The cron remains the
+  // fallback if this push fails. Fire it and wait briefly so it isn't killed on response.
+  try {
+    await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/gh-visa-sync-push`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+      },
+      body: '{}',
+    });
+  } catch (e) {
+    console.error('immediate sync push failed (cron will retry)', e);
+  }
+
   // No on-site checkout. The case syncs to the Command Centre, which auto-generates the
   // deposit invoice and emails it to the applicant (pay online or by bank transfer from the
   // email). This replaces the old Paystack-on-site step. paystackCheckout/stripeCheckout
