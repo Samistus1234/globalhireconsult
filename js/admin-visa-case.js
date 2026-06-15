@@ -41,7 +41,8 @@
     return session ? 'Bearer ' + session.access_token : null;
   }
 
-  function caseId() { return new URLSearchParams(location.search).get('id'); }
+  var _resolvedCaseId = null;
+  function caseId() { return _resolvedCaseId || new URLSearchParams(location.search).get('id'); }
 
   async function rest(path) {
     var r = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
@@ -192,7 +193,16 @@
   }
 
   async function init() {
-    if (!(await authHeader()) || !caseId()) { location.href = 'admin-visas.html'; return; }
+    if (!(await authHeader())) { location.href = 'admin-visas.html'; return; }
+    // Deep-link from the Command Centre: ?cc_id=<CC case id> resolves to the GlobalHire case.
+    var params = new URLSearchParams(location.search);
+    if (!params.get('id') && params.get('cc_id')) {
+      try {
+        var rows = await rest('visa_cases?cc_case_id=eq.' + encodeURIComponent(params.get('cc_id')) + '&select=id&limit=1');
+        if (rows && rows[0]) _resolvedCaseId = rows[0].id;
+      } catch (e) { /* fall through */ }
+    }
+    if (!caseId()) { location.href = 'admin-visas.html'; return; }
 
     function run(p, okMsg) {
       flash('Working…');
