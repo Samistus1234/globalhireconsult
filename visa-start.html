@@ -75,9 +75,9 @@
           <p style="display: flex; justify-content: space-between; opacity: 0.7; margin: 0 0 0.25rem;"><span>Balance after review</span><span id="estimated-balance">~$160</span></p>
           <p style="display: flex; justify-content: space-between; border-top: 1px solid var(--sand); padding-top: 0.5rem;"><span>Estimated total</span><strong class="visa-price-display" style="font-size: 1.5rem;" id="estimated-total">$210</strong></p>
           <p class="visa-kicker" style="margin-top: 1rem;">Pay with</p>
+          <!-- Stripe option hidden until STRIPE_SECRET_KEY is configured (would 502 "checkout init failed"). -->
           <select class="visa-field" id="provider-select" name="provider">
-            <option value="paystack">Paystack (NGN cards)</option>
-            <option value="stripe">Stripe (USD cards)</option>
+            <option value="paystack">Paystack (cards, bank transfer)</option>
           </select>
         </aside>
       </div>
