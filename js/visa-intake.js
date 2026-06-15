@@ -41,8 +41,8 @@
   var ESTIMATES = {
     tourist:          { total: 185, balance: 135 },
     umrah:            { total: 295, balance: 245 },
-    family_visit:     { total: 210, balance: 160 },
-    family_residence: { total: 320, balance: 270 },
+    family_visit:     { total: 543, balance: 493 },
+    family_residence: { total: 283, balance: 233 },
   };
 
   // Lightweight Supabase client (PostgREST + Storage) without bringing the npm SDK
@@ -90,7 +90,7 @@
 
   async function init() {
     if (!(await authHeader())) {
-      window.location.href = 'login.html?return=' + encodeURIComponent(location.pathname + location.search);
+      window.location.href = 'login.html?redirect=' + encodeURIComponent(location.pathname.replace(/^\//,'').replace(/\.html$/,'') + location.search);
       return;
     }
 

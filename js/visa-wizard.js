@@ -46,10 +46,17 @@
   }
 
   function postJSON(path, body) {
+    var anon = window.SUPABASE_ANON_KEY || '';
     return fetch(FN_BASE + path, {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: {
+        'content-type': 'application/json',
+        // Without the anon apikey the function 401s and the response is CORB-blocked.
+        apikey: anon,
+        Authorization: 'Bearer ' + anon,
+      },
       body: JSON.stringify(body),
+      keepalive: true, // survive the page navigation that follows
     }).then(function (r) { return r.json(); });
   }
 
@@ -64,7 +71,8 @@
   }
 
   function init() {
-    var chips = $$('.visa-outcome-chip');
+    // Hub buttons use the .visa-wizard-chip class (kept .visa-outcome-chip as a legacy alias).
+    var chips = $$('.visa-wizard-chip, .visa-outcome-chip');
     if (!chips.length) return;
 
     chips.forEach(function (chip) {
@@ -74,6 +82,14 @@
         chip.setAttribute('aria-selected', 'true');
 
         var outcome = chip.getAttribute('data-outcome');
+
+        // "More options" — scroll to the full catalog rather than dead-ending.
+        if (outcome === 'more') {
+          var catalog = $('.visa-catalog');
+          if (catalog) catalog.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return;
+        }
+
         var meta = OUTCOME_TO_PAGE[outcome];
         if (!meta) return;
 
@@ -82,19 +98,17 @@
           return;
         }
 
-        // Submit the lead, then route
-        postJSON('/submit-visa-eligibility', Object.assign({
-          outcome: outcome,
-          session_id: getSessionId(),
-        }, getUTM())).then(function (resp) {
-          if (resp && resp.lead_id) {
-            sessionStorage.setItem('gh_visa_lead_id', resp.lead_id);
-          }
-          window.location.href = meta.v1 + '?outcome=' + encodeURIComponent(outcome);
-        }).catch(function () {
-          // Fail open — still navigate, server will create lead from the visa page if needed
-          window.location.href = meta.v1 + '?outcome=' + encodeURIComponent(outcome);
-        });
+        // Log the lead in the background and route immediately. Never block navigation
+        // on this call — it was hanging on a CORB-blocked 401 and dead-ending the wizard.
+        try {
+          postJSON('/submit-visa-eligibility', Object.assign({
+            outcome: outcome,
+            session_id: getSessionId(),
+          }, getUTM())).then(function (resp) {
+            if (resp && resp.lead_id) sessionStorage.setItem('gh_visa_lead_id', resp.lead_id);
+          }).catch(function () {});
+        } catch (e) { /* fail open */ }
+        window.location.href = meta.v1 + '?outcome=' + encodeURIComponent(outcome);
       });
     });
   }
