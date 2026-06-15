@@ -1831,6 +1831,24 @@
       if (nextActionEl && nextActionText) nextActionEl.textContent = nextActionText;
       if (nextActionEl && !nextActionText) nextActionEl.style.display = 'none';
 
+      // ── Timeline (progression) ── render the case_events we already fetched
+      var timelineEl = document.getElementById('visa-detail-timeline');
+      if (timelineEl) {
+        if (!events.length) {
+          timelineEl.innerHTML = '<div style="text-align:center;padding:var(--space-4);color:var(--text-tertiary);">No updates yet.</div>';
+        } else {
+          timelineEl.innerHTML = events.slice().reverse().map(function(e, i) {
+            var when = new Date(e.created_at).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit' });
+            var dot = i === 0 ? 'var(--primary)' : 'var(--border-strong, #cbd5e1)';
+            return '<div style="display:flex;gap:var(--space-3);padding:var(--space-2) 0;">' +
+              '<div style="flex:none;width:10px;height:10px;border-radius:50%;margin-top:5px;background:' + dot + ';"></div>' +
+              '<div><div style="font-weight:600;color:var(--text-primary);font-size:var(--text-sm);">' + escapeHtml(e.event_type) + '</div>' +
+              '<div style="color:var(--text-tertiary);font-size:var(--text-xs);">' + escapeHtml(when) + '</div></div>' +
+            '</div>';
+          }).join('');
+        }
+      }
+
       // ── PDF download ──
       if (pdfLink && caseRow.visa_pdf_path) {
         pdfLink.hidden = false;
