@@ -55,7 +55,7 @@
         '</div>' +
         '<div class="lo-card-salary">' + escHtml(salaryText(c)) + '</div>' +
           // Links to the full board (jobs.html) by design: live campaigns have no per-job detail page.
-          '<a class="lo-card-cta" href="jobs.html">View role &rarr;</a>' +
+          '<a class="lo-card-cta" href="jobs.html" aria-label="View role: ' + escHtml(c.title) + '">View role &rarr;</a>' +
       '</article>';
   }
 
@@ -108,7 +108,7 @@
     var pages = pageCount(state.jobs.length, state.perView);
     var html = '';
     for (var i = 0; i < pages; i++) {
-      html += '<button class="lo-dot" data-page="' + i + '" aria-label="Go to slide ' + (i + 1) + '"></button>';
+      html += '<button class="lo-dot" role="tab" data-page="' + i + '" aria-label="Go to slide ' + (i + 1) + '" aria-selected="false"></button>';
     }
     els.dots.innerHTML = html;
     syncDots();
@@ -118,6 +118,7 @@
     var dots = els.dots.querySelectorAll('.lo-dot');
     for (var i = 0; i < dots.length; i++) {
       dots[i].classList.toggle('is-active', i === state.page);
+      dots[i].setAttribute('aria-selected', i === state.page ? 'true' : 'false');
     }
   }
 
