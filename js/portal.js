@@ -1885,7 +1885,7 @@
                   'content-type': 'application/json',
                   'Authorization': 'Bearer ' + session.access_token,
                 },
-                body: JSON.stringify({ case_id: caseId, provider: 'stripe' }),
+                body: JSON.stringify({ case_id: caseId, provider: 'paystack' }),
               });
               var data = await resp.json();
               if (!resp.ok || !data.payment_url) {
