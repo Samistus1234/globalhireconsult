@@ -167,24 +167,12 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ error: 'invoice create failed' }), { status: 500, headers: corsHeaders });
   }
 
-  let payment_url: string;
-  try {
-    payment_url = body.provider === 'paystack'
-      ? await paystackCheckout(grossUpForPaystack(DEPOSIT_USD), created.id, user.email ?? '')
-      : await stripeCheckout(DEPOSIT_USD, created.id, user.email ?? '');
-  } catch (e) {
-    console.error('checkout init failed', e);
-    return new Response(JSON.stringify({ error: 'checkout init failed' }), { status: 502, headers: corsHeaders });
-  }
-
-  // Store provider_ref alongside the invoice for webhook reconciliation
-  await supabase
-    .from('visa_invoices')
-    .update({ provider_ref: payment_url })
-    .eq('id', invoice.id);
-
+  // No on-site checkout. The case syncs to the Command Centre, which auto-generates the
+  // deposit invoice and emails it to the applicant (pay online or by bank transfer from the
+  // email). This replaces the old Paystack-on-site step. paystackCheckout/stripeCheckout
+  // remain available for a future "pay now" option but are not used here.
   return new Response(
-    JSON.stringify({ case_id: created.id, invoice_id: invoice.id, payment_url }),
+    JSON.stringify({ case_id: created.id, invoice_id: invoice.id, invoice_emailed: true }),
     { headers: { ...corsHeaders, 'content-type': 'application/json' } },
   );
 });

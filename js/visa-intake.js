@@ -129,11 +129,8 @@
     $('#estimated-balance').textContent = '~$' + est.balance;
     $('#estimated-total').textContent   = '$' + est.total;
 
-    // Card-fee breakdown (deposit is credited to total; the 3.9% is the customer's card fee)
-    var fee = cardFeeUSD(), charged = chargedTodayUSD();
-    if ($('#card-fee'))      $('#card-fee').textContent      = '$' + fee.toFixed(2);
-    if ($('#charged-today')) $('#charged-today').textContent = '$' + charged.toFixed(2);
-    $('#visa-pay-btn').textContent = 'Pay $' + charged.toFixed(2) + ' & start case';
+    // No on-site charge — the deposit invoice is emailed after submit (pay online or by transfer).
+    $('#visa-pay-btn').textContent = 'Submit & email my invoice';
     $('#visa-pay-btn').disabled = false;
 
     $('#visa-intake-form').addEventListener('submit', async function (e) {
@@ -172,11 +169,24 @@
           }
         }
 
-        // Step 3: redirect to payment
-        window.location.href = created.payment_url;
+        // Step 3: case created — the Command Centre emails the deposit invoice. Show confirmation.
+        var main = document.querySelector('main.visa-main');
+        if (main) {
+          main.innerHTML =
+            '<section class="visa-section visa-section--ivory" style="text-align:center;padding:4rem 1.5rem;">' +
+              '<div style="max-width:560px;margin:0 auto;">' +
+                '<div style="font-size:2.75rem;color:#16a34a;line-height:1;">&#10003;</div>' +
+                '<h1 class="visa-h2" style="margin-top:0.75rem;">Your visa case is created</h1>' +
+                '<p class="visa-lede" style="margin-top:1rem;">We’re emailing your <strong>deposit invoice</strong> now. Open it and pay online or by bank transfer — as soon as your deposit lands we begin processing.</p>' +
+                '<p style="margin-top:1rem;opacity:.7;font-size:.9rem;">Check your inbox (and spam). Your $50 deposit is credited toward your visa total and refunded if you’re not eligible.</p>' +
+                '<a class="visa-btn visa-btn--primary" style="margin-top:1.5rem;" href="dashboard-visas.html">Go to my dashboard &#8594;</a>' +
+              '</div>' +
+            '</section>';
+          window.scrollTo(0, 0);
+        }
       } catch (err) {
         showError(err.message || 'Something went wrong. Please try again or message us on WhatsApp.');
-        btn.disabled = false; btn.textContent = 'Pay $' + chargedTodayUSD().toFixed(2) + ' & start case';
+        btn.disabled = false; btn.textContent = 'Submit & email my invoice';
       }
     });
   }
