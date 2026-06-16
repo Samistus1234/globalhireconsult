@@ -15,10 +15,8 @@
     nav.setAttribute('role', 'navigation');
     nav.innerHTML =
       '<div class="gnav-inner">' +
-        '<a href="index.html" class="gnav-logo">' +
-          '<div class="logo-icon">G</div>' +
-          '<span>Global<span class="accent">Hire</span></span>' +
-          '<span class="sub">@eLab</span>' +
+        '<a href="index.html" class="gnav-logo" aria-label="GlobalHire Consult — home">' +
+          '<img src="assets/brand/globalhire-logo.png" alt="GlobalHire Consult" class="gnav-logo-img">' +
         '</a>' +
         '<div class="gnav-links">' +
 
@@ -130,11 +128,7 @@
       '<div class="container">' +
         '<div class="gfooter-grid">' +
           '<div class="gfooter-brand">' +
-            '<div class="gnav-logo" style="margin-bottom:var(--space-2);">' +
-              '<div class="logo-icon">G</div>' +
-              '<span>Global<span class="accent">Hire</span></span>' +
-              '<span class="sub">@eLab</span>' +
-            '</div>' +
+            '<img src="assets/brand/globalhire-logo.png" alt="GlobalHire Consult" class="gfooter-logo-img" style="margin-bottom:var(--space-3);">' +
             '<p>Healthcare recruitment platform connecting professionals with opportunities across multiple countries. A division of eLab Solutions International LLC.</p>' +
           '</div>' +
           '<div class="gfooter-col">' +

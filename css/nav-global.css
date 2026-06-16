@@ -57,6 +57,21 @@
   box-shadow: var(--primary-glow);
 }
 
+/* Image logo (GlobalHire Consult lockup) */
+.gnav-logo-img {
+  height: 50px;
+  width: auto;
+  display: block;
+}
+.gfooter-logo-img {
+  height: 84px;
+  width: auto;
+  display: block;
+}
+@media (max-width: 640px) {
+  .gnav-logo-img { height: 40px; }
+}
+
 .gnav-logo .accent { color: var(--primary); }
 
 .gnav-logo .sub {
