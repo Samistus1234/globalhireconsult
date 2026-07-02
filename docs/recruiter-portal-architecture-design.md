@@ -4,6 +4,21 @@ Date: 2026-07-02
 Status: Draft for CEO review (not yet implemented)
 Repo: GLOBALHIRE@ELAB · GlobalHire Supabase `evzhnsugmvtqgmvzwyix` · Ops CRM Supabase `fwmhfwprvqaovidykaqt`
 
+## ⚠️ System split (read first)
+
+Two separate systems, two separate databases:
+
+- **GlobalHire website** (`globalhire.elabsolution.org`, repo GLOBALHIRE@ELAB, Supabase
+  `evzhnsugmvtqgmvzwyix`) — recruiters, their candidates, the recruiter portal, admin candidate/recruiter
+  management. **Feature A lives entirely here.**
+- **ELAB Command Centre / ops CRM** (Supabase `fwmhfwprvqaovidykaqt`, driven by the `elab-ops-monitor`
+  MCP) — where marketing **campaigns are sent from** (email_contacts, WhatsApp broadcasts).
+
+The two DBs don't currently share a "this candidate belongs to recruiter X (opt-out)" signal. A recruiter's
+candidate only reaches a campaign if they've also been added to the **Command Centre** contact list. So
+**Feature B is inherently cross-system**: the opt-out toggle lives on **GlobalHire**, but suppression must
+be enforced in the **Command Centre** audience builders — that bridge is the main work in Feature B.
+
 ## Goal
 
 Two capabilities:
