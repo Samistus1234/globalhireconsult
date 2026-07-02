@@ -104,9 +104,17 @@ campaign when they're added to the CRM/marketing list. Exclusion must be enforce
 3. **A1 — recruiter upload**: `recruiter_clients` columns + docs table + RLS + recruiter portal "My Candidates".
 4. **A2 — admin review**: submissions view, status/note, promote-to-pool + recruiter notification.
 
-## Open questions / risks
-- Confirm the recruiter created 2026-07-02 (shows as **NIKE ADEJUMOBI MURTALA**) is the one to opt out
-  ("Gata Ruya" may be the agency name).
-- Notify recruiters of status changes by email, in-portal only, or both?
-- Ops MCP server change (B2) is the biggest dependency — confirm appetite, or accept interim suppression.
+## Resolved decisions (CEO, 2026-07-02)
+- **First opt-out recruiter:** the recruiter created 2026-07-02 (account **NIKE ADEJUMOBI MURTALA**,
+  agency **GATA ROYAL**) → set `allow_direct_marketing = false`.
+- **Recruiter status notifications:** BOTH email AND in-portal.
+- **Campaign suppression:** build the PROPER Command Centre / ops-MCP enforcement (no interim
+  operator-side list).
+- Scope: build **both** features; candidate submission includes **documents**; exclusion default =
+  **include, opt-out per recruiter**.
+
+## Open risks
 - RLS review before any recruiter-writable tables go live (avoid cross-recruiter data leaks).
+- Cross-DB bridge: how a GlobalHire recruiter opt-out reaches the Command Centre contact
+  (`do_not_market`) — via candidate onboarding/sync. Define the sync trigger in the plan.
+- Ops MCP server change deploys separately (VPS) from the website.
