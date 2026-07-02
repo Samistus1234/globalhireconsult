@@ -218,7 +218,7 @@ Deno.serve(async (req) => {
         .neq("role", "recruiter");
 
       const { data: recruiters } = await sb.schema("globalhire").from("profiles")
-        .select("id, full_name, organization_name, country_of_origin, phone, recruiter_approved, created_at")
+        .select("id, full_name, organization_name, country_of_origin, phone, recruiter_approved, created_at, allow_direct_marketing")
         .in("id", recruiterIds)
         .order("created_at", { ascending: false });
 

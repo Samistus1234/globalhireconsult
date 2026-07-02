@@ -63,7 +63,7 @@
   function renderTable(list) {
     var tbody = document.getElementById('recruiters-tbody');
     if (list.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:var(--space-10);color:var(--text-tertiary);">No recruiters yet. Invite hospitals and agencies to register at <strong>/recruiter-signup.html</strong></td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:var(--space-10);color:var(--text-tertiary);">No recruiters yet. Invite hospitals and agencies to register at <strong>/recruiter-signup.html</strong></td></tr>';
       return;
     }
 
@@ -80,6 +80,9 @@
         ? '<div style="display:flex;align-items:center;">' + resendBtn + '</div>'
         : '<div style="display:flex;align-items:center;gap:var(--space-2);"><button class="btn btn-primary btn-sm btn-approve" data-id="' + r.id + '" data-name="' + esc(r.full_name) + '">Approve</button>' + resendBtn + '</div>';
 
+      var marketingOn = r.allow_direct_marketing !== false;
+      var marketingBtn = '<button class="btn-marketing-toggle ' + (marketingOn ? 'marketing-on' : 'marketing-off') + '" data-id="' + r.id + '" data-name="' + esc(r.full_name) + '" data-current="' + (marketingOn ? 'true' : 'false') + '" title="Toggle direct marketing eligibility">' + (marketingOn ? 'On' : 'Off') + '</button>';
+
       return '<tr>' +
         '<td>' +
           '<div style="display:flex;align-items:center;gap:var(--space-3);">' +
@@ -93,6 +96,7 @@
         '<td>' + esc(r.country_of_origin || '—') + '</td>' +
         '<td>' + joined + '</td>' +
         '<td>' + statusHtml + '</td>' +
+        '<td>' + marketingBtn + '</td>' +
         '<td>' + actions + '</td>' +
       '</tr>';
     }).join('');
@@ -149,6 +153,34 @@
           alert('Failed to send: ' + err.message);
           btn.textContent = '✉ Resend';
           btn.disabled = false;
+        }
+      });
+    });
+
+    // Bind direct-marketing toggle buttons
+    tbody.querySelectorAll('.btn-marketing-toggle').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        var recruiterId = btn.dataset.id;
+        var name = btn.dataset.name;
+        var current = btn.dataset.current === 'true';
+        var newVal = !current;
+
+        if (!newVal) {
+          if (!confirm("Exclude " + name + "'s candidates from all marketing campaigns?")) return;
+        }
+
+        btn.disabled = true;
+        var prevText = btn.textContent;
+        btn.textContent = '...';
+
+        try {
+          var { error } = await ghFrom('profiles').update({ allow_direct_marketing: newVal }).eq('id', recruiterId);
+          if (error) throw new Error(error.message || 'Failed');
+          await loadRecruiters();
+        } catch (err) {
+          alert('Failed to update direct marketing setting: ' + err.message);
+          btn.disabled = false;
+          btn.textContent = prevText;
         }
       });
     });

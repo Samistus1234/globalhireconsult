@@ -672,6 +672,44 @@ test.describe('Recruiter Portal Page — Structure', () => {
 });
 
 // ─────────────────────────────────────────────
+// ADMIN: RECRUITERS PAGE — Direct Marketing Opt-Out Toggle
+// (auth-guarded; asserting on static markup + served JS only, no login attempted)
+// ─────────────────────────────────────────────
+test.describe('Admin Recruiters Page — Direct Marketing Toggle', () => {
+  test('page loads without 404', async ({ request }) => {
+    const response = await request.get(`${BASE}/recruiters.html`);
+    expect(response.status()).toBeLessThan(400);
+  });
+
+  test('has Direct Marketing column header and toggle styles in HTML', async ({ request }) => {
+    const response = await request.get(`${BASE}/recruiters.html`);
+    expect(response.status()).toBeLessThan(400);
+    const html = await response.text();
+    expect(html).toContain('Direct Marketing');
+    expect(html).toContain('btn-marketing-toggle');
+    expect(html).toContain('marketing-on');
+    expect(html).toContain('marketing-off');
+    // table now has 7 columns (Recruiter, Organisation, Country, Joined, Status,
+    // Direct Marketing, Actions) — loading/empty states must match the header count
+    expect(html).toContain('colspan="7"');
+  });
+
+  test('has direct-marketing toggle wired in served JS', async ({ request }) => {
+    const js = await (await request.get(`${BASE}/js/recruiters-admin.js`)).text();
+    // Row render binds to allow_direct_marketing and builds an On/Off toggle
+    expect(js).toContain('allow_direct_marketing');
+    expect(js).toContain('btn-marketing-toggle');
+    // Handler writes directly via ghFrom (admin RLS), not the manage-recruiter fn
+    expect(js).toContain("ghFrom('profiles').update({ allow_direct_marketing: newVal }).eq('id', recruiterId)");
+    // Confirm dialog is required when turning OFF
+    expect(js).toContain('Exclude ');
+    expect(js).toContain("candidates from all marketing campaigns?");
+    // Empty-state colspan also matches the 7-column table
+    expect(js).toContain('colspan="7"');
+  });
+});
+
+// ─────────────────────────────────────────────
 // ADMIN: RECRUITER SUBMISSIONS PAGE — Structure
 // (auth-guarded; asserting on static markup only, no login attempted)
 // ─────────────────────────────────────────────
