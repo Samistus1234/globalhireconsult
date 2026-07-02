@@ -79,10 +79,10 @@
 - Create: `/Users/samuel/GLOBALHIRE@ELAB/supabase/functions/sync-marketing-suppression/index.ts` (edge function, GlobalHire) OR a documented admin action calling it.
 
 **Interfaces:**
-- Consumes: GlobalHire opt-out recruiters (`allow_direct_marketing=false`) and their candidate emails — from `globalhire.recruiter_clients.email` (Plan 1) and assigned `globalhire.profiles` where `recruiter_id` in opt-out set; the Command Centre `email_contacts` (service-role).
+- Consumes: GlobalHire opt-out recruiters (`allow_direct_marketing=false`) and their candidate emails — from `globalhire.recruiter_submitted_candidates.email` (Plan 1) and assigned `globalhire.profiles` where `recruiter_id` in opt-out set; the Command Centre `email_contacts` (service-role).
 - Produces: sets `email_contacts.do_not_market=true, marketing_optout_reason='recruiter_optout:{recruiter}'` for matching emails (normalized). Idempotent.
 
-- [ ] **Step 1:** Gather opt-out emails: query GlobalHire for recruiters with `allow_direct_marketing=false`; collect their candidates' emails (recruiter_clients + assigned profiles), lowercased/trimmed, deduped.
+- [ ] **Step 1:** Gather opt-out emails: query GlobalHire for recruiters with `allow_direct_marketing=false`; collect their candidates' emails (recruiter_submitted_candidates + assigned profiles), lowercased/trimmed, deduped.
 - [ ] **Step 2:** Against the Command Centre (service-role client, project `fwmhfwprvqaovidykaqt`): `update email_contacts set do_not_market=true, marketing_optout_reason='recruiter_optout' where lower(email) in (<emails>) and org_id=<org>;` Also set any matching `persons` marker if desired (optional).
 - [ ] **Step 3:** Re-include path: when a recruiter is toggled back ON, clear `do_not_market` for their emails that have `marketing_optout_reason='recruiter_optout'` (don't clear genuine unsubscribes).
 - [ ] **Step 4:** Trigger: invoke from the Task 1 admin toggle handler (fire-and-forget) AND expose a manual "Sync suppression" admin button. (No cross-DB FK possible; email-match sync is the bridge.)
