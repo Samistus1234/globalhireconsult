@@ -345,7 +345,12 @@
         'saudi-fast-track': { label: 'Saudi Fast Track', color: '#D4A84B', bg: 'rgba(212,168,75,0.1)' },
         'qatar-caregivers': { label: 'Qatar', color: '#8b5cf6', bg: 'rgba(139,92,246,0.08)' },
       };
+      // Exact match for campaign sources; prefix match for recruiter-promoted
+      // candidates (source = 'recruiter:{recruiter_id}') → generic "Recruiter" badge.
       var srcInfo = a.source ? sourceLabels[a.source] : null;
+      if (!srcInfo && a.source && a.source.indexOf('recruiter:') === 0) {
+        srcInfo = { label: 'Recruiter', color: '#0077B6', bg: 'rgba(0,119,182,0.08)' };
+      }
       var sourceBadge = srcInfo
         ? '<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;color:' + srcInfo.color + ';background:' + srcInfo.bg + ';letter-spacing:0.03em;">' + srcInfo.label + '</span>'
         : '';
