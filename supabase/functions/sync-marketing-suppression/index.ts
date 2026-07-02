@@ -165,11 +165,24 @@ Deno.serve(async (req) => {
     }
     const cc = createClient(ccUrl, ccKey);
 
-    const { data: ccContacts, error: ccErr } = await cc
-      .from("email_contacts")
-      .select("id, email, do_not_market, marketing_optout_reason")
-      .eq("org_id", ccOrgId);
-    if (ccErr) return json({ error: "Failed to load email_contacts: " + ccErr.message }, 500);
+    // Page through the FULL email_contacts set — PostgREST caps a single
+    // response at ~1000 rows and this table is already ~900+, so an unpaginated
+    // fetch would silently drop rows past the cap and miss suppressing them (a
+    // compliance gap). Bounded loop, same style as buildEmailMapForIds above.
+    const PAGE = 1000;
+    const ccContacts: Array<{ id: string; email: string | null; do_not_market: boolean | null; marketing_optout_reason: string | null }> = [];
+    for (let offset = 0; offset < 500_000; offset += PAGE) {
+      const { data, error: ccErr } = await cc
+        .from("email_contacts")
+        .select("id, email, do_not_market, marketing_optout_reason")
+        .eq("org_id", ccOrgId)
+        .order("id", { ascending: true })
+        .range(offset, offset + PAGE - 1);
+      if (ccErr) return json({ error: "Failed to load email_contacts: " + ccErr.message }, 500);
+      const rows = data ?? [];
+      for (const r of rows) ccContacts.push(r);
+      if (rows.length < PAGE) break; // short page → last page
+    }
 
     const toFlag: string[] = [];
     const toClear: string[] = [];
