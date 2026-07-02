@@ -446,11 +446,28 @@
   var lastDocsBySubmission = {};
   function docsCacheFor(id) { return lastDocsBySubmission[id] || []; }
 
-  // ── TODO(A7): wire the actual recruiter notification (email/WhatsApp/in-app).
-  // No-op stub for now — the in-portal half of the loop already works because
-  // the recruiter's "My Candidates" list reads admin_status/admin_note live. ──
+  // Email the submitting recruiter that their candidate's status changed. The
+  // in-portal half of the loop already works (the recruiter's "My Candidates"
+  // list reads admin_status/admin_note live) — this is the second, async
+  // channel so the recruiter doesn't have to keep polling the portal.
+  //
+  // Fire-and-forget: a failed/slow email must never block or roll back the
+  // admin's status save, which has already succeeded by the time this runs.
   function notifyRecruiterStatus(submission) {
-    console.log('notifyRecruiterStatus stub — submission id:', submission.id, 'status:', submission.admin_status, '(wiring is Task A7)');
+    if (!submission || !submission.recruiter_id) return;
+    var rec = recruiterMap[submission.recruiter_id];
+    sb.functions.invoke('notify-recruiter-status', {
+      body: {
+        submission_id: submission.id,
+        recruiter_id: submission.recruiter_id,
+        recruiter_name: rec ? rec.full_name : undefined,
+        candidate_name: submission.full_name,
+        admin_status: submission.admin_status,
+        admin_note: submission.admin_note
+      }
+    }).catch(function (err) {
+      console.warn('notify-recruiter-status invoke failed (non-blocking):', err);
+    });
   }
 
   // Exposed for other admin pages / future tasks to hook into.
