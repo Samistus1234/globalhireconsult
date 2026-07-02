@@ -368,6 +368,18 @@
 
     html += '<button type="button" id="review-save-btn" class="btn btn-primary" style="width:100%;">Save Changes</button>';
 
+    // ── Promote to candidate pool (Task A8) ──
+    html += '<div style="margin-top:var(--space-4);padding-top:var(--space-4);border-top:1px solid var(--border-color, #E2E8F0);">';
+    if (submission.promoted_profile_id) {
+      html += '<div style="font-size:var(--text-sm);color:var(--success, #16A34A);margin-bottom:var(--space-2);">&#10003; Promoted to candidate pool</div>';
+      html += '<a href="candidates.html?open=' + esc(submission.promoted_profile_id) + '" class="btn btn-secondary btn-sm" style="width:100%;text-align:center;display:block;">View in Candidate Pool</a>';
+    } else {
+      html += '<button type="button" id="review-promote-btn" class="btn btn-secondary" style="width:100%;">Promote to Candidate Pool</button>';
+      html += '<div style="font-size:11px;color:var(--text-tertiary);margin-top:var(--space-2);">Creates a portal account for this candidate, copies their documents, and lists them in the main Candidates page.</div>';
+    }
+    html += '<div id="review-promote-error" style="color:var(--error);font-size:var(--text-sm);margin-top:var(--space-3);display:none;"></div>';
+    html += '</div>';
+
     if (submission.reviewed_at) {
       // reviewed_by is an admin id (recruiterMap only holds recruiter profiles),
       // so we can only confidently name the reviewer when it's the current admin.
@@ -401,6 +413,60 @@
         updateSubmission(submission.id, status, note, saveBtn);
       });
     }
+
+    // Bind Promote
+    var promoteBtn = document.getElementById('review-promote-btn');
+    if (promoteBtn) {
+      promoteBtn.addEventListener('click', function () {
+        promoteSubmission(submission.id, promoteBtn);
+      });
+    }
+  }
+
+  // Promote a reviewed submission into the main candidate pool. This is an
+  // admin-privileged operation done server-side (Edge Function, service role)
+  // because globalhire.profiles.id FKs to auth.users(id) — there is no such
+  // thing as a standalone profile row, so promoting requires actually creating
+  // a portal account for the candidate, not just a client-side insert.
+  async function promoteSubmission(id, promoteBtn) {
+    var errorEl = document.getElementById('review-promote-error');
+    if (errorEl) { errorEl.style.display = 'none'; errorEl.textContent = ''; }
+    if (promoteBtn) { promoteBtn.disabled = true; promoteBtn.textContent = 'Promoting...'; }
+
+    var { data, error } = await sb.functions.invoke('promote-recruiter-submission', {
+      body: { submission_id: id }
+    });
+
+    // supabase-js surfaces non-2xx function responses as `error`, with the
+    // JSON body's `error` message only accessible via error.context — fall
+    // back to a generic message if we can't read it.
+    if (error) {
+      console.error('Failed to promote submission:', error);
+      var message = (error.context && error.context.error) || error.message || 'Could not promote candidate.';
+      if (errorEl) { errorEl.textContent = message; errorEl.style.display = 'block'; }
+      if (promoteBtn) { promoteBtn.disabled = false; promoteBtn.textContent = 'Promote to Candidate Pool'; }
+      return;
+    }
+
+    if (!data || data.error) {
+      var msg = (data && data.error) || 'Could not promote candidate.';
+      if (errorEl) { errorEl.textContent = msg; errorEl.style.display = 'block'; }
+      if (promoteBtn) { promoteBtn.disabled = false; promoteBtn.textContent = 'Promote to Candidate Pool'; }
+      return;
+    }
+
+    // Update local cache so the table + panel reflect the new profile link.
+    var idx = allSubmissions.findIndex(function (s) { return s.id === id; });
+    if (idx !== -1) allSubmissions[idx].promoted_profile_id = data.profile_id;
+
+    if (data.document_errors && data.document_errors.length > 0) {
+      console.warn('Some documents did not copy during promotion:', data.document_errors);
+    }
+
+    applyFilters();
+    if (activeSubmissionId === id) {
+      renderReviewPanel(allSubmissions[idx] || { id: id, promoted_profile_id: data.profile_id }, docsCacheFor(id));
+    }
   }
 
   // Persist admin review: admin_status, admin_note, reviewed_by, reviewed_at.
@@ -432,7 +498,7 @@
     updateKPIs();
     applyFilters();
 
-    // TODO(A7): notify the recruiter (and/or candidate) of the status change.
+    // Notify the recruiter (and/or candidate) of the status change.
     notifyRecruiterStatus(data);
 
     if (saveBtn) { saveBtn.textContent = 'Saved'; }

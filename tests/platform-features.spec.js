@@ -760,6 +760,22 @@ test.describe('Admin Recruiter Submissions Page — Structure', () => {
     expect(js).toContain('gh-applicant-documents');
     expect(js).toContain('createSignedUrl');
   });
+
+  // Task A8: "Promote to candidate pool" action. Dynamic markup lives inside
+  // #review-panel-content (same auth-guard rationale as A6 above), so assert
+  // on the script that builds/wires it plus the Edge Function it invokes.
+  test('has promote-to-candidate-pool action wired in served JS', async ({ request }) => {
+    const js = await (await request.get(`${BASE}/js/recruiter-submissions.js`)).text();
+    expect(js).toContain('review-promote-btn');
+    expect(js).toContain('promoteSubmission');
+    expect(js).toContain('promote-recruiter-submission');
+    expect(js).toContain('promoted_profile_id');
+    // Promoted state links back into the main candidate pool with the new
+    // profile id, using the existing candidates.html `?open=` deep-link.
+    expect(js).toContain('candidates.html?open=');
+    // The stale A7 TODO should be gone now that A7 shipped.
+    expect(js).not.toContain('TODO(A7)');
+  });
 });
 
 // ─────────────────────────────────────────────
