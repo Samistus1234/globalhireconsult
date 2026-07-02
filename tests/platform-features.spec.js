@@ -729,6 +729,37 @@ test.describe('Admin Recruiter Submissions Page — Structure', () => {
     );
     expect(critical).toEqual([]);
   });
+
+  // Task A6: review detail panel markup (docs + status/note editor). Same
+  // request-fixture rationale as above — the page is admin-auth-guarded so a
+  // real browser session would redirect before a locator could see the DOM.
+  test('has review panel markup with status/note editor in served HTML', async ({ request }) => {
+    const response = await request.get(`${BASE}/recruiter-submissions.html`);
+    expect(response.status()).toBeLessThan(400);
+    const html = await response.text();
+    // Panel shell
+    expect(html).toContain('id="review-panel"');
+    expect(html).toContain('id="review-panel-content"');
+    expect(html).toContain('id="review-panel-close"');
+    // JS wires up the status select / note textarea / save button dynamically
+    // inside #review-panel-content, so assert on the script that builds them.
+    const js = await (await request.get(`${BASE}/js/recruiter-submissions.js`)).text();
+    expect(js).toContain('review-status-select');
+    expect(js).toContain('review-note-textarea');
+    expect(js).toContain('review-save-btn');
+    // admin_status options rendered match the DB check constraint exactly
+    ['submitted', 'under_review', 'shortlisted', 'placed', 'rejected'].forEach(function (s) {
+      expect(js).toContain("'" + s + "'");
+    });
+    // Update writes the admin review columns + reviewed_by/reviewed_at
+    expect(js).toContain('admin_status');
+    expect(js).toContain('admin_note');
+    expect(js).toContain('reviewed_by');
+    expect(js).toContain('reviewed_at');
+    // Documents: signed-download seam against the shared applicant bucket
+    expect(js).toContain('gh-applicant-documents');
+    expect(js).toContain('createSignedUrl');
+  });
 });
 
 // ─────────────────────────────────────────────
