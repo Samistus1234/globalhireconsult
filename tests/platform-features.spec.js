@@ -672,6 +672,66 @@ test.describe('Recruiter Portal Page — Structure', () => {
 });
 
 // ─────────────────────────────────────────────
+// ADMIN: RECRUITER SUBMISSIONS PAGE — Structure
+// (auth-guarded; asserting on static markup only, no login attempted)
+// ─────────────────────────────────────────────
+test.describe('Admin Recruiter Submissions Page — Structure', () => {
+  test('page loads without 404', async ({ request }) => {
+    const response = await request.get(`${BASE}/recruiter-submissions.html`);
+    expect(response.status()).toBeLessThan(400);
+  });
+
+  test('has submissions table, filters, and KPI cards in HTML', async ({ request }) => {
+    // recruiter-submissions.html is admin-auth-guarded — a real browser page
+    // redirects before a locator can observe the pre-redirect DOM. Fetch the
+    // raw served HTML instead, same rationale as the recruiter.html tests above.
+    const response = await request.get(`${BASE}/recruiter-submissions.html`);
+    expect(response.status()).toBeLessThan(400);
+    const html = await response.text();
+    // Table + rows container
+    expect(html).toContain('id="submissions-tbody"');
+    // Filters: by recruiter, by admin_status, free-text search
+    expect(html).toContain('id="filter-recruiter"');
+    expect(html).toContain('id="filter-admin-status"');
+    expect(html).toContain('id="rs-search"');
+    // admin_status filter options match the DB check constraint
+    expect(html).toContain('value="submitted"');
+    expect(html).toContain('value="under_review"');
+    expect(html).toContain('value="shortlisted"');
+    expect(html).toContain('value="placed"');
+    expect(html).toContain('value="rejected"');
+    // KPI strip
+    expect(html).toContain('id="kpi-total"');
+    expect(html).toContain('id="kpi-pending"');
+    expect(html).toContain('id="kpi-shortlisted"');
+    expect(html).toContain('id="kpi-placed"');
+  });
+
+  test('linked from admin nav (candidates.html and recruiters.html)', async ({ request }) => {
+    const candidatesHtml = await (await request.get(`${BASE}/candidates.html`)).text();
+    const recruitersHtml = await (await request.get(`${BASE}/recruiters.html`)).text();
+    expect(candidatesHtml).toContain('href="recruiter-submissions.html"');
+    expect(recruitersHtml).toContain('href="recruiter-submissions.html"');
+  });
+
+  test('recruiter-submissions.html loads without JS console errors', async ({ page }) => {
+    const errors = [];
+    page.on('console', msg => {
+      if (msg.type() === 'error') errors.push(msg.text());
+    });
+    await page.goto(`${BASE}/recruiter-submissions.html`);
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(2000);
+    const critical = errors.filter(e =>
+      !e.includes('net::') && !e.includes('ERR_') && !e.includes('favicon') &&
+      !e.includes('Failed to load') && !e.includes('401') &&
+      !e.includes('Auth guard') && !e.includes('Supabase not ready')
+    );
+    expect(critical).toEqual([]);
+  });
+});
+
+// ─────────────────────────────────────────────
 // CROSS-PAGE LINKS
 // ─────────────────────────────────────────────
 test.describe('Cross-Page Links', () => {
