@@ -32,7 +32,11 @@ const corsHeaders = {
        ops/CRM cross-project calls), sets
        `email_contacts.do_not_market = true, marketing_optout_reason =
        'recruiter_optout'` for every `email_contacts` row (scoped to
-       OPS_ORG_ID) whose lowercased email is in the opt-out set.
+       OPS_ORG_ID) whose lowercased email is in the opt-out set AND is not
+       ALREADY suppressed. Rows already `do_not_market = true` for any reason
+       (e.g. a genuine unsubscribe) are left completely untouched — we never
+       overwrite an existing `marketing_optout_reason`, so we can never later
+       clobber then re-subscribe a genuine opt-out.
     3. Re-include path: any `email_contacts` row that currently has
        `marketing_optout_reason = 'recruiter_optout'` but whose email is NO
        LONGER in the opt-out set (recruiter toggled back on, or the candidate
@@ -189,10 +193,18 @@ Deno.serve(async (req) => {
     for (const c of ccContacts ?? []) {
       const norm = (c.email || "").trim().toLowerCase();
       const shouldSuppress = optOutEmailSet.has(norm);
-      const alreadyFlaggedByUs = c.do_not_market === true && c.marketing_optout_reason === REASON;
-      if (shouldSuppress && !alreadyFlaggedByUs) {
+      const currentlySuppressed = c.do_not_market === true;
+      const flaggedByUs = currentlySuppressed && c.marketing_optout_reason === REASON;
+      if (shouldSuppress && !currentlySuppressed) {
+        // Only suppress rows that are NOT already opted out. A row already
+        // do_not_market=true for ANY reason (e.g. a genuine unsubscribe) is
+        // left completely untouched — we never overwrite its
+        // marketing_optout_reason, so we can never later "re-subscribe" a
+        // genuine opt-out via the clear path below.
         toFlag.push(c.id);
-      } else if (!shouldSuppress && alreadyFlaggedByUs) {
+      } else if (!shouldSuppress && flaggedByUs) {
+        // Only clear rows WE flagged (reason === 'recruiter_optout'); genuine
+        // opt-outs with any other reason are never cleared.
         toClear.push(c.id);
       }
     }
