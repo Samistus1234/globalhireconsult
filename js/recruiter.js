@@ -9,6 +9,7 @@
   var currentProfile = null;
   var allAssigned = [];
   var noteApplicantIds = new Set();
+  var myCandidatesLoaded = false;
 
   // ── Document type labels ──
   var DOC_LABELS = {
@@ -76,6 +77,18 @@
     return { label: 'Docs Verified \u2713', bg: 'rgba(46,196,182,0.1)', color: '#2EC4B6' };
   }
 
+  // ── Recruiter-submitted candidate admin_status → badge ──
+  var RSC_STATUS_BADGE = {
+    submitted:    { label: 'Submitted',      bg: 'rgba(148,163,184,0.12)', color: '#64748B' },
+    under_review: { label: 'Under Review',   bg: 'rgba(72,202,228,0.1)',   color: '#48CAE4' },
+    shortlisted:  { label: 'Shortlisted',    bg: 'rgba(244,162,97,0.1)',   color: '#F4A261' },
+    placed:       { label: 'Placed ✓', bg: 'rgba(46,196,182,0.1)',   color: '#2EC4B6' },
+    rejected:     { label: 'Not Selected',   bg: 'rgba(230,57,70,0.1)',    color: '#E63946' }
+  };
+  function getAdminStatusBadge(status) {
+    return RSC_STATUS_BADGE[status] || RSC_STATUS_BADGE.submitted;
+  }
+
   // ── Is this candidate targeting Saudi Arabia? ──
   function isSaudi(candidate) {
     return (candidate.preferred_destinations || []).some(function (d) {
@@ -137,7 +150,7 @@
   }
 
   function initTabs() {
-    var pageTitles = { 'tab-candidates': 'Assigned Candidates', 'tab-pipeline': 'Pipeline View', 'tab-notes': 'My Assessments' };
+    var pageTitles = { 'tab-candidates': 'Assigned Candidates', 'tab-mycandidates': 'My Candidates', 'tab-pipeline': 'Pipeline View', 'tab-notes': 'My Assessments' };
     document.querySelectorAll('.sb-nav-item[data-tab]').forEach(function (item) {
       item.addEventListener('click', function (e) {
         e.preventDefault();
@@ -149,6 +162,11 @@
         });
         var titleEl = document.getElementById('topbar-title');
         if (titleEl) titleEl.textContent = pageTitles[tabId] || 'Portal';
+
+        if (tabId === 'tab-mycandidates' && !myCandidatesLoaded) {
+          myCandidatesLoaded = true;
+          loadMyCandidates();
+        }
       });
     });
   }
@@ -717,6 +735,60 @@
     });
     notesHtml += '</div>';
     list.innerHTML = notesHtml;
+  }
+
+  // ── Load recruiter-submitted candidates (My Candidates tab) ──
+  async function loadMyCandidates() {
+    var grid = document.getElementById('my-candidates-grid');
+    if (!grid) return;
+
+    var { data: submissions, error } = await ghFrom('recruiter_submitted_candidates')
+      .select('*')
+      .eq('recruiter_id', currentUser.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      grid.innerHTML = '<div style="text-align:center;padding:var(--space-12);color:var(--error);grid-column:1/-1;">Could not load your candidates. Please try again.</div>';
+      return;
+    }
+
+    renderMyCandidates(submissions || []);
+  }
+
+  function renderMyCandidates(list) {
+    var grid = document.getElementById('my-candidates-grid');
+    var countEl = document.getElementById('my-candidates-count');
+    if (countEl) countEl.textContent = list.length ? (list.length + ' candidate' + (list.length !== 1 ? 's' : '')) : '';
+    if (!grid) return;
+
+    if (list.length === 0) {
+      grid.innerHTML = '<div style="text-align:center;padding:var(--space-16);color:var(--text-tertiary);grid-column:1/-1;">You haven\'t added any candidates yet.</div>';
+      return;
+    }
+
+    grid.innerHTML = list.map(function (c) {
+      var badge = getAdminStatusBadge(c.admin_status);
+      var specLine = [c.profession, c.specialty].filter(Boolean).join(' — ');
+      var noteHtml = c.admin_note
+        ? '<div class="mycand-note"><span class="mycand-note-label">eLab Feedback</span>' + esc(c.admin_note) + '</div>'
+        : '';
+
+      return '<div class="cand-card" data-id="' + esc(c.id) + '" style="cursor:default;">' +
+        '<div class="cand-card-accent"></div>' +
+        '<div class="cand-card-body">' +
+          '<div class="cand-header">' +
+            '<div class="cand-info">' +
+              '<div class="cand-name">' + esc(c.full_name || 'Unnamed') + '</div>' +
+              '<div class="cand-specialty">' + esc(specLine || 'No specialty listed') + '</div>' +
+            '</div>' +
+            '<span class="stage-pill" style="background:' + badge.bg + ';color:' + badge.color + ';align-self:flex-start;">' +
+              '<span class="stage-dot" style="background:' + badge.color + '"></span>' + esc(badge.label) +
+            '</span>' +
+          '</div>' +
+          noteHtml +
+        '</div>' +
+      '</div>';
+    }).join('');
   }
 
 })();

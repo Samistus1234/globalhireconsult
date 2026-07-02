@@ -248,6 +248,27 @@
     .review-dot { width: 5px; height: 5px; border-radius: 50%; background: #F4A261; animation: pulse-dot 1.8s infinite; }
     .assessed-ok { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; color: var(--success); }
 
+    /* My Candidates — feedback note + add button */
+    .mycand-note {
+      margin-top: var(--space-4); padding: var(--space-3) var(--space-4);
+      background: var(--bg-surface); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md); font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.5;
+    }
+    .mycand-note-label {
+      display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-tertiary); margin-bottom: 3px;
+    }
+    .btn-add-candidate {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: var(--text-sm); font-weight: 700; color: #fff;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      border: none; border-radius: var(--radius-md); padding: 9px 16px;
+      cursor: pointer; transition: opacity 0.15s, transform 0.15s;
+      box-shadow: 0 4px 16px rgba(0,119,182,0.25);
+    }
+    .btn-add-candidate:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-add-candidate svg { flex-shrink: 0; }
+
     /* ══════════════════════════════════════════
        PIPELINE BOARD
     ══════════════════════════════════════════ */
@@ -478,6 +499,10 @@
         Assigned Candidates
         <span class="sb-count" id="assigned-count" style="display:none">0</span>
       </a>
+      <a class="sb-nav-item" data-tab="tab-mycandidates" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        My Candidates
+      </a>
       <a class="sb-nav-item" data-tab="tab-pipeline" href="#">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         Pipeline View
@@ -579,6 +604,29 @@
             <div style="grid-column:1/-1;text-align:center;padding:var(--space-16);color:var(--text-tertiary);">
               <div class="spinner" style="margin:0 auto var(--space-4);"></div>
               Loading your assigned candidates…
+            </div>
+          </div>
+        </div>
+
+        <!-- ── My Candidates ── -->
+        <div class="rec-tab" id="tab-mycandidates">
+          <div class="page-header ani">
+            <div class="page-title">My Candidates</div>
+            <div class="page-subtitle">Candidates you've submitted for eLab review</div>
+          </div>
+
+          <div class="toolbar ani ani-2">
+            <span class="toolbar-count" id="my-candidates-count"></span>
+            <button class="btn-add-candidate" id="btn-add-candidate" style="margin-left:auto;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Candidate
+            </button>
+          </div>
+
+          <div id="my-candidates-grid" class="candidates-grid ani ani-3">
+            <div style="grid-column:1/-1;text-align:center;padding:var(--space-16);color:var(--text-tertiary);">
+              <div class="spinner" style="margin:0 auto var(--space-4);"></div>
+              Loading your candidates…
             </div>
           </div>
         </div>

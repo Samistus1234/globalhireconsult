@@ -593,6 +593,49 @@ test.describe('Portal Page — Structure', () => {
 });
 
 // ─────────────────────────────────────────────
+// RECRUITER PORTAL PAGE — Structure
+// (auth-guarded; asserting on static markup only, no login attempted)
+// ─────────────────────────────────────────────
+test.describe('Recruiter Portal Page — Structure', () => {
+  test('page loads without 404', async ({ page }) => {
+    const response = await page.goto(`${BASE}/recruiter.html`);
+    expect(response.status()).toBeLessThan(400);
+  });
+
+  test('has My Candidates nav item and tab panel in HTML', async ({ request }) => {
+    // recruiter.html is auth-guarded — a real browser page redirects to login.html
+    // as soon as auth-guard.js resolves (no session), often before a locator can
+    // observe the pre-redirect DOM. Fetch the raw served HTML instead (via the
+    // request context, which follows the .html → clean-URL 308) so this asserts
+    // on the static markup itself rather than racing the client-side redirect.
+    const response = await request.get(`${BASE}/recruiter.html`);
+    expect(response.status()).toBeLessThan(400);
+    const html = await response.text();
+    expect(html).toContain('data-tab="tab-mycandidates"');
+    expect(html).toMatch(/id="tab-mycandidates"/);
+    expect(html).toContain('id="my-candidates-grid"');
+    expect(html).toContain('id="my-candidates-count"');
+    expect(html).toContain('id="btn-add-candidate"');
+  });
+
+  test('recruiter.html loads without JS console errors', async ({ page }) => {
+    const errors = [];
+    page.on('console', msg => {
+      if (msg.type() === 'error') errors.push(msg.text());
+    });
+    await page.goto(`${BASE}/recruiter.html`);
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(2000);
+    const critical = errors.filter(e =>
+      !e.includes('net::') && !e.includes('ERR_') && !e.includes('favicon') &&
+      !e.includes('Failed to load') && !e.includes('401') &&
+      !e.includes('Auth guard') && !e.includes('Supabase not ready')
+    );
+    expect(critical).toEqual([]);
+  });
+});
+
+// ─────────────────────────────────────────────
 // CROSS-PAGE LINKS
 // ─────────────────────────────────────────────
 test.describe('Cross-Page Links', () => {
