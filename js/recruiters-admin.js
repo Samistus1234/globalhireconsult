@@ -19,6 +19,7 @@
     await loadRecruiters();
     bindFilters();
     bindCreateModal();
+    bindSuppressionSyncButton();
   });
 
   function updateAdminUI() {
@@ -176,6 +177,7 @@
         try {
           var { error } = await ghFrom('profiles').update({ allow_direct_marketing: newVal }).eq('id', recruiterId);
           if (error) throw new Error(error.message || 'Failed');
+          triggerSuppressionSync(); // fire-and-forget: propagate to Command Centre email_contacts
           await loadRecruiters();
         } catch (err) {
           alert('Failed to update direct marketing setting: ' + err.message);
@@ -183,6 +185,51 @@
           btn.textContent = prevText;
         }
       });
+    });
+  }
+
+  // Fire-and-forget call to the cross-DB suppression bridge. Never blocks or
+  // surfaces errors to the toggle flow — the manual "Sync suppression" button
+  // is the retry path if this silently fails (network blip, cold start, etc).
+  function triggerSuppressionSync() {
+    GHAuth.getSession().then(function (session) {
+      return fetch(SUPABASE_URL + '/functions/v1/sync-marketing-suppression', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+        body: '{}'
+      });
+    }).catch(function (err) {
+      console.warn('sync-marketing-suppression trigger failed (non-blocking):', err);
+    });
+  }
+
+  function bindSuppressionSyncButton() {
+    var btn = document.getElementById('btn-sync-suppression');
+    if (!btn) return;
+    btn.addEventListener('click', async function () {
+      btn.disabled = true;
+      var prevText = btn.textContent;
+      btn.innerHTML = '<span class="spinner" style="width:12px;height:12px;border-width:2px;"></span> Syncing...';
+      try {
+        var session = await GHAuth.getSession();
+        var resp = await fetch(SUPABASE_URL + '/functions/v1/sync-marketing-suppression', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+          body: '{}'
+        });
+        var result = await resp.json();
+        if (!resp.ok || result.error) throw new Error(result.error || 'Failed');
+        alert('Suppression sync complete.\n\nOpt-out recruiters: ' + result.opt_out_recruiters +
+          '\nOpt-out emails: ' + result.opt_out_emails +
+          '\nFlagged in Command Centre: ' + result.cc_flagged +
+          '\nCleared (re-included): ' + result.cc_cleared +
+          (result.unresolved_profile_emails ? '\nUnresolved profile emails: ' + result.unresolved_profile_emails : ''));
+      } catch (err) {
+        alert('Suppression sync failed: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = prevText;
+      }
     });
   }
 
