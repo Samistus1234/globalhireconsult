@@ -206,3 +206,44 @@ create view public.gh_recruiter_submission_documents
 
 grant select, insert, update on public.gh_recruiter_submitted_candidates to authenticated, service_role;
 grant select, insert, update on public.gh_recruiter_submission_documents  to authenticated, service_role;
+
+-- ============================================================================
+-- 6. IDOR fix (migration v18_rsd_idor_fix)
+-- ============================================================================
+-- The original recruiter document policies only checked recruiter_id = auth.uid()
+-- on the document row, NOT that the referenced submission belongs to that recruiter.
+-- A recruiter could therefore attach/reassign a document to another recruiter's
+-- submission. Recreate both policies with an EXISTS predicate validating that the
+-- referenced submission is owned by the acting recruiter.
+
+drop policy gh_rsd_recruiter_insert on globalhire.recruiter_submission_documents;
+drop policy gh_rsd_recruiter_update on globalhire.recruiter_submission_documents;
+
+create policy gh_rsd_recruiter_insert
+  on globalhire.recruiter_submission_documents
+  for insert to authenticated
+  with check (
+    recruiter_id = auth.uid()
+    and exists (
+      select 1 from globalhire.recruiter_submitted_candidates s
+      where s.id = submission_id and s.recruiter_id = auth.uid()
+    )
+  );
+
+create policy gh_rsd_recruiter_update
+  on globalhire.recruiter_submission_documents
+  for update to authenticated
+  using (
+    recruiter_id = auth.uid()
+    and exists (
+      select 1 from globalhire.recruiter_submitted_candidates s
+      where s.id = submission_id and s.recruiter_id = auth.uid()
+    )
+  )
+  with check (
+    recruiter_id = auth.uid()
+    and exists (
+      select 1 from globalhire.recruiter_submitted_candidates s
+      where s.id = submission_id and s.recruiter_id = auth.uid()
+    )
+  );
