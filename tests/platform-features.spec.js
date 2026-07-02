@@ -618,6 +618,28 @@ test.describe('Recruiter Portal Page — Structure', () => {
     expect(html).toContain('id="btn-add-candidate"');
   });
 
+  test('has Add Candidate form fields in HTML', async ({ request }) => {
+    // Same rationale as above: assert on the raw served markup (auth-guarded page).
+    const response = await request.get(`${BASE}/recruiter.html`);
+    expect(response.status()).toBeLessThan(400);
+    const html = await response.text();
+    // Modal shell + submit control
+    expect(html).toContain('id="ac-modal"');
+    expect(html).toContain('id="ac-submit-btn"');
+    // Required + optional fields
+    expect(html).toContain('id="ac-full-name"');
+    expect(html).toContain('id="ac-email"');
+    expect(html).toContain('id="ac-phone"');
+    expect(html).toContain('id="ac-profession"');
+    expect(html).toContain('id="ac-specialty"');
+    expect(html).toContain('id="ac-experience"');
+    expect(html).toContain('id="ac-current-country"');
+    expect(html).toContain('id="ac-target-countries"');
+    expect(html).toContain('id="ac-passport"');
+    expect(html).toContain('id="ac-license"');
+    expect(html).toContain('id="ac-notes"');
+  });
+
   test('recruiter.html loads without JS console errors', async ({ page }) => {
     const errors = [];
     page.on('console', msg => {

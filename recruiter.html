@@ -270,6 +270,64 @@
     .btn-add-candidate svg { flex-shrink: 0; }
 
     /* ══════════════════════════════════════════
+       ADD CANDIDATE MODAL
+    ══════════════════════════════════════════ */
+    .ac-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+      z-index: 300; opacity: 0; display: none; transition: opacity 0.3s;
+    }
+    .ac-modal {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%,-48%);
+      width: 640px; max-width: calc(100vw - 32px); max-height: 88vh;
+      background: var(--bg-deep); border: 1px solid var(--border-default);
+      border-radius: var(--radius-xl); z-index: 301;
+      display: none; flex-direction: column; overflow: hidden;
+      opacity: 0; transition: opacity 0.3s, transform 0.3s;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .ac-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+    .ac-modal-title { font-size: var(--text-lg); font-weight: 800; color: var(--text-primary); font-family: var(--font-display); }
+    .ac-modal-body { padding: var(--space-6); overflow-y: auto; flex: 1; }
+    .ac-modal-footer {
+      display: flex; align-items: center; justify-content: flex-end; gap: var(--space-3);
+      padding: var(--space-5) var(--space-6); border-top: 1px solid var(--border-subtle); flex-shrink: 0;
+    }
+    .ac-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-4); }
+    .ac-form-grid .full { grid-column: 1 / -1; }
+    .ac-form-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block; }
+    .ac-form-label .req { color: var(--error); }
+    .ac-form-input, .ac-form-select, .ac-form-textarea {
+      width: 100%; padding: 10px 14px; border-radius: var(--radius-md);
+      border: 1px solid var(--border-default); background: var(--bg-surface);
+      font-size: var(--text-sm); color: var(--text-primary); outline: none;
+      font-family: var(--font-body); transition: border-color 0.15s; box-sizing: border-box;
+    }
+    .ac-form-input:focus, .ac-form-select:focus, .ac-form-textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,119,182,0.1); }
+    .ac-form-input::placeholder, .ac-form-textarea::placeholder { color: var(--text-tertiary); }
+    .ac-form-textarea { resize: vertical; font-family: var(--font-body); }
+    .ac-form-error {
+      display: none; gap: 10px; align-items: center; padding: 12px 16px;
+      border-radius: var(--radius-md); background: rgba(230,57,70,0.08); border: 1px solid rgba(230,57,70,0.2);
+      margin-bottom: var(--space-4); font-size: var(--text-sm); color: var(--error);
+    }
+    .ac-btn-cancel {
+      padding: 10px 18px; border-radius: var(--radius-md); font-size: var(--text-sm); font-weight: 700;
+      background: var(--bg-surface); border: 1px solid var(--border-default); color: var(--text-secondary); cursor: pointer;
+    }
+    .ac-btn-cancel:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .ac-btn-submit {
+      padding: 10px 20px; border-radius: var(--radius-md); font-size: var(--text-sm); font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border: none; cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0,119,182,0.3); transition: opacity 0.15s, transform 0.15s;
+    }
+    .ac-btn-submit:hover { opacity: 0.9; transform: translateY(-1px); }
+    .ac-btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* ══════════════════════════════════════════
        PIPELINE BOARD
     ══════════════════════════════════════════ */
     .pipeline-board { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-4); align-items: start; }
@@ -674,6 +732,75 @@
   <div style="overflow-y:auto;flex:1;display:flex;flex-direction:column;">
     <div id="panel-hero"></div>
     <div class="panel-body" id="panel-body"></div>
+  </div>
+</div>
+
+<!-- ═══════════ ADD CANDIDATE MODAL ═══════════ -->
+<div class="ac-overlay" id="ac-overlay"></div>
+<div class="ac-modal" id="ac-modal">
+  <div class="ac-modal-header">
+    <span class="ac-modal-title">Add Candidate</span>
+    <button class="panel-close-btn" id="ac-close">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="ac-modal-body">
+    <div class="ac-form-error" id="ac-error"></div>
+    <div class="ac-form-grid">
+      <div class="full">
+        <label class="ac-form-label">Full Name <span class="req">*</span></label>
+        <input class="ac-form-input" id="ac-full-name" placeholder="Jane Doe">
+      </div>
+      <div>
+        <label class="ac-form-label">Email</label>
+        <input class="ac-form-input" id="ac-email" type="email" placeholder="jane@email.com">
+      </div>
+      <div>
+        <label class="ac-form-label">Phone</label>
+        <input class="ac-form-input" id="ac-phone" type="tel" placeholder="+234 ...">
+      </div>
+      <div>
+        <label class="ac-form-label">Profession <span class="req">*</span></label>
+        <select class="ac-form-select" id="ac-profession">
+          <option value="">Select…</option>
+          <option value="Doctor">Doctor</option>
+          <option value="Nurse">Nurse</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div>
+        <label class="ac-form-label">Specialty</label>
+        <input class="ac-form-input" id="ac-specialty" placeholder="e.g. ICU, Cardiology">
+      </div>
+      <div>
+        <label class="ac-form-label">Years of Experience</label>
+        <input class="ac-form-input" id="ac-experience" type="number" min="0" placeholder="e.g. 5">
+      </div>
+      <div>
+        <label class="ac-form-label">Current Country</label>
+        <input class="ac-form-input" id="ac-current-country" placeholder="e.g. Nigeria">
+      </div>
+      <div class="full">
+        <label class="ac-form-label">Target Countries</label>
+        <input class="ac-form-input" id="ac-target-countries" placeholder="e.g. Saudi Arabia, Qatar, UAE (comma-separated)">
+      </div>
+      <div>
+        <label class="ac-form-label">Passport Number</label>
+        <input class="ac-form-input" id="ac-passport" placeholder="Passport number">
+      </div>
+      <div>
+        <label class="ac-form-label">License Number</label>
+        <input class="ac-form-input" id="ac-license" placeholder="Professional license number">
+      </div>
+      <div class="full">
+        <label class="ac-form-label">Notes</label>
+        <textarea class="ac-form-textarea" id="ac-notes" rows="3" placeholder="Any additional context for the eLab team…"></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="ac-modal-footer">
+    <button class="ac-btn-cancel" id="ac-cancel">Cancel</button>
+    <button class="ac-btn-submit" id="ac-submit-btn">Add Candidate</button>
   </div>
 </div>
 

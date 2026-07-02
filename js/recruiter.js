@@ -128,6 +128,7 @@
     document.getElementById('screen-portal').style.display = 'block';
     initTabs();
     initPanel();
+    initAddCandidatePanel();
     await loadCandidates();
     await loadNotes();
     bindSearch();
@@ -789,6 +790,141 @@
         '</div>' +
       '</div>';
     }).join('');
+  }
+
+  // ── Add Candidate Modal ──
+  var acOverlayEl, acModalEl;
+  var AC_FIELD_IDS = ['ac-full-name', 'ac-email', 'ac-phone', 'ac-specialty', 'ac-experience',
+    'ac-current-country', 'ac-target-countries', 'ac-passport', 'ac-license', 'ac-notes'];
+
+  function initAddCandidatePanel() {
+    acOverlayEl = document.getElementById('ac-overlay');
+    acModalEl = document.getElementById('ac-modal');
+    if (!acOverlayEl || !acModalEl) return;
+
+    var addBtn = document.getElementById('btn-add-candidate');
+    if (addBtn) addBtn.addEventListener('click', openAddCandidate);
+
+    var closeBtn = document.getElementById('ac-close');
+    var cancelBtn = document.getElementById('ac-cancel');
+    if (closeBtn) closeBtn.addEventListener('click', closeAddCandidatePanel);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeAddCandidatePanel);
+    acOverlayEl.addEventListener('click', closeAddCandidatePanel);
+
+    var submitBtn = document.getElementById('ac-submit-btn');
+    if (submitBtn) submitBtn.addEventListener('click', submitCandidate);
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && acModalEl.style.display === 'flex') closeAddCandidatePanel();
+    });
+  }
+
+  function openAddCandidate() {
+    if (!acModalEl || !acOverlayEl) return;
+    clearAddCandidateForm();
+    acOverlayEl.style.display = 'block';
+    acModalEl.style.display = 'flex';
+    requestAnimationFrame(function () {
+      acOverlayEl.style.opacity = '1';
+      acModalEl.style.opacity = '1';
+      acModalEl.style.transform = 'translate(-50%,-50%)';
+    });
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeAddCandidatePanel() {
+    if (!acModalEl || !acOverlayEl) return;
+    acOverlayEl.style.opacity = '0';
+    acModalEl.style.opacity = '0';
+    acModalEl.style.transform = 'translate(-50%,-48%)';
+    document.body.style.overflow = '';
+    setTimeout(function () {
+      acModalEl.style.display = 'none';
+      acOverlayEl.style.display = 'none';
+    }, 250);
+  }
+
+  function clearAddCandidateForm() {
+    AC_FIELD_IDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    var prof = document.getElementById('ac-profession');
+    if (prof) prof.value = '';
+    showAddCandidateError('');
+  }
+
+  function showAddCandidateError(msg) {
+    var el = document.getElementById('ac-error');
+    if (!el) return;
+    if (!msg) { el.style.display = 'none'; el.textContent = ''; return; }
+    el.textContent = msg;
+    el.style.display = 'flex';
+  }
+
+  // ── Seam for Task A4 (document upload) ──
+  // A4 will replace this no-op with the real upload UI/flow, opened for the
+  // newly-created submission id right after a successful Add Candidate insert.
+  function openCandidateDocs(submissionId) {
+    // TODO(A4): implement document-upload step for recruiter_submission_documents.
+  }
+
+  async function submitCandidate() {
+    showAddCandidateError('');
+
+    var fullName = (document.getElementById('ac-full-name').value || '').trim();
+    var profession = document.getElementById('ac-profession').value || '';
+
+    if (!fullName) { showAddCandidateError('Full name is required.'); return; }
+    if (!profession) { showAddCandidateError('Profession is required.'); return; }
+
+    var email = (document.getElementById('ac-email').value || '').trim() || null;
+    var phone = (document.getElementById('ac-phone').value || '').trim() || null;
+    var specialty = (document.getElementById('ac-specialty').value || '').trim() || null;
+    var expRaw = (document.getElementById('ac-experience').value || '').trim();
+    var experienceYears = expRaw ? parseInt(expRaw, 10) : null;
+    if (experienceYears != null && isNaN(experienceYears)) experienceYears = null;
+    var currentCountry = (document.getElementById('ac-current-country').value || '').trim() || null;
+    var targetRaw = (document.getElementById('ac-target-countries').value || '').trim();
+    var targetCountries = targetRaw
+      ? targetRaw.split(',').map(function (s) { return s.trim(); }).filter(Boolean)
+      : null;
+    var passportNumber = (document.getElementById('ac-passport').value || '').trim() || null;
+    var licenseNumber = (document.getElementById('ac-license').value || '').trim() || null;
+    var notes = (document.getElementById('ac-notes').value || '').trim();
+
+    var submitBtn = document.getElementById('ac-submit-btn');
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Saving…'; }
+
+    try {
+      var { data, error } = await ghFrom('recruiter_submitted_candidates').insert({
+        recruiter_id: currentUser.id,
+        full_name: fullName,
+        email: email,
+        phone: phone,
+        profession: profession,
+        specialty: specialty,
+        experience_years: experienceYears,
+        current_country: currentCountry,
+        target_countries: targetCountries,
+        passport_number: passportNumber,
+        license_number: licenseNumber,
+        profile_data: { notes: notes || null }
+      }).select().single();
+
+      if (error) throw error;
+
+      // Success — hand off to the (not-yet-built) document-upload step.
+      openCandidateDocs(data.id);
+
+      closeAddCandidatePanel();
+      myCandidatesLoaded = true;
+      await loadMyCandidates();
+    } catch (err) {
+      showAddCandidateError('Could not add candidate: ' + (err.message || 'Unknown error'));
+    } finally {
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Add Candidate'; }
+    }
   }
 
 })();
