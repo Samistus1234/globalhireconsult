@@ -328,6 +328,37 @@
     .ac-btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
     /* ══════════════════════════════════════════
+       CANDIDATE DOCUMENTS MODAL (reuses .ac-overlay/.ac-modal)
+    ══════════════════════════════════════════ */
+    .dc-file-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+    .dc-file-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block; }
+    .dc-file-zone {
+      padding: 16px 14px; border-radius: var(--radius-md); text-align: center; cursor: pointer;
+      border: 2px dashed var(--border-default); background: var(--bg-surface); transition: border-color 0.15s, background 0.15s;
+    }
+    .dc-file-zone.drag-over { border-color: var(--primary); background: rgba(0,119,182,0.05); }
+    .dc-file-zone .drop-text { font-size: 12px; color: var(--text-tertiary); }
+    .dc-file-zone .drop-text .browse { color: var(--primary-light); font-weight: 700; }
+    .dc-file-selected {
+      display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: var(--radius-md);
+      background: rgba(46,196,182,0.06); border: 1px solid rgba(46,196,182,0.2);
+    }
+    .dc-file-selected .fname {
+      font-size: 12px; color: var(--text-primary); font-weight: 600; flex: 1;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .dc-file-selected .remove-btn { background: none; border: none; cursor: pointer; padding: 2px; display: flex; color: var(--text-tertiary); }
+    .mycand-docs-row { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
+    .btn-add-docs {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 700; color: var(--primary-light);
+      background: rgba(0,119,182,0.1); border: 1px solid rgba(0,119,182,0.2);
+      padding: 5px 12px; border-radius: var(--radius-full); cursor: pointer;
+      margin-top: var(--space-3); transition: background 0.15s;
+    }
+    .btn-add-docs:hover { background: rgba(0,119,182,0.2); }
+
+    /* ══════════════════════════════════════════
        PIPELINE BOARD
     ══════════════════════════════════════════ */
     .pipeline-board { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-4); align-items: start; }
@@ -801,6 +832,27 @@
   <div class="ac-modal-footer">
     <button class="ac-btn-cancel" id="ac-cancel">Cancel</button>
     <button class="ac-btn-submit" id="ac-submit-btn">Add Candidate</button>
+  </div>
+</div>
+
+<!-- ═══════════ CANDIDATE DOCUMENTS MODAL ═══════════ -->
+<div class="ac-overlay" id="ad-overlay"></div>
+<div class="ac-modal" id="ad-modal">
+  <div class="ac-modal-header">
+    <span class="ac-modal-title">Candidate Documents</span>
+    <button class="panel-close-btn" id="ad-close">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="ac-modal-body">
+    <div class="ac-form-error" id="ad-error"></div>
+    <div style="font-size:var(--text-sm);color:var(--text-tertiary);margin-bottom:var(--space-4);">All documents are optional — upload what you have now, add the rest later.</div>
+    <div id="ad-existing"></div>
+    <div id="ad-file-grid" class="dc-file-grid"></div>
+  </div>
+  <div class="ac-modal-footer">
+    <button class="ac-btn-cancel" id="ad-cancel">Close</button>
+    <button class="ac-btn-submit" id="ad-submit-btn">Upload Documents</button>
   </div>
 </div>
 

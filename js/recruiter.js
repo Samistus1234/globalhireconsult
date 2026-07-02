@@ -22,6 +22,17 @@
     travel_insurance: 'Travel Insurance'
   };
 
+  // ── Recruiter-submitted candidate document types (recruiter_submission_documents) ──
+  var SUBMISSION_DOC_TYPES = [
+    { key: 'cv', label: 'CV / Resume' },
+    { key: 'license', label: 'Medical / Professional Licence' },
+    { key: 'dataflow', label: 'DataFlow Report' },
+    { key: 'passport', label: 'Passport' },
+    { key: 'fellowship', label: 'Fellowship / Specialty Certificate' }
+  ];
+  var SUBMISSION_DOC_LABELS = {};
+  SUBMISSION_DOC_TYPES.forEach(function (t) { SUBMISSION_DOC_LABELS[t.key] = t.label; });
+
   // ── Saudi Arabia recruitment pipeline stages ──
   // Correct order: DataFlow → Mumaris+ → Prometric/ORA → License → Deployment
   var SAUDI_PIPELINE = [
@@ -129,6 +140,7 @@
     initTabs();
     initPanel();
     initAddCandidatePanel();
+    initCandidateDocsModal();
     await loadCandidates();
     await loadNotes();
     bindSearch();
@@ -753,10 +765,22 @@
       return;
     }
 
-    renderMyCandidates(submissions || []);
+    var list = submissions || [];
+    var docsBySubmission = {};
+    var ids = list.map(function (c) { return c.id; });
+    if (ids.length) {
+      var { data: docs } = await ghFrom('recruiter_submission_documents')
+        .select('submission_id, doc_type, file_name, status')
+        .in('submission_id', ids);
+      (docs || []).forEach(function (d) {
+        (docsBySubmission[d.submission_id] = docsBySubmission[d.submission_id] || []).push(d);
+      });
+    }
+
+    renderMyCandidates(list, docsBySubmission);
   }
 
-  function renderMyCandidates(list) {
+  function renderMyCandidates(list, docsBySubmission) {
     var grid = document.getElementById('my-candidates-grid');
     var countEl = document.getElementById('my-candidates-count');
     if (countEl) countEl.textContent = list.length ? (list.length + ' candidate' + (list.length !== 1 ? 's' : '')) : '';
@@ -767,12 +791,26 @@
       return;
     }
 
+    docsBySubmission = docsBySubmission || {};
+
     grid.innerHTML = list.map(function (c) {
       var badge = getAdminStatusBadge(c.admin_status);
       var specLine = [c.profession, c.specialty].filter(Boolean).join(' — ');
       var noteHtml = c.admin_note
         ? '<div class="mycand-note"><span class="mycand-note-label">eLab Feedback</span>' + esc(c.admin_note) + '</div>'
         : '';
+
+      var docs = docsBySubmission[c.id] || [];
+      var docsHtml;
+      if (docs.length) {
+        docsHtml = '<div class="mycand-docs-row">' + docs.map(function (d) {
+          var chipClass = d.status === 'verified' ? 'doc-chip-v' : (d.status === 'rejected' ? 'doc-chip-r' : 'doc-chip-p');
+          var label = SUBMISSION_DOC_LABELS[d.doc_type] || d.doc_type || 'Document';
+          return '<span class="doc-chip ' + chipClass + '" title="' + esc(d.file_name || '') + '">' + esc(label) + '</span>';
+        }).join('') + '</div>';
+      } else {
+        docsHtml = '<div class="mycand-docs-row"><span class="doc-chip doc-chip-e">No documents yet</span></div>';
+      }
 
       return '<div class="cand-card" data-id="' + esc(c.id) + '" style="cursor:default;">' +
         '<div class="cand-card-accent"></div>' +
@@ -787,9 +825,18 @@
             '</span>' +
           '</div>' +
           noteHtml +
+          docsHtml +
+          '<button type="button" class="btn-add-docs" data-add-docs="' + esc(c.id) + '">' +
+            '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
+            (docs.length ? 'Add More Documents' : 'Add Documents') +
+          '</button>' +
         '</div>' +
       '</div>';
     }).join('');
+
+    grid.querySelectorAll('[data-add-docs]').forEach(function (btn) {
+      btn.addEventListener('click', function () { openCandidateDocs(btn.dataset.addDocs); });
+    });
   }
 
   // ── Add Candidate Modal ──
@@ -862,11 +909,246 @@
     el.style.display = 'flex';
   }
 
-  // ── Seam for Task A4 (document upload) ──
-  // A4 will replace this no-op with the real upload UI/flow, opened for the
-  // newly-created submission id right after a successful Add Candidate insert.
-  function openCandidateDocs(submissionId) {
-    // TODO(A4): implement document-upload step for recruiter_submission_documents.
+  // ── Candidate Documents Modal (recruiter_submission_documents) ──
+  var adOverlayEl, adModalEl;
+  var adSubmissionId = null;
+  var adSelectedFiles = {};
+  var adExistingDocs = [];
+
+  function initCandidateDocsModal() {
+    adOverlayEl = document.getElementById('ad-overlay');
+    adModalEl = document.getElementById('ad-modal');
+    if (!adOverlayEl || !adModalEl) return;
+
+    var closeBtn = document.getElementById('ad-close');
+    var cancelBtn = document.getElementById('ad-cancel');
+    if (closeBtn) closeBtn.addEventListener('click', closeCandidateDocs);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeCandidateDocs);
+    adOverlayEl.addEventListener('click', closeCandidateDocs);
+
+    var submitBtn = document.getElementById('ad-submit-btn');
+    if (submitBtn) submitBtn.addEventListener('click', uploadCandidateDocs);
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && adModalEl.style.display === 'flex') closeCandidateDocs();
+    });
+  }
+
+  // Opened for a submission id right after a successful Add Candidate insert,
+  // and also from the "Add Documents" button on a My Candidates card.
+  async function openCandidateDocs(submissionId) {
+    if (!adModalEl || !adOverlayEl || !submissionId) return;
+
+    adSubmissionId = submissionId;
+    adSelectedFiles = {};
+    adExistingDocs = [];
+    showDocsError('');
+    renderDocFileGrid();
+
+    var existingEl = document.getElementById('ad-existing');
+    if (existingEl) existingEl.innerHTML = '<div style="text-align:center;padding:var(--space-4) 0;color:var(--text-tertiary);font-size:var(--text-sm);"><div class="spinner" style="margin:0 auto var(--space-2);"></div>Loading existing documents…</div>';
+
+    adOverlayEl.style.display = 'block';
+    adModalEl.style.display = 'flex';
+    requestAnimationFrame(function () {
+      adOverlayEl.style.opacity = '1';
+      adModalEl.style.opacity = '1';
+      adModalEl.style.transform = 'translate(-50%,-50%)';
+    });
+    document.body.style.overflow = 'hidden';
+
+    var { data: docs } = await ghFrom('recruiter_submission_documents')
+      .select('id, doc_type, file_name, status, created_at')
+      .eq('submission_id', submissionId)
+      .order('created_at', { ascending: false });
+    adExistingDocs = docs || [];
+    renderExistingDocs();
+  }
+
+  function closeCandidateDocs() {
+    if (!adModalEl || !adOverlayEl) return;
+    adOverlayEl.style.opacity = '0';
+    adModalEl.style.opacity = '0';
+    adModalEl.style.transform = 'translate(-50%,-48%)';
+    document.body.style.overflow = '';
+    setTimeout(function () {
+      adModalEl.style.display = 'none';
+      adOverlayEl.style.display = 'none';
+    }, 250);
+
+    // Refresh the My Candidates cards so any newly-uploaded docs show up.
+    if (myCandidatesLoaded) loadMyCandidates();
+  }
+
+  function showDocsError(msg) {
+    var el = document.getElementById('ad-error');
+    if (!el) return;
+    if (!msg) { el.style.display = 'none'; el.textContent = ''; return; }
+    el.textContent = msg;
+    el.style.display = 'flex';
+  }
+
+  function renderExistingDocs() {
+    var el = document.getElementById('ad-existing');
+    if (!el) return;
+    if (!adExistingDocs.length) { el.innerHTML = ''; return; }
+
+    var statusMap = {
+      pending:   { c: '#F4A261', bg: 'rgba(244,162,97,0.1)',  l: 'Pending' },
+      in_review: { c: '#48CAE4', bg: 'rgba(72,202,228,0.1)',  l: 'In Review' },
+      verified:  { c: '#2EC4B6', bg: 'rgba(46,196,182,0.1)',  l: 'Verified' },
+      rejected:  { c: '#E63946', bg: 'rgba(230,57,70,0.1)',   l: 'Rejected' }
+    };
+
+    var html = '<div class="panel-section-title">Already Uploaded</div>';
+    adExistingDocs.forEach(function (d) {
+      var st = statusMap[d.status] || statusMap.pending;
+      var label = SUBMISSION_DOC_LABELS[d.doc_type] || d.doc_type || 'Document';
+      html += '<div class="doc-row">';
+      html += '<div class="doc-row-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="' + st.c + '" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>';
+      html += '<div style="flex:1;min-width:0;">';
+      html += '<div style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary);">' + esc(label) + '</div>';
+      html += '<div style="font-size:11px;color:var(--text-tertiary);">' + esc(d.file_name || '') + '</div>';
+      html += '</div>';
+      html += '<span class="doc-status-badge" style="background:' + st.bg + ';color:' + st.c + ';">' + esc(st.l) + '</span>';
+      html += '</div>';
+    });
+    el.innerHTML = html;
+  }
+
+  function renderDocFileGrid() {
+    var grid = document.getElementById('ad-file-grid');
+    if (!grid) return;
+    grid.innerHTML = SUBMISSION_DOC_TYPES.map(buildDocFileDrop).join('');
+    bindDocFileGridEvents();
+  }
+
+  function buildDocFileDrop(f) {
+    var file = adSelectedFiles[f.key];
+    if (file) {
+      return '<div>' +
+        '<label class="dc-file-label">' + esc(f.label) + '</label>' +
+        '<div class="dc-file-selected">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2EC4B6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>' +
+          '<span class="fname">' + esc(file.name) + '</span>' +
+          '<button type="button" class="remove-btn" data-remove-doc="' + esc(f.key) + '">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+          '</button>' +
+        '</div>' +
+      '</div>';
+    }
+    return '<div>' +
+      '<label class="dc-file-label">' + esc(f.label) + '</label>' +
+      '<div class="dc-file-zone" data-drop-doc="' + esc(f.key) + '">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 4px;color:var(--text-tertiary);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
+        '<div class="drop-text">Drop or <span class="browse">browse</span></div>' +
+        '<input type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" style="display:none" data-input-doc="' + esc(f.key) + '">' +
+      '</div>' +
+    '</div>';
+  }
+
+  function bindDocFileGridEvents() {
+    var grid = document.getElementById('ad-file-grid');
+    if (!grid) return;
+
+    grid.querySelectorAll('[data-drop-doc]').forEach(function (zone) {
+      var key = zone.dataset.dropDoc;
+      zone.addEventListener('click', function () {
+        var input = grid.querySelector('[data-input-doc="' + key + '"]');
+        if (input) input.click();
+      });
+      zone.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        zone.classList.add('drag-over');
+      });
+      zone.addEventListener('dragleave', function () {
+        zone.classList.remove('drag-over');
+      });
+      zone.addEventListener('drop', function (e) {
+        e.preventDefault();
+        zone.classList.remove('drag-over');
+        if (e.dataTransfer.files[0]) {
+          adSelectedFiles[key] = e.dataTransfer.files[0];
+          renderDocFileGrid();
+        }
+      });
+    });
+
+    grid.querySelectorAll('[data-input-doc]').forEach(function (input) {
+      input.addEventListener('change', function (e) {
+        if (e.target.files[0]) {
+          adSelectedFiles[input.dataset.inputDoc] = e.target.files[0];
+          renderDocFileGrid();
+        }
+      });
+    });
+
+    grid.querySelectorAll('[data-remove-doc]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        delete adSelectedFiles[btn.dataset.removeDoc];
+        renderDocFileGrid();
+      });
+    });
+  }
+
+  // ── Upload each selected file to storage, then insert its DB row ──
+  async function uploadCandidateDoc(docType, file, submissionId) {
+    var ext = (file.name.split('.').pop() || 'pdf').toLowerCase();
+    var path = 'recruiter-clients/' + currentUser.id + '/' + submissionId + '/' + docType + '-' + Date.now() + '.' + ext;
+
+    var uploadResult = await sb.storage.from('gh-applicant-documents').upload(path, file, { contentType: file.type });
+    if (uploadResult.error) throw uploadResult.error;
+
+    var { error: insertError } = await ghFrom('recruiter_submission_documents').insert({
+      submission_id: submissionId,
+      recruiter_id: currentUser.id,
+      doc_type: docType,
+      file_name: file.name,
+      file_path: path,
+      mime_type: file.type,
+      file_size_bytes: file.size,
+      status: 'pending'
+    });
+    if (insertError) throw insertError;
+  }
+
+  async function uploadCandidateDocs() {
+    showDocsError('');
+    var keys = Object.keys(adSelectedFiles);
+    if (!keys.length) { showDocsError('Choose at least one file to upload.'); return; }
+    if (!adSubmissionId) { showDocsError('Missing candidate reference — please close and try again.'); return; }
+
+    var submitBtn = document.getElementById('ad-submit-btn');
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Uploading…'; }
+
+    var failures = [];
+    for (var i = 0; i < keys.length; i++) {
+      var docType = keys[i];
+      try {
+        await uploadCandidateDoc(docType, adSelectedFiles[docType], adSubmissionId);
+      } catch (err) {
+        console.warn('Upload failed for ' + docType + ':', err);
+        failures.push(docType);
+      }
+    }
+
+    if (failures.length) {
+      showDocsError('Some files could not be uploaded (' + failures.map(function (k) { return SUBMISSION_DOC_LABELS[k] || k; }).join(', ') + '). Please try again.');
+      // Keep the failed files selected so the recruiter can retry; drop the succeeded ones.
+      keys.forEach(function (k) { if (failures.indexOf(k) === -1) delete adSelectedFiles[k]; });
+    } else {
+      adSelectedFiles = {};
+    }
+
+    var { data: docs } = await ghFrom('recruiter_submission_documents')
+      .select('id, doc_type, file_name, status, created_at')
+      .eq('submission_id', adSubmissionId)
+      .order('created_at', { ascending: false });
+    adExistingDocs = docs || [];
+    renderExistingDocs();
+    renderDocFileGrid();
+
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Upload Documents'; }
   }
 
   async function submitCandidate() {

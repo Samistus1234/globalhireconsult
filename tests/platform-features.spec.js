@@ -640,6 +640,20 @@ test.describe('Recruiter Portal Page — Structure', () => {
     expect(html).toContain('id="ac-notes"');
   });
 
+  test('has candidate documents upload modal in HTML', async ({ request }) => {
+    // Same rationale as above: assert on the raw served markup (auth-guarded page).
+    const response = await request.get(`${BASE}/recruiter.html`);
+    expect(response.status()).toBeLessThan(400);
+    const html = await response.text();
+    // Modal shell + controls
+    expect(html).toContain('id="ad-modal"');
+    expect(html).toContain('id="ad-overlay"');
+    expect(html).toContain('id="ad-submit-btn"');
+    expect(html).toContain('id="ad-file-grid"');
+    expect(html).toContain('id="ad-existing"');
+    expect(html).toContain('id="ad-error"');
+  });
+
   test('recruiter.html loads without JS console errors', async ({ page }) => {
     const errors = [];
     page.on('console', msg => {
