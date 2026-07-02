@@ -21,6 +21,19 @@
     var y = Math.floor(days / 365); return 'Posted ' + y + ' year' + (y > 1 ? 's' : '') + ' ago';
   }
 
+  /* ---------- Offer closed check ----------
+     An offer is closed if status:'closed' is set, OR closes_at (YYYY-MM-DD)
+     is in the past. Closed featured cards are greyed + "Position Filled". */
+  function isClosed(f) {
+    if (!f) return false;
+    if (f.status === 'closed') return true;
+    if (f.closes_at) {
+      var today = new Date().toISOString().slice(0, 10);
+      if (today > f.closes_at) return true;
+    }
+    return false;
+  }
+
   /* ---------- Featured / Pinned listings ---------- */
   var WA_QATAR = 'https://wa.me/19294192327?text=Hi%20eLab%2C%20I%E2%80%99m%20interested%20in%20the%20Qatar%20Caregiver%20position.%20My%20name%20is%20____%20and%20I%20have%20____%20years%20of%20experience.';
   var WA_LINK = WA_QATAR;
@@ -568,6 +581,7 @@
 
   /* ---------- Featured card HTML ---------- */
   function featuredCardHtml(f) {
+    var closed = isClosed(f);
     var benefitsHtml = f.benefits.map(function (b) {
       return '<span class="benefit-tag">' +
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m5 12 5 5L20 7"/></svg>' +
@@ -575,9 +589,11 @@
     }).join('');
 
     return (
-      '<div class="job-card featured" data-id="' + f.id + '">' +
+      '<div class="job-card featured' + (closed ? ' closed' : '') + '" data-id="' + f.id + '"' + (closed ? ' style="opacity:0.62;filter:grayscale(0.75);"' : '') + '>' +
         '<div class="featured-accent"></div>' +
-        '<span class="job-badge job-badge-featured">FEATURED</span>' +
+        (closed
+          ? '<span class="job-badge job-badge-closed" style="background:#6b7280;color:#fff;">POSITION FILLED</span>'
+          : '<span class="job-badge job-badge-featured">FEATURED</span>') +
         '<div class="job-card-body">' +
           '<div class="job-card-header">' +
             '<div class="job-employer-logo" style="background:' + (f.accent_color ? f.accent_color + '20' : 'rgba(139,26,58,0.15)') + ';color:' + (f.accent_color || '#d4a84b') + ';font-weight:800;font-size:18px;">' +
@@ -623,15 +639,17 @@
           '<div class="job-salary" style="color:' + (f.accent_color || '#d4a84b') + ';">' + escHtml(f.salary_display) + '</div>' +
           '<span class="job-posted" style="color:var(--text-tertiary);">' + escHtml(f.requirements) + '</span>' +
           '<div class="job-card-actions" style="display:flex;flex-direction:column;gap:8px;">' +
-            (f.detail_link ? '<a href="' + f.detail_link + '" class="btn btn-primary btn-sm" style="text-decoration:none;text-align:center;">Apply Now</a>' : '') +
+            (closed
+              ? '<span class="btn btn-sm" style="text-align:center;background:#e5e7eb;color:#6b7280;border:none;cursor:not-allowed;">Position Filled</span>'
+              : (f.detail_link ? '<a href="' + f.detail_link + '" class="btn btn-primary btn-sm" style="text-decoration:none;text-align:center;">Apply Now</a>' : '')) +
             '<button class="btn-save-job" data-job-id="' + f.id + '" title="' + (savedJobIds.has(f.id) ? 'Remove from saved' : 'Save this job') + '" style="background:none;border:none;cursor:pointer;padding:6px;display:flex;align-items:center;gap:6px;color:' + (savedJobIds.has(f.id) ? 'var(--primary)' : 'var(--text-tertiary)') + ';font-size:var(--text-xs);border-radius:var(--radius-sm);transition:color 0.15s;" onmouseover="this.style.color=\'var(--primary)\'" onmouseout="if(!window.JobsPage._isSaved(\'' + f.id + '\'))this.style.color=\'var(--text-tertiary)\'" onclick="JobsPage.saveJob(\'' + f.id + '\',\'' + escHtml(f.title).replace(/'/g, "\\'") + '\',\'' + escHtml(f.employer_name).replace(/'/g, "\\'") + '\',\'' + escHtml(f.destination_country).replace(/'/g, "\\'") + '\',\'' + escHtml(f.salary_display).replace(/'/g, "\\'") + '\')">' +
               (savedJobIds.has(f.id) ? SVG_BOOKMARK_FILLED : SVG_BOOKMARK_OUTLINE) +
               (savedJobIds.has(f.id) ? 'Saved' : 'Save Job') +
             '</button>' +
-            '<a href="' + f.wa_link + '" target="_blank" rel="noopener noreferrer" class="btn-featured">' +
+            (closed ? '' : '<a href="' + f.wa_link + '" target="_blank" rel="noopener noreferrer" class="btn-featured">' +
               '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>' +
               'Apply on WhatsApp' +
-            '</a>' +
+            '</a>') +
           '</div>' +
           '<a href="' + (f.detail_link || 'https://elabsolution.org/qatar-caregivers') + '" style="font-size:var(--text-xs);color:var(--text-tertiary);margin-top:var(--space-2);display:inline-block;text-decoration:underline;">View full details &rarr;</a>' +
           shareButtons(f.title, f.destination_country, f.salary_display) +
@@ -642,8 +660,11 @@
 
   /* ---------- Render filtered list ---------- */
   function render() {
-    // Always render featured listings first
-    var featuredHtml = featuredListings.map(featuredCardHtml).join('');
+    // Always render featured listings first; open roles above filled ones
+    var orderedFeatured = featuredListings.slice().sort(function (a, b) {
+      return (isClosed(a) ? 1 : 0) - (isClosed(b) ? 1 : 0);
+    });
+    var featuredHtml = orderedFeatured.map(featuredCardHtml).join('');
 
     if (!filtered.length && !featuredListings.length) { showEmpty(); }
     else {

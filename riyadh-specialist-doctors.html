@@ -1249,6 +1249,45 @@
     try { if (window.ghSupabase) { window.ghSupabase.rpc('increment_page_view', { p_slug: 'riyadh-specialist-doctors' }); } } catch (e) {}
   </script>
   <script>
+    /* ── Offer status ──────────────────────────────
+       To CLOSE this offer: set OFFER_CLOSED = true (role filled),
+       OR set OFFER_CLOSES_AT = 'YYYY-MM-DD' to auto-close after that date.
+       When closed: the apply form is hidden and a "role closed" notice shows. */
+    var OFFER_CLOSED = false;
+    var OFFER_CLOSES_AT = '';
+    (function () {
+      var today = new Date().toISOString().slice(0, 10);
+      var closed = OFFER_CLOSED || (OFFER_CLOSES_AT && today > OFFER_CLOSES_AT);
+      if (!closed) return;
+      function applyClosed() {
+        var form = document.getElementById('form-wrap');
+        if (form) form.style.display = 'none';
+        var wa = document.querySelector('.wa-alt');
+        if (wa) wa.style.display = 'none';
+        var apply = document.getElementById('apply');
+        if (apply) {
+          var header = apply.querySelector('.section-header');
+          var notice = document.createElement('div');
+          notice.className = 'form-wrap';
+          notice.style.textAlign = 'center';
+          notice.innerHTML =
+            '<h3 class="h2" style="font-size:1.4rem;margin-bottom:10px">This role is now closed</h3>' +
+            '<p style="margin-bottom:16px">Thank you for your interest — applications for these Riyadh specialist roles are currently closed. Explore our other open opportunities or register to be notified about new roles.</p>' +
+            '<a href="jobs.html" class="btn btn-indigo">See other open roles</a>';
+          if (header && header.parentNode) header.parentNode.insertBefore(notice, header.nextSibling);
+          else apply.appendChild(notice);
+        }
+        document.querySelectorAll('a[href="#apply"]').forEach(function (a) {
+          a.textContent = 'Role Closed';
+          a.style.pointerEvents = 'none';
+          a.style.opacity = '0.6';
+        });
+      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', applyClosed);
+      else applyClosed();
+    })();
+  </script>
+  <script>
     /* ── IntersectionObserver for scroll reveals ── */
     const observer = new IntersectionObserver(function(entries) {
       entries.forEach(function(entry) {
