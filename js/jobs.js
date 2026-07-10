@@ -41,6 +41,25 @@
 
   var featuredListings = [
     {
+      id: 'featured-kuwait-government-healthcare',
+      posted_at: '2026-07-10',
+      title: 'Nurses & Allied Health — Kuwait (100 Positions)',
+      employer_name: 'Government Healthcare Institution — Kuwait',
+      destination_country: 'Kuwait',
+      specialty: 'Nursing / Allied Health / Technicians — 17 roles',
+      category: 'Nursing',
+      positions: 100,
+      salary_display: '$970–$1,615/month (≈USD)',
+      min_experience: 3,
+      visa_sponsored: true,
+      benefits: ['Accommodation', 'Visa & Flight Arranged', 'Paid in KWD', 'Prometric Guidance', '17 Roles'],
+      description: 'A major government healthcare institution in Kuwait is filling 100 positions across 17 roles — nurses, assistant and dental nurses, physiotherapists, pharmacists, medical lab, radiology, EMTs, biomedical engineers and technicians. Salaries of about $970 to $1,615 per month depending on role, paid in Kuwaiti Dinar, with accommodation provided. Male candidates with a minimum of 3 years\' experience. ELAB guides you through Prometric, document verification and visa processing.',
+      requirements: 'Male candidates + relevant degree/diploma + minimum 3 years\' experience + Prometric after selection (Lagos or Kuwait)',
+      wa_link: 'https://wa.me/19294192327?text=Hi%20eLab%2C%20I%E2%80%99m%20interested%20in%20the%20Kuwait%20healthcare%20roles%20%28100%20positions%29.%20My%20name%20is%20____%2C%20my%20profession%20is%20____%20and%20I%20have%20____%20years%20of%20experience.',
+      detail_link: 'kuwait-healthcare.html',
+      accent_color: '#CE1126',
+    },
+    {
       id: 'featured-riyadh-female-nurses-2026',
       posted_at: '2026-06-30',
       title: 'Female Registered Nurses — Riyadh',
