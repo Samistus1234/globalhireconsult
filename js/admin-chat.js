@@ -15,6 +15,7 @@
   var activeThreadId = null;
   var activePeer = null; // { id, full_name, role, avatar_initials, avatar_color_index } for a not-yet-created thread
   var allPeers = [];
+  var pendingAttachment = null;
   var lastListRefresh = 0;
 
   function escapeHtml(str) {
@@ -149,6 +150,7 @@
         var mine = m.sender_id === currentUser.id;
         return '<div class="chat-msg ' + (mine ? 'mine' : 'theirs') + '">' +
           escapeHtml(m.body) +
+          (m.attachment ? renderFileCard(m.id, m.attachment) : '') +
           '<div class="chat-msg-meta">' + fmtTime(m.created_at) + (m.read_at ? ' · ✓✓' : '') + '</div>' +
         '</div>';
       }).join('') + '</div>';
@@ -156,9 +158,11 @@
 
     var composer =
       '<div class="chat-composer">' +
+        '<button class="chat-attach-btn" id="chat-attach-btn" title="Attach file">📎</button>' +
         '<textarea id="chat-composer-input" placeholder="Type a message… (Enter to send, Shift+Enter for new line)"></textarea>' +
         '<button class="chat-send-btn" id="chat-send-btn">Send</button>' +
-      '</div>';
+      '</div>' +
+      '<input type="file" id="chat-attach-input" style="display:none">';
 
     pane.innerHTML = head + body + composer;
 
@@ -174,6 +178,15 @@
       input.focus();
     }
     if (sendBtn) sendBtn.addEventListener('click', sendMessage);
+
+    var attachBtn = document.getElementById('chat-attach-btn');
+    var attachInput = document.getElementById('chat-attach-input');
+    if (attachBtn && attachInput) {
+      attachBtn.addEventListener('click', function () { attachInput.click(); });
+      attachInput.addEventListener('change', function () { handleAttach(attachInput.files[0]); attachInput.value = ''; });
+    }
+
+    pane.querySelectorAll('.chat-file-card').forEach(bindFileCard);
 
     if (body.indexOf('chat-msg-body') !== -1) {
       var msgBody = document.getElementById('chat-msg-body');
@@ -199,10 +212,11 @@
     var sendBtn = document.getElementById('chat-send-btn');
     if (!input) return;
     var text = input.value.trim();
-    if (!text) return;
+    if (!text && !pendingAttachment) return;
     if (sendBtn) sendBtn.disabled = true;
 
     var payload = { action: 'send', body: text };
+    if (pendingAttachment) payload.attachment = pendingAttachment;
     if (activeThreadId) {
       payload.thread_id = activeThreadId;
     } else if (activePeer) {
@@ -220,6 +234,7 @@
       return;
     }
     input.value = '';
+    pendingAttachment = null;
     if (!activeThreadId && data && data.thread_id) {
       await openThread(data.thread_id);
     } else if (data && data.message) {
@@ -235,8 +250,11 @@
     var div = document.createElement('div');
     div.className = 'chat-msg ' + (mine ? 'mine' : 'theirs');
     div.innerHTML = escapeHtml(message.body) +
+      (message.attachment ? renderFileCard(message.id, message.attachment) : '') +
       '<div class="chat-msg-meta">' + fmtTime(message.created_at) + (message.read_at ? ' · ✓✓' : '') + '</div>';
     body.appendChild(div);
+    var newCard = div.querySelector('.chat-file-card');
+    if (newCard) bindFileCard(newCard);
     body.scrollTop = body.scrollHeight;
   }
 
@@ -296,6 +314,79 @@
   }
 
   // ── Realtime: live-update on new messages ──
+  // ── Attachments ──
+  function fileIcon(mime) {
+    if (!mime) return '📄';
+    if (mime.indexOf('image/') === 0) return '🖼️';
+    if (mime === 'application/pdf') return '📕';
+    if (mime.indexOf('word') !== -1 || mime.indexOf('msword') !== -1) return '📝';
+    if (mime.indexOf('sheet') !== -1 || mime.indexOf('excel') !== -1 || mime === 'text/csv') return '📊';
+    if (mime.indexOf('zip') !== -1 || mime.indexOf('compressed') !== -1) return '📦';
+    return '📄';
+  }
+
+  function fmtBytes(n) {
+    if (!n && n !== 0) return '';
+    if (n < 1024) return n + ' B';
+    if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+    return (n / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  function renderFileCard(messageId, att) {
+    return '<div class="chat-file-card" data-mid="' + messageId + '">' +
+      '<span class="chat-file-icon">' + fileIcon(att.mime) + '</span>' +
+      '<span class="chat-file-meta">' +
+        '<span class="chat-file-name">' + escapeHtml(att.name) + '</span>' +
+        '<span class="chat-file-size">' + fmtBytes(att.size) + '</span>' +
+      '</span>' +
+      '<span class="chat-file-dl">Download</span>' +
+    '</div>';
+  }
+
+  function bindFileCard(el) {
+    el.addEventListener('click', function () { downloadFile(el.dataset.mid); });
+  }
+
+  async function downloadFile(messageId) {
+    var { data, error } = await chatInvoke({ action: 'download-url', message_id: messageId });
+    if (error) {
+      console.error('download-url error:', error);
+      alert('Failed to get download link: ' + (error.message || 'Unknown error'));
+      return;
+    }
+    window.open(data.url, '_blank');
+  }
+
+  async function handleAttach(file) {
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) { alert('File too large (max 10 MB)'); return; }
+    var attachBtn = document.getElementById('chat-attach-btn');
+    if (attachBtn) attachBtn.disabled = true;
+    try {
+      var { data, error } = await chatInvoke({
+        action: 'upload-url',
+        file_name: file.name,
+        file_type: file.type || 'application/octet-stream',
+        size: file.size
+      });
+      if (error) throw new Error(error.message || 'Failed to request upload URL');
+      var up = await sb.storage.from('chat-files').uploadToSignedUrl(data.storage_path, data.token, file);
+      if (up.error) throw new Error(up.error.message || 'Upload failed');
+      pendingAttachment = {
+        storage_path: data.storage_path,
+        name: file.name,
+        mime: file.type || 'application/octet-stream',
+        size: file.size
+      };
+      await sendMessage();
+    } catch (e) {
+      console.error('attach error:', e);
+      alert('Failed to attach file: ' + e.message);
+    } finally {
+      if (attachBtn) attachBtn.disabled = false;
+    }
+  }
+
   function subscribeRealtime() {
     if (!sb || !currentUser) return;
     sb.channel('gh-chat-' + currentUser.id)
