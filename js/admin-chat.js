@@ -230,7 +230,7 @@
     if (sendBtn) sendBtn.disabled = false;
     if (error) {
       console.error('chat send error:', error);
-      alert('Failed to send: ' + (error.message || 'Unknown error'));
+      alert('Failed to send: ' + ((error.context && (error.context.error || error.context.message)) || error.message || 'Unknown error'));
       return;
     }
     input.value = '';
