@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import nodemailer from "npm:nodemailer@6.9.10";
 
 /*
   chat — GlobalHire pair chat (eLab staff <-> recruiters / applicants)
@@ -25,6 +26,10 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
               file in chat-files/<caller-id>/. Returns { storage_path, token }.
     - download-url: { message_id } → signed read URL for the message's
               attachment (participant-only). Returns { url }.
+    - email-peer: { thread_id, subject, body } → sends a real email to the
+              peer via Gmail SMTP (same transport/env as notify-recruiter-status:
+              GMAIL_USER/GMAIL_APP_PASSWORD) and records a kind='email' entry
+              in the thread. Non-admins may only email admins (eLab staff).
 
   Rules:
     - Caller must have a globalhire profile (any role).
@@ -149,6 +154,101 @@ Deno.serve(async (req) => {
       if (error) return json({ error: "Failed to issue download URL: " + error.message }, 500);
 
       return json({ url: data?.signedUrl });
+    }
+
+    // ── email-peer: real email to the peer, recorded in the thread ──
+    if (action === "email-peer") {
+      const tid = typeof body.thread_id === "string" ? body.thread_id : "";
+      const subject = typeof body.subject === "string" ? body.subject.trim() : "";
+      const emailBody = typeof body.body === "string" ? body.body.trim() : "";
+      if (!tid) return json({ error: "thread_id required" }, 400);
+      if (!subject || subject.length > 150) return json({ error: "Subject required (max 150 chars)" }, 400);
+      if (!emailBody || emailBody.length > 5000) return json({ error: "Email body required (max 5000 chars)" }, 400);
+
+      const { data: thr, error: thrErr } = await sb
+        .schema("globalhire").from("chat_threads")
+        .select("id, participant_a, participant_b")
+        .eq("id", tid)
+        .maybeSingle();
+      if (thrErr) return json({ error: "Failed to load thread: " + thrErr.message }, 500);
+      if (!thr) return json({ error: "Thread not found" }, 404);
+      if (thr.participant_a !== ME && thr.participant_b !== ME) {
+        return json({ error: "Not a participant of this thread" }, 403);
+      }
+
+      const peerId = thr.participant_a === ME ? thr.participant_b : thr.participant_a;
+      const { data: peer } = await sb
+        .from("gh_profiles")
+        .select("id, full_name, role")
+        .eq("id", peerId)
+        .maybeSingle();
+      const peerName = peer?.full_name || "there";
+      const peerRole = peer?.role || null;
+
+      // Same direction rule as chat: non-admins may only email eLab staff.
+      if (!isAdmin && peerRole !== "admin") {
+        return json({ error: "Recruiters and applicants can only email eLab staff" }, 403);
+      }
+
+      // Peer email lives on auth.users (recruiters/applicants log in with it).
+      const { data: peerAuth, error: peerAuthErr } = await sb.auth.admin.getUserById(peerId);
+      const peerEmail = peerAuth?.user?.email;
+      if (peerAuthErr || !peerEmail) {
+        return json({ error: "Peer has no email address on file" }, 400);
+      }
+
+      const smtpUser = Deno.env.get("GMAIL_USER") || Deno.env.get("SMTP_USER") || "support@elabsolution.org";
+      const smtpPass = Deno.env.get("GMAIL_APP_PASSWORD") || Deno.env.get("SMTP_PASS");
+      if (!smtpPass) return json({ error: "SMTP credentials not configured" }, 500);
+
+      const esc = (s: string) =>
+        s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+      const transport = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: { user: smtpUser, pass: smtpPass },
+      });
+
+      let mailError: string | null = null;
+      try {
+        await transport.sendMail({
+          from: `"GlobalHire@eLab" <${smtpUser}>`,
+          to: peerEmail,
+          subject: subject,
+          text: emailBody,
+          html:
+            '<p style="margin:0 0 20px;font-size:15px;color:#475569;">Hi <strong style="color:#0F172A;">' +
+            esc(peerName) +
+            "</strong>,</p>" +
+            '<p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#334155;white-space:pre-wrap;">' +
+            esc(emailBody) +
+            "</p>" +
+            '<p style="margin:24px 0 0;font-size:12px;color:#94A3B8;">Sent from the GlobalHire chat. Reply here or continue the conversation in your portal.</p>',
+        });
+      } catch (e) {
+        mailError = e instanceof Error ? e.message : String(e);
+      } finally {
+        transport.close();
+      }
+      if (mailError) return json({ error: "Email send failed: " + mailError }, 502);
+
+      // Record the email in the thread timeline (kind='email' entry).
+      const { data: entry, error: insErr } = await sb
+        .schema("globalhire").from("chat_messages")
+        .insert({
+          thread_id: tid,
+          sender_id: ME,
+          body: "",
+          kind: "email",
+          email_meta: { subject, to_email: peerEmail, body: emailBody },
+        })
+        .select("id, thread_id, sender_id, body, kind, email_meta, created_at, read_at")
+        .single();
+      if (insErr) return json({ error: "Email sent but failed to log: " + insErr.message }, 500);
+
+      return json({ success: true, sent_to: peerEmail, entry });
     }
 
     // ── send ──
@@ -325,7 +425,7 @@ Deno.serve(async (req) => {
       // Latest 100, returned chronologically
       const { data: rows } = await sb
         .schema("globalhire").from("chat_messages")
-        .select("id, sender_id, body, attachment, created_at, read_at")
+        .select("id, sender_id, body, attachment, kind, email_meta, created_at, read_at")
         .eq("thread_id", tid)
         .order("created_at", { ascending: false })
         .limit(100);

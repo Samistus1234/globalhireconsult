@@ -16,6 +16,7 @@
   var allPeers = [];
   var pendingAttachment = null;
   var chatAuthRetried = false;
+  var currentThreadPeer = null;
 
   function escapeHtml(str) {
     var div = document.createElement('div');
@@ -49,7 +50,21 @@
   }
 
   function chatInvoke(payload) {
-    return sb.functions.invoke('chat', { body: payload });
+    return sb.functions.invoke('chat', { body: payload }).then(function (res) {
+      // supabase-js v2 puts the raw Response in error.context on non-2xx;
+      // parse it so the real server error reaches the UI (and the auth retry).
+      if (res.error && res.error.context && typeof res.error.context.json === 'function') {
+        return res.error.context.json().then(function (body) {
+          var serverMsg = body && (body.error || body.message) || null;
+          res.error = Object.assign({}, res.error, { serverMessage: serverMsg });
+          return res;
+        }).catch(function () {
+          res.error = Object.assign({}, res.error, { serverMessage: null });
+          return res;
+        });
+      }
+      return res;
+    });
   }
 
   // ── Conversation list ──
@@ -121,14 +136,16 @@
     var pane = document.getElementById('portal-chat-thread-pane');
     if (!pane) return;
     var c = avatarColors(peer);
+    currentThreadPeer = peer;
 
     var head =
       '<div class="chat-thread-head">' +
         '<div class="chat-conv-avatar" style="background:' + c.bg + ';color:' + c.fg + ';">' + escapeHtml(initials(peer.full_name)) + '</div>' +
-        '<div>' +
+        '<div class="chat-thread-head-main">' +
           '<div class="chat-thread-title">' + escapeHtml(peer.full_name) + '</div>' +
           '<div class="chat-thread-sub">' + escapeHtml(roleLabel(peer.role)) + ' · eLab team</div>' +
         '</div>' +
+        (activeThreadId ? '<button class="chat-email-btn" id="portal-chat-email-btn" title="Email ' + escapeHtml(peer.full_name) + '">📧 Email</button>' : '') +
       '</div>';
 
     var body;
@@ -137,6 +154,12 @@
     } else {
       body = '<div class="chat-thread-body" id="portal-chat-msg-body">' + messages.map(function (m) {
         var mine = m.sender_id === currentUser.id;
+        if (m.kind === 'email') {
+          return '<div class="chat-msg ' + (mine ? 'mine' : 'theirs') + ' chat-msg-email">' +
+            renderEmailEntry(m) +
+            '<div class="chat-msg-meta">' + fmtTime(m.created_at) + '</div>' +
+          '</div>';
+        }
         return '<div class="chat-msg ' + (mine ? 'mine' : 'theirs') + '">' +
           escapeHtml(m.body) +
           (m.attachment ? renderFileCard(m.id, m.attachment) : '') +
@@ -171,6 +194,8 @@
       attachBtn.addEventListener('click', function () { attachInput.click(); });
       attachInput.addEventListener('change', function () { handleAttach(attachInput.files[0]); attachInput.value = ''; });
     }
+    var emailBtn = document.getElementById('portal-chat-email-btn');
+    if (emailBtn) emailBtn.addEventListener('click', openEmailModal);
 
     pane.querySelectorAll('.chat-file-card').forEach(bindFileCard);
 
@@ -199,7 +224,7 @@
     if (sendBtn) sendBtn.disabled = false;
     if (error) {
       console.error('chat send error:', error);
-      var realErr = (error.context && (error.context.error || error.context.message)) || error.message || 'Unknown error';
+      var realErr = error.serverMessage || error.message || 'Unknown error';
       // Session may have expired mid-use: refresh once and retry before giving up
       if (!chatAuthRetried && /authorization|Missing or invalid|expired|unauthorized|401/i.test(realErr)) {
         chatAuthRetried = true;
@@ -227,8 +252,8 @@
     var mine = message.sender_id === currentUser.id;
     var div = document.createElement('div');
     div.className = 'chat-msg ' + (mine ? 'mine' : 'theirs');
-    div.innerHTML = escapeHtml(message.body) +
-      (message.attachment ? renderFileCard(message.id, message.attachment) : '') +
+    div.innerHTML = (message.kind === 'email' ? renderEmailEntry(message) : escapeHtml(message.body) +
+      (message.attachment ? renderFileCard(message.id, message.attachment) : '')) +
       '<div class="chat-msg-meta">' + fmtTime(message.created_at) + (message.read_at ? ' · ✓✓' : '') + '</div>';
     body.appendChild(div);
     var newCard = div.querySelector('.chat-file-card');
@@ -361,6 +386,75 @@
     }
   }
 
+  function renderEmailEntry(m) {
+    var meta = m.email_meta || {};
+    return '<div class="chat-email-card">' +
+      '<span class="chat-email-icon">📧</span>' +
+      '<span class="chat-email-meta">' +
+        '<span class="chat-email-subject">' + escapeHtml(meta.subject || 'Email') + '</span>' +
+        '<span class="chat-email-to">to ' + escapeHtml(meta.to_email || '') + '</span>' +
+      '</span>' +
+    '</div>';
+  }
+  function ensureEmailModal() {
+    var m = document.getElementById('portal-chat-email-modal');
+    if (m) return;
+    var d = document.createElement('div');
+    d.id = 'portal-chat-email-modal';
+    d.className = 'chat-modal-overlay';
+    d.innerHTML =
+      '<div class="chat-modal">' +
+        '<div class="chat-modal-head"><div class="chat-modal-title">📧 Send email</div><button class="chat-modal-close" id="portal-chat-email-cancel">✕</button></div>' +
+        '<div class="chat-modal-body" style="padding:var(--space-4) var(--space-5);overflow:auto;">' +
+          '<div class="chat-email-to-label" id="portal-chat-email-to-label"></div>' +
+          '<input class="chat-email-input" id="portal-chat-email-subject" placeholder="Subject" maxlength="150">' +
+          '<textarea class="chat-email-input chat-email-body" id="portal-chat-email-body" placeholder="Write your message…" maxlength="5000"></textarea>' +
+          '<div style="display:flex;justify-content:flex-end;gap:var(--space-2);">' +
+            '<button class="chat-btn" id="portal-chat-email-cancel2">Cancel</button>' +
+            '<button class="chat-btn chat-btn-primary" id="portal-chat-email-send">Send email</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(d);
+    document.getElementById('portal-chat-email-cancel').addEventListener('click', closeEmailModal);
+    document.getElementById('portal-chat-email-cancel2').addEventListener('click', closeEmailModal);
+    document.getElementById('portal-chat-email-send').addEventListener('click', sendEmail);
+  }
+  function openEmailModal() {
+    if (!activeThreadId) { alert('Open a conversation first'); return; }
+    ensureEmailModal();
+    var label = document.getElementById('portal-chat-email-to-label');
+    if (label && currentThreadPeer) label.textContent = 'To: ' + currentThreadPeer.full_name;
+    document.getElementById('portal-chat-email-modal').classList.add('open');
+    var sub = document.getElementById('portal-chat-email-subject');
+    if (sub) sub.focus();
+  }
+  function closeEmailModal() {
+    var m = document.getElementById('portal-chat-email-modal');
+    if (!m) return;
+    m.classList.remove('open');
+    var sub = document.getElementById('portal-chat-email-subject');
+    var bod = document.getElementById('portal-chat-email-body');
+    if (sub) sub.value = '';
+    if (bod) bod.value = '';
+  }
+  async function sendEmail() {
+    var subject = document.getElementById('portal-chat-email-subject').value.trim();
+    var emBody = document.getElementById('portal-chat-email-body').value.trim();
+    if (!subject || !emBody) { alert('Subject and message are required'); return; }
+    var btn = document.getElementById('portal-chat-email-send');
+    if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+    var { data, error } = await chatInvoke({ action: 'email-peer', thread_id: activeThreadId, subject: subject, body: emBody });
+    if (btn) { btn.disabled = false; btn.textContent = 'Send email'; }
+    if (error) {
+      var realErr = error.serverMessage || error.message || 'Unknown error';
+      alert('Failed to send email: ' + realErr);
+      return;
+    }
+    closeEmailModal();
+    if (activeThreadId) loadThread(activeThreadId);
+    loadThreads(true);
+  }
   function subscribeRealtime() {
     if (!sb || !currentUser) return;
     sb.channel('gh-chat-app-' + currentUser.id)
