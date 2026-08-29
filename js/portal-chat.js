@@ -15,6 +15,7 @@
   var activePeer = null;
   var allPeers = [];
   var pendingAttachment = null;
+  var chatAuthRetried = false;
 
   function escapeHtml(str) {
     var div = document.createElement('div');
@@ -198,9 +199,18 @@
     if (sendBtn) sendBtn.disabled = false;
     if (error) {
       console.error('chat send error:', error);
-      alert('Failed to send: ' + ((error.context && (error.context.error || error.context.message)) || error.message || 'Unknown error'));
+      var realErr = (error.context && (error.context.error || error.context.message)) || error.message || 'Unknown error';
+      // Session may have expired mid-use: refresh once and retry before giving up
+      if (!chatAuthRetried && /authorization|Missing or invalid|expired|unauthorized|401/i.test(realErr)) {
+        chatAuthRetried = true;
+        var { error: refErr } = await sb.auth.refreshSession();
+        if (!refErr) return sendMessage();
+      }
+      chatAuthRetried = false;
+      alert('Failed to send: ' + realErr);
       return;
     }
+    chatAuthRetried = false;
     input.value = '';
     pendingAttachment = null;
     if (!activeThreadId && data && data.thread_id) {
