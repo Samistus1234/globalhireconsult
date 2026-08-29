@@ -163,7 +163,7 @@
   }
 
   function initTabs() {
-    var pageTitles = { 'tab-candidates': 'Assigned Candidates', 'tab-mycandidates': 'My Candidates', 'tab-pipeline': 'Pipeline View', 'tab-notes': 'My Assessments' };
+    var pageTitles = { 'tab-candidates': 'Assigned Candidates', 'tab-mycandidates': 'My Candidates', 'tab-pipeline': 'Pipeline View', 'tab-notes': 'My Assessments', 'tab-messages': 'Messages' };
     document.querySelectorAll('.sb-nav-item[data-tab]').forEach(function (item) {
       item.addEventListener('click', function (e) {
         e.preventDefault();
