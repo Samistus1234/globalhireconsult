@@ -529,6 +529,233 @@ test.describe('Supabase API Integration', () => {
       data: { pipeline_stage: 'application_received' },
     });
   });
+
+  test('offer review: accept from portal advances + emails (schema-v28)', async ({ page, request }) => {
+    const ts = Date.now();
+    const email = `offeraccept+${ts}@globalhire-test.com`;
+    const pass = 'OfferTest1234!';
+
+    // A real, live campaign (my_opportunities only surfaces status active/review/sending)
+    const campRes = await request.get(`${API_URL}/rest/v1/gh_campaigns?select=id,title,salary_display,employer_name,destination_country&status=eq.active&limit=1`, {
+      headers: { 'apikey': ANON_KEY, 'Authorization': `Bearer ${authToken}` },
+    });
+    const campaign = (await campRes.json())[0];
+    expect(campaign).toBeTruthy();
+
+    const H = {
+      'apikey': ANON_KEY, 'Authorization': `Bearer ${authToken}`,
+      'Content-Type': 'application/json', 'Prefer': 'return=representation',
+    };
+
+    // Fresh applicant
+    const signup = await request.post(`${API_URL}/auth/v1/signup`, {
+      headers: { 'apikey': ANON_KEY, 'Content-Type': 'application/json' },
+      data: { email, password: pass, data: { full_name: 'Offer Accept Test' } },
+    });
+    expect(signup.status()).toBe(200);
+    const applicantId = (await signup.json()).user.id;
+    expect(applicantId).toBeTruthy();
+
+    // Admin: match → interested (auto-updatable write view)
+    const m = await request.post(`${API_URL}/rest/v1/gh_campaign_matches_write`, {
+      headers: H,
+      data: { campaign_id: campaign.id, applicant_id: applicantId, response: 'interested', match_score: 80 },
+    });
+    expect(m.status()).toBe(201);
+    const matchId = (await m.json())[0].id;
+    expect(matchId).toBeTruthy();
+
+    // Admin: profile → offer_extended
+    const patchP = await request.patch(`${API_URL}/rest/v1/gh_profiles?id=eq.${applicantId}`, {
+      headers: H, data: { pipeline_stage: 'offer_extended' },
+    });
+    expect(patchP.status()).toBe(200);
+
+    // Admin: placement INSERT via gh_placements (INSTEAD OF trigger — was 0A000 pre-v28)
+    const ins = await request.post(`${API_URL}/rest/v1/gh_placements`, {
+      headers: H,
+      data: {
+        match_id: matchId, applicant_id: applicantId, campaign_id: campaign.id,
+        stage: 'offer_extended', offer_summary: 'E2E offer terms',
+        position_title: campaign.title, employer_name: campaign.employer_name,
+        destination_country: campaign.destination_country, salary_display: campaign.salary_display,
+      },
+    });
+    expect(ins.status()).toBe(201);
+    const placementId = (await ins.json())[0].id;
+    expect(placementId).toBeTruthy();
+
+    // Portal: log in as the applicant, open Opportunities, Review Offer, Accept
+    await page.goto(`${BASE}/login.html`);
+    await page.fill('#login-email', email);
+    await page.fill('#login-password', pass);
+    await page.click('#login-form button[type="submit"]');
+    await page.waitForURL(/portal/, { timeout: 20000 });
+    await page.waitForFunction(() => document.body.classList.contains('auth-ready'), { timeout: 20000 });
+
+    await page.click('.portal-nav-item[data-tab="tab-opportunities"]');
+    const offerBtn = page.locator('.btn-opp-offer').first();
+    await offerBtn.waitFor({ state: 'visible', timeout: 20000 });
+    await offerBtn.click();
+
+    // Offer panel renders campaign details + recruiter offer summary
+    await expect(page.locator('#offer-panel')).toBeVisible();
+    await expect(page.locator('#offer-panel-content')).toContainText(campaign.title);
+    await expect(page.locator('#offer-panel-content')).toContainText('E2E offer terms');
+
+    // Accept
+    await page.click('#offer-accept-btn');
+    await page.click('#offer-accept-confirm');
+    // Back on the list after a successful accept
+    await expect(page.locator('#opportunities-list-panel')).toBeVisible({ timeout: 15000 });
+
+    // API asserts
+    const prof = await request.get(`${API_URL}/rest/v1/gh_profiles?select=pipeline_stage&id=eq.${applicantId}`, { headers: H });
+    expect((await prof.json())[0].pipeline_stage).toBe('offer_accepted');
+    const pl = await request.get(`${API_URL}/rest/v1/gh_placements?select=stage&id=eq.${placementId}`, { headers: H });
+    expect((await pl.json())[0].stage).toBe('offer_accepted');
+
+    // v26 stage-change email — poll for the row; subject ONLY (triggered_by = the
+    // applicant's own auth.uid(), so sent_by_admin must NOT be asserted).
+    let found = null;
+    for (let i = 0; i < 30; i++) {
+      const sel = await request.get(`${API_URL}/rest/v1/gh_messages?applicant_id=eq.${applicantId}&direction=eq.outbound&select=subject`, { headers: H });
+      found = (await sel.json()).find((r) => r.subject === 'Offer Accepted — Next Steps');
+      if (found) break;
+      await new Promise((r) => setTimeout(r, 1500));
+    }
+    expect(found).toBeTruthy();
+    expect(found.subject).toBe('Offer Accepted — Next Steps');
+
+    // Cleanup (gh_campaign_matches is a JOINed view — DELETE goes through the write proxy)
+    await request.delete(`${API_URL}/rest/v1/gh_placements?id=eq.${placementId}`, { headers: H });
+    await request.delete(`${API_URL}/rest/v1/gh_campaign_matches_write?id=eq.${matchId}`, { headers: H });
+  });
+
+  test('offer review: decline via RPC exits pipeline + notifies team (schema-v28)', async ({ request }) => {
+    const ts = Date.now();
+    const email = `offerdecline+${ts}@globalhire-test.com`;
+    const pass = 'OfferTest1234!';
+
+    const campRes = await request.get(`${API_URL}/rest/v1/gh_campaigns?select=id,title,employer_name,destination_country&status=eq.active&limit=1`, {
+      headers: { 'apikey': ANON_KEY, 'Authorization': `Bearer ${authToken}` },
+    });
+    const campaign = (await campRes.json())[0];
+    expect(campaign).toBeTruthy();
+
+    const H = {
+      'apikey': ANON_KEY, 'Authorization': `Bearer ${authToken}`,
+      'Content-Type': 'application/json', 'Prefer': 'return=representation',
+    };
+
+    const signup = await request.post(`${API_URL}/auth/v1/signup`, {
+      headers: { 'apikey': ANON_KEY, 'Content-Type': 'application/json' },
+      data: { email, password: pass, data: { full_name: 'Offer Decline Test' } },
+    });
+    const signupBody = await signup.json();
+    const applicantId = signupBody.user.id;
+    const applicantToken = signupBody.access_token;
+    expect(applicantId && applicantToken).toBeTruthy();
+
+    const m = await request.post(`${API_URL}/rest/v1/gh_campaign_matches_write`, {
+      headers: H,
+      data: { campaign_id: campaign.id, applicant_id: applicantId, response: 'interested', match_score: 70 },
+    });
+    expect(m.status()).toBe(201);
+    const matchId = (await m.json())[0].id;
+
+    await request.patch(`${API_URL}/rest/v1/gh_profiles?id=eq.${applicantId}`, {
+      headers: H, data: { pipeline_stage: 'offer_extended' },
+    });
+
+    // Applicant calls the RPC directly (public wrapper → globalhire.respond_offer)
+    const dec = await request.post(`${API_URL}/rest/v1/rpc/respond_offer`, {
+      headers: { 'apikey': ANON_KEY, 'Authorization': `Bearer ${applicantToken}`, 'Content-Type': 'application/json' },
+      data: { p_match_id: matchId, p_decision: 'decline', p_reason: 'E2E decline' },
+    });
+    const decBody = await dec.json();
+    expect(decBody.success).toBe(true);
+    expect(decBody.stage).toBe('terminated');
+
+    const prof = await request.get(`${API_URL}/rest/v1/gh_profiles?select=pipeline_exit_status,pipeline_exit_reason&id=eq.${applicantId}`, { headers: H });
+    const profRow = (await prof.json())[0];
+    expect(profRow.pipeline_exit_status).toBe('declined');
+    expect(profRow.pipeline_exit_reason).toContain('E2E decline');
+
+    const pl = await request.get(`${API_URL}/rest/v1/gh_placements?select=stage,termination_reason&match_id=eq.${matchId}`, { headers: H });
+    const plRow = (await pl.json())[0];
+    expect(plRow.stage).toBe('terminated');
+    expect(plRow.termination_reason).toContain('E2E decline');
+
+    // Inbound message lands in the team inbox
+    const inMsgs = await request.get(`${API_URL}/rest/v1/gh_messages?applicant_id=eq.${applicantId}&direction=eq.inbound&select=subject,body`, { headers: H });
+    const inRow = (await inMsgs.json()).find((r) => r.subject === 'Offer Declined');
+    expect(inRow).toBeTruthy();
+    expect(inRow.body).toContain('Offer Decline Test');
+
+    // Cleanup (gh_campaign_matches is a JOINed view — DELETE goes through the write proxy)
+    const delPl = await request.get(`${API_URL}/rest/v1/gh_placements?select=id&match_id=eq.${matchId}`, { headers: H });
+    const plId = (await delPl.json())[0].id;
+    await request.delete(`${API_URL}/rest/v1/gh_placements?id=eq.${plId}`, { headers: H });
+    await request.delete(`${API_URL}/rest/v1/gh_campaign_matches_write?id=eq.${matchId}`, { headers: H });
+  });
+
+  test('offer review: non-owner accept is rejected (schema-v28)', async ({ request }) => {
+    const ts = Date.now();
+
+    const campRes = await request.get(`${API_URL}/rest/v1/gh_campaigns?select=id&status=eq.active&limit=1`, {
+      headers: { 'apikey': ANON_KEY, 'Authorization': `Bearer ${authToken}` },
+    });
+    const campaign = (await campRes.json())[0];
+    expect(campaign).toBeTruthy();
+
+    const H = {
+      'apikey': ANON_KEY, 'Authorization': `Bearer ${authToken}`,
+      'Content-Type': 'application/json', 'Prefer': 'return=representation',
+    };
+
+    // Attacker: applicant A with a valid session but no match on C's offer
+    const suA = await request.post(`${API_URL}/auth/v1/signup`, {
+      headers: { 'apikey': ANON_KEY, 'Content-Type': 'application/json' },
+      data: { email: `offernonowner+${ts}@globalhire-test.com`, password: 'OfferTest1234!', data: { full_name: 'Non Owner A' } },
+    });
+    const attackerToken = (await suA.json()).access_token;
+    expect(attackerToken).toBeTruthy();
+
+    // Victim: applicant C owns the match
+    const suC = await request.post(`${API_URL}/auth/v1/signup`, {
+      headers: { 'apikey': ANON_KEY, 'Content-Type': 'application/json' },
+      data: { email: `offervictim+${ts}@globalhire-test.com`, password: 'OfferTest1234!', data: { full_name: 'Non Owner C' } },
+    });
+    const victimId = (await suC.json()).user.id;
+    expect(victimId).toBeTruthy();
+
+    const m = await request.post(`${API_URL}/rest/v1/gh_campaign_matches_write`, {
+      headers: H,
+      data: { campaign_id: campaign.id, applicant_id: victimId, response: 'interested', match_score: 60 },
+    });
+    expect(m.status()).toBe(201);
+    const matchId = (await m.json())[0].id;
+
+    await request.patch(`${API_URL}/rest/v1/gh_profiles?id=eq.${victimId}`, {
+      headers: H, data: { pipeline_stage: 'offer_extended' },
+    });
+
+    // Attacker calls respond_offer on the victim's match
+    const res = await request.post(`${API_URL}/rest/v1/rpc/respond_offer`, {
+      headers: { 'apikey': ANON_KEY, 'Authorization': `Bearer ${attackerToken}`, 'Content-Type': 'application/json' },
+      data: { p_match_id: matchId, p_decision: 'accept' },
+    });
+    const body = await res.json();
+    expect(body.success).toBe(false);
+
+    // Victim unchanged
+    const prof = await request.get(`${API_URL}/rest/v1/gh_profiles?select=pipeline_stage&id=eq.${victimId}`, { headers: H });
+    expect((await prof.json())[0].pipeline_stage).toBe('offer_extended');
+
+    // Cleanup (gh_campaign_matches is a JOINed view — DELETE goes through the write proxy)
+    await request.delete(`${API_URL}/rest/v1/gh_campaign_matches_write?id=eq.${matchId}`, { headers: H });
+  });
 });
 
 // ─────────────────────────────────────────────

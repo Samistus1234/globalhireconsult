@@ -450,7 +450,9 @@
         <!-- ═══ TAB: Opportunities ═══ -->
         <div class="portal-tab" id="tab-opportunities">
           <div id="active-placement-banner" style="display:none;"></div>
-          <div class="panel">
+
+          <!-- List view -->
+          <div class="panel" id="opportunities-list-panel">
             <div class="panel-header">
               <span class="panel-title">Matched Opportunities</span>
               <span class="badge badge-primary badge-dot" id="opp-count-badge">0 opportunities</span>
@@ -461,6 +463,19 @@
                   <p>No opportunities yet. When recruiters match your profile, opportunities will appear here.</p>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- Offer review detail (hidden until a match's Review Offer is opened) -->
+          <div id="offer-panel" hidden>
+            <div style="margin-bottom:var(--space-4);">
+              <button class="btn btn-ghost btn-sm" id="offer-back-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                All opportunities
+              </button>
+            </div>
+            <div id="offer-panel-content">
+              <!-- filled by portal.js showOfferPanel() -->
             </div>
           </div>
         </div>

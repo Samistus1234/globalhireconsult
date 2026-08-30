@@ -71,7 +71,7 @@
   // ── Data Loading ──
   async function loadData() {
     var [placementsRes, matchesRes] = await Promise.all([
-      ghFrom('gh_placements').select('*').order('created_at', { ascending: false }),
+      ghFrom('placements').select('*').order('created_at', { ascending: false }),
       ghFrom('campaign_matches').select('*, profiles:applicant_id(id, full_name, avatar_initials, avatar_color_index), campaigns:campaign_id(id, title, destination_country)')
         .eq('response', 'interested')
         .is('placement_created', null)
@@ -463,6 +463,40 @@
       }
       revenueEl.hidden = revItems.length === 0;
     }
+
+    // Offer Summary editor — recruiter-entered offer terms, shown to the candidate in the portal
+    var summaryInput = document.getElementById('offer-summary-input');
+    if (summaryInput) {
+      summaryInput.value = p.offer_summary || '';
+    }
+    var savedEl = document.getElementById('offer-summary-saved');
+    var saveBtn = document.getElementById('offer-summary-save');
+    if (saveBtn && !saveBtn._bound) {
+      saveBtn._bound = true;
+      saveBtn.addEventListener('click', async function () {
+        var value = summaryInput ? summaryInput.value.trim() : '';
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving…';
+        if (savedEl) savedEl.textContent = '';
+        var { error } = await ghFrom('placements')
+          .update({ offer_summary: value || null, updated_at: new Date().toISOString() })
+          .eq('id', p.id);
+        if (error) {
+          alert('Failed to save offer summary: ' + error.message);
+          saveBtn.disabled = false;
+          saveBtn.textContent = 'Save Offer Summary';
+          return;
+        }
+        await logActivity(p.id, 'note_added', null, 'Offer summary updated');
+        p.offer_summary = value || null;
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save Offer Summary';
+        if (savedEl) {
+          savedEl.textContent = '✓ Saved';
+          setTimeout(function () { savedEl.textContent = ''; }, 2500);
+        }
+      });
+    }
   }
 
   // ── Visa Tab ──
@@ -541,7 +575,7 @@
     if (statusSelect) statusSelect.value = p.contract_status || 'not_started';
 
     // Load contracts
-    var { data: contracts } = await ghFrom('gh_placement_contracts')
+    var { data: contracts } = await ghFrom('placement_contracts')
       .select('*')
       .eq('placement_id', p.id)
       .order('uploaded_at', { ascending: false });
@@ -608,7 +642,7 @@
     }
 
     // Count existing contracts for version
-    var { count } = await ghFrom('gh_placement_contracts').select('id', { count: 'exact', head: true }).eq('placement_id', p.id);
+    var { count } = await ghFrom('placement_contracts').select('id', { count: 'exact', head: true }).eq('placement_id', p.id);
 
     var { error: dbErr } = await ghFrom('placement_contracts').insert({
       placement_id: p.id,
@@ -640,7 +674,7 @@
   async function renderOnboardingTab() {
     var p = currentPlacement;
 
-    var { data: items } = await ghFrom('gh_placement_checklist')
+    var { data: items } = await ghFrom('placement_checklist')
       .select('*')
       .eq('placement_id', p.id)
       .order('sort_order', { ascending: true })
@@ -739,7 +773,7 @@
     var timeline = document.getElementById('activity-timeline');
     if (!timeline || !currentPlacementId) return;
 
-    var { data: activities } = await ghFrom('gh_placement_activities')
+    var { data: activities } = await ghFrom('placement_activities')
       .select('*')
       .eq('placement_id', currentPlacementId)
       .order('created_at', { ascending: false });

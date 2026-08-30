@@ -674,7 +674,7 @@
   window._myChecklist = {};
 
   async function loadMyPlacements() {
-    var { data: placements } = await ghFrom('gh_my_placements')
+    var { data: placements } = await ghFrom('my_placements')
       .select('*')
       .eq('applicant_id', currentUser.id);
 
@@ -691,7 +691,7 @@
 
     if (activePlacements.length > 0) {
       var ids = activePlacements.map(function(p) { return p.id; });
-      var { data: checklist } = await ghFrom('gh_placement_checklist')
+      var { data: checklist } = await ghFrom('placement_checklist')
         .select('*')
         .in('placement_id', ids)
         .order('sort_order', { ascending: true });
@@ -841,6 +841,9 @@
       .eq('applicant_id', currentUser.id)
       .order('match_score', { ascending: false });
 
+    // Stash for the offer panel + deep-links (#offer-<matchId>)
+    window._myOpportunities = opps || [];
+
     // Update badge
     var badge = document.getElementById('opportunities-badge');
     var countBadge = document.getElementById('opp-count-badge');
@@ -885,6 +888,14 @@
           </div>`;
       }
 
+      // Review Offer surface: only while the offer is actually open for this candidate
+      var offerOpen = opp.response === 'interested'
+        && (currentProfile.pipeline_stage === 'offer_extended' || currentProfile.pipeline_stage === 'offer_accepted'
+            || (window._myPlacements[opp.match_id] && (window._myPlacements[opp.match_id].stage === 'offer_extended' || window._myPlacements[opp.match_id].stage === 'offer_accepted')));
+      var offerBtnHtml = offerOpen
+        ? '<div style="margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--border-subtle);"><a class="btn btn-primary btn-sm btn-opp-offer" href="#offer-' + opp.match_id + '" data-match="' + opp.match_id + '" style="text-decoration:none;">Review Offer</a></div>'
+        : '';
+
       return `
         <div class="application-item" style="margin-bottom:var(--space-4);">
           <div class="application-header">
@@ -901,6 +912,7 @@
             <span style="font-size:var(--text-xs);color:var(--text-tertiary);">${opp.positions || ''} positions &middot; ${opp.specialty || ''}</span>
             ${responseHtml}
           </div>
+          ${offerBtnHtml}
           ${placementHtml}
         </div>`;
     }).join('');
@@ -927,6 +939,284 @@
         await loadOpportunities();
       });
     });
+
+    // Bind "Review Offer" buttons → swap to the offer detail panel
+    listEl.querySelectorAll('.btn-opp-offer').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        var matchId = btn.dataset.match;
+        if (typeof switchToTab === 'function') switchToTab('tab-opportunities');
+        showOfferPanel(matchId);
+      });
+    });
+  }
+
+  // ── Offer Review (list/detail swap — mirrors the visa tab) ──
+  function showOpportunitiesList() {
+    var listPanel = document.getElementById('opportunities-list-panel');
+    var offerPanel = document.getElementById('offer-panel');
+    if (listPanel) listPanel.hidden = false;
+    if (offerPanel) offerPanel.hidden = true;
+  }
+
+  async function showOfferPanel(matchId) {
+    var listPanel = document.getElementById('opportunities-list-panel');
+    var offerPanel = document.getElementById('offer-panel');
+    var content = document.getElementById('offer-panel-content');
+    if (!listPanel || !offerPanel || !content) return;
+
+    var opp = (window._myOpportunities || []).find(function (o) { return o.match_id === matchId; });
+    if (!opp) {
+      content.innerHTML =
+        '<div class="panel"><div class="panel-body" style="text-align:center;padding:var(--space-8);color:var(--text-tertiary);">' +
+        '<p>We could not find this opportunity. It may no longer be active.</p></div></div>';
+      listPanel.hidden = true;
+      offerPanel.hidden = false;
+      return;
+    }
+
+    var pl = window._myPlacements[matchId] || null;
+    var stage = pl ? pl.stage : (currentProfile ? currentProfile.pipeline_stage : 'offer_extended');
+    var isOfferOpen = stage === 'offer_extended';
+
+    // Offer-letter PDF(s) for this placement (private bucket → signed URL on demand)
+    var lettersHtml = '';
+    if (pl && pl.id) {
+      var contractsRes = await ghFrom('placement_contracts')
+        .select('id,file_name,file_path,mime_type,uploaded_at')
+        .eq('placement_id', pl.id)
+        .eq('contract_type', 'offer_letter')
+        .order('uploaded_at', { ascending: false });
+      var contracts = contractsRes.data || [];
+      if (contracts.length > 0) {
+        var letterLinks = [];
+        for (var i = 0; i < contracts.length; i++) {
+          var c = contracts[i];
+          try {
+            var urlRes = await window.ghSupabase.storage.from('gh-placement-contracts')
+              .createSignedUrl(c.file_path, 3600);
+            if (urlRes.data && urlRes.data.signedUrl) {
+              letterLinks.push(
+                '<a href="' + urlRes.data.signedUrl + '" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-right:var(--space-2);">' +
+                '&#128196; ' + escapeHtml(c.file_name || 'Offer Letter') + '</a>'
+              );
+            }
+          } catch (e) { /* skip an unreadable letter */ }
+        }
+        if (letterLinks.length > 0) {
+          lettersHtml =
+            '<div class="panel" style="margin-bottom:var(--space-4);">' +
+              '<div class="panel-header"><span class="panel-title">Offer Letter</span></div>' +
+              '<div class="panel-body" style="padding:var(--space-4);">' + letterLinks.join('') + '</div>' +
+            '</div>';
+        }
+      }
+    }
+
+    // Recruiter-entered offer terms
+    var summaryHtml = '';
+    if (pl && pl.offer_summary) {
+      summaryHtml =
+        '<div class="panel" style="margin-bottom:var(--space-4);">' +
+          '<div class="panel-header"><span class="panel-title">Offer Summary</span></div>' +
+          '<div class="panel-body" style="white-space:pre-wrap;line-height:1.7;color:var(--text-secondary);">' + escapeHtml(pl.offer_summary) + '</div>' +
+        '</div>';
+    }
+
+    // Placement meta (start / contract / visa) when a placement exists
+    var metaHtml = '';
+    if (pl) {
+      var metaBits = [];
+      if (pl.start_date) metaBits.push('Start date: ' + new Date(pl.start_date).toLocaleDateString());
+      if (pl.contract_status) metaBits.push('Contract: ' + escapeHtml(String(pl.contract_status).replace('_', ' ')));
+      if (pl.visa_status) metaBits.push('Visa: ' + escapeHtml(String(pl.visa_status).replace('_', ' ')));
+      if (metaBits.length > 0) {
+        metaHtml = '<div style="font-size:var(--text-sm);color:var(--text-tertiary);margin-bottom:var(--space-4);">' + metaBits.join(' &middot; ') + '</div>';
+      }
+    }
+
+    // Auto campaign details
+    var detailsHtml =
+      '<div style="display:flex;flex-wrap:wrap;gap:var(--space-4);font-size:var(--text-sm);color:var(--text-secondary);">' +
+        (opp.destination_country ? '<span>&#127758; ' + escapeHtml(opp.destination_country) + '</span>' : '') +
+        (opp.salary_display ? '<span>&#128176; ' + escapeHtml(opp.salary_display) + '</span>' : '') +
+        (opp.visa_sponsored ? '<span style="color:var(--primary);">&#9989; Visa Sponsored</span>' : '') +
+        (opp.positions ? '<span>&#128101; ' + escapeHtml(String(opp.positions)) + ' positions</span>' : '') +
+        (opp.specialty ? '<span>&#127973; ' + escapeHtml(opp.specialty) + '</span>' : '') +
+      '</div>' +
+      (opp.description ? '<p style="margin-top:var(--space-4);font-size:var(--text-sm);line-height:1.7;color:var(--text-secondary);">' + escapeHtml(opp.description) + '</p>' : '');
+
+    // Decision buttons — only while the offer is open
+    var actionsHtml = '';
+    if (isOfferOpen) {
+      actionsHtml =
+        '<div style="display:flex;gap:var(--space-3);flex-wrap:wrap;">' +
+          '<button class="btn btn-primary" id="offer-accept-btn" data-match="' + matchId + '">Accept Offer</button>' +
+          '<button class="btn btn-ghost" id="offer-decline-btn" data-match="' + matchId + '" style="color:var(--accent-coral);border-color:var(--accent-coral);">Decline Offer</button>' +
+        '</div>';
+    } else if (stage === 'offer_accepted') {
+      actionsHtml =
+        '<div style="background:rgba(46,196,182,0.08);border:1px solid rgba(46,196,182,0.3);border-radius:var(--radius-md);padding:var(--space-4);color:var(--primary);font-size:var(--text-sm);">' +
+        '&#10003; Offer accepted. Our team will reach out with your pre-employment checklist next.</div>';
+    } else if (stage === 'terminated' || (currentProfile && currentProfile.pipeline_exit_status === 'declined')) {
+      actionsHtml =
+        '<div style="background:rgba(255,176,32,0.08);border:1px solid rgba(255,176,32,0.3);border-radius:var(--radius-md);padding:var(--space-4);color:var(--accent-amber);font-size:var(--text-sm);">' +
+        'Offer declined. If you change your mind, contact our team in Messages.</div>';
+    }
+
+    content.innerHTML =
+      '<div class="panel" style="margin-bottom:var(--space-4);border-color:var(--primary);border-width:2px;">' +
+        '<div class="panel-header" style="background:var(--primary-muted);">' +
+          '<span class="panel-title" style="color:var(--primary);">' + escapeHtml(opp.title || 'Offer') + '</span>' +
+          '<span class="stage-badge stage-' + stage + '">' + getStageLabel(stage) + '</span>' +
+        '</div>' +
+        '<div class="panel-body">' +
+          '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-4);">' +
+            '<div><strong>' + escapeHtml(opp.employer_name || 'Employer') + '</strong>' +
+            '<div style="font-size:var(--text-sm);color:var(--text-tertiary);">' + escapeHtml(opp.destination_country || '') + '</div></div>' +
+            (opp.salary_display ? '<div style="margin-left:auto;font-family:var(--font-display);font-weight:700;color:var(--primary);">' + escapeHtml(opp.salary_display) + '</div>' : '') +
+          '</div>' +
+          detailsHtml +
+          metaHtml +
+        '</div>' +
+      '</div>' +
+      summaryHtml +
+      lettersHtml +
+      (actionsHtml ? '<div style="margin-top:var(--space-2);">' + actionsHtml + '</div>' : '');
+
+    listPanel.hidden = true;
+    offerPanel.hidden = false;
+
+    var acceptBtn = document.getElementById('offer-accept-btn');
+    var declineBtn = document.getElementById('offer-decline-btn');
+    if (acceptBtn) acceptBtn.addEventListener('click', function () { showOfferConfirmModal(matchId); });
+    if (declineBtn) declineBtn.addEventListener('click', function () { showOfferDeclineModal(matchId); });
+  }
+
+  function closeOfferModal() {
+    var overlay = document.getElementById('offer-decision-modal');
+    if (overlay) overlay.remove();
+  }
+
+  function showOfferConfirmModal(matchId) {
+    closeOfferModal();
+    var overlay = document.createElement('div');
+    overlay.id = 'offer-decision-modal';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:var(--space-4);';
+    overlay.innerHTML =
+      '<div style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);max-width:480px;width:100%;padding:var(--space-6);">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-5);">' +
+          '<div><h2 style="font-family:var(--font-display);font-size:var(--text-xl);font-weight:800;margin-bottom:var(--space-1);">Accept Offer</h2>' +
+          '<p style="font-size:var(--text-sm);color:var(--text-tertiary);">Confirm you accept this offer. We will send your next steps by email.</p></div>' +
+          '<button class="btn btn-icon btn-ghost" id="offer-modal-close" style="width:32px;height:32px;flex-shrink:0;">' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>' +
+          '</button>' +
+        '</div>' +
+        '<button class="btn btn-primary" id="offer-accept-confirm" style="width:100%;">Yes, Accept Offer</button>' +
+        '<button class="btn btn-ghost" id="offer-modal-cancel" style="width:100%;margin-top:var(--space-2);">Cancel</button>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    document.getElementById('offer-modal-close').addEventListener('click', closeOfferModal);
+    document.getElementById('offer-modal-cancel').addEventListener('click', closeOfferModal);
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) closeOfferModal(); });
+    document.getElementById('offer-accept-confirm').addEventListener('click', async function () {
+      var btn = document.getElementById('offer-accept-confirm');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Processing...';
+      var { data, error } = await window.ghSupabase.rpc('respond_offer', { p_match_id: matchId, p_decision: 'accept' });
+      if (error || !data || data.success !== true) {
+        btn.disabled = false;
+        btn.textContent = 'Yes, Accept Offer';
+        showPortalToast(((error && error.message) || (data && data.error) || 'Could not accept the offer. Please try again.'));
+        return;
+      }
+      closeOfferModal();
+      showPortalToast('Offer accepted — check your email for next steps.');
+      await loadMyPlacements();
+      await loadOpportunities();
+      showOpportunitiesList();
+    });
+  }
+
+  function showOfferDeclineModal(matchId) {
+    closeOfferModal();
+    var overlay = document.createElement('div');
+    overlay.id = 'offer-decision-modal';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:var(--space-4);';
+    overlay.innerHTML =
+      '<div style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);max-width:480px;width:100%;padding:var(--space-6);">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-5);">' +
+          '<div><h2 style="font-family:var(--font-display);font-size:var(--text-xl);font-weight:800;margin-bottom:var(--space-1);">Decline Offer</h2>' +
+          '<p style="font-size:var(--text-sm);color:var(--text-tertiary);">Let us know why (optional) so we can improve our matching.</p></div>' +
+          '<button class="btn btn-icon btn-ghost" id="offer-modal-close" style="width:32px;height:32px;flex-shrink:0;">' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>' +
+          '</button>' +
+        '</div>' +
+        '<label style="font-size:var(--text-sm);font-weight:600;color:var(--text-secondary);display:block;margin-bottom:var(--space-2);">Reason (optional)</label>' +
+        '<textarea id="offer-decline-reason" class="form-input" rows="3" placeholder="e.g. Better offer elsewhere, relocation timing, compensation…" style="width:100%;resize:vertical;"></textarea>' +
+        '<button class="btn btn-primary" id="offer-decline-confirm" style="width:100%;margin-top:var(--space-4);background:var(--accent-coral);border-color:var(--accent-coral);">Decline Offer</button>' +
+        '<button class="btn btn-ghost" id="offer-modal-cancel" style="width:100%;margin-top:var(--space-2);">Cancel</button>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    document.getElementById('offer-modal-close').addEventListener('click', closeOfferModal);
+    document.getElementById('offer-modal-cancel').addEventListener('click', closeOfferModal);
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) closeOfferModal(); });
+    document.getElementById('offer-decline-confirm').addEventListener('click', async function () {
+      var btn = document.getElementById('offer-decline-confirm');
+      var reason = (document.getElementById('offer-decline-reason').value || '').trim();
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Processing...';
+      var { data, error } = await window.ghSupabase.rpc('respond_offer', { p_match_id: matchId, p_decision: 'decline', p_reason: reason || null });
+      if (error || !data || data.success !== true) {
+        btn.disabled = false;
+        btn.textContent = 'Decline Offer';
+        showPortalToast(((error && error.message) || (data && data.error) || 'Could not decline the offer. Please try again.'));
+        return;
+      }
+      closeOfferModal();
+      showPortalToast('Offer declined. Our team has been notified.');
+      await loadMyPlacements();
+      await loadOpportunities();
+      showOpportunitiesList();
+    });
+  }
+
+  // ── Offer deep-link routing (mirror the visa hash router) ──
+  var _offerTabWired = false;
+  var _offerHashApplied = false;
+
+  function wireOfferTabHook() {
+    if (_offerTabWired) return;
+    _offerTabWired = true;
+
+    // Back to list
+    var backBtn = document.getElementById('offer-back-btn');
+    if (backBtn) backBtn.addEventListener('click', function () { showOpportunitiesList(); });
+
+    // Returning to the Opportunities tab while viewing an offer → show the list
+    var oppNavItem = document.querySelector('.portal-nav-item[data-tab="tab-opportunities"]');
+    if (oppNavItem) {
+      oppNavItem.addEventListener('click', function () { showOpportunitiesList(); });
+    }
+
+    // Deep-link: /portal#offer-<matchId> opens the offer panel
+    window.addEventListener('hashchange', function () { applyOfferHash(true); });
+    window.addEventListener('gh:auth-ready', function () { applyOfferHash(false); });
+    if (window.GHAuth && GHAuth.getSession) {
+      GHAuth.getSession().then(function (s) { if (s) applyOfferHash(false); }).catch(function () {});
+    }
+  }
+
+  function applyOfferHash(force) {
+    var h = location.hash || '';
+    if (h.indexOf('#offer-') !== 0) return;
+    if (_offerHashApplied && !force) return;
+    _offerHashApplied = true;
+    // consume the hash so later events can never re-route/revert
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+    if (typeof switchToTab === 'function') switchToTab('tab-opportunities');
+    var m = h.match(/^#offer-([0-9a-fA-F-]{36})$/);
+    if (m) { showOfferPanel(m[1]); } else { showOpportunitiesList(); }
   }
 
   // ── Account Settings tab ──
@@ -2079,11 +2369,14 @@
     }
   }
 
-  // Wire visa tab hook after DOM is ready
+  // Wire visa + offer tab hooks after DOM is ready
   wireVisaTabHook();
+  wireOfferTabHook();
 
   // Expose for testing / programmatic use
   window.loadVisaCases = loadVisaCases;
   window.showVisaCase  = showVisaCase;
+  window.showOfferPanel = showOfferPanel;
+  window.showOpportunitiesList = showOpportunitiesList;
 
 })();
