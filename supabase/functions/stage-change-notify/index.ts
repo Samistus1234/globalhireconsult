@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import nodemailer from "npm:nodemailer@6.9.10";
+import { buildEmailHtml, renderBulletsHtml, renderAtAGlance } from "../_shared/gh-email-shell.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -27,8 +28,8 @@ const corsHeaders = {
 
 type Template = {
   subject: string;
-  badge: string;
-  color: string;
+  badge: string;        // gold letterspaced eyebrow in the navy letterhead
+  headline: string;     // serif display headline
   cta: string;
   intro: string;
   bullets?: string[];
@@ -36,11 +37,11 @@ type Template = {
 };
 
 // ── The 10 stages that email. Absence = silent. ──
-const STAGE_TEMPLATES: Record<string, Template> = {
+export const STAGE_TEMPLATES: Record<string, Template> = {
   qualified: {
     subject: "You're Qualified — Here's What's Next",
     badge: "QUALIFIED",
-    color: "#2EC4B6",
+    headline: "You're officially Qualified.",
     cta: "View Your Progress",
     intro:
       "Great news — your application and documents have been assessed and you've passed our qualification stage. You're now formally Qualified in our pipeline.",
@@ -56,7 +57,7 @@ const STAGE_TEMPLATES: Record<string, Template> = {
   shortlisted: {
     subject: "Congratulations — You've Been Shortlisted",
     badge: "SHORTLISTED",
-    color: "#10B981",
+    headline: "You've been shortlisted.",
     cta: "View Your Status",
     intro:
       "Great news! You've been shortlisted. Your profile stood out among the candidates we're working with, and we're moving you forward.",
@@ -72,7 +73,7 @@ const STAGE_TEMPLATES: Record<string, Template> = {
   presented_to_employer: {
     subject: "Your Profile Has Been Presented to an Employer",
     badge: "PRESENTED TO EMPLOYER",
-    color: "#0077B6",
+    headline: "Your profile is with an employer.",
     cta: "Track Your Application",
     intro:
       "We have presented your profile to an employer that matches your specialty and career goals.",
@@ -88,7 +89,7 @@ const STAGE_TEMPLATES: Record<string, Template> = {
   interview_scheduled: {
     subject: "Interview Scheduled — Please Prepare",
     badge: "INTERVIEW SCHEDULED",
-    color: "#0EA5E9",
+    headline: "An interview is scheduled.",
     cta: "View Interview Details",
     intro:
       "You've been invited to an interview! Log in to your portal for the date, time and interview details.",
@@ -104,7 +105,7 @@ const STAGE_TEMPLATES: Record<string, Template> = {
   interview_completed: {
     subject: "Thanks for Interviewing — What's Next",
     badge: "INTERVIEW COMPLETED",
-    color: "#0EA5E9",
+    headline: "Thank you for interviewing.",
     cta: "View Your Status",
     intro: "Thank you for completing your interview. We hope it went well!",
     bullets: [
@@ -119,7 +120,7 @@ const STAGE_TEMPLATES: Record<string, Template> = {
   offer_extended: {
     subject: "Offer Extended — Congratulations",
     badge: "OFFER EXTENDED",
-    color: "#D4A84B",
+    headline: "An offer has been extended to you.",
     cta: "Review Your Offer",
     intro:
       "Congratulations! An employer has extended an offer to you. This is a big milestone.",
@@ -129,13 +130,13 @@ const STAGE_TEMPLATES: Record<string, Template> = {
       "We'll guide you through the next steps once you respond",
     ],
     closing:
-      "If you'd like any clarification on the offer, reply to this email or speak with your recruiter.",
+      "Review the letter, then reply Accept to begin pre-employment. Questions about any term? Your recruiter is one message away.",
   },
 
   offer_accepted: {
     subject: "Offer Accepted — Next Steps",
     badge: "OFFER ACCEPTED",
-    color: "#D4A84B",
+    headline: "Your offer is accepted.",
     cta: "Continue in Your Portal",
     intro:
       "Thank you for accepting your offer! We'll now move you into the pre-employment phase.",
@@ -151,12 +152,12 @@ const STAGE_TEMPLATES: Record<string, Template> = {
   pre_employment: {
     subject: "Pre-Employment — Get Your Documents Ready",
     badge: "PRE-EMPLOYMENT",
-    color: "#6D28D9",
+    headline: "Let's get your documents ready.",
     cta: "View Your Checklist",
     intro:
       "Welcome to the pre-employment phase! Before your placement is confirmed, you'll need the following in order. We believe you have most of these — if you don't, now is the time to get them ready.",
     bullets: [
-      "Valid passport (with at least 18 months validity)",
+      "Valid international passport",
       "Professional licenses and academic certificates",
       "DataFlow / credential verification",
       "Destination licensure / registration (e.g. Mumaris, SCFHS)",
@@ -171,7 +172,7 @@ const STAGE_TEMPLATES: Record<string, Template> = {
   placement_confirmed: {
     subject: "Your Placement Is Confirmed",
     badge: "PLACEMENT CONFIRMED",
-    color: "#6D28D9",
+    headline: "Your placement is confirmed.",
     cta: "View Your Placement",
     intro: "Wonderful news — your placement is confirmed! Here's what happens next.",
     bullets: [
@@ -186,7 +187,7 @@ const STAGE_TEMPLATES: Record<string, Template> = {
   started_employment: {
     subject: "Welcome Aboard — First Week",
     badge: "WELCOME ABOARD",
-    color: "#10B981",
+    headline: "Welcome aboard.",
     cta: "Visit Your Portal",
     intro:
       "Welcome aboard! You've officially started employment. We're so proud of what you've achieved.",
@@ -199,6 +200,47 @@ const STAGE_TEMPLATES: Record<string, Template> = {
       "If you know other healthcare professionals ready for an international career, we'd love to work with them too. Thank you for being part of the GlobalHire journey!",
   },
 };
+
+// ── Pure builder — exported so all 10 stage emails are unit-testable ──
+export function buildStageEmail(
+  t: Template,
+  applicantName: string,
+  atAGlance: { employer: string; role: string; location: string; recruiter: string } | null,
+  portalUrl: string,
+  logoUrl: string
+): { html: string; text: string } {
+  let bodyHtml = '<p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#475569;">' + esc(t.intro) + '</p>';
+
+  if (atAGlance) {
+    bodyHtml += renderAtAGlance(atAGlance);
+  } else if (t.bullets && t.bullets.length) {
+    bodyHtml +=
+      '<div style="margin:4px 0 6px;font-size:10.5px;font-weight:700;letter-spacing:.16em;color:#0A1F44;">WHAT HAPPENS NEXT</div>' +
+      '<table role="presentation" width="100%">' + renderBulletsHtml(t.bullets.map((b) => esc(b))) + '</table>';
+  }
+
+  const html = buildEmailHtml({
+    logoUrl,
+    eyebrow: t.badge,
+    headline: t.headline,
+    greeting: "Dear " + esc(applicantName) + ",",
+    bodyHtml,
+    closingHtml: t.closing ? esc(t.closing) : undefined,
+    ctaLabel: t.cta,
+    ctaUrl: portalUrl,
+    footerSubtitle: "GlobalHire@eLab — International Healthcare Recruitment",
+  });
+
+  const text =
+    "Hi " + applicantName + ",\n\n" +
+    t.intro +
+    (t.bullets?.length ? "\n\n" + t.bullets.map((b) => "• " + b).join("\n") : "") +
+    (t.closing ? "\n\n" + t.closing : "") +
+    "\n\nVisit your portal: " + portalUrl +
+    "\n\n— GlobalHire@eLab";
+
+  return { html, text };
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -257,23 +299,36 @@ Deno.serve(async (req) => {
 
     const applicantEmail = authUser.user.email;
     const applicantName = profile.full_name || "Applicant";
-    const portalUrl = (Deno.env.get("SITE_URL") || "https://globalhire.elabsolution.org") + "/portal.html";
+    const siteOrigin = Deno.env.get("SITE_URL") || "https://globalhire.elabsolution.org";
+    const portalUrl = siteOrigin + "/portal.html";
+    const logoUrl = siteOrigin + "/assets/brand/globalhire-logo-white.png";
 
-    // ── Build branded HTML body ──
-    let bodyHtml = '<p style="margin:0 0 20px;font-size:15px;color:#475569;">Hi <strong style="color:#0F172A;">' + esc(applicantName) + '</strong>,</p>';
-    bodyHtml += '<p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#475569;">' + esc(t.intro) + '</p>';
-
-    if (t.bullets && t.bullets.length) {
-      bodyHtml += '<ul style="margin:0 0 20px;padding-left:20px;">';
-      for (const b of t.bullets) {
-        bodyHtml += '<li style="font-size:14px;line-height:1.7;color:#475569;margin-bottom:6px;">' + esc(b) + '</li>';
+    // ── Offer milestone: pull the active placement for the at-a-glance panel ──
+    let atAGlance: { employer: string; role: string; location: string; recruiter: string } | null = null;
+    if (newStage === "offer_extended") {
+      try {
+        const { data: pl } = await sb
+          .schema("globalhire")
+          .from("placements")
+          .select("employer_name,position_title,destination_country")
+          .eq("applicant_id", applicantId)
+          .order("created_at", { ascending: false })
+          .maybeSingle();
+        if (pl?.employer_name && pl?.position_title && pl?.destination_country) {
+          atAGlance = {
+            employer: esc(pl.employer_name),
+            role: esc(pl.position_title),
+            location: esc(pl.destination_country),
+            recruiter: "GlobalHire Talent Team",
+          };
+        }
+      } catch (e) {
+        console.warn("placement fetch failed (offer panel omitted):", e);
       }
-      bodyHtml += '</ul>';
     }
 
-    if (t.closing) {
-      bodyHtml += '<p style="margin:0 0 28px;font-size:15px;line-height:1.7;color:#475569;">' + esc(t.closing) + '</p>';
-    }
+    // ── Build design-B email (HTML + plain text) ──
+    const { html: fullHtml, text: plainText } = buildStageEmail(t, applicantName, atAGlance, portalUrl, logoUrl);
 
     // ── SMTP ──
     const smtpUser = Deno.env.get("GMAIL_USER") || Deno.env.get("SMTP_USER") || "support@elabsolution.org";
@@ -286,38 +341,6 @@ Deno.serve(async (req) => {
       secure: true,
       auth: { user: smtpUser, pass: smtpPass },
     });
-
-    const badgeBg = t.color + "15";
-    const badgeBorder = t.color + "30";
-
-    const fullHtml = [
-      '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>',
-      '<body style="margin:0;padding:0;background:#F0F4F8;font-family:Segoe UI,Roboto,Helvetica Neue,sans-serif;color:#0F172A;">',
-      '<table width="100%" cellpadding="0" cellspacing="0" style="background:#F0F4F8;padding:40px 20px;"><tr><td align="center">',
-      '<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;">',
-      '<tr><td style="padding:28px 40px 20px;border-bottom:1px solid #E2E8F0;"><table width="100%"><tr>',
-      '<td><span style="display:inline-block;width:34px;height:34px;background:#0077B6;border-radius:8px;text-align:center;line-height:34px;font-weight:800;color:#fff;font-size:14px;">G</span></td>',
-      '<td style="padding-left:12px;font-size:18px;font-weight:800;color:#0F172A;letter-spacing:-0.3px;">Global<span style="color:#0077B6;">Hire</span></td>',
-      '</tr></table></td></tr>',
-      '<tr><td style="padding:24px 40px 0;"><span style="display:inline-block;padding:5px 14px;border-radius:50px;font-size:11px;font-weight:700;letter-spacing:1px;color:' + t.color + ';background:' + badgeBg + ';border:1px solid ' + badgeBorder + ';">' + t.badge + '</span></td></tr>',
-      '<tr><td style="padding:20px 40px 32px;">',
-      bodyHtml,
-      '<a href="' + portalUrl + '" style="display:inline-block;padding:14px 32px;background:#0077B6;color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;border-radius:8px;">' + t.cta + '</a>',
-      '<p style="margin:24px 0 0;font-size:13px;color:#94A3B8;">Access your portal: <a href="' + portalUrl + '" style="color:#0077B6;">' + portalUrl + '</a></p>',
-      '</td></tr>',
-      '<tr><td style="padding:20px 40px;border-top:1px solid #E2E8F0;text-align:center;">',
-      '<p style="margin:0 0 4px;font-size:12px;color:#94A3B8;">GlobalHire@eLab — International Healthcare Recruitment</p>',
-      '<p style="margin:0;font-size:11px;color:#CBD5E1;">eLab Solutions International LLC</p>',
-      '</td></tr></table></td></tr></table></body></html>',
-    ].join("\n");
-
-    const plainText =
-      "Hi " + applicantName + ",\n\n" +
-      t.intro +
-      (t.bullets?.length ? "\n\n" + t.bullets.map((b) => "• " + b).join("\n") : "") +
-      (t.closing ? "\n\n" + t.closing : "") +
-      "\n\nVisit your portal: " + portalUrl +
-      "\n\n— GlobalHire@eLab";
 
     await transport.sendMail({
       from: '"GlobalHire@eLab" <' + smtpUser + '>',
@@ -348,7 +371,7 @@ Deno.serve(async (req) => {
 
   } catch (err) {
     console.error("stage-change-notify error:", err);
-    return json({ error: err.message || "Internal server error" }, 500);
+    return json({ error: err instanceof Error ? err.message : "Internal server error" }, 500);
   }
 });
 
