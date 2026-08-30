@@ -112,7 +112,7 @@ export function buildEmailHtml(p: ShellProps): string {
     // ── Navy footer ──
     '<tr><td style="background:#0A1F44;padding:22px 48px;text-align:center;">',
     '<p style="margin:0 0 3px;' + SANS + 'font-size:12px;color:#B9C7DF;">' + p.footerSubtitle + "</p>",
-    '<p style="margin:0;' + SANS + 'font-size:11px;color:#6E7FA0;">' + (p.footerLine2 ?? "eLab Solutions International LLC · Riyadh · Doha · Abu Dhabi") + "</p>",
+    '<p style="margin:0;' + SANS + 'font-size:11px;color:#6E7FA0;">' + (p.footerLine2 ?? "eLab Solutions International LLC · US · Nigeria") + "</p>",
     "</td></tr>",
 
     "</table></td></tr></table></body></html>",
