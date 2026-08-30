@@ -16,7 +16,8 @@ const corsHeaders = {
   Uses service role key to generate a password recovery link.
 
   Variants are selected by `source`:
-    - tech-*  (e.g. tech-careers-middle-east)  → tech recruitment copy
+    - app-signup  (main portal signup)          → "account ready" copy (no docs yet)
+    - tech-*      (e.g. tech-careers-middle-east)  → tech recruitment copy
     - everything else                           → healthcare default
 */
 
@@ -37,6 +38,20 @@ const HEALTHCARE_LABELS: Record<string, string> = {
 };
 
 function variantFor(source: string | undefined): Variant {
+  // ── Main portal signup: account ready, docs come later ──
+  if (source === "app-signup") {
+    return {
+      badgeText: "WELCOME",
+      badgeColor: "#2EC4B6",
+      introPara:
+        'Your GlobalHire account is ready — complete your profile and upload your documents in your portal to get started.',
+      setupPara:
+        'Click the button below to <strong style="color:#0F172A;">set your password</strong> and access your portal, where you can complete your profile, upload documents, and track your application at every stage.',
+      footerSubtitle: "GlobalHire@eLab — International Healthcare Recruitment",
+      subject: "Welcome to GlobalHire — Let's Get You Started",
+    };
+  }
+
   // ── Tech recruitment branch ──
   if (source && source.startsWith("tech-")) {
     return {
@@ -194,7 +209,7 @@ Deno.serve(async (req) => {
 
     transport.close();
 
-    return json({ success: true, sent_to: email, variant: source && source.startsWith("tech-") ? "tech" : "healthcare" });
+    return json({ success: true, sent_to: email, variant: source ?? "healthcare" });
 
   } catch (err) {
     console.error("welcome-applicant error:", err);

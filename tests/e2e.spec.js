@@ -307,6 +307,7 @@ test.describe('Supabase API Integration', () => {
   const API_URL = 'https://evzhnsugmvtqgmvzwyix.supabase.co';
   const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2emhuc3VnbXZ0cWdtdnp3eWl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NTcyNzcsImV4cCI6MjA4NzEzMzI3N30.JSjwHLHudUWlgXkaAam8xxXQbpCmbOLcBGenkFW3qNk';
   let authToken = null;
+  let ADMIN_ID = null;
 
   test.beforeAll(async ({ request }) => {
     const res = await request.post(`${API_URL}/auth/v1/token?grant_type=password`, {
@@ -316,6 +317,13 @@ test.describe('Supabase API Integration', () => {
     const body = await res.json();
     authToken = body.access_token;
     expect(authToken).toBeTruthy();
+
+    // The admin's auth.users id (for asserting the trigger's auth.uid() attribution).
+    const me = await request.get(`${API_URL}/auth/v1/user`, {
+      headers: { 'apikey': ANON_KEY, 'Authorization': `Bearer ${authToken}` },
+    });
+    ADMIN_ID = (await me.json()).id;
+    expect(ADMIN_ID).toBeTruthy();
   });
 
   test('gh_profiles: SELECT returns profiles', async ({ request }) => {
@@ -445,6 +453,81 @@ test.describe('Supabase API Integration', () => {
       headers: { 'apikey': ANON_KEY, 'Authorization': `Bearer ${authToken}` },
     });
     expect(del.status()).toBeLessThan(300);
+  });
+
+  test('stage change: trigger → stage-change-notify emails + audits (schema-v26)', async ({ request }) => {
+    const ts = Date.now();
+    const email = `stagechange+${ts}@globalhire-test.com`;
+
+    // Fresh test applicant. GoTrue auto-confirm is ON, so /auth/v1/signup
+    // returns a session (and user.id) immediately — no admin create needed.
+    const signup = await request.post(`${API_URL}/auth/v1/signup`, {
+      headers: { 'apikey': ANON_KEY, 'Content-Type': 'application/json' },
+      data: { email, password: 'StageChange1234!', data: { full_name: 'Stage Change Test' } },
+    });
+    expect(signup.status()).toBe(200);
+    const signupBody = await signup.json();
+    const applicantId = signupBody.user.id;
+    expect(applicantId).toBeTruthy();
+
+    const H = {
+      'apikey': ANON_KEY, 'Authorization': `Bearer ${authToken}`,
+      'Content-Type': 'application/json', 'Prefer': 'return=representation',
+    };
+
+    // ── Mapped stage: moving to 'shortlisted' must email + audit ──
+    const patch = await request.patch(`${API_URL}/rest/v1/gh_profiles?id=eq.${applicantId}`, {
+      headers: H,
+      data: { pipeline_stage: 'shortlisted' },
+    });
+    expect(patch.status()).toBe(200);
+    expect((await patch.json())[0].pipeline_stage).toBe('shortlisted');
+
+    // Trigger → pg_net → edge fn is async; poll gh_messages for the audit row.
+    let found = null;
+    for (let i = 0; i < 30; i++) {
+      const sel = await request.get(
+        `${API_URL}/rest/v1/gh_messages?applicant_id=eq.${applicantId}&direction=eq.outbound&select=subject,sent_by_admin`,
+        { headers: { 'apikey': ANON_KEY, 'Authorization': `Bearer ${authToken}` } }
+      );
+      if (sel.ok) {
+        found = (await sel.json()).find((r) => r.subject === "Congratulations — You've Been Shortlisted");
+        if (found) break;
+      }
+      await new Promise((r) => setTimeout(r, 1500));
+    }
+    expect(found).toBeTruthy();
+    expect(found.subject).toBe("Congratulations — You've Been Shortlisted");
+    // The audit row should be attributed to the triggering admin.
+    expect(found.sent_by_admin).toBe(ADMIN_ID);
+
+    // ── Silent stage: a revenue stage must NOT email/audit (no new row) ──
+    const before = (await (
+      await request.get(`${API_URL}/rest/v1/gh_messages?applicant_id=eq.${applicantId}&select=id`, {
+        headers: { 'apikey': ANON_KEY, 'Authorization': `Bearer ${authToken}` },
+      })
+    ).json()).length;
+
+    const patch2 = await request.patch(`${API_URL}/rest/v1/gh_profiles?id=eq.${applicantId}`, {
+      headers: H,
+      data: { pipeline_stage: 'invoiced' },
+    });
+    expect(patch2.status()).toBe(200);
+
+    // Give the (skipped) edge-fn call a quiet window; assert nothing new landed.
+    await new Promise((r) => setTimeout(r, 12000));
+    const after = (await (
+      await request.get(`${API_URL}/rest/v1/gh_messages?applicant_id=eq.${applicantId}&select=id`, {
+        headers: { 'apikey': ANON_KEY, 'Authorization': `Bearer ${authToken}` },
+      })
+    ).json()).length;
+    expect(after).toBe(before);
+
+    // Cleanup: reset the throwaway applicant to a silent stage (no further email).
+    await request.patch(`${API_URL}/rest/v1/gh_profiles?id=eq.${applicantId}`, {
+      headers: H,
+      data: { pipeline_stage: 'application_received' },
+    });
   });
 });
 

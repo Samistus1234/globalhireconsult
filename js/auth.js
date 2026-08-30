@@ -174,6 +174,12 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
+        // Fire the welcome email for this new account (main-app signup variant).
+        // Not awaited — never block the redirect on email delivery.
+        sb.functions.invoke('welcome-applicant', {
+          body: { email: email, name: fullName, source: 'app-signup' }
+        }).catch(err => console.warn('welcome-applicant failed:', err));
+
         // Wait for profile trigger to fire
         await new Promise(r => setTimeout(r, 1500));
 
