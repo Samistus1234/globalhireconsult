@@ -101,6 +101,98 @@ const GHE = {
     };
   },
 
+  // ── Escape HTML ──
+  escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    const div = document.createElement('div');
+    div.appendChild(document.createTextNode(String(str)));
+    return div.innerHTML;
+  },
+
+  // ── Recruitment Pipeline registry (single source of truth) ──
+  // One master pipeline replaces the six fragmented stage systems.
+  // Keys match profiles.pipeline_stage values (see schema-v25-pipeline.sql).
+  PHASES: [
+    { key: 'lead', label: 'Lead & Application' },
+    { key: 'qualification', label: 'Qualification' },
+    { key: 'employer', label: 'Employer' },
+    { key: 'offer', label: 'Offer' },
+    { key: 'deployment', label: 'Deployment' },
+    { key: 'revenue', label: 'Revenue' }
+  ],
+
+  PIPELINE: [
+    { key: 'suggested',             label: 'Suggested',              phase: 'lead' },
+    { key: 'application_received',  label: 'Application Received',   phase: 'lead' },
+    { key: 'screening',             label: 'Screening',              phase: 'qualification' },
+    { key: 'qualified',             label: 'Qualified',              phase: 'qualification' },
+    { key: 'shortlisted',           label: 'Shortlisted',            phase: 'qualification' },
+    { key: 'presented_to_employer', label: 'Presented to Employer',  phase: 'employer' },
+    { key: 'interview_scheduled',   label: 'Interview Scheduled',    phase: 'employer' },
+    { key: 'interview_completed',   label: 'Interview Completed',    phase: 'employer' },
+    { key: 'offer_extended',        label: 'Offer Extended',         phase: 'offer' },
+    { key: 'offer_accepted',        label: 'Offer Accepted',         phase: 'offer' },
+    { key: 'pre_employment',        label: 'Pre-Employment',         phase: 'deployment' },
+    { key: 'placement_confirmed',   label: 'Placement Confirmed',    phase: 'deployment' },
+    { key: 'started_employment',    label: 'Started Employment',     phase: 'deployment' },
+    { key: 'commission_due',        label: 'Commission Due',         phase: 'revenue' },
+    { key: 'invoiced',              label: 'Invoiced',               phase: 'revenue' },
+    { key: 'paid_closed',           label: 'Paid & Closed',          phase: 'revenue' }
+  ],
+
+  EXIT_STATUSES: [
+    { value: 'rejected',         label: 'Rejected' },
+    { value: 'withdrawn',        label: 'Withdrawn' },
+    { value: 'declined',         label: 'Declined' },
+    { value: 'terminated',       label: 'Terminated' },
+    { value: 'placed_elsewhere', label: 'Placed Elsewhere' }
+  ],
+
+  // Phase accent colors (badge text/border tint uses color + '1f' alpha bg)
+  PHASE_COLORS: {
+    lead: '#0EA5E9',
+    qualification: '#D4A84B',
+    employer: '#7C3AED',
+    offer: '#0096C7',
+    deployment: '#0F766E',
+    revenue: '#16A34A'
+  },
+
+  stageLabel(key) {
+    const s = this.PIPELINE.find(x => x.key === key);
+    return s ? s.label : key;
+  },
+
+  phaseOf(key) {
+    const s = this.PIPELINE.find(x => x.key === key);
+    return s ? s.phase : null;
+  },
+
+  phaseColor(phase) {
+    return this.PHASE_COLORS[phase] || '#94A3B8';
+  },
+
+  phaseLabel(phase) {
+    const p = this.PHASES.find(x => x.key === phase);
+    return p ? p.label : phase;
+  },
+
+  // Tinted pill badge for a pipeline stage
+  stageBadge(key) {
+    if (!key) return '<span style="color:var(--text-tertiary);">—</span>';
+    const s = this.PIPELINE.find(x => x.key === key);
+    if (!s) return '<span style="color:var(--text-tertiary);">' + this.escapeHtml(key) + '</span>';
+    const color = this.phaseColor(s.phase);
+    return '<span style="display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;color:' + color + ';background:' + color + '1f;letter-spacing:0.02em;">' + this.escapeHtml(s.label) + '</span>';
+  },
+
+  // Red pill for an exited candidate
+  exitBadge(status) {
+    const e = this.EXIT_STATUSES.find(x => x.value === status);
+    const label = e ? e.label : status;
+    return '<span style="display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;color:#EF4444;background:#EF44441f;letter-spacing:0.02em;">✕ ' + this.escapeHtml(label) + '</span>';
+  },
+
   // ── Avatar colors (healthcare palette) ──
   avatarColors: [
     ['#0077B6', '#ffffff'],

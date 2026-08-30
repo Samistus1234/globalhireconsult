@@ -1,8 +1,8 @@
 const { test, expect } = require('@playwright/test');
 
 const BASE = 'https://globalhire-elab.vercel.app';
-const ADMIN_EMAIL = 'living4purpose247@gmail.com';
-const ADMIN_PASS = 'Dataflow1234@';
+const ADMIN_EMAIL = 'e2e-admin@globalhire-test.com';
+const ADMIN_PASS = 'E2EAdmin1234!';
 
 const ts = Date.now();
 const TEST_USER_EMAIL = `testuser+${ts}@globalhire-test.com`;
@@ -195,10 +195,10 @@ test.describe('Admin Dashboard', () => {
     expect(html.length).toBeGreaterThan(0);
   });
 
-  test('Pipeline stages visible with 4 stages', async ({ page }) => {
+  test('Pipeline phases visible with 6 phases', async ({ page }) => {
     const stages = page.locator('.pipeline-stage[data-stage]');
     await expect(stages.first()).toBeVisible({ timeout: 10000 });
-    expect(await stages.count()).toBe(4);
+    expect(await stages.count()).toBe(6);
   });
 
   test('Verification Queue section present', async ({ page }) => {
@@ -354,11 +354,69 @@ test.describe('Supabase API Integration', () => {
     expect(Array.isArray(data)).toBeTruthy();
     if (data.length > 0) {
       expect(data[0]).toHaveProperty('pipeline_status');
+      expect(data[0]).toHaveProperty('pipeline_exit_status');
+      expect(data[0]).toHaveProperty('placement_fee');
       expect(data[0]).toHaveProperty('total_docs');
     }
   });
 
+  test('pipeline: new stage keys + revenue + exit columns round-trip (schema-v25)', async ({ request }) => {
+    const pid = '10914406-a283-40be-a16a-fea273933322';
+    const H = {
+      'apikey': ANON_KEY, 'Authorization': `Bearer ${authToken}`,
+      'Content-Type': 'application/json', 'Prefer': 'return=representation',
+    };
+
+    // Read current values so we can restore the shared test profile afterwards.
+    const cur = await request.get(`${API_URL}/rest/v1/gh_profiles?select=pipeline_stage,pipeline_exit_status,placement_fee,invoice_number&id=eq.${pid}`, { headers: H });
+    const curRow = cur.ok ? (await cur.json())[0] : {};
+
+    try {
+      // 1. A revenue stage key + revenue columns are accepted (v25 CHECK + columns)
+      const r1 = await request.patch(`${API_URL}/rest/v1/gh_profiles?id=eq.${pid}`, {
+        headers: H,
+        data: { pipeline_stage: 'invoiced', placement_fee: 7500, fee_currency: 'USD', invoice_number: 'GH-TEST-0001', invoiced_at: new Date().toISOString() },
+      });
+      expect(r1.status()).toBe(200);
+      const d1 = (await r1.json())[0];
+      expect(d1.pipeline_stage).toBe('invoiced');
+      expect(Number(d1.placement_fee)).toBe(7500);
+      expect(d1.invoice_number).toBe('GH-TEST-0001');
+
+      // 2. Exit columns round-trip
+      const r2 = await request.patch(`${API_URL}/rest/v1/gh_profiles?id=eq.${pid}`, {
+        headers: H,
+        data: { pipeline_exit_status: 'withdrawn', pipeline_exit_reason: 'e2e round-trip', pipeline_exited_at: new Date().toISOString() },
+      });
+      expect(r2.status()).toBe(200);
+      const d2 = (await r2.json())[0];
+      expect(d2.pipeline_exit_status).toBe('withdrawn');
+      expect(d2.pipeline_exit_reason).toBe('e2e round-trip');
+    } finally {
+      // Restore the shared test profile to its prior state.
+      await request.patch(`${API_URL}/rest/v1/gh_profiles?id=eq.${pid}`, {
+        headers: H,
+        data: {
+          pipeline_stage: curRow.pipeline_stage || 'application_received',
+          pipeline_exit_status: curRow.pipeline_exit_status || null,
+          pipeline_exit_reason: null,
+          pipeline_exited_at: null,
+          placement_fee: curRow.placement_fee != null ? curRow.placement_fee : null,
+          invoice_number: curRow.invoice_number || null,
+          invoiced_at: null,
+          paid_at: null,
+        },
+      });
+    }
+  });
+
   test('gh_documents: INSERT, SELECT, DELETE cycle', async ({ request }) => {
+    // Use the logged-in user's own id as applicant_id: the "own docs" RLS
+    // policy (WITH CHECK applicant_id = auth.uid()) is what permits this.
+    const me = await request.get(`${API_URL}/auth/v1/user`, {
+      headers: { 'apikey': ANON_KEY, 'Authorization': `Bearer ${authToken}` },
+    });
+    const myId = (await me.json()).id;
     // INSERT
     const ins = await request.post(`${API_URL}/rest/v1/gh_documents`, {
       headers: {
@@ -366,7 +424,7 @@ test.describe('Supabase API Integration', () => {
         'Content-Type': 'application/json', 'Prefer': 'return=representation',
       },
       data: {
-        applicant_id: '10914406-a283-40be-a16a-fea273933322',
+        applicant_id: myId,
         doc_type: 'cv', file_name: 'e2e-test.pdf',
         file_path: 'e2e/test.pdf', file_size_bytes: 512, mime_type: 'application/pdf',
       },

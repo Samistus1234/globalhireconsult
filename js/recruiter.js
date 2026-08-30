@@ -33,29 +33,17 @@
   var SUBMISSION_DOC_LABELS = {};
   SUBMISSION_DOC_TYPES.forEach(function (t) { SUBMISSION_DOC_LABELS[t.key] = t.label; });
 
-  // ── Saudi Arabia recruitment pipeline stages ──
-  // Correct order: DataFlow → Mumaris+ → Prometric/ORA → License → Deployment
-  var SAUDI_PIPELINE = [
-    { id: 'profile',   label: 'Profile & Documents',       desc: 'Candidate profile complete, all required documents submitted', icon: '1' },
-    { id: 'dataflow',  label: 'DataFlow Verification',     desc: 'Primary source verification of credentials — mandatory SCFHS requirement', icon: '2' },
-    { id: 'mumaris',   label: 'Mumaris+ Registration',     desc: 'Professional registration on the Mumaris+ platform (SCFHS portal)', icon: '3' },
-    { id: 'prometric', label: 'Prometric / ORA Evaluation', desc: 'SCFHS licensing exam (Prometric) or ORA evaluation — required for license issuance', icon: '4' },
-    { id: 'license',   label: 'License Issuance',          desc: 'MOH / SCFHS professional practice license issued', icon: '5' },
-    { id: 'visa',      label: 'Visa & Deployment',         desc: 'Job offer confirmed, visa processed, deployment scheduled', icon: '6' },
-  ];
-
-  // Stage ID → step index maps (for pipeline_stage DB value → stepper position)
-  var SAUDI_STAGE_MAP   = { profile: 0, dataflow: 1, mumaris: 2, prometric: 3, license: 4, visa: 5 };
-  var GENERIC_STAGE_MAP = { profile: 0, verification: 1, licensing: 2, offer: 3, deployment: 4 };
-
-  // ── Generic recruitment pipeline stages ──
-  var GENERIC_PIPELINE = [
-    { id: 'profile', label: 'Profile & Documents', desc: 'Profile complete, documents submitted', icon: '1' },
-    { id: 'verification', label: 'Credential Verification', desc: 'Documents and credentials under review', icon: '2' },
-    { id: 'licensing', label: 'Licensing / Exam', desc: 'Local licensing requirements and assessments', icon: '3' },
-    { id: 'offer', label: 'Job Offer', desc: 'Matched with position, offer extended', icon: '4' },
-    { id: 'deployment', label: 'Visa & Deployment', desc: 'Visa processed and deployment confirmed', icon: '5' },
-  ];
+  // ── Unified recruitment pipeline (all markets) ──
+  // Phase-level stepper built from GHE.PHASES so recruiters see the same master
+  // pipeline as the admin dashboard — the per-market stage maps are gone.
+  var PIPELINE_PHASE_DESC = {
+    lead: 'Leads and applications being collected',
+    qualification: 'Screening, qualification and shortlisting',
+    employer: 'Presented to employer, interviews underway',
+    offer: 'Offer extended and accepted',
+    deployment: 'Pre-employment through to starting work',
+    revenue: 'Commission due, invoicing and payment'
+  };
 
   // ── XSS escape ──
   function esc(str) {
@@ -98,13 +86,6 @@
   };
   function getAdminStatusBadge(status) {
     return RSC_STATUS_BADGE[status] || RSC_STATUS_BADGE.submitted;
-  }
-
-  // ── Is this candidate targeting Saudi Arabia? ──
-  function isSaudi(candidate) {
-    return (candidate.preferred_destinations || []).some(function (d) {
-      return /saudi|ksa|riyadh|jeddah/i.test(d);
-    });
   }
 
   // ── Parse [ASSESSMENT: X] prefix from note text ──
@@ -204,7 +185,7 @@
 
     // Fetch profiles
     var { data: profiles } = await ghFrom('profiles')
-      .select('id, full_name, specialty, country_of_origin, years_of_experience, avatar_initials, avatar_color_index, preferred_destinations, phone, license_number, pipeline_stage')
+      .select('id, full_name, specialty, country_of_origin, years_of_experience, avatar_initials, avatar_color_index, preferred_destinations, phone, license_number, pipeline_stage, pipeline_exit_status, pipeline_exit_reason')
       .in('id', applicantIds);
 
     // Fetch documents summary
@@ -505,26 +486,30 @@
     }
 
     // ── Section: Recruitment Pipeline ──
-    var pipeline = isSaudi(candidate) ? SAUDI_PIPELINE : GENERIC_PIPELINE;
-    var pipelineTitle = isSaudi(candidate) ? 'Saudi Arabia Recruitment Path' : 'Recruitment Path';
-    var pipelineSubtitle = isSaudi(candidate)
-      ? 'DataFlow \u2192 Mumaris+ \u2192 Prometric / ORA \u2192 License \u2192 Deployment'
-      : 'Verification \u2192 Licensing \u2192 Job Offer \u2192 Deployment';
+    // Unified phase stepper (GHE.PHASES) — same pipeline as the admin dashboard.
+    var pipeline = GHE.PHASES.map(function (ph, i) {
+      return { id: ph.key, label: ph.label, desc: PIPELINE_PHASE_DESC[ph.key] || '', icon: String(i + 1) };
+    });
+    var pipelineTitle = 'Recruitment Path';
+    var pipelineSubtitle = 'Unified pipeline across all markets';
 
-    // Use pipeline_stage set by eLab admin (stored in profiles.pipeline_stage)
-    var stageMap = isSaudi(candidate) ? SAUDI_STAGE_MAP : GENERIC_STAGE_MAP;
+    // Current phase = the candidate's stored pipeline_stage → phase (GHE.phaseOf)
     var currentPipelineStep = 0;
-    if (candidate.pipeline_stage && stageMap.hasOwnProperty(candidate.pipeline_stage)) {
-      currentPipelineStep = stageMap[candidate.pipeline_stage];
-    } else {
-      // Fallback: infer from doc status if admin hasn't set a stage yet
-      var docStage = getDocStage(docs);
-      currentPipelineStep = docStage >= 2 ? 1 : 0;
+    if (candidate.pipeline_stage) {
+      var phase = GHE.phaseOf(candidate.pipeline_stage);
+      var phaseIdx = pipeline.findIndex(function (s) { return s.id === phase; });
+      if (phaseIdx >= 0) currentPipelineStep = phaseIdx;
     }
 
     html += '<div>';
     html += '<div class="panel-section-title">' + esc(pipelineTitle) + '</div>';
     html += '<div style="font-size:11px;color:var(--text-tertiary);margin-bottom:var(--space-4);">' + esc(pipelineSubtitle) + '</div>';
+    if (candidate.pipeline_exit_status) {
+      html += '<div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-4);">' +
+        GHE.exitBadge(candidate.pipeline_exit_status) +
+        (candidate.pipeline_exit_reason ? '<span style="font-size:11px;color:var(--text-tertiary);">' + esc(candidate.pipeline_exit_reason) + '</span>' : '') +
+      '</div>';
+    }
     html += '<div class="pipeline-stepper">';
 
     pipeline.forEach(function (step, idx) {

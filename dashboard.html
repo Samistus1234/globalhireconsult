@@ -175,7 +175,7 @@
               </div>
             </div>
             <div class="kpi-value" id="kpi-pipeline" data-count="0">0</div>
-            <span class="kpi-change" style="color:var(--text-tertiary)">
+            <span class="kpi-change" id="kpi-pipeline-sub" style="color:var(--text-tertiary)">
               No data yet
             </span>
           </div>
@@ -208,17 +208,17 @@
             </span>
           </div>
 
-          <!-- KPI 4: Match Accuracy -->
+          <!-- KPI 4: Revenue Due -->
           <div class="kpi-card" style="--kpi-accent: var(--accent-cyan)">
             <div class="kpi-header">
-              <span class="kpi-label">Match Accuracy</span>
+              <span class="kpi-label">Revenue Due</span>
               <div class="kpi-icon" style="background:rgba(0,212,255,0.12);color:var(--accent-cyan)">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               </div>
             </div>
-            <div class="kpi-value">&mdash;<span style="font-size:var(--text-xl);color:var(--accent-cyan)">%</span></div>
-            <span class="kpi-change" style="color:var(--text-tertiary)">
-              No data yet
+            <div class="kpi-value" id="kpi-revenue" data-count="0">0</div>
+            <span class="kpi-change" id="kpi-revenue-sub" style="color:var(--text-tertiary)">
+              Commission due + invoiced
             </span>
           </div>
 
@@ -258,25 +258,35 @@
               <a href="candidates.html" class="btn btn-ghost btn-sm">View All</a>
             </div>
             <div class="pipeline">
-              <div class="pipeline-stage" data-stage="applied">
+              <div class="pipeline-stage" data-stage="lead">
                 <div class="stage-count">0</div>
-                <div class="stage-label">Applied</div>
+                <div class="stage-label">Lead &amp; Application</div>
                 <div class="stage-bar"><div class="stage-fill" style="width:100%"></div></div>
               </div>
-              <div class="pipeline-stage" data-stage="screening">
+              <div class="pipeline-stage" data-stage="qualification">
                 <div class="stage-count">0</div>
-                <div class="stage-label">Screening</div>
-                <div class="stage-bar"><div class="stage-fill" style="width:68%"></div></div>
+                <div class="stage-label">Qualification</div>
+                <div class="stage-bar"><div class="stage-fill" style="width:70%"></div></div>
               </div>
-              <div class="pipeline-stage" data-stage="verifying">
+              <div class="pipeline-stage" data-stage="employer">
                 <div class="stage-count">0</div>
-                <div class="stage-label">Verifying</div>
-                <div class="stage-bar"><div class="stage-fill" style="width:37%"></div></div>
+                <div class="stage-label">Employer</div>
+                <div class="stage-bar"><div class="stage-fill" style="width:50%"></div></div>
               </div>
-              <div class="pipeline-stage" data-stage="verified">
+              <div class="pipeline-stage" data-stage="offer">
                 <div class="stage-count">0</div>
-                <div class="stage-label">Verified</div>
-                <div class="stage-bar"><div class="stage-fill" style="width:21%"></div></div>
+                <div class="stage-label">Offer</div>
+                <div class="stage-bar"><div class="stage-fill" style="width:35%"></div></div>
+              </div>
+              <div class="pipeline-stage" data-stage="deployment">
+                <div class="stage-count">0</div>
+                <div class="stage-label">Deployment</div>
+                <div class="stage-bar"><div class="stage-fill" style="width:25%"></div></div>
+              </div>
+              <div class="pipeline-stage" data-stage="revenue">
+                <div class="stage-count">0</div>
+                <div class="stage-label">Revenue</div>
+                <div class="stage-bar"><div class="stage-fill" style="width:15%"></div></div>
               </div>
             </div>
           </div>

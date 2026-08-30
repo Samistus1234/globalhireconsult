@@ -76,11 +76,12 @@
               <option value="">All Stages</option>
               <option value="offer_extended">Offer Extended</option>
               <option value="offer_accepted">Offer Accepted</option>
-              <option value="visa_processing">Visa Processing</option>
-              <option value="contract">Contract</option>
-              <option value="onboarding">Onboarding</option>
-              <option value="active">Active</option>
-              <option value="completed">Completed</option>
+              <option value="pre_employment">Pre-Employment</option>
+              <option value="placement_confirmed">Placement Confirmed</option>
+              <option value="started_employment">Started Employment</option>
+              <option value="commission_due">Commission Due</option>
+              <option value="invoiced">Invoiced</option>
+              <option value="paid_closed">Paid &amp; Closed</option>
               <option value="terminated">Terminated</option>
             </select>
             <select id="filter-country">
@@ -135,6 +136,10 @@
           <div style="margin-top:var(--space-5);">
             <label class="form-label" style="font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-tertiary);font-weight:600;">Current Stage</label>
             <div style="margin-top:var(--space-2);" id="overview-stage-badge"></div>
+          </div>
+          <div style="margin-top:var(--space-5);" id="overview-revenue" hidden>
+            <label class="form-label" style="font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-tertiary);font-weight:600;">Revenue</label>
+            <div class="placement-info-grid" style="margin-top:var(--space-2);" id="overview-revenue-grid"></div>
           </div>
         </div>
 

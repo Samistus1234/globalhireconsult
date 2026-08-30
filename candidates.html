@@ -274,10 +274,24 @@
             </div>
             <select id="filter-pipeline">
               <option value="">All Pipeline</option>
-              <option value="applied">Applied</option>
+              <option value="active">● Active pipeline</option>
+              <option value="exited">✕ Exited</option>
+              <option value="suggested">Suggested</option>
+              <option value="application_received">Application Received</option>
               <option value="screening">Screening</option>
-              <option value="verifying">Verifying</option>
-              <option value="verified">Verified</option>
+              <option value="qualified">Qualified</option>
+              <option value="shortlisted">Shortlisted</option>
+              <option value="presented_to_employer">Presented to Employer</option>
+              <option value="interview_scheduled">Interview Scheduled</option>
+              <option value="interview_completed">Interview Completed</option>
+              <option value="offer_extended">Offer Extended</option>
+              <option value="offer_accepted">Offer Accepted</option>
+              <option value="pre_employment">Pre-Employment</option>
+              <option value="placement_confirmed">Placement Confirmed</option>
+              <option value="started_employment">Started Employment</option>
+              <option value="commission_due">Commission Due</option>
+              <option value="invoiced">Invoiced</option>
+              <option value="paid_closed">Paid &amp; Closed</option>
             </select>
             <select id="filter-availability">
               <option value="">All Availability</option>
@@ -335,12 +349,12 @@
             <span class="kpi-change" id="kpi-paused-sub" style="color:var(--text-tertiary)">Loading...</span>
           </div>
 
-          <!-- KPI 4: Verified -->
+          <!-- KPI 4: Revenue -->
           <div class="kpi-card" style="--kpi-accent: var(--accent-cyan)">
             <div class="kpi-header">
-              <span class="kpi-label">Verified</span>
+              <span class="kpi-label">Revenue</span>
               <div class="kpi-icon" style="background:rgba(0,212,255,0.12);color:var(--accent-cyan)">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               </div>
             </div>
             <div class="kpi-value" id="kpi-verified">0</div>

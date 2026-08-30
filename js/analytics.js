@@ -33,7 +33,7 @@
 
   async function loadAnalytics() {
     var [applicantsRes, campaignsRes, docsRes, matchesRes] = await Promise.all([
-      ghFrom('admin_applicant_overview').select('specialty, pipeline_status, availability_status'),
+      ghFrom('admin_applicant_overview').select('specialty, pipeline_status, pipeline_exit_status, availability_status'),
       ghFrom('campaigns').select('id, title, destination_country, status, matched_count'),
       ghFrom('documents').select('status'),
       ghFrom('campaign_matches').select('match_score, email_status, response, campaign_id')
@@ -81,22 +81,29 @@
       }
     }
 
-    // Pipeline chart
-    var pipeCounts = { applied: 0, screening: 0, verifying: 0, verified: 0 };
+    // Pipeline chart (counts rolled up by phase — 6 bars, from GHE.PHASES)
+    var pipeCounts = {};
+    GHE.PHASES.forEach(function (p) { pipeCounts[p.key] = 0; });
     applicants.forEach(function (a) {
-      if (pipeCounts[a.pipeline_status] !== undefined) pipeCounts[a.pipeline_status]++;
+      if (a.pipeline_exit_status) return; // exited candidates don't occupy a phase
+      var phase = GHE.phaseOf(a.pipeline_status);
+      if (phase && pipeCounts[phase] !== undefined) pipeCounts[phase]++;
     });
     var pipeTotal = applicants.length || 1;
-    var pipeColors = { applied: 'var(--primary)', screening: 'var(--secondary)', verifying: 'var(--accent-amber)', verified: 'var(--accent-cyan)' };
+    var pipeColors = {};
+    GHE.PHASES.forEach(function (p) {
+      pipeColors[p.key] = GHE.phaseColor(p.key);
+    });
 
     var pipeChart = document.getElementById('pipeline-chart');
     if (pipeChart) {
-      pipeChart.innerHTML = Object.entries(pipeCounts).map(function (item) {
-        var pct = Math.round(item[1] / pipeTotal * 100);
+      pipeChart.innerHTML = GHE.PHASES.map(function (p) {
+        var n = pipeCounts[p.key];
+        var pct = Math.round(n / pipeTotal * 100);
         return '<div class="bar-chart-row">' +
-          '<span class="bar-chart-label" style="text-transform:capitalize;">' + item[0] + '</span>' +
-          '<div class="bar-chart-track"><div class="bar-chart-fill" style="width:' + pct + '%;background:' + (pipeColors[item[0]] || 'var(--primary)') + '"></div></div>' +
-          '<span class="bar-chart-value">' + item[1] + ' (' + pct + '%)</span></div>';
+          '<span class="bar-chart-label">' + p.label + '</span>' +
+          '<div class="bar-chart-track"><div class="bar-chart-fill" style="width:' + pct + '%;background:' + pipeColors[p.key] + '"></div></div>' +
+          '<span class="bar-chart-value">' + n + ' (' + pct + '%)</span></div>';
       }).join('');
     }
 

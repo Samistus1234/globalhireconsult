@@ -12,12 +12,19 @@
   var currentPlacementId = null;
   var currentPlacement = null;
 
-  var STAGES = ['offer_extended','offer_accepted','visa_processing','contract','onboarding','active','completed','terminated'];
+  // Aligned with GHE.PIPELINE deployment + revenue stages (see core.js / schema-v25-pipeline.sql).
+  // Legacy keys (visa_processing/contract/onboarding/active/completed) are mapped for display of
+  // pre-migration rows and activity-log entries; live rows carry the unified keys.
+  var STAGES = ['offer_extended','offer_accepted','pre_employment','placement_confirmed','started_employment','commission_due','invoiced','paid_closed','terminated'];
   var STAGE_LABELS = {
     offer_extended: 'Offer Extended', offer_accepted: 'Offer Accepted',
-    visa_processing: 'Visa Processing', contract: 'Contract',
-    onboarding: 'Onboarding', active: 'Active',
-    completed: 'Completed', terminated: 'Terminated'
+    pre_employment: 'Pre-Employment', placement_confirmed: 'Placement Confirmed',
+    started_employment: 'Started Employment', commission_due: 'Commission Due',
+    invoiced: 'Invoiced', paid_closed: 'Paid & Closed', terminated: 'Terminated',
+    // Legacy keys → unified labels (pre-migration rows)
+    visa_processing: 'Pre-Employment', contract: 'Placement Confirmed',
+    onboarding: 'Started Employment', active: 'Commission Due',
+    completed: 'Paid & Closed'
   };
   var VISA_LABELS = {
     not_started: 'Not Started', documents_submitted: 'Docs Submitted',
@@ -97,10 +104,11 @@
 
   // ── KPIs ──
   function updateKPIs() {
-    var active = allPlacements.filter(function(p) { return p.stage === 'active'; }).length;
-    var pipeline = allPlacements.filter(function(p) { return ['offer_extended','offer_accepted','visa_processing','contract','onboarding'].indexOf(p.stage) >= 0; }).length;
-    var visa = allPlacements.filter(function(p) { return p.stage === 'visa_processing'; }).length;
-    var completed = allPlacements.filter(function(p) { return p.stage === 'completed'; }).length;
+    var stageOf = function(s) { return STAGE_LABELS[s] ? s : 'offer_extended'; }; // legacy rows still count
+    var active = allPlacements.filter(function(p) { return stageOf(p.stage) === 'started_employment'; }).length;
+    var pipeline = allPlacements.filter(function(p) { return ['offer_extended','offer_accepted','pre_employment','placement_confirmed'].indexOf(stageOf(p.stage)) >= 0; }).length;
+    var visa = allPlacements.filter(function(p) { return p.visa_status === 'documents_submitted' || p.visa_status === 'in_review'; }).length;
+    var completed = allPlacements.filter(function(p) { return stageOf(p.stage) === 'paid_closed'; }).length;
 
     setText('kpi-active', active);
     setText('kpi-pipeline', pipeline);
@@ -436,6 +444,25 @@
     if (stageBadge) {
       stageBadge.innerHTML = '<span class="stage-badge stage-' + p.stage + '">' + STAGE_LABELS[p.stage] + '</span>';
     }
+
+    // Revenue block — surfaces the candidate's master-pipeline revenue fields
+    // (placement_fee / invoice / paid live on profiles, decoupled from the placement row).
+    var revenueEl = document.getElementById('overview-revenue');
+    if (revenueEl) {
+      var revItems = [
+        { label: 'Fee', value: p.placement_fee != null ? (p.fee_currency || 'USD') + ' ' + Number(p.placement_fee).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : null },
+        { label: 'Invoice', value: p.invoice_number || null },
+        { label: 'Invoiced', value: p.invoiced_at ? new Date(p.invoiced_at).toLocaleDateString() : null },
+        { label: 'Paid', value: p.paid_at ? new Date(p.paid_at).toLocaleDateString() : null }
+      ].filter(function(i) { return i.value; });
+      var revGrid = document.getElementById('overview-revenue-grid');
+      if (revGrid) {
+        revGrid.innerHTML = revItems.map(function(i) {
+          return '<div class="info-item"><span class="info-label">' + i.label + '</span><span class="info-value">' + escapeHtml(i.value) + '</span></div>';
+        }).join('');
+      }
+      revenueEl.hidden = revItems.length === 0;
+    }
   }
 
   // ── Visa Tab ──
@@ -760,39 +787,20 @@
   // ── Advance Stage ──
   async function advanceStage() {
     var p = currentPlacement;
-    var advanceable = ['offer_extended','offer_accepted','visa_processing','contract','onboarding','active'];
+    var advanceable = ['offer_extended','offer_accepted','pre_employment','placement_confirmed','started_employment','commission_due','invoiced','paid_closed'];
     var idx = advanceable.indexOf(p.stage);
-    if (idx < 0 || idx >= advanceable.length - 1) {
-      // If active, next is completed
-      if (p.stage === 'active') {
-        var updates = { stage: 'completed', updated_at: new Date().toISOString() };
-        var { error } = await ghFrom('placements').update(updates).eq('id', p.id);
-        if (error) { alert('Failed: ' + error.message); return; }
-        await logActivity(p.id, 'completed', 'active', 'completed');
-        Object.assign(p, updates);
-        await loadData();
-        openPlacementModal(p.id);
-        return;
-      }
-      return;
-    }
+    if (idx < 0 || idx >= advanceable.length - 1) return; // terminal (paid_closed/terminated) or unknown
 
     var nextStage = advanceable[idx + 1];
-    if (nextStage === 'active') {
-      // Set start date if not set
-      var updates = { stage: nextStage, updated_at: new Date().toISOString() };
-      if (!p.start_date) updates.start_date = new Date().toISOString().split('T')[0];
-      var { error } = await ghFrom('placements').update(updates).eq('id', p.id);
-      if (error) { alert('Failed: ' + error.message); return; }
-      await logActivity(p.id, 'stage_changed', p.stage, nextStage);
-      Object.assign(p, updates);
-    } else {
-      var updates = { stage: nextStage, updated_at: new Date().toISOString() };
-      var { error } = await ghFrom('placements').update(updates).eq('id', p.id);
-      if (error) { alert('Failed: ' + error.message); return; }
-      await logActivity(p.id, 'stage_changed', p.stage, nextStage);
-      Object.assign(p, updates);
+    var updates = { stage: nextStage, updated_at: new Date().toISOString() };
+    if (nextStage === 'started_employment' && !p.start_date) {
+      updates.start_date = new Date().toISOString().split('T')[0]; // set start date when employment starts
     }
+
+    var { error } = await ghFrom('placements').update(updates).eq('id', p.id);
+    if (error) { alert('Failed: ' + error.message); return; }
+    await logActivity(p.id, 'stage_changed', p.stage, nextStage);
+    Object.assign(p, updates);
 
     await loadData();
     openPlacementModal(p.id);

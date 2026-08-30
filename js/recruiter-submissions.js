@@ -171,6 +171,9 @@
   }
 
   // ── admin_status badge ──
+  // STATUS_INFO still labels the editor dropdown (the enum is unchanged); the
+  // table badge maps each submission status onto the unified master pipeline so
+  // recruiters see one vocabulary (see GHE.PIPELINE in core.js).
   var STATUS_INFO = {
     submitted:     { label: 'Submitted',     color: '#94A3B8', bg: 'rgba(148,163,184,0.12)' },
     under_review:  { label: 'Under Review',  color: '#D4A84B', bg: 'rgba(212,168,75,0.12)' },
@@ -178,10 +181,17 @@
     placed:        { label: 'Placed',        color: '#16A34A', bg: 'rgba(22,163,74,0.12)' },
     rejected:      { label: 'Rejected',      color: '#DC2626', bg: 'rgba(220,38,38,0.12)' }
   };
+  var ADMIN_STATUS_TO_STAGE = {
+    submitted: 'suggested',
+    under_review: 'screening',
+    shortlisted: 'shortlisted',
+    placed: 'placement_confirmed'
+  };
 
   function statusBadge(status) {
-    var info = STATUS_INFO[status] || STATUS_INFO.submitted;
-    return '<span class="rs-status-badge" style="color:' + info.color + ';background:' + info.bg + ';">' + esc(info.label) + '</span>';
+    if (status === 'rejected') return GHE.exitBadge('rejected');
+    var stage = ADMIN_STATUS_TO_STAGE[status] || 'suggested';
+    return GHE.stageBadge(stage);
   }
 
   // ── Render table ──

@@ -213,21 +213,38 @@
     }
 
     // ── Pipeline status ──
-    const stages = ['applied', 'screening', 'verifying', 'verified'];
-    const stageLabels = ['Applied', 'Profile Complete', 'Documents Uploaded', 'Under Review'];
-    let currentStage = 'applied';
-    if (p.profile_completed && completedSteps >= 5) currentStage = 'verifying';
-    else if (p.profile_completed) currentStage = 'screening';
-    const stageIdx = stages.indexOf(currentStage);
-
     const pipelineEl = document.getElementById('status-pipeline');
     if (pipelineEl) {
-      pipelineEl.innerHTML = stages.map((s, i) => `
-        <div class="pipeline-step ${i <= stageIdx ? 'active' : ''} ${i === stageIdx ? 'current' : ''}">
-          <div class="pipeline-dot"></div>
-          <span>${stageLabels[i]}</span>
-        </div>
-      `).join('<div class="pipeline-line"></div>');
+      if (p.pipeline_exit_status) {
+        const exitedAt = p.pipeline_exited_at
+          ? new Date(p.pipeline_exited_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+          : '';
+        const reason = p.pipeline_exit_reason
+          ? ' · ' + GHE.escapeHtml(p.pipeline_exit_reason)
+          : '';
+        pipelineEl.innerHTML = '<div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3) 0;flex-wrap:wrap;">' +
+          GHE.exitBadge(p.pipeline_exit_status) +
+          '<span style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary);">Your application is no longer active.</span>' +
+          '<span style="font-size:var(--text-xs);color:var(--text-tertiary);">' + exitedAt + reason + '</span>' +
+        '</div>';
+      } else {
+        // Friendly stepper: every stage up to (and including) Started Employment —
+        // candidates never see the revenue stages (Commission Due → Paid & Closed).
+        const steps = GHE.PIPELINE.slice(0, GHE.PIPELINE.findIndex(s => s.key === 'started_employment') + 1);
+        let stageIdx;
+        if (!p.pipeline_stage) {
+          stageIdx = 0; // new candidate, no stage assigned yet
+        } else {
+          stageIdx = steps.findIndex(s => s.key === p.pipeline_stage);
+          if (stageIdx === -1) stageIdx = steps.length - 1; // revenue/legacy stage → furthest visible step
+        }
+        pipelineEl.innerHTML = steps.map((s, i) => `
+          <div class="pipeline-step ${i <= stageIdx ? 'active' : ''} ${i === stageIdx ? 'current' : ''}">
+            <div class="pipeline-dot"></div>
+            <span>${s.label}</span>
+          </div>
+        `).join('<div class="pipeline-line"></div>');
+      }
     }
   }
 
@@ -695,8 +712,14 @@
     var banner = document.getElementById('active-placement-banner');
     if (!banner) return;
 
+    // Active = anything from Offer Extended up to (not including) Paid & Closed.
+    var activeStageKeys = GHE.PIPELINE.slice(
+      GHE.PIPELINE.findIndex(function (s) { return s.key === 'offer_extended'; }),
+      GHE.PIPELINE.findIndex(function (s) { return s.key === 'paid_closed'; })
+    ).map(function (s) { return s.key; });
+
     var activePlacement = placements.find(function(p) {
-      return ['offer_extended','offer_accepted','visa_processing','contract','onboarding','active'].indexOf(p.stage) >= 0;
+      return activeStageKeys.indexOf(p.stage) >= 0;
     });
 
     if (!activePlacement) {
@@ -724,9 +747,18 @@
 
   function renderPlacementStatus(placement) {
     var p = placement;
-    var stages = ['offer_extended','offer_accepted','visa_processing','contract','onboarding','active'];
-    var stageLabels = ['Offer','Visa','Contract','Onboarding','Active','Complete'];
-    var simplifiedMap = { offer_extended: 0, offer_accepted: 0, visa_processing: 1, contract: 2, onboarding: 3, active: 4, completed: 5 };
+    // Unified deployment + revenue stages (schema-v25-pipeline.sql). Pre-migration
+    // legacy keys still map so old rows render sensibly.
+    var stageLabels = ['Offer','Pre-Employment','Confirmed','Started','Billing','Paid'];
+    var simplifiedMap = {
+      offer_extended: 0, offer_accepted: 0,
+      pre_employment: 1, visa_processing: 1,
+      placement_confirmed: 2, contract: 2,
+      started_employment: 3, onboarding: 3, active: 3,
+      commission_due: 4, invoiced: 4,
+      paid_closed: 5, completed: 5,
+      terminated: -2
+    };
     var currentIdx = simplifiedMap[p.stage] !== undefined ? simplifiedMap[p.stage] : -1;
 
     var pipelineHtml = '<div style="display:flex;align-items:center;gap:0;margin-bottom:var(--space-3);">';
@@ -777,7 +809,15 @@
   }
 
   function getStageLabel(s) {
-    var labels = { offer_extended:'Offer Extended', offer_accepted:'Offer Accepted', visa_processing:'Visa Processing', contract:'Contract', onboarding:'Onboarding', active:'Active', completed:'Completed', terminated:'Terminated' };
+    var labels = {
+      offer_extended: 'Offer Extended', offer_accepted: 'Offer Accepted',
+      pre_employment: 'Pre-Employment', placement_confirmed: 'Placement Confirmed',
+      started_employment: 'Started Employment', commission_due: 'Commission Due',
+      invoiced: 'Invoiced', paid_closed: 'Paid & Closed', terminated: 'Terminated',
+      // Legacy placement keys (pre-migration rows / activity logs)
+      visa_processing: 'Pre-Employment', contract: 'Placement Confirmed',
+      onboarding: 'Started Employment', active: 'Commission Due', completed: 'Paid & Closed'
+    };
     return labels[s] || s;
   }
 

@@ -171,8 +171,10 @@
         if (haystack.indexOf(searchVal) === -1) return false;
       }
 
-      // Pipeline status
-      if (pipelineVal && a.pipeline_status !== pipelineVal) return false;
+      // Pipeline stage (16-stage master pipeline; 'exited'/'active' are state filters)
+      if (pipelineVal === 'exited' && !a.pipeline_exit_status) return false;
+      if (pipelineVal === 'active' && a.pipeline_exit_status) return false;
+      if (pipelineVal && pipelineVal !== 'exited' && pipelineVal !== 'active' && a.pipeline_status !== pipelineVal) return false;
 
       // Availability
       var avail = a.availability_status || 'active';
@@ -207,13 +209,16 @@
     var total = allApplicants.length;
     var active = 0;
     var pausedClosed = 0;
-    var verified = 0;
+    var inRevenue = 0;
+    var outstanding = 0;
+    var REVENUE_STAGES = ['commission_due', 'invoiced', 'paid_closed'];
 
     allApplicants.forEach(function (a) {
       var avail = a.availability_status || 'active';
       if (avail === 'active') active++;
       if (avail === 'paused' || avail === 'closed') pausedClosed++;
-      if (a.pipeline_status === 'verified') verified++;
+      if (REVENUE_STAGES.indexOf(a.pipeline_status) !== -1) inRevenue++;
+      if (a.pipeline_status === 'commission_due' || a.pipeline_status === 'invoiced') outstanding++;
     });
 
     var kpiTotal = document.getElementById('kpi-total');
@@ -224,7 +229,7 @@
     if (kpiTotal) kpiTotal.textContent = total.toLocaleString();
     if (kpiActive) kpiActive.textContent = active.toLocaleString();
     if (kpiPaused) kpiPaused.textContent = pausedClosed.toLocaleString();
-    if (kpiVerified) kpiVerified.textContent = verified.toLocaleString();
+    if (kpiVerified) kpiVerified.textContent = inRevenue.toLocaleString();
 
     // Sub-labels
     var totalPct = total > 0 ? Math.round((active / total) * 100) : 0;
@@ -236,7 +241,7 @@
     if (subTotal) subTotal.textContent = 'All registered applicants';
     if (subActive) subActive.textContent = totalPct + '% of total pipeline';
     if (subPaused) subPaused.textContent = pausedClosed === 0 ? 'None currently' : 'May need follow-up';
-    if (subVerified) subVerified.textContent = verified === 0 ? 'None yet' : 'Ready for placement';
+    if (subVerified) subVerified.textContent = outstanding === 0 ? (inRevenue === 0 ? 'None yet' : 'All invoiced & paid') : outstanding + ' awaiting payment';
   }
 
   // ── Migration milestone helpers ──
@@ -308,14 +313,9 @@
     tbody.innerHTML = pageData.map(function (a) {
       var colors = GHE.avatarColors[a.avatar_color_index || 0];
 
-      // Pipeline badge
-      var statusMap = {
-        applied: { badge: 'badge-info', label: 'Applied' },
-        screening: { badge: 'badge-warning', label: 'Screening' },
-        verifying: { badge: 'badge-secondary', label: 'Verifying' },
-        verified: { badge: 'badge-primary', label: 'Verified' }
-      };
-      var st = statusMap[a.pipeline_status] || statusMap.applied;
+      // Pipeline badge (16-stage master pipeline from GHE registry)
+      var st = GHE.stageBadge(a.pipeline_status);
+      var exitHtml = a.pipeline_exit_status ? GHE.exitBadge(a.pipeline_exit_status) : '';
 
       // Availability badge
       var availStatus = a.availability_status || 'active';
@@ -388,7 +388,7 @@
         '<td>' + stageInfo + '</td>' +
         '<td>' + milestoneChips + '</td>' +
         '<td>' + docs + '</td>' +
-        '<td><span class="badge ' + st.badge + ' badge-dot">' + st.label + '</span></td>' +
+        '<td>' + st + (exitHtml ? '<div style="margin-top:4px;">' + exitHtml + '</div>' : '') + '</td>' +
         '<td><span class="badge ' + av.badge + ' badge-dot">' + av.label + '</span></td>' +
         '<td style="white-space:nowrap;color:var(--text-secondary);font-size:13px;">' + appliedDate + '</td>' +
         '<td>' + actionHtml + '</td>' +
@@ -695,38 +695,84 @@
     }
     html += '</div>';
 
-    // ── Pipeline Stage (eLab sets, recruiter sees) ──
-    var isSaudiCand = (profile.preferred_destinations || []).some(function (d) { return /saudi|ksa|riyadh|jeddah/i.test(d); });
-    var stageOptions = isSaudiCand ? [
-      { value: '',          label: '— Not set —' },
-      { value: 'profile',   label: 'Profile & Documents' },
-      { value: 'dataflow',  label: 'DataFlow Verification' },
-      { value: 'mumaris',   label: 'Mumaris+ Registration' },
-      { value: 'prometric', label: 'Prometric / ORA Evaluation' },
-      { value: 'license',   label: 'License Issuance' },
-      { value: 'visa',      label: 'Visa & Deployment' },
-    ] : [
-      { value: '',             label: '— Not set —' },
-      { value: 'profile',      label: 'Profile & Documents' },
-      { value: 'verification', label: 'Credential Verification' },
-      { value: 'licensing',    label: 'Licensing / Exam' },
-      { value: 'offer',        label: 'Job Offer' },
-      { value: 'deployment',   label: 'Visa & Deployment' },
-    ];
+    // ── Pipeline Stage (16-stage master pipeline, eLab sets, recruiter sees) ──
+    var exited = profile.pipeline_exit_status;
+    var currentStage = profile.pipeline_stage || '';
+    var REVENUE_STAGES = ['commission_due', 'invoiced', 'paid_closed'];
     html += '<div style="margin-top:var(--space-6);padding-top:var(--space-5);border-top:1px solid var(--border-subtle);">';
     html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-3);">';
     html += '<div>';
     html += '<div style="font-size:var(--text-base);font-weight:700;color:var(--text-primary);">Pipeline Stage</div>';
-    html += '<div style="font-size:11px;color:var(--text-tertiary);margin-top:2px;">Set here — reflects on recruiter\'s dashboard automatically</div>';
+    html += '<div style="font-size:11px;color:var(--text-tertiary);margin-top:2px;">One master flow — reflects on recruiter\'s dashboard automatically</div>';
     html += '</div>';
     html += '<span id="stage-save-status" style="font-size:11px;color:var(--success);display:none;font-weight:600;"></span>';
     html += '</div>';
-    html += '<select id="pipeline-stage-select" style="width:100%;padding:var(--space-2) var(--space-3);font-size:var(--text-sm);border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-primary);">';
-    stageOptions.forEach(function (opt) {
-      var sel = (profile.pipeline_stage || '') === opt.value ? ' selected' : '';
-      html += '<option value="' + GHE.escapeHtml(opt.value) + '"' + sel + '>' + GHE.escapeHtml(opt.label) + '</option>';
+
+    // Exit banner if candidate has been moved out
+    if (exited) {
+      var exitInfo = GHE.EXIT_STATUSES.find(function (e) { return e.value === exited; });
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);padding:var(--space-3);background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--radius-md);margin-bottom:var(--space-3);">';
+      html += '<div style="font-size:var(--text-sm);color:#B91C1C;">';
+      html += '<strong>' + GHE.escapeHtml(exitInfo ? exitInfo.label : exited) + '</strong>';
+      if (profile.pipeline_exit_reason) html += ' — ' + GHE.escapeHtml(profile.pipeline_exit_reason);
+      if (profile.pipeline_exited_at) html += '<div style="font-size:11px;color:var(--text-tertiary);margin-top:2px;">' + new Date(profile.pipeline_exited_at).toLocaleString() + '</div>';
+      html += '</div>';
+      html += '<button id="btn-move-back-in" class="btn btn-secondary btn-sm" style="font-size:11px;white-space:nowrap;">Move back in</button>';
+      html += '</div>';
+    }
+
+    html += '<select id="pipeline-stage-select"' + (exited ? ' disabled' : '') + ' style="width:100%;padding:var(--space-2) var(--space-3);font-size:var(--text-sm);border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-primary);">';
+    GHE.PHASES.forEach(function (phase) {
+      var phaseStages = GHE.PIPELINE.filter(function (s) { return s.phase === phase.key; });
+      html += '<optgroup label="' + GHE.escapeHtml(phase.label) + '">';
+      phaseStages.forEach(function (s) {
+        var sel = currentStage === s.key ? ' selected' : '';
+        html += '<option value="' + s.key + '"' + sel + '>' + GHE.escapeHtml(s.label) + '</option>';
+      });
+      html += '</optgroup>';
     });
     html += '</select>';
+
+    // Move-out control (only when not already exited)
+    if (!exited) {
+      html += '<div style="display:flex;gap:var(--space-3);margin-top:var(--space-3);align-items:center;">';
+      html += '<select id="pipeline-exit-select" style="flex:1;padding:var(--space-2) var(--space-3);font-size:var(--text-sm);border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-primary);">';
+      html += '<option value="">Move out… (rejected / withdrawn / …)</option>';
+      GHE.EXIT_STATUSES.forEach(function (e) {
+        html += '<option value="' + e.value + '">' + GHE.escapeHtml(e.label) + '</option>';
+      });
+      html += '</select>';
+      html += '<button id="btn-move-out" class="btn btn-ghost btn-sm" style="font-size:11px;color:var(--error);border:1px solid #FECACA;white-space:nowrap;">Move out</button>';
+      html += '</div>';
+    }
+
+    // Revenue block (placement fee + invoice + payment)
+    html += '<div style="margin-top:var(--space-3);padding:var(--space-3);background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-md);">';
+    html += '<div style="font-size:12px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:var(--space-2);">Placement Fee</div>';
+    html += '<div style="display:flex;gap:var(--space-2);align-items:center;margin-bottom:var(--space-2);">';
+    html += '<input type="number" id="pf-fee" value="' + (profile.placement_fee != null ? profile.placement_fee : '') + '" min="0" step="0.01" placeholder="Fee amount" style="flex:1;min-width:0;padding:var(--space-2) var(--space-3);font-size:var(--text-sm);border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-primary);">';
+    html += '<select id="pf-currency" style="padding:var(--space-2);font-size:var(--text-sm);border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-primary);">';
+    ['USD', 'SAR', 'QAR', 'AED', 'GBP', 'EUR'].forEach(function (c) {
+      html += '<option' + ((profile.fee_currency || 'USD') === c ? ' selected' : '') + '>' + c + '</option>';
+    });
+    html += '</select>';
+    html += '</div>';
+    html += '<div id="pf-status" style="font-size:11px;color:var(--text-tertiary);margin-bottom:var(--space-2);">';
+    if (profile.invoice_number) {
+      html += 'Invoice <strong>' + GHE.escapeHtml(profile.invoice_number) + '</strong>';
+      if (profile.invoiced_at) html += ' · invoiced ' + new Date(profile.invoiced_at).toLocaleDateString();
+      if (profile.paid_at) html += ' · <span style="color:var(--success);">paid ' + new Date(profile.paid_at).toLocaleDateString() + '</span>';
+    } else {
+      html += 'No invoice yet';
+    }
+    html += '</div>';
+    html += '<div style="display:flex;gap:var(--space-2);">';
+    html += '<button id="btn-commission" class="btn btn-ghost btn-sm" style="font-size:11px;">Commission due</button>';
+    html += '<button id="btn-invoice" class="btn btn-secondary btn-sm" style="font-size:11px;">Mark invoiced</button>';
+    html += '<button id="btn-paid" class="btn btn-primary btn-sm" style="font-size:11px;">Mark paid</button>';
+    html += '</div>';
+    html += '</div>';
+
     html += '</div>';
 
     // ── Recruiter Notes ──
@@ -831,7 +877,7 @@
       });
     }
 
-    // Bind pipeline stage selector
+    // Bind pipeline stage selector (16-stage master pipeline)
     var stageSelect = document.getElementById('pipeline-stage-select');
     var stageSaveStatus = document.getElementById('stage-save-status');
     if (stageSelect) {
@@ -840,7 +886,14 @@
         stageSelect.disabled = true;
         if (stageSaveStatus) { stageSaveStatus.textContent = 'Saving...'; stageSaveStatus.style.color = 'var(--text-tertiary)'; stageSaveStatus.style.display = ''; }
         var oldStage = stageSelect.dataset.prevValue || null;
-        var { error } = await ghFrom('profiles').update({ pipeline_stage: newStage }).eq('id', candidateId);
+        var payload = { pipeline_stage: newStage };
+        // Selecting a stage while exited clears the exit (acts as "move back in")
+        if (profile.pipeline_exit_status && newStage) {
+          payload.pipeline_exit_status = null;
+          payload.pipeline_exit_reason = null;
+          payload.pipeline_exited_at = null;
+        }
+        var { error } = await ghFrom('profiles').update(payload).eq('id', candidateId);
         stageSelect.disabled = false;
         if (stageSaveStatus) {
           if (error) {
@@ -856,6 +909,74 @@
           stageSaveStatus.style.display = '';
         }
       });
+    }
+
+    // Bind Move out / Move back in
+    var btnMoveOut = document.getElementById('btn-move-out');
+    if (btnMoveOut) {
+      btnMoveOut.addEventListener('click', async function () {
+        var exitVal = document.getElementById('pipeline-exit-select').value;
+        if (!exitVal) { alert('Choose an exit reason first.'); return; }
+        var reason = prompt('Optional reason (notes for the record):');
+        if (reason === null) return;
+        var { error } = await ghFrom('profiles').update({
+          pipeline_exit_status: exitVal,
+          pipeline_exit_reason: reason || null,
+          pipeline_exited_at: new Date().toISOString()
+        }).eq('id', candidateId);
+        if (error) { alert('Failed to move out: ' + error.message); return; }
+        await loadAllCandidates();
+        openCandidatePanel(candidateId);
+      });
+    }
+    var btnMoveBackIn = document.getElementById('btn-move-back-in');
+    if (btnMoveBackIn) {
+      btnMoveBackIn.addEventListener('click', async function () {
+        var { error } = await ghFrom('profiles').update({
+          pipeline_exit_status: null,
+          pipeline_exit_reason: null,
+          pipeline_exited_at: null
+        }).eq('id', candidateId);
+        if (error) { alert('Failed: ' + error.message); return; }
+        await loadAllCandidates();
+        openCandidatePanel(candidateId);
+      });
+    }
+
+    // Bind revenue fields (placement fee / invoice / payment)
+    var pfFee = document.getElementById('pf-fee');
+    var pfCurrency = document.getElementById('pf-currency');
+    var pfStatus = document.getElementById('pf-status');
+    if (pfFee) {
+      pfFee.addEventListener('change', saveRevenue);
+      pfCurrency.addEventListener('change', saveRevenue);
+    }
+    function saveRevenue() {
+      ghFrom('profiles').update({
+        placement_fee: pfFee.value !== '' ? parseFloat(pfFee.value) : null,
+        fee_currency: pfCurrency.value
+      }).eq('id', candidateId).then(function (res) {
+        if (res.error && pfStatus) { pfStatus.textContent = 'Error saving fee: ' + res.error.message; pfStatus.style.color = 'var(--error)'; }
+      });
+    }
+
+    var btnCommission = document.getElementById('btn-commission');
+    var btnInvoice = document.getElementById('btn-invoice');
+    var btnPaid = document.getElementById('btn-paid');
+    if (btnCommission) btnCommission.addEventListener('click', function () { setRevenueStage('commission_due'); });
+    if (btnInvoice) btnInvoice.addEventListener('click', function () { setRevenueStage('invoiced'); });
+    if (btnPaid) btnPaid.addEventListener('click', function () { setRevenueStage('paid_closed'); });
+    async function setRevenueStage(stage) {
+      var payload = { pipeline_stage: stage };
+      if (stage === 'invoiced' && !profile.invoice_number) {
+        payload.invoice_number = 'GH-' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '-' + String(candidateId).slice(-4).toUpperCase();
+        payload.invoiced_at = new Date().toISOString();
+      }
+      if (stage === 'paid_closed') payload.paid_at = new Date().toISOString();
+      var { error } = await ghFrom('profiles').update(payload).eq('id', candidateId);
+      if (error) { alert('Failed: ' + error.message); return; }
+      await loadAllCandidates();
+      openCandidatePanel(candidateId);
     }
 
     // Bind "Forward to Applicant" buttons on recruiter notes
@@ -1200,7 +1321,7 @@
   // ── Export: CSV ──
   document.getElementById('export-csv')?.addEventListener('click', function () {
     exportMenu.style.display = 'none';
-    var rows = [['Name', 'Email', 'Specialty', 'Origin', 'Destination', 'Experience', 'DataFlow', 'Stage', 'Milestones', 'Docs', 'Pipeline', 'Availability', 'Source', 'Applied']];
+    var rows = [['Name', 'Email', 'Specialty', 'Origin', 'Destination', 'Experience', 'DataFlow', 'Stage', 'Milestones', 'Docs', 'Pipeline Stage', 'Exited', 'Fee', 'Availability', 'Source', 'Applied']];
     filteredApplicants.forEach(function (a) {
       rows.push([
         a.full_name || '',
@@ -1213,7 +1334,9 @@
         STAGE_LABELS[a.current_stage] ? STAGE_LABELS[a.current_stage].label : (a.current_stage || ''),
         milestonesAsText(a.migration_status),
         (a.total_docs != null ? a.total_docs : 0) + ' docs',
-        a.pipeline_status || '',
+        GHE.stageLabel(a.pipeline_status) || '',
+        a.pipeline_exit_status ? (a.pipeline_exit_status + (a.pipeline_exit_reason ? ' — ' + a.pipeline_exit_reason : '')) : '',
+        a.placement_fee != null ? a.placement_fee + ' ' + (a.fee_currency || 'USD') : '',
         a.availability_status || 'active',
         a.source || 'direct',
         a.created_at ? a.created_at.slice(0, 10) : ''
@@ -1245,7 +1368,7 @@
         STAGE_LABELS[a.current_stage] ? STAGE_LABELS[a.current_stage].label : (a.current_stage || '-'),
         milestonesAsText(a.migration_status) || '-',
         (a.total_docs != null ? a.total_docs : 0) + ' docs',
-        a.pipeline_status || '-',
+        GHE.stageLabel(a.pipeline_status) || '-',
         a.source || 'direct',
         a.created_at ? new Date(a.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'
       ];

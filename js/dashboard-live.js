@@ -48,16 +48,31 @@
 
   // ── KPI Cards ──
   async function loadKPIs() {
-    const { data: applicants } = await ghFrom('admin_applicant_overview').select('id, pipeline_status');
+    const { data: applicants } = await ghFrom('admin_applicant_overview')
+      .select('id, pipeline_status, pipeline_exit_status, placement_fee');
     const { data: pendingDocs } = await ghFrom('documents').select('id').eq('status', 'pending');
 
     const totalApplicants = applicants ? applicants.length : 0;
+    const activePipeline = applicants ? applicants.filter(a => !a.pipeline_exit_status).length : 0;
     const pendingCount = pendingDocs ? pendingDocs.length : 0;
+    let revenueDue = 0;
+    if (applicants) {
+      applicants.forEach(a => {
+        if (a.pipeline_status === 'commission_due' || a.pipeline_status === 'invoiced') revenueDue++;
+      });
+    }
 
     const kpiPipeline = document.getElementById('kpi-pipeline');
     const kpiPending = document.getElementById('kpi-pending');
-    if (kpiPipeline) kpiPipeline.textContent = totalApplicants.toLocaleString();
+    const kpiRevenue = document.getElementById('kpi-revenue');
+    if (kpiPipeline) kpiPipeline.textContent = activePipeline.toLocaleString();
     if (kpiPending) kpiPending.textContent = pendingCount.toLocaleString();
+    if (kpiRevenue) kpiRevenue.textContent = revenueDue.toLocaleString();
+
+    const subPipeline = document.getElementById('kpi-pipeline-sub');
+    const subRevenue = document.getElementById('kpi-revenue-sub');
+    if (subPipeline) subPipeline.textContent = activePipeline + ' of ' + totalApplicants + ' active in pipeline';
+    if (subRevenue) subRevenue.textContent = revenueDue === 0 ? 'Nothing outstanding' : revenueDue + ' awaiting payment';
   }
 
   // ── Recent Applicants ──
@@ -80,13 +95,8 @@
 
     tbody.innerHTML = data.map(a => {
       var colors = GHE.avatarColors[a.avatar_color_index || 0];
-      const statusMap = {
-        applied: { badge: 'badge-info', label: 'Applied' },
-        screening: { badge: 'badge-warning', label: 'Screening' },
-        verifying: { badge: 'badge-secondary', label: 'Verifying' },
-        verified: { badge: 'badge-primary', label: 'Verified' }
-      };
-      const st = statusMap[a.pipeline_status] || statusMap.applied;
+      const st = GHE.stageBadge(a.pipeline_status);
+      const exitHtml = a.pipeline_exit_status ? GHE.exitBadge(a.pipeline_exit_status) : '';
 
       // Availability status badge
       const availStatus = a.availability_status || 'active';
@@ -120,7 +130,7 @@
           <td>${a.specialty || '-'}</td>
           <td><span class="tag">${a.country_of_origin || '-'}</span></td>
           <td>${a.total_docs}/4 docs</td>
-          <td><span class="badge ${st.badge} badge-dot">${st.label}</span></td>
+          <td>${st}${exitHtml ? '<div style="margin-top:4px;">' + exitHtml + '</div>' : ''}</td>
           <td><span class="badge ${av.badge} badge-dot">${av.label}</span></td>
           <td style="white-space:nowrap;color:var(--text-secondary);font-size:13px;">${appliedDate}</td>
           <td>${actionHtml}</td>
@@ -235,12 +245,15 @@
 
   // ── Pipeline counts ──
   async function loadPipelineCounts() {
-    const { data } = await ghFrom('admin_applicant_overview').select('pipeline_status');
+    const { data } = await ghFrom('admin_applicant_overview').select('pipeline_status, pipeline_exit_status');
     if (!data) return;
 
-    const counts = { applied: 0, screening: 0, verifying: 0, verified: 0 };
+    const counts = {};
+    GHE.PHASES.forEach(p => { counts[p.key] = 0; });
     data.forEach(a => {
-      if (counts[a.pipeline_status] !== undefined) counts[a.pipeline_status]++;
+      if (a.pipeline_exit_status) return; // exited candidates don't occupy a phase
+      const phase = GHE.phaseOf(a.pipeline_status);
+      if (phase && counts[phase] !== undefined) counts[phase]++;
     });
 
     const stageEls = document.querySelectorAll('.pipeline-stage[data-stage]');
