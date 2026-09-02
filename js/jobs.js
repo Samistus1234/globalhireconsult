@@ -41,6 +41,25 @@
 
   var featuredListings = [
     {
+      id: 'featured-kuwait-doctors-1836',
+      posted_at: '2026-09-03',
+      title: 'Doctors — Kuwait Hospitals & Medical Centres (30 Vacancies)',
+      employer_name: 'Hospitals & Medical Centres — Kuwait',
+      destination_country: 'Kuwait',
+      specialty: '17 Specialties — Consultants, Specialists & Registrars',
+      category: 'Physician',
+      positions: 30,
+      salary_display: 'Tax-free — confirmed at interview',
+      min_experience: 0,
+      visa_sponsored: true,
+      benefits: ['No Residence Restriction', 'No Age Limit', 'Tax-free (KWD)', '17 Doctor Specialties'],
+      description: 'Kuwait hospitals and medical centres are hiring consultants, senior specialists, specialists and registered doctors across 17 specialties — plastic surgery, orthodontics, oral & maxillofacial surgery and implants, dermatology, endocrinology & diabetes, gastroenterology, internal medicine, OB/GYN, diagnostic radiology, orthopedic surgery, ENT, general surgery, ICU, nephrology and pediatric cardiology, neurology and endocrinology — plus radiology technicians and nurses. Open to doctors of any nationality — no residence restriction, no age limit. Doctors need a Master\'s, Doctorate or Board from a university recognised by the Kuwaiti authorities. ELAB handles credential verification, licensing and relocation.',
+      requirements: 'MBBS/MD + Master\'s/Doctorate/Board from recognised university + good English + valid home license',
+      wa_link: 'https://wa.me/19294192327?text=Hi%20eLab%2C%20I%E2%80%99m%20interested%20in%20the%20Kuwait%20doctor%20vacancies%20%2830%20positions%29.%20My%20name%20is%20____%2C%20my%20specialty%20is%20____%20and%20I%20have%20____%20years%20of%20experience.',
+      detail_link: 'kuwait-doctors-1836.html',
+      accent_color: '#CE1126',
+    },
+    {
       id: 'featured-kuwait-government-healthcare',
       posted_at: '2026-07-10',
       title: 'Nurses & Allied Health — Kuwait',
