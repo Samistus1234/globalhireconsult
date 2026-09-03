@@ -445,7 +445,8 @@
   window.ghTrackShare = function (id, network) {
     try {
       if (window.ghSupabase) {
-        window.ghSupabase.rpc('increment_page_view', { p_slug: 'share:' + network + ':' + id });
+        var p = window.ghSupabase.rpc('increment_page_view', { p_slug: 'share:' + network + ':' + id });
+        if (p && p.then) { p.then(function () {}).catch(function () {}); }
       }
     } catch (e) {}
     var el = document.querySelector('.sc-count[data-sc-listing="' + id + '"][data-sc-network="' + network + '"]');
