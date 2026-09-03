@@ -52,7 +52,13 @@ later phases.
    directory). A 6-month exclusive **claim opens on nomination**; the dedupe check runs at nomination.
 7. **Phase 1 scope = the full loop** — S1–S10 below (everything except subscription tiers and two-sided
    jobs). AI screening is text-chat; voice is a later flag.
-8. **Security remediation is in-scope** — the 2026-07-06 `gh_*`/RLS hole is closed as build chunk 1.
+8. **Security foundation is mostly already done** — the `gh_*` / RLS remediation (P0 privilege
+   escalation, RLS-disabled tables) **shipped 2026-07-06** (commits `25534b4` `64aa2f8` `b3f0e85`
+   `96f2874` `ff4a81e`; `.superpowers/sdd/progress.md` Plan 3 R1–R5 complete). Chunk 1's DB-security
+   work is now just: build the new `gh_mp_*` views as `security_invoker` from creation (the current
+   established pattern) and confirm the `globalhire.profiles` / `campaign_matches` column-guard
+   triggers need no extension. R6 (`visa_sync_outbox` RLS) and R7 (admin-visa page guards) remain
+   pending but are unrelated to this project.
 
 ### Deferred to later phases (explicitly out of Phase 1)
 
@@ -139,9 +145,31 @@ membership, stores licence/profile uploads → admin queue (new **Agencies** tab
 admin `verify` / `reject` / `suspend` with a note → `mp-agency-verify` emails the agency. Only `verified`
 agencies can see jobs or nominate — enforced **server-side** (RLS + edge-fn guard), not just UI.
 
-### 4.4 Security remediation (build chunk 1, non-negotiable)
+### 4.4 Security foundation
 
-Pre-existing, documented in `docs/superpowers/plans/2026-07-06-gh-rls-remediation.md`:
+**The `gh_*` / RLS remediation already shipped (2026-07-06)** — `docs/superpowers/plans/2026-07-06-gh-rls-remediation.md`
+tasks R1–R5 complete per `.superpowers/sdd/progress.md` (commits `25534b4` `64aa2f8` `b3f0e85` `96f2874`
+`ff4a81e`). Every `public.gh_*` view is now `security_invoker=true` with covering RLS or admin-gated via
+`is_admin()`; RLS is enabled on `globalhire.messages` / `recruiter_assignments` / `recruiter_notes`; the
+privilege-escalation P0 is closed by column-guard triggers on `globalhire.profiles`
+(`gh_profiles_column_guard`) and `globalhire.campaign_matches`; the `allow_direct_marketing` admin toggle
+has a real admin-UPDATE policy. R6 (`visa_sync_outbox` RLS) and R7 (admin-visa page guards) remain
+pending but are unrelated to this project.
+
+So this project's DB-security work is small and lives inside chunk 1:
+
+1. Every new `gh_mp_*` view is created `WITH (security_invoker = true)` from the start (the established
+   pattern — see `gh_recruiter_submitted_candidates`); RLS is enabled on the base table **in the same
+   migration** as its view (atomic — never flip/enable without the covering policy).
+2. The `globalhire.profiles` / `campaign_matches` column guards are blocklists; confirm the marketplace
+   flows never write a guarded column on those tables — they don't (all agency data is in `mp_*`), so no
+   guard extension is needed.
+3. The real isolation risk is the **new** `mp_*` RLS (agency A must never see agency B) — that gets the
+   dedicated test pass in §10.3, run as chunk 1's acceptance gate.
+
+<details><summary>Original pre-remediation state (for context — now historical)</summary>
+
+Documented in `docs/superpowers/plans/2026-07-06-gh-rls-remediation.md`:
 
 - `public.gh_profiles` + ~34 sibling `gh_*` views are `postgres`-owned, **not** `security_invoker`, and
   grant INSERT/UPDATE/DELETE to `anon` **and** `authenticated` → anyone with the public anon key can
@@ -158,8 +186,9 @@ A marketplace where Agency A must never see Agency B's data cannot ship on top o
 2. Enable RLS + write policies on `recruiter_assignments` and the other four tables.
 3. All new `gh_mp_*` views are `security_invoker` from creation; `anon` is granted nothing on them.
 
-Regression risk is real (many pages write via `gh_profiles`) — this chunk gets its own test pass
-(§10.3) before anything else builds on it.
+Regression risk was real (many pages write via `gh_profiles`); the remediation carried its own test pass.
+
+</details>
 
 ---
 
@@ -499,12 +528,15 @@ adjustment payment — the ledger keeps the full audit. No processor.
 
 ### 10.2 Automated tests
 
-- **`node --test`** (repo already uses this for `home-openings`, visa rules): `mp-identity` (hash +
-  fuzzy-match cases, diacritics, token order), claim-expiry decision function, `mp-match` pre-filter,
-  statement math, nomination state-machine transition table.
-- **Deno tests:** `mp-nominate` dedupe/claim branches (mocked DB) — clear / blocked-claimed /
-  expired-collision / own-agency-dup / race; `mp-match` pre-filter; AI-JSON schema validation for each
-  `mp-prompts` schema.
+- **Deno tests** (`deno test`, colocated `*_test.ts` — the repo pattern, e.g.
+  `supabase/functions/_shared/visa-eligibility-rules_test.ts`): pure logic in `_shared/` —
+  `mp-identity` (hash + fuzzy-match cases, diacritics, token order), the claim-expiry decision function,
+  the `mp-match` deterministic pre-filter, statement math, the nomination state-machine transition table,
+  and AI-JSON schema validation for each `mp-prompts` schema.
+- **Deno tests, edge fns:** `mp-nominate` dedupe/claim branches (mocked DB client) — clear /
+  blocked-claimed / expired-collision / own-agency-dup / race.
+- **Playwright** (`tests/*.spec.js`, the repo's only browser test tool — it does not unit-test DOM
+  IIFEs): smoke specs that each new `partners-*.html` page loads and its primary list/form renders.
 
 ### 10.3 RLS + E2E
 
@@ -549,10 +581,12 @@ Supabase auth
 
 ## 12. Build sequence (chunks for the implementation plan)
 
-1. **Security remediation + tenancy** — RLS fixes (§4.4); `mp_agencies` / `mp_agency_members` /
-   `mp_agency_invites` + views + RLS; recruiter→agency migration; `partners-signup` + `mp-agency-register`;
-   admin Agencies tab + `mp-agency-verify`; `_shared/mp-ai.ts` skeleton + `mp_ai_runs`.
-   **Acceptance:** the §10.3 RLS test script passes.
+1. **Agency tenancy + verification** — `mp_agencies` / `mp_agency_members` / `mp_agency_invites` +
+   `gh_mp_*` `security_invoker` views + `mp_*` RLS; recruiter→agency migration; `partners-signup` +
+   `mp-agency-register`; `partners-onboarding` (partnership profile) + team invites; admin **Agencies**
+   tab in `recruiters.html` + `mp-agency-verify`; `_shared/mp-ai.ts` skeleton + `mp_ai_runs`. (The
+   `gh_*` RLS remediation this used to depend on already shipped 2026-07-06 — see §4.4.)
+   **Acceptance:** the §10.3 `mp_*` RLS test script passes (agency A cannot see agency B).
 2. **Job board** — `mp_jobs` + views + RLS; `admin-mp-jobs`; `partners-jobs` / `partners-job` (no match
    badge yet); "create from campaign".
 3. **Candidate intake (manual)** — `mp_candidates` / `mp_candidate_documents` + storage RLS;
@@ -578,9 +612,9 @@ Supabase auth
 
 ## 13. Open risks
 
-- **RLS remediation regression** — many existing pages write via `gh_profiles`; converting those views to
-  `security_invoker` can break writes. Chunk 1 needs a full click-test of the existing recruiter/admin
-  pages, not just the new RLS test.
+- **`mp_*` cross-agency isolation** — the whole marketplace trust model depends on the RLS predicate in
+  §4.2 being correct on every one of ~24 tables. One missing policy leaks a competitor's candidates.
+  Chunk 1's acceptance gate (§10.3) tests it; every later chunk that adds a table re-runs that script.
 - **`identity_hash` collisions / misses** — common names + missing passport/licence produce weak hashes.
   Mitigation: the nomination gate (§6.3 step 1) forces at least one hard identifier; the expired-collision
   admin-review flag catches the rest. Monitor `mp_dedupe_checks` in the hardening pass.
