@@ -335,6 +335,7 @@
     },
     {
       id: 'featured-albania-work-visa',
+      status: 'closed',
       posted_at: '2026-04-15',
       title: 'Work in Albania (Europe) — D Visa',
       employer_name: 'eLab Solutions International',
