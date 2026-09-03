@@ -448,6 +448,59 @@
         window.ghSupabase.rpc('increment_page_view', { p_slug: 'share:' + network + ':' + id });
       }
     } catch (e) {}
+    var el = document.querySelector('.sc-count[data-sc-listing="' + id + '"][data-sc-network="' + network + '"]');
+    if (el) { var cur = parseInt(el.textContent, 10) || 0; el.textContent = String(cur + 1); }
+    if (window.refreshShareCounts) setTimeout(window.refreshShareCounts, 900);
+  };
+
+  /* ---------- Share counters (counts live in page_views as 'share:<network>:<listing>') ---------- */
+  /* Inject a counter chip after every share button, then load the live numbers. */
+  function enhanceShareButtons() {
+    if (!document.querySelectorAll) return;
+    var anchors = document.querySelectorAll('.job-card a[title^="Share on"]');
+    for (var i = 0; i < anchors.length; i++) {
+      var a = anchors[i];
+      if (a.nextSibling && a.nextSibling.className && String(a.nextSibling.className).indexOf('sc-count') !== -1) continue;
+      var oc = a.getAttribute('onclick') || '';
+      var m = oc.match(/ghTrackShare\('([^']*)','([^']*)'\)/);
+      if (!m) continue;
+      var sp = document.createElement('span');
+      sp.className = 'sc-count';
+      sp.setAttribute('data-sc-listing', m[1]);
+      sp.setAttribute('data-sc-network', m[2]);
+      sp.textContent = '0';
+      sp.style.cssText = 'font-size:10px;color:var(--text-tertiary);min-width:14px;text-align:center;';
+      a.parentNode.insertBefore(sp, a.nextSibling);
+    }
+  }
+
+  window.refreshShareCounts = function () {
+    var els = document.querySelectorAll('.sc-count[data-sc-listing]');
+    if (!els.length || !window.ghSupabase) return;
+    var wanted = {};
+    for (var i = 0; i < els.length; i++) {
+      var l = els[i].getAttribute('data-sc-listing');
+      var n = els[i].getAttribute('data-sc-network');
+      if (l && n) wanted[l + '|' + n] = els[i];
+    }
+    var keys = Object.keys(wanted);
+    if (!keys.length) return;
+    var slugs = keys.map(function (k) { var p = k.split('|'); return 'share:' + p[1] + ':' + p[0]; });
+    for (var c = 0; c < slugs.length; c += 45) {
+      (function (sliceKeys, sliceSlugs) {
+        window.ghSupabase.from('page_views').select('slug,views_count').in('slug', sliceSlugs).then(function (res) {
+          if (res.error || !res.data) return;
+          var bySlug = {};
+          res.data.forEach(function (r) { bySlug[r.slug] = r.views_count || 0; });
+          sliceKeys.forEach(function (k) {
+            var p = k.split('|');
+            var count = bySlug['share:' + p[1] + ':' + p[0]] || 0;
+            var el = wanted[k];
+            if (el) el.textContent = count > 999 ? (count / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : String(count);
+          });
+        });
+      })(keys.slice(c, c + 45), slugs.slice(c, c + 45));
+    }
   };
 
   function shareButtons(title, destination, salary, listingId) {
@@ -792,6 +845,8 @@
     else {
       container.innerHTML = openHtml + filtered.map(cardHtml).join('') + closedHtml;
     }
+    enhanceShareButtons();
+    window.refreshShareCounts();
     var total = filtered.length + featuredListings.length;
     countEl.textContent = 'Showing ' + total + ' position' + (total !== 1 ? 's' : '');
   }
