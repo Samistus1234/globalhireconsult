@@ -782,15 +782,15 @@
 
   /* ---------- Render filtered list ---------- */
   function render() {
-    // Always render featured listings first; open roles above filled ones
-    var orderedFeatured = featuredListings.slice().sort(function (a, b) {
-      return (isClosed(a) ? 1 : 0) - (isClosed(b) ? 1 : 0);
-    });
-    var featuredHtml = orderedFeatured.map(featuredCardHtml).join('');
+    // Order: OPEN featured first → live campaign cards → closed/past cards last
+    var openFeatured = featuredListings.filter(function (f) { return !isClosed(f); });
+    var closedFeatured = featuredListings.filter(function (f) { return isClosed(f); });
+    var openHtml = openFeatured.map(featuredCardHtml).join('');
+    var closedHtml = closedFeatured.map(featuredCardHtml).join('');
 
     if (!filtered.length && !featuredListings.length) { showEmpty(); }
     else {
-      container.innerHTML = featuredHtml + filtered.map(cardHtml).join('');
+      container.innerHTML = openHtml + filtered.map(cardHtml).join('') + closedHtml;
     }
     var total = filtered.length + featuredListings.length;
     countEl.textContent = 'Showing ' + total + ' position' + (total !== 1 ? 's' : '');
