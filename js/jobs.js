@@ -99,6 +99,7 @@
     },
     {
       id: 'featured-kuwait-government-healthcare',
+      status: 'closed',
       posted_at: '2026-07-10',
       title: 'Nurses & Allied Health — Kuwait',
       employer_name: 'Government Healthcare Institution — Kuwait',
@@ -118,6 +119,7 @@
     },
     {
       id: 'featured-riyadh-female-nurses-2026',
+      status: 'closed',
       posted_at: '2026-06-30',
       title: 'Female Registered Nurses — Riyadh',
       employer_name: 'Private Hospital — Riyadh, Saudi Arabia',
@@ -137,6 +139,7 @@
     },
     {
       id: 'featured-riyadh-surgeons-fee-per-case',
+      status: 'closed',
       posted_at: '2026-07-04',
       title: 'Ophthalmology & Orthopedic Surgeons — 20% Per Procedure',
       employer_name: 'Private Hospital — Riyadh, Saudi Arabia',
@@ -156,6 +159,7 @@
     },
     {
       id: 'featured-riyadh-dermatologist',
+      status: 'closed',
       posted_at: '2026-07-02',
       title: 'Dermatologist',
       employer_name: 'Private Hospital — Riyadh, Saudi Arabia',
@@ -175,6 +179,7 @@
     },
     {
       id: 'featured-riyadh-ophthalmologist',
+      status: 'closed',
       posted_at: '2026-07-02',
       title: 'Ophthalmologist',
       employer_name: 'Private Hospital — Riyadh, Saudi Arabia',
@@ -194,6 +199,7 @@
     },
     {
       id: 'featured-riyadh-obgyn',
+      status: 'closed',
       posted_at: '2026-07-02',
       title: 'Obstetrician & Gynaecologist (OB-GYN)',
       employer_name: 'Private Hospital — Riyadh, Saudi Arabia',
@@ -213,6 +219,7 @@
     },
     {
       id: 'featured-riyadh-ent',
+      status: 'closed',
       posted_at: '2026-07-02',
       title: 'ENT (Otolaryngology)',
       employer_name: 'Private Hospital — Riyadh, Saudi Arabia',
@@ -232,6 +239,7 @@
     },
     {
       id: 'featured-riyadh-neurologist',
+      status: 'closed',
       posted_at: '2026-07-02',
       title: 'Neurologist',
       employer_name: 'Private Hospital — Riyadh, Saudi Arabia',
@@ -251,6 +259,7 @@
     },
     {
       id: 'featured-qatar-derm-consultant',
+      status: 'closed',
       posted_at: '2026-06-06',
       title: 'Consultant Dermatologist',
       employer_name: 'Leading Healthcare Provider — Qatar',
@@ -270,6 +279,7 @@
     },
     {
       id: 'featured-qatar-plastics-consultant',
+      status: 'closed',
       posted_at: '2026-06-06',
       title: 'Consultant Plastic Surgeon',
       employer_name: 'Leading Healthcare Provider — Qatar',
@@ -289,6 +299,7 @@
     },
     {
       id: 'featured-elderly-caregiver-qatar',
+      status: 'closed',
       posted_at: '2026-05-05',
       title: 'Elderly Caregiver',
       employer_name: 'Qatar Healthcare Employer',
@@ -306,6 +317,7 @@
     },
     {
       id: 'featured-paediatric-caregiver-qatar',
+      status: 'closed',
       posted_at: '2026-05-05',
       title: 'Paediatric Caregiver',
       employer_name: 'Qatar Healthcare Employer',
@@ -342,6 +354,7 @@
     },
     {
       id: 'featured-qatar-nursing-2yr',
+      status: 'closed',
       posted_at: '2026-04-08',
       title: 'Registered Nurse — 2-Year Contract',
       employer_name: 'Qatar Hospital',
@@ -361,6 +374,7 @@
     },
     {
       id: 'featured-qatar-nursing-5yr',
+      status: 'closed',
       posted_at: '2026-04-08',
       title: 'Registered Nurse — 5-Year Contract',
       employer_name: 'Qatar Hospital',
@@ -380,6 +394,7 @@
     },
     {
       id: 'featured-saudi-ent-surgeon',
+      status: 'closed',
       posted_at: '2026-05-20',
       title: 'ENT Surgeon / Otorhinolaryngologist',
       employer_name: 'Private Hospital — Saudi Arabia',
@@ -698,7 +713,7 @@
       '<div class="job-card featured' + (closed ? ' closed' : '') + '" data-id="' + f.id + '"' + (closed ? ' style="opacity:0.62;filter:grayscale(0.75);"' : '') + '>' +
         '<div class="featured-accent"></div>' +
         (closed
-          ? '<span class="job-badge job-badge-closed" style="background:#6b7280;color:#fff;">POSITION FILLED</span>'
+          ? '<span class="job-badge job-badge-closed" style="background:#6b7280;color:#fff;">CLOSED</span>'
           : '<span class="job-badge job-badge-featured">FEATURED</span>') +
         '<div class="job-card-body">' +
           '<div class="job-card-header">' +
@@ -746,7 +761,7 @@
           '<span class="job-posted" style="color:var(--text-tertiary);">' + escHtml(f.requirements) + '</span>' +
           '<div class="job-card-actions" style="display:flex;flex-direction:column;gap:8px;">' +
             (closed
-              ? '<span class="btn btn-sm" style="text-align:center;background:#e5e7eb;color:#6b7280;border:none;cursor:not-allowed;">Position Filled</span>'
+              ? '<span class="btn btn-sm" style="text-align:center;background:#e5e7eb;color:#6b7280;border:none;cursor:not-allowed;">No Longer Available</span>'
               : (f.detail_link ? '<a href="' + f.detail_link + '" class="btn btn-primary btn-sm" style="text-decoration:none;text-align:center;">Apply Now</a>' : '')) +
             '<button class="btn-save-job" data-job-id="' + f.id + '" title="' + (savedJobIds.has(f.id) ? 'Remove from saved' : 'Save this job') + '" style="background:none;border:none;cursor:pointer;padding:6px;display:flex;align-items:center;gap:6px;color:' + (savedJobIds.has(f.id) ? 'var(--primary)' : 'var(--text-tertiary)') + ';font-size:var(--text-xs);border-radius:var(--radius-sm);transition:color 0.15s;" onmouseover="this.style.color=\'var(--primary)\'" onmouseout="if(!window.JobsPage._isSaved(\'' + f.id + '\'))this.style.color=\'var(--text-tertiary)\'" onclick="JobsPage.saveJob(\'' + f.id + '\',\'' + escHtml(f.title).replace(/'/g, "\\'") + '\',\'' + escHtml(f.employer_name).replace(/'/g, "\\'") + '\',\'' + escHtml(f.destination_country).replace(/'/g, "\\'") + '\',\'' + escHtml(f.salary_display).replace(/'/g, "\\'") + '\')">' +
               (savedJobIds.has(f.id) ? SVG_BOOKMARK_FILLED : SVG_BOOKMARK_OUTLINE) +
@@ -757,8 +772,8 @@
               'Apply on WhatsApp' +
             '</a>') +
           '</div>' +
-          '<a href="' + (f.detail_link || 'https://elabsolution.org/qatar-caregivers') + '" style="font-size:var(--text-xs);color:var(--text-tertiary);margin-top:var(--space-2);display:inline-block;text-decoration:underline;">View full details &rarr;</a>' +
-          shareButtons(f.title, f.destination_country, f.salary_display, f.id) +
+          (closed ? '' : '<a href="' + (f.detail_link || 'https://elabsolution.org/qatar-caregivers') + '" style="font-size:var(--text-xs);color:var(--text-tertiary);margin-top:var(--space-2);display:inline-block;text-decoration:underline;">View full details &rarr;</a>') +
+          (closed ? '' : shareButtons(f.title, f.destination_country, f.salary_display, f.id)) +
         '</div>' +
       '</div>'
     );
