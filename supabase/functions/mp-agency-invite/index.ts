@@ -39,6 +39,12 @@ Deno.serve(async (req) => {
     if (!mem || !['owner', 'admin'].includes(mem.role))
       return json({ error: 'only an agency owner or admin can invite' }, 403);
 
+    const { error: revErr } = await svc.schema('globalhire').from('mp_agency_invites')
+      .update({ status: 'revoked' })
+      .eq('agency_id', mem.agency_id).eq('status', 'pending')
+      .ilike('email', parsed.value.email);
+    if (revErr) console.error('revoke prior invites failed:', revErr.message);
+
     const token = crypto.randomUUID();
     const { data: inv, error } = await svc.schema('globalhire').from('mp_agency_invites').insert({
       agency_id: mem.agency_id, email: parsed.value.email, role: parsed.value.role,

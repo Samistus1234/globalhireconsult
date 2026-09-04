@@ -30,6 +30,9 @@ Deno.serve(async (req) => {
       return json({ error: 'invite expired' }, 400);
     }
 
+    if ((user.email ?? '').toLowerCase() !== String(inv.email).toLowerCase())
+      return json({ error: 'this invite was issued to a different email' }, 403);
+
     const { data: existing } = await svc.schema('globalhire').from('mp_agency_members')
       .select('agency_id').eq('user_id', user.id).eq('status', 'active').maybeSingle();
     if (existing && existing.agency_id !== inv.agency_id)
