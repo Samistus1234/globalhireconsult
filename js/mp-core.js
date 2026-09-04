@@ -43,14 +43,24 @@
     esc: esc,
 
     async init() {
-      var u = await sb.auth.getUser();
-      MP.user = (u && u.data && u.data.user) || null;
-      if (u && u.error && !MP.user) {
+      // Session state first: a logged-out visitor is a NORMAL state, not a failure.
+      // getSession() returns { data: { session: null }, error: null } when signed out.
+      var s = await sb.auth.getSession();
+      if (s && s.error) {
         MP.status = 'error';
-        MP.lastError = u.error.message || String(u.error);
+        MP.lastError = s.error.message || String(s.error);
         return MP;
       }
-      if (!MP.user) { MP.status = 'no_agency'; return MP; }
+      if (!s || !s.data || !s.data.session) { MP.status = 'no_agency'; return MP; }
+
+      var u = await sb.auth.getUser();
+      MP.user = (u && u.data && u.data.user) || null;
+      if (!MP.user) {
+        // A session exists but the user can't be resolved — that IS a real failure.
+        MP.status = 'error';
+        MP.lastError = (u && u.error && u.error.message) || 'Could not resolve the signed-in user';
+        return MP;
+      }
 
       var m = await mpFrom('agency_members')
         .select('agency_id, role, status')
