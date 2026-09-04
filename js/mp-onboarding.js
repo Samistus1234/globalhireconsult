@@ -16,9 +16,6 @@
    ============================================ */
 
 (function () {
-  var SERVICES = ['flight_tickets', 'candidate_sourcing', 'local_recruitment', 'medical_verification_licensing', 'international_recruitment', 'visa_clearance', 'job_opportunities'];
-  var COOP = ['have_jobs_want_candidates', 'have_candidates_to_nominate', 'dataflow_licensing_partnership', 'be_your_agent', 'international_partnership', 'urgent_recruitment', 'gulf_market_partnership', 'permanent_recruitment', 'temporary_recruitment', 'new_market_entry', 'visa_clearance', 'flight_booking_for_clients'];
-
   var banner = document.getElementById('mp-status-banner');
   var form = document.getElementById('mp-profile-form');
   var team = document.getElementById('mp-team');
@@ -54,6 +51,26 @@
       '</div>';
     var b = document.getElementById('mp-retry');
     if (b) b.onclick = function () { window.location.reload(); };
+  }
+
+  // ?invite=<token> failed (400 expired / 403 wrong email / 409 already belongs elsewhere).
+  // The visitor most commonly has NO existing membership at this point — the normal state
+  // for a first-time invitee — so we must render this BEFORE the requireAgency() guard ever
+  // runs, or it silently bounces them to partners-signup.html with no explanation, inviting
+  // a duplicate-agency signup (the exact outcome the invite flow exists to avoid).
+  function renderInviteError(msg) {
+    var host = document.getElementById('mp-error');
+    var body = document.getElementById('mp-onboarding-body');
+    if (body) body.hidden = true;
+    if (!host) return;
+    host.hidden = false;
+    host.innerHTML =
+      '<div class="mp-card">' +
+      '<h2>This invite could not be accepted</h2>' +
+      '<p>' + window.MP.esc(msg) + '</p>' +
+      '<p><a class="mp-btn" href="login.html">Sign in</a>' +
+      '<a class="mp-link" href="partners-signup.html">Register a new agency instead</a></p>' +
+      '</div>';
   }
 
   function renderBanner() {
@@ -191,11 +208,15 @@
 
     await window.MP.init();
 
+    // An invite failure takes over the page outright — render it and stop BEFORE the guard
+    // (requireAgency) is evaluated at all, so a no-membership visitor is never silently
+    // redirected to partners-signup.html without knowing why their invite didn't work.
+    if (inviteError) { renderInviteError(inviteError); return; }
+
     if (window.MP.status === 'error') { renderError(); return; }
     if (!window.MP.requireAgency({ to: 'partners-signup.html' })) return;
 
     renderBanner();
-    if (inviteError && banner) { banner.textContent = inviteError; }
     fillForm();
     renderTeam();
     form.addEventListener('submit', saveProfile);
