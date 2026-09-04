@@ -28,3 +28,33 @@ test.describe('partners-signup', () => {
     expect(errors).toEqual([]);
   });
 });
+
+test.describe('partners-onboarding', () => {
+  // MP.init() resolves the (unauthenticated) session locally with no network hop,
+  // so the page guard's redirect to login.html fires within a microtask of load —
+  // there's no reliable window to assert the live DOM after a normal page.goto().
+  // This test verifies the STATIC markup shape (the form + its checkbox groups,
+  // as authored in partners-onboarding.html) with JS disabled, sidestepping the
+  // race entirely. The guard/redirect behavior itself is covered by the
+  // partners-dashboard test below (same mp-core.js contract, same code path).
+  test.use({ javaScriptEnabled: false });
+
+  test('renders #mp-profile-form with services (7) and cooperation_areas (12) checkbox groups, no console errors', async ({ page }) => {
+    const errors = [];
+    page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+    page.on('pageerror', (e) => errors.push(String(e)));
+
+    await page.goto('/partners-onboarding.html');
+
+    await expect(page.locator('#mp-profile-form')).toBeVisible();
+
+    const services = page.locator('#mp-profile-form input[name="services"]');
+    await expect(services).toHaveCount(7);
+
+    const coopAreas = page.locator('#mp-profile-form input[name="cooperation_areas"]');
+    await expect(coopAreas).toHaveCount(12);
+
+    expect(errors).toEqual([]);
+  });
+});
+
