@@ -58,3 +58,10 @@ test.describe('partners-onboarding', () => {
   });
 });
 
+test.describe('partners-dashboard', () => {
+  test('unauthenticated visit redirects to login.html', async ({ page }) => {
+    await page.goto('/partners-dashboard.html');
+    await page.waitForURL(/login\.html/);
+    expect(page.url()).toContain('login.html');
+  });
+});
