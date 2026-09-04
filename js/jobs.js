@@ -41,7 +41,27 @@
 
   var featuredListings = [
     {
+      id: 'featured-saudi-doctor-openings-sep2026',
+      posted_at: '2026-09-04',
+      title: 'Saudi Arabia — 3 New Doctor Openings (5 Vacancies)',
+      employer_name: 'Hospitals — Saudi Arabia (Riyadh & locum)',
+      destination_country: 'Saudi Arabia',
+      specialty: 'Internal Medicine (Consultant Locum) · OB/GYN (F) · Diagnostic Radiology (F)',
+      category: 'Physician',
+      positions: 5,
+      salary_display: 'Confirmed at interview (SAR)',
+      min_experience: 0,
+      visa_sponsored: false,
+      benefits: ['SCFHS Required', 'KSA Residents Only', 'Kafala Transfer (Riyadh Roles)', 'OB/GYN & Radiology — Female'],
+      description: 'Three new Saudi hospital openings published this week: an Internal Medicine Consultant for a 1-month locum (12 Sep – 12 Oct, SCFHS locum approval required), a female OB/GYN Registrar (Riyadh) and female Diagnostic Radiology Registrars / Senior Registrars (Riyadh — 3 posts). All roles require a valid SCFHS classification and residence in Saudi Arabia; the Riyadh roles need a transferable kafala. ELAB handles eligibility checks and the employment transfer.',
+      requirements: 'Valid SCFHS classification + resident in Saudi Arabia (transferable kafala where stated; locum approval for the locum role)',
+      wa_link: 'https://wa.me/19294192327?text=Hi%20eLab%2C%20I%E2%80%99m%20interested%20in%20the%20new%20Saudi%20Arabia%20doctor%20openings%20%285%20positions%29.%20My%20name%20is%20____%2C%20my%20role%20is%20____%20and%20I%20have%20____%20years%20of%20experience.',
+      detail_link: 'saudi-doctor-openings-sep2026.html',
+      accent_color: '#006C35',
+    },
+    {
       id: 'featured-kuwait-doctors-1836',
+      status: 'closed',
       posted_at: '2026-09-03',
       title: 'Doctors — Kuwait Hospitals & Medical Centres (30 Vacancies)',
       employer_name: 'Hospitals & Medical Centres — Kuwait',
