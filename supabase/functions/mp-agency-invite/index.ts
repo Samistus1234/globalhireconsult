@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
     const { error: revErr } = await svc.schema('globalhire').from('mp_agency_invites')
       .update({ status: 'revoked' })
       .eq('agency_id', mem.agency_id).eq('status', 'pending')
-      .ilike('email', parsed.value.email);
+      .eq('email', parsed.value.email);
     if (revErr) console.error('revoke prior invites failed:', revErr.message);
 
     const token = crypto.randomUUID();
