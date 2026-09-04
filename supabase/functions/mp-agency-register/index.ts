@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
 
     const { data: created, error: cErr } = await sb.auth.admin.createUser({
       email: b.email, password: b.password, email_confirm: false,
-      user_metadata: { full_name: b.full_name, role: 'agency' },
+      user_metadata: { full_name: b.full_name, role: 'agency', phone: b.phone ?? null },
     });
     if (cErr) return json({ error: cErr.message }, 400);
     const userId = created.user.id;
@@ -56,7 +56,17 @@ Deno.serve(async (req) => {
     const { error: mErr } = await sb.schema('globalhire').from('mp_agency_members').insert({
       agency_id: agency.id, user_id: userId, role: 'owner', status: 'active',
     });
-    if (mErr) return json({ error: mErr.message }, 400);
+    if (mErr) {
+      // Unwind in reverse: drop the ownerless agency row, then the dangling auth user.
+      // Failure-tolerant so a cleanup error never masks the original mErr.
+      try {
+        await sb.schema('globalhire').from('mp_agencies').delete().eq('id', agency.id);
+      } catch (e) { console.error('mp-agency-register unwind: agency delete failed:', (e as Error).message); }
+      try {
+        await sb.auth.admin.deleteUser(userId);
+      } catch (e) { console.error('mp-agency-register unwind: user delete failed:', (e as Error).message); }
+      return json({ error: mErr.message }, 400);
+    }
 
     // welcome / pending-review email (non-fatal)
     const smtpUser = Deno.env.get('GMAIL_USER') || 'support@elabsolution.org';
