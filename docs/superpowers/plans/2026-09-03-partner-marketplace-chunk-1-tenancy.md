@@ -1161,10 +1161,12 @@ git commit -m "feat(fn): mp-agency-invite + mp-agency-invite-accept — agency t
   MP.user                     // auth user | null
   MP.membership               // { agency_id, role, status } | null
   MP.agency                   // gh_mp_agencies row | null
-  MP.status                   // 'no_agency' | 'pending_verification' | 'verified' | 'suspended' | 'rejected'
-  MP.requireAgency(opts)      // redirect to login/signup if no membership
-  MP.requireVerified(opts)    // redirect to partners-onboarding.html if not verified
-  MP.callFn(name, body)       // fetch a marketplace edge fn with the session JWT
+  MP.status                   // 'no_agency' | 'pending_verification' | 'verified' | 'suspended' | 'rejected' | 'error'
+  MP.lastError                // string | null — set when status === 'error'
+  MP.requireAgency(opts)      // redirect to login/signup if no membership; NEVER redirects when status==='error'
+  MP.requireVerified(opts)    // redirect to partners-onboarding.html if not verified; NEVER redirects when status==='error'
+  MP.callFn(name, body)       // fetch a marketplace edge fn with the session JWT; never rejects —
+                              //   a thrown fetch returns { ok:false, status:0, data:{error} }
   MP.esc(str)                 // HTML-escape helper (copy from js/recruiter.js)
   ```
 
@@ -1519,12 +1521,15 @@ git commit -m "feat(partners): partners-dashboard landing (status-aware; nav she
 
 ---
 
-### Task 14: Admin — `recruiters.html` Agencies tab + `js/mp-agencies-admin.js`
+### Task 14: Admin — `admin-mp-agencies.html` + `js/mp-agencies-admin.js`
+
+> **CORRECTED 2026-09-04 (plan defect).** This task originally said "add an Agencies **tab** to `recruiters.html`". That was wrong on two counts, verified against the repo: (1) `recruiters.html` and `js/recruiters-admin.js` contain **zero** `data-tab` attributes — it is a flat single-view page, and the `data-tab`/`.tab-content` pattern exists elsewhere only *inside document-review modals* on six other pages, each hand-wired, with no reusable component; (2) the codebase's actual convention for admin surfaces is a **separate page** per area (`candidates.html`, `recruiter-submissions.html`, `admin-visas.html`, `admin-chat.html`), each carrying its own hand-written copy of `<nav class="sidebar-nav">`. Building a page-level tab mechanism from scratch on a live production page to host one panel is unjustified risk; a new page is additive and matches both the codebase and the rest of this project's plan (later chunks already specify `admin-mp-jobs`, `admin-mp-nominations`, `admin-mp-statements` as separate pages).
 
 **Files:**
-- Modify: `recruiters.html` (add a sidebar/tab entry + an `#tab-agencies` panel, mirroring the existing tab structure)
+- Create: `admin-mp-agencies.html` (new admin page; copy the shell + sidebar from `recruiters.html`, mark the new nav item `active`)
 - Create: `js/mp-agencies-admin.js`
-- Modify: `recruiters.html` `<script>` list — add `js/mp-agencies-admin.js` after the existing admin scripts
+- Modify: `recruiters.html` — add exactly ONE `<a class="nav-item" href="admin-mp-agencies.html">` to its `<nav class="sidebar-nav">`. Nothing else on that page changes.
+  - Note: the sidebar is duplicated per-page, so the link is reachable only from `recruiters.html` for now. A follow-up should add it to the other admin pages (or extract a shared nav) once later chunks add `admin-mp-jobs` / `admin-mp-nominations` / `admin-mp-statements`.
 
 **Interfaces:**
 - Consumes: `window.ghFrom` (admin session already established by `recruiters.html`'s `js/auth-guard.js` + `data-auth-role="admin"`), `ghSupabase.functions` via a small `callFn` (or fetch), `ghSupabase.storage…createSignedUrl`.

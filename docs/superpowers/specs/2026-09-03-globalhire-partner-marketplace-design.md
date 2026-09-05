@@ -562,7 +562,7 @@ adjustment payment — the ledger keeps the full audit. No processor.
 
 ### 11.2 Admin pages
 
-`recruiters.html` **+ Agencies tab** (verification queue: verify / reject / suspend) · `admin-mp-jobs` ·
+`admin-mp-agencies.html` (verification queue: verify / reject / suspend; a separate page + one sidebar link in `recruiters.html` — that page has no tab mechanism, and separate admin pages are this repo's convention) · `admin-mp-jobs` ·
 `admin-mp-nominations` (queue + inbox) · `admin-mp-nomination` (pipeline cockpit) · `admin-mp-statements`
 · `admin-mp-screening-templates` · `admin-mp-ai` (`mp_ai_runs` cost/usage view)
 
