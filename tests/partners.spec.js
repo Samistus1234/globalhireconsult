@@ -140,3 +140,70 @@ test.describe('partners-onboarding — invite failure regression', () => {
     expect(await page.evaluate(() => window.__requireAgencyCalled)).not.toBe(true);
   });
 });
+
+test.describe('partners-onboarding — signed-out invite: token survives the login redirect', () => {
+  // Regression for: an invite link opened while SIGNED OUT — the normal state for a
+  // first-time invitee — used to fall straight through to the requireAgency() guard,
+  // whose bare `window.location.href = 'login.html'` (no ?next=) silently destroyed the
+  // token. After logging in the visitor had no membership, got bounced to
+  // partners-signup.html, and registered a DUPLICATE agency — the exact outcome the invite
+  // flow exists to prevent. The fix stashes the token in sessionStorage and redirects to
+  // login.html?next=... BEFORE requireAgency (or callFn) ever runs.
+  test('stashes the token in sessionStorage and redirects to login.html?next=... carrying it, without ever calling requireAgency or accept', async ({ page }) => {
+    await page.route('**/js/supabase-client.js', (route) => route.fulfill({
+      contentType: 'application/javascript',
+      body: `
+        window.ghSupabase = {
+          auth: {
+            getSession: async function () {
+              return { data: { session: null }, error: null };
+            }
+          }
+        };
+      `
+    }));
+
+    await page.route('**/js/mp-core.js', (route) => route.fulfill({
+      contentType: 'application/javascript',
+      body: `
+        window.MP = {
+          status: 'no_agency',
+          agency: null,
+          membership: null,
+          user: null,
+          lastError: null,
+          esc: function (s) {
+            var d = document.createElement('div');
+            d.appendChild(document.createTextNode(String(s || '')));
+            return d.innerHTML;
+          },
+          init: async function () { return window.MP; },
+          // Spy: must never be reached — the signed-out redirect must fire first.
+          requireAgency: function (opts) {
+            window.__requireAgencyCalled = true;
+            window.location.href = (opts && opts.to) || 'partners-signup.html';
+            return false;
+          },
+          // Spy: mp-agency-invite-accept must never be POSTed while signed out.
+          callFn: async function () {
+            window.__callFnCalled = true;
+            return { ok: false, status: 404, data: { error: 'should not be called signed-out' } };
+          }
+        };
+      `
+    }));
+
+    const token = 'signed-out-test-token';
+    await page.goto('/partners-onboarding.html?invite=' + token);
+
+    await page.waitForURL(/login\.html/);
+    expect(page.url()).toContain('login.html');
+    expect(decodeURIComponent(page.url())).toContain('next=partners-onboarding.html?invite=' + token);
+
+    // sessionStorage is per-origin and survives a same-tab navigation to login.html
+    // (same origin, localhost:8080), so the stash made on partners-onboarding.html before
+    // the redirect is still readable here — proving the token was not simply lost.
+    const pending = await page.evaluate(() => sessionStorage.getItem('mp_pending_invite'));
+    expect(pending).toBe(token);
+  });
+});

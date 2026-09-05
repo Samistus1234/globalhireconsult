@@ -188,22 +188,43 @@
 
     // ?invite=<token>: accept BEFORE init() when the visitor already has a session.
     var token = new URLSearchParams(location.search).get('invite');
+
+    // No ?invite= in this URL — check for one stashed before a signed-out redirect to
+    // login.html (see below). login.html has no ?next= support, so this sessionStorage
+    // fallback is what actually gets the visitor back to their invite once signed in.
+    if (!token) {
+      try {
+        var pending = sessionStorage.getItem('mp_pending_invite');
+        if (pending) {
+          sessionStorage.removeItem('mp_pending_invite');
+          token = pending;
+        }
+      } catch (e) { /* sessionStorage unavailable — same as having no pending invite */ }
+    }
+
     if (token) {
       var sess = await window.ghSupabase.auth.getSession();
-      if (sess && sess.data && sess.data.session) {
-        var ar = await window.MP.callFn('mp-agency-invite-accept', { token: token });
-        if (ar.ok) {
-          // Full reload without the token → the next page load runs MP.init() exactly once
-          // against the freshly-created membership.
-          location.search = '';
-          return;
-        }
-        // 409 "you already belong to another agency" / 403 "this invite was issued to a
-        // different email" / 400 "invite expired" — surface the server's message.
-        inviteError = (ar.data && ar.data.error) ||
-          (ar.status === 0 ? 'Network error — the invite could not be accepted.' : 'Invite could not be accepted.');
+      if (!(sess && sess.data && sess.data.session)) {
+        // Signed-out is the NORMAL state for a first-time invitee — the requireAgency()
+        // guard further down would otherwise bounce them to a bare login.html and
+        // silently discard the token, forcing a duplicate-agency signup after login.
+        // Stash it and send them to sign in with a return path instead.
+        try { sessionStorage.setItem('mp_pending_invite', token); } catch (e) {}
+        window.location.href = 'login.html?next=' +
+          encodeURIComponent('partners-onboarding.html?invite=' + token);
+        return;
       }
-      // Not signed in → fall through; the guard below sends them to login.html.
+      var ar = await window.MP.callFn('mp-agency-invite-accept', { token: token });
+      if (ar.ok) {
+        // Full reload without the token → the next page load runs MP.init() exactly once
+        // against the freshly-created membership.
+        location.search = '';
+        return;
+      }
+      // 409 "you already belong to another agency" / 403 "this invite was issued to a
+      // different email" / 400 "invite expired" — surface the server's message.
+      inviteError = (ar.data && ar.data.error) ||
+        (ar.status === 0 ? 'Network error — the invite could not be accepted.' : 'Invite could not be accepted.');
     }
 
     await window.MP.init();
