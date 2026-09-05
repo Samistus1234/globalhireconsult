@@ -58,13 +58,19 @@ Deno.serve(async (req) => {
     });
     if (mErr) {
       // Unwind in reverse: drop the ownerless agency row, then the dangling auth user.
-      // Failure-tolerant so a cleanup error never masks the original mErr.
+      // Failure-tolerant so a cleanup error never masks the original mErr — but supabase-js
+      // RESOLVES with {error} rather than throwing on a DB-side failure, so a bare try/catch
+      // around these calls would silently swallow a failed delete and leave the ownerless
+      // agency (the exact thing this unwind exists to remove) sitting in the table. Check
+      // the returned error explicitly and log loudly.
       try {
-        await sb.schema('globalhire').from('mp_agencies').delete().eq('id', agency.id);
-      } catch (e) { console.error('mp-agency-register unwind: agency delete failed:', (e as Error).message); }
+        const { error: delAgencyErr } = await sb.schema('globalhire').from('mp_agencies').delete().eq('id', agency.id);
+        if (delAgencyErr) console.error('mp-agency-register unwind: agency delete failed, ownerless agency may remain:', delAgencyErr.message, agency.id);
+      } catch (e) { console.error('mp-agency-register unwind: agency delete threw:', (e as Error).message); }
       try {
-        await sb.auth.admin.deleteUser(userId);
-      } catch (e) { console.error('mp-agency-register unwind: user delete failed:', (e as Error).message); }
+        const { error: delUserErr } = await sb.auth.admin.deleteUser(userId);
+        if (delUserErr) console.error('mp-agency-register unwind: user delete failed, dangling auth user may remain:', delUserErr.message, userId);
+      } catch (e) { console.error('mp-agency-register unwind: user delete threw:', (e as Error).message); }
       return json({ error: mErr.message }, 400);
     }
 

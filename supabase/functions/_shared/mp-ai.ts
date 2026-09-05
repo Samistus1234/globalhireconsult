@@ -53,7 +53,8 @@ function svc() {
 
 async function logRun(row: Record<string, unknown>) {
   try {
-    await svc().schema('globalhire').from('mp_ai_runs').insert(row);
+    const { error } = await svc().schema('globalhire').from('mp_ai_runs').insert(row);
+    if (error) console.error('mp_ai_runs insert failed (non-fatal, telemetry only):', error.message);
   } catch (e) {
     console.warn('mp_ai_runs insert failed (non-fatal):', (e as Error).message);
   }

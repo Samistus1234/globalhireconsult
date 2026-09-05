@@ -38,12 +38,25 @@ Deno.serve(async (req) => {
     if (existing && existing.agency_id !== inv.agency_id)
       return json({ error: 'you already belong to another agency' }, 409);
 
-    await svc.schema('globalhire').from('mp_agency_members').upsert({
+    // supabase-js resolves with {error} rather than throwing on a DB-side failure, so both
+    // writes below are explicitly checked. The membership upsert is the write that actually
+    // grants access — if it fails, the request must fail too (a silently-ignored error here
+    // previously returned {success:true} while the caller never joined the agency).
+    const { error: upsertErr } = await svc.schema('globalhire').from('mp_agency_members').upsert({
       agency_id: inv.agency_id, user_id: user.id, role: inv.role, status: 'active', invited_by: inv.invited_by,
     }, { onConflict: 'agency_id,user_id' });
-    await svc.schema('globalhire').from('mp_agency_invites').update({
+    if (upsertErr) {
+      console.error('mp-agency-invite-accept: membership upsert failed:', upsertErr.message, inv.id, user.id);
+      return json({ error: 'could not accept invite: ' + upsertErr.message }, 500);
+    }
+
+    // The membership already succeeded at this point, so a failure to flag the invite
+    // 'accepted' must not fail the request — just log loudly so it can be reconciled
+    // (the invite would otherwise look 'pending' forever even though access was granted).
+    const { error: statusErr } = await svc.schema('globalhire').from('mp_agency_invites').update({
       status: 'accepted', accepted_at: new Date().toISOString(), accepted_user_id: user.id,
     }).eq('id', inv.id);
+    if (statusErr) console.error('mp-agency-invite-accept: invite status update failed (membership already granted):', statusErr.message, inv.id);
 
     return json({ success: true, agency_id: inv.agency_id });
   } catch (e) {
