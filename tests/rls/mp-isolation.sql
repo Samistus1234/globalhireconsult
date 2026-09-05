@@ -13,6 +13,33 @@
 --
 -- Re-run this script (unmodified, or extended with new mp_* tables) as the acceptance
 -- gate for every later chunk that adds an mp_* table.
+--
+-- ── What this script currently proves, layer by layer (read before trusting a green run) ──
+-- Checks 1-7 exercise the RLS USING/WITH CHECK clauses directly: the grants involved
+-- (SELECT on all four tables; UPDATE on mp_agencies) are still held by `authenticated`
+-- as of schema-v35, so these checks reach the policy and a PASS means the policy denied it.
+--
+-- Checks 8, 9, 11 (INSERTs) and 10 (an UPDATE) are DIFFERENT: as of schema-v35,
+-- `authenticated` holds NO INSERT/UPDATE/DELETE at all on mp_agency_members,
+-- mp_agency_invites, or mp_agencies-for-insert — so these four statements are rejected at
+-- the GRANT layer (`permission denied for table ...`) before Postgres ever evaluates RLS.
+-- A PASS on 8/9/10/11 today proves the grant is absent; it does NOT independently
+-- re-verify that the RLS write-policies underneath would also deny them.
+--
+-- Those RLS write-policies WERE independently verified during Chunk 1's earlier task
+-- reviews, back when the broad default-privilege grants were still in place: five
+-- escalation attempts — join another agency, self-promote to owner, forge an invite,
+-- hijack an invite, rename another agency — were all denied by RLS alone. This script
+-- does not re-run that RLS-only proof; it only confirms the current (correct) posture
+-- that those paths are blocked, without asserting which layer is doing the blocking for
+-- checks 8-11 today.
+--
+-- ⚠ IMPORTANT for future chunks: if any future migration grants `authenticated` INSERT or
+-- UPDATE on mp_agency_members / mp_agency_invites / mp_agencies, checks 8-11 will start
+-- reaching RLS for the first time under this script — do NOT treat a green 11/11 run of
+-- this script alone as sufficient proof that RLS still holds. Re-verify the underlying
+-- USING/WITH CHECK clauses directly (e.g. re-run the five escalation attempts above) before
+-- trusting this gate again for those tables.
 BEGIN;
 
 -- Two synthetic users, two synthetic agencies (each owned by one of them), one invite
@@ -92,6 +119,7 @@ END $$;
 
 -- 8. cannot INSERT a membership into another agency (self-join escalation — blocked by the
 --    schema-v35 grant revocation before RLS is even reached)
+--    GRANT-layer denial today (see header) — does not exercise the RLS write-policy.
 DO $$
 BEGIN
   INSERT INTO globalhire.mp_agency_members (agency_id, user_id, role, status)
@@ -102,6 +130,7 @@ EXCEPTION WHEN OTHERS THEN
 END $$;
 
 -- 9. cannot forge a brand-new invite for another agency
+--    GRANT-layer denial today (see header) — does not exercise the RLS write-policy.
 DO $$
 BEGIN
   INSERT INTO globalhire.mp_agency_invites (agency_id, email, role, token, invited_by, expires_at)
@@ -114,6 +143,7 @@ END $$;
 
 -- 10. cannot hijack another agency's invite via a direct write (bypassing the
 --     mp-agency-invite-accept edge function's own-email check)
+--     GRANT-layer denial today (see header) — does not exercise the RLS write-policy.
 DO $$
 BEGIN
   UPDATE globalhire.mp_agency_invites SET status = 'accepted', accepted_user_id = '00000000-0000-0000-0000-00000000000a'
@@ -124,6 +154,7 @@ EXCEPTION WHEN OTHERS THEN
 END $$;
 
 -- 11. cannot self-register a verified agency directly, bypassing mp-agency-register
+--     GRANT-layer denial today (see header) — does not exercise the RLS write-policy.
 DO $$
 BEGIN
   INSERT INTO globalhire.mp_agencies (name, status, created_by)
