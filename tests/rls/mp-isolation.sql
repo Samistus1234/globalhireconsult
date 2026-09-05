@@ -164,6 +164,23 @@ EXCEPTION WHEN OTHERS THEN
   PERFORM set_config('chk.agency_self_insert_denied', 'PASS (' || SQLERRM || ')', true);
 END $$;
 
+-- 12. cannot SELECT the invite `token` column at all — CRITICAL fix, schema-v37.
+--     public.gh_mp_agency_invites (schema-v31) deliberately omits `token`, but that
+--     omission is only a privilege boundary if the base-table GRANT is column-level too.
+--     Before schema-v37 the grant was table-wide, so any authenticated principal with RLS
+--     row access (userA already has it here, as Agency A's owner — see check 4) could
+--     read `token` straight off globalhire.mp_agency_invites, bypassing the view entirely.
+--     This must now raise regardless of RLS, because it is a GRANT-layer (column
+--     privilege) denial, not a row-visibility one.
+DO $$
+BEGIN
+  PERFORM token FROM globalhire.mp_agency_invites
+  WHERE agency_id = 'aaaaaaaa-0000-0000-0000-000000000001' LIMIT 1;
+  PERFORM set_config('chk.token_column_denied', 'FAIL (token was readable)', true);
+EXCEPTION WHEN OTHERS THEN
+  PERFORM set_config('chk.token_column_denied', 'PASS (' || SQLERRM || ')', true);
+END $$;
+
 RESET role;
 
 -- Consolidated result — every row must read PASS.
@@ -178,7 +195,8 @@ SELECT * FROM (VALUES
   ('8_cross_agency_membership_insert',  current_setting('chk.cross_agency_membership_insert_denied', true)),
   ('9_invite_forge_denied',             current_setting('chk.invite_forge_denied', true)),
   ('10_invite_hijack_denied',           current_setting('chk.invite_hijack_denied', true)),
-  ('11_agency_self_insert_denied',      current_setting('chk.agency_self_insert_denied', true))
+  ('11_agency_self_insert_denied',      current_setting('chk.agency_self_insert_denied', true)),
+  ('12_token_column_denied',            current_setting('chk.token_column_denied', true))
 ) AS t(check_name, result)
 ORDER BY 1;
 
