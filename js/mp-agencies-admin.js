@@ -47,18 +47,27 @@
 
   async function callVerify(agencyId, action, note) {
     var sb = window.ghSupabase;
-    var s = await sb.auth.getSession();
-    var token = (s.data && s.data.session) ? s.data.session.access_token : null;
-    var res = await fetch(SUPABASE_URL + '/functions/v1/mp-agency-verify', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': sb.supabaseKey || '',
-        'Authorization': 'Bearer ' + token
-      },
-      body: JSON.stringify({ agency_id: agencyId, action: action, note: note })
-    });
-    return res.json();
+    try {
+      var s = await sb.auth.getSession();
+      var token = (s.data && s.data.session) ? s.data.session.access_token : null;
+      var res = await fetch(SUPABASE_URL + '/functions/v1/mp-agency-verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': sb.supabaseKey || '',
+          'Authorization': 'Bearer ' + (token || sb.supabaseKey || '')
+        },
+        body: JSON.stringify({ agency_id: agencyId, action: action, note: note })
+      });
+      var out = await res.json().catch(function () { return {}; });
+      return res.ok ? out : { error: (out && out.error) || ('HTTP ' + res.status) };
+    } catch (e) {
+      // Mirrors MP.callFn's "never rejects" contract — a cold-start non-JSON body,
+      // a worker-boot 502, or a lapsed session between gh:auth-ready and the click
+      // must resolve to an error object, never an unhandled rejection that leaves
+      // the drawer reading "Working…" forever.
+      return { error: (e && e.message) || String(e) };
+    }
   }
 
   function renderTable(rows) {
