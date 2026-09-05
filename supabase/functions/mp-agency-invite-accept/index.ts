@@ -1,0 +1,65 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const cors = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
+const json = (b: unknown, s = 200) =>
+  new Response(JSON.stringify(b), { status: s, headers: { ...cors, 'Content-Type': 'application/json' } });
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
+  try {
+    const auth = req.headers.get('Authorization');
+    if (!auth) return json({ error: 'sign in first' }, 401);
+    const svc = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+    const uc = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!,
+      { global: { headers: { Authorization: auth } } });
+    const { data: { user } } = await uc.auth.getUser();
+    if (!user) return json({ error: 'sign in first' }, 401);
+
+    const { token } = await req.json();
+    if (!token) return json({ error: 'token required' }, 400);
+
+    const { data: inv } = await svc.schema('globalhire').from('mp_agency_invites')
+      .select('*').eq('token', token).maybeSingle();
+    if (!inv || inv.status !== 'pending') return json({ error: 'invite not found or already used' }, 400);
+    if (new Date(inv.expires_at) < new Date()) {
+      await svc.schema('globalhire').from('mp_agency_invites').update({ status: 'expired' }).eq('id', inv.id);
+      return json({ error: 'invite expired' }, 400);
+    }
+
+    if ((user.email ?? '').toLowerCase() !== String(inv.email).toLowerCase())
+      return json({ error: 'this invite was issued to a different email' }, 403);
+
+    const { data: existing } = await svc.schema('globalhire').from('mp_agency_members')
+      .select('agency_id').eq('user_id', user.id).eq('status', 'active').maybeSingle();
+    if (existing && existing.agency_id !== inv.agency_id)
+      return json({ error: 'you already belong to another agency' }, 409);
+
+    // supabase-js resolves with {error} rather than throwing on a DB-side failure, so both
+    // writes below are explicitly checked. The membership upsert is the write that actually
+    // grants access — if it fails, the request must fail too (a silently-ignored error here
+    // previously returned {success:true} while the caller never joined the agency).
+    const { error: upsertErr } = await svc.schema('globalhire').from('mp_agency_members').upsert({
+      agency_id: inv.agency_id, user_id: user.id, role: inv.role, status: 'active', invited_by: inv.invited_by,
+    }, { onConflict: 'agency_id,user_id' });
+    if (upsertErr) {
+      console.error('mp-agency-invite-accept: membership upsert failed:', upsertErr.message, inv.id, user.id);
+      return json({ error: 'could not accept invite: ' + upsertErr.message }, 500);
+    }
+
+    // The membership already succeeded at this point, so a failure to flag the invite
+    // 'accepted' must not fail the request — just log loudly so it can be reconciled
+    // (the invite would otherwise look 'pending' forever even though access was granted).
+    const { error: statusErr } = await svc.schema('globalhire').from('mp_agency_invites').update({
+      status: 'accepted', accepted_at: new Date().toISOString(), accepted_user_id: user.id,
+    }).eq('id', inv.id);
+    if (statusErr) console.error('mp-agency-invite-accept: invite status update failed (membership already granted):', statusErr.message, inv.id);
+
+    return json({ success: true, agency_id: inv.agency_id });
+  } catch (e) {
+    return json({ error: (e as Error).message || 'internal error' }, 500);
+  }
+});

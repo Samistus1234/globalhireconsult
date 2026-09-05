@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2R8CT52B7P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-2R8CT52B7P");</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Partner Agency Registration — GlobalHire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <style>
+    body { background: var(--bg-base); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: var(--space-6); }
+    .reg-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: var(--space-10);
+      width: 100%;
+      max-width: 520px;
+    }
+    .reg-logo { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-8); }
+    .reg-logo-text { font-size: var(--text-xl); font-weight: 800; color: var(--text-primary); }
+    .reg-logo-text span { color: var(--primary); }
+    .reg-heading { font-size: var(--text-2xl); font-weight: 800; color: var(--text-primary); margin-bottom: var(--space-1); }
+    .reg-sub { font-size: var(--text-sm); color: var(--text-tertiary); margin-bottom: var(--space-8); line-height: 1.5; }
+    .form-group { margin-bottom: var(--space-4); }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: var(--space-2); }
+    .form-input {
+      width: 100%; padding: var(--space-3) var(--space-4);
+      background: var(--bg-surface); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md); color: var(--text-primary);
+      font-size: var(--text-sm); font-family: inherit;
+      box-sizing: border-box; transition: border-color 0.15s;
+    }
+    .form-input:focus { outline: none; border-color: var(--primary); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+    .reg-footer { text-align: center; margin-top: var(--space-6); font-size: var(--text-sm); color: var(--text-tertiary); }
+    .reg-footer a { color: var(--primary); text-decoration: none; }
+    .divider { border: none; border-top: 1px solid var(--border-subtle); margin: var(--space-6) 0; }
+    .mp-msg { font-size: var(--text-sm); color: var(--text-secondary); margin-top: var(--space-4); min-height: 1.2em; }
+  </style>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/brand/favicon-32.png">
+  <link rel="apple-touch-icon" href="assets/brand/globalhire-icon-180.png">
+</head>
+<body>
+  <div class="reg-card">
+    <div class="reg-logo">
+      <img src="assets/brand/globalhire-icon-white.png" alt="GlobalHire Consult" style="width:38px;height:38px;object-fit:contain;display:block;flex-shrink:0;">
+      <div class="reg-logo-text">Global<span>Hire</span> Consult</div>
+    </div>
+
+    <div class="reg-heading">Partner Agency Registration</div>
+    <div class="reg-sub">Register your recruitment agency to join the GlobalHire partner marketplace. Your account is created immediately; our team verifies the agency before marketplace access opens.</div>
+
+    <form id="mp-signup-form">
+      <div class="form-group">
+        <label class="form-label" for="mp-full-name">Your Full Name *</label>
+        <input type="text" id="mp-full-name" name="full_name" class="form-input" placeholder="Your full name" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="mp-email">Work Email *</label>
+        <input type="email" id="mp-email" name="email" class="form-input" placeholder="you@agency.com" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="mp-password">Password *</label>
+        <input type="password" id="mp-password" name="password" class="form-input" placeholder="Min. 8 characters" required minlength="8">
+      </div>
+
+      <hr class="divider">
+
+      <div class="form-group">
+        <label class="form-label" for="mp-agency-name">Agency Name *</label>
+        <input type="text" id="mp-agency-name" name="agency_name" class="form-input" placeholder="e.g. Gulf Medical Recruitment Ltd" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="mp-country">Country</label>
+          <input type="text" id="mp-country" name="country" class="form-input" placeholder="e.g. India">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="mp-city">City</label>
+          <input type="text" id="mp-city" name="city" class="form-input" placeholder="e.g. Mumbai">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="mp-phone">Phone</label>
+        <input type="tel" id="mp-phone" name="phone" class="form-input" placeholder="+91...">
+      </div>
+
+      <button type="submit" id="mp-signup-submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:var(--space-2);">
+        Create Partner Account
+      </button>
+    </form>
+
+    <div id="mp-signup-msg" class="mp-msg" role="status" aria-live="polite"></div>
+
+    <div class="reg-footer">
+      Already a partner? <a href="login.html">Sign in</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/mp-core.js"></script>
+  <script src="js/mp-signup.js"></script>
+</body>
+</html>
