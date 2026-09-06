@@ -346,42 +346,17 @@
                   </div>
                 </div>
 
-                <!-- DataFlow Verification -->
+                <!-- DataFlow Verification (read-only — verified by the eLab team) -->
                 <div style="border-top:1px solid var(--border-subtle);padding-top:var(--space-4);margin-top:var(--space-2);">
                   <label class="form-label" style="font-size:var(--text-base);font-weight:700;margin-bottom:var(--space-3);display:block;">DataFlow Verification</label>
 
-                  <div class="form-group" style="margin-bottom:var(--space-3);">
-                    <label style="display:flex;align-items:center;gap:var(--space-3);cursor:pointer;font-size:var(--text-sm);color:var(--text-primary);">
-                      <input type="checkbox" name="dataflow_completed" style="width:18px;height:18px;accent-color:var(--primary);">
-                      I have completed DataFlow verification
-                    </label>
+                  <div id="dataflow-status" class="form-group" style="padding:var(--space-3);background:rgba(127,127,127,0.08);border-radius:8px;font-size:var(--text-sm);color:var(--text-primary);">
+                    Checking status…
                   </div>
 
-                  <div id="dataflow-details" class="form-row" style="display:none;">
-                    <div class="form-group">
-                      <label class="form-label">DataFlow Reference Number</label>
-                      <input type="text" class="form-input" name="dataflow_number" placeholder="e.g. DF-2026-XXXXX">
-                    </div>
-                    <div class="form-group">
-                      <label class="form-label">DataFlow Country</label>
-                      <select class="form-input" name="dataflow_country">
-                        <option value="">Select country...</option>
-                        <option value="Saudi Arabia">Saudi Arabia</option>
-                        <option value="Qatar">Qatar</option>
-                        <option value="UAE">UAE</option>
-                        <option value="Oman">Oman</option>
-                        <option value="Bahrain">Bahrain</option>
-                        <option value="Kuwait">Kuwait</option>
-                        <option value="Other">Other</option>
-                      </select>
-                    </div>
-                    <div class="form-group" style="grid-column:1/-1;">
-                      <label style="display:flex;align-items:center;gap:var(--space-3);cursor:pointer;font-size:var(--text-sm);color:var(--text-primary);">
-                        <input type="checkbox" name="dataflow_via_elab" style="width:18px;height:18px;accent-color:var(--primary);">
-                        DataFlow was done through eLab Solutions
-                      </label>
-                    </div>
-                  </div>
+                  <p style="font-size:var(--text-xs);color:var(--text-tertiary);margin:var(--space-2) 0 0;">
+                    DataFlow status is verified by our team. Upload your DataFlow report under <strong>Documents</strong> — once it is verified, this section updates automatically.
+                  </p>
                 </div>
 
                 <div class="form-group">

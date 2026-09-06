@@ -262,19 +262,21 @@
       }
     });
 
-    // DataFlow checkboxes
-    const dfCompleted = form.querySelector('[name="dataflow_completed"]');
-    if (dfCompleted) dfCompleted.checked = !!currentProfile.dataflow_completed;
-    const dfElab = form.querySelector('[name="dataflow_via_elab"]');
-    if (dfElab) dfElab.checked = !!currentProfile.dataflow_via_elab;
-
-    // Show/hide DataFlow details based on checkbox
-    const dfDetails = document.getElementById('dataflow-details');
-    if (dfCompleted && dfDetails) {
-      dfDetails.style.display = dfCompleted.checked ? 'grid' : 'none';
-      dfCompleted.addEventListener('change', function() {
-        dfDetails.style.display = this.checked ? 'grid' : 'none';
-      });
+    // DataFlow status is read-only (verified by the eLab team) — render as text
+    const dfStatusEl = document.getElementById('dataflow-status');
+    if (dfStatusEl) {
+      if (currentProfile.dataflow_completed) {
+        var dfBits = [];
+        if (currentProfile.dataflow_number) dfBits.push('Ref: ' + currentProfile.dataflow_number);
+        if (currentProfile.dataflow_country) dfBits.push(currentProfile.dataflow_country);
+        var statusTxt = '✔ Completed' + (dfBits.length ? ' — ' + dfBits.join(' · ') : '');
+        if (currentProfile.dataflow_via_elab) statusTxt += ' (via eLab Solutions)';
+        dfStatusEl.textContent = statusTxt;
+        dfStatusEl.style.color = 'var(--success, #10b981)';
+      } else {
+        dfStatusEl.textContent = 'Not yet verified — we will update this once your DataFlow report is confirmed.';
+        dfStatusEl.style.color = 'var(--text-tertiary)';
+      }
     }
 
     // Preferred destinations checkboxes
@@ -305,10 +307,6 @@
         license_number: form.license_number.value.trim(),
         preferred_destinations: destinations,
         profile_completed: !!(form.specialty.value && form.country_of_origin.value && form.phone.value.trim()),
-        dataflow_completed: !!form.querySelector('[name="dataflow_completed"]')?.checked,
-        dataflow_number: (form.querySelector('[name="dataflow_number"]')?.value || '').trim() || null,
-        dataflow_country: (form.querySelector('[name="dataflow_country"]')?.value || '').trim() || null,
-        dataflow_via_elab: !!form.querySelector('[name="dataflow_via_elab"]')?.checked,
       };
 
       // Update initials
