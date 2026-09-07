@@ -130,6 +130,10 @@
           '<div class="gfooter-brand">' +
             '<img src="assets/brand/globalhire-logo.png" alt="GlobalHire Consult" class="gfooter-logo-img" style="margin-bottom:var(--space-3);">' +
             '<p>Healthcare recruitment platform connecting professionals with opportunities across multiple countries. A division of eLab Solutions International LLC.</p>' +
+            '<div class="gfooter-member">' +
+              '<span class="gfooter-member-eyebrow">Member</span>' +
+              '<span class="gfooter-member-body">Employers Association for Private Employment Agencies of Nigeria &middot; Membership No. <strong>EAP0339</strong></span>' +
+            '</div>' +
           '</div>' +
           '<div class="gfooter-col">' +
             '<h5>For Professionals</h5>' +
