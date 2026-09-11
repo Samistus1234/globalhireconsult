@@ -52,6 +52,19 @@
             '</div>' +
           '</div>' +
 
+          /* For Agencies dropdown */
+          '<div class="gnav-group" data-group="agencies">' +
+            '<button class="gnav-group-trigger">For Agencies ' + chevronSVG + '</button>' +
+            '<div class="gnav-group-menu">' +
+              '<a href="partners-signup.html"' + isActive(activePage, 'partners-signup') + '>' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>' +
+                'Become a Partner Agency</a>' +
+              '<a href="partners-dashboard.html"' + isActive(activePage, 'partners-dashboard') + '>' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>' +
+                'Partner Dashboard</a>' +
+            '</div>' +
+          '</div>' +
+
           /* Platform dropdown */
           '<div class="gnav-group" data-group="platform">' +
             '<button class="gnav-group-trigger">Platform ' + chevronSVG + '</button>' +
@@ -149,6 +162,7 @@
             '<h5>Platform</h5>' +
             '<ul>' +
               '<li><a href="for-employers.html">For Employers</a></li>' +
+              '<li><a href="partners-signup.html">Become a Partner Agency</a></li>' +
               '<li><a href="platform.html">Platform Overview</a></li>' +
               '<li><a href="guides.html">Resource Guides</a></li>' +
               '<li><a href="events.html">Events</a></li>' +
@@ -200,6 +214,9 @@
         '<div class="mobile-group-title">For Employers</div>' +
         '<a href="for-employers.html"' + isActive(activePage, 'for-employers') + '>For Employers</a>' +
         '<a href="contact.html"' + isActive(activePage, 'contact') + '>Post a Role</a>' +
+        '<div class="mobile-group-title">For Agencies</div>' +
+        '<a href="partners-signup.html"' + isActive(activePage, 'partners-signup') + '>Become a Partner Agency</a>' +
+        '<a href="partners-dashboard.html"' + isActive(activePage, 'partners-dashboard') + '>Partner Dashboard</a>' +
         '<div class="mobile-group-title">Platform</div>' +
         '<a href="platform.html"' + isActive(activePage, 'platform') + '>Platform Overview</a>' +
         '<a href="guides.html"' + isActive(activePage, 'guides') + '>Resource Guides</a>' +
@@ -309,6 +326,19 @@
                 a.href = 'admin-visas.html';
                 a.setAttribute('data-admin-visa', '1');
                 a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Visa Cases (Admin)';
+                if (div) dd.insertBefore(a, div); else dd.appendChild(a);
+              }).catch(function(){});
+
+              // best-effort: partner-agency members get a "Partner Dashboard" link
+              ghFrom('gh_mp_agency_members').select('agency_id').eq('user_id', session.user.id).limit(1).then(function(mr) {
+                if (!(mr && mr.data && mr.data.length)) return;
+                var dd = document.getElementById('gnav-dropdown');
+                if (!dd || dd.querySelector('[data-partner-dash]')) return;
+                var div = dd.querySelector('.divider');
+                var a = document.createElement('a');
+                a.href = 'partners-dashboard.html';
+                a.setAttribute('data-partner-dash', '1');
+                a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>Partner Dashboard';
                 if (div) dd.insertBefore(a, div); else dd.appendChild(a);
               }).catch(function(){});
             }
