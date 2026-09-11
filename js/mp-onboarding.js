@@ -104,6 +104,17 @@
     setChecks('cooperation_areas', a.cooperation_areas);
   }
 
+  // The Website field is type="text" on purpose: as type="url" a bare domain
+  // ("example.com") fails constraint validation, the browser cancels submit before any
+  // listener runs, and the only feedback is a native bubble that is easy to miss — the
+  // save looked like it did nothing at all. Accept what people actually type and add the
+  // scheme here instead.
+  function normalizeUrl(v) {
+    v = (v || '').trim();
+    if (!v) return null;
+    return /^https?:\/\//i.test(v) ? v : 'https://' + v;
+  }
+
   async function uploadIfAny(inputName, purpose) {
     var el = form.querySelector('input[name="' + inputName + '"]');
     if (!el || !el.files || !el.files[0]) return null;
@@ -126,7 +137,7 @@
         country: q('country').value.trim() || null,
         city: q('city').value.trim() || null,
         address: q('address').value.trim() || null,
-        website: q('website').value.trim() || null,
+        website: normalizeUrl(q('website').value),
         year_founded: q('year_founded').value ? parseInt(q('year_founded').value, 10) : null,
         owner_name: q('owner_name').value.trim() || null,
         services: checks('services'),
@@ -144,6 +155,8 @@
         return;
       }
       status.textContent = 'Saved.';
+      // Show the stored value back, so a normalised website isn't a silent rewrite.
+      if (q('website')) q('website').value = patch.website || '';
       // Keep MP.agency current WITHOUT a second MP.init() (init is not re-entrant).
       if (window.MP.agency) {
         Object.keys(patch).forEach(function (k) { window.MP.agency[k] = patch[k]; });
@@ -241,5 +254,18 @@
     fillForm();
     renderTeam();
     form.addEventListener('submit', saveProfile);
+
+    // Defence in depth: any failed constraint cancels submit BEFORE saveProfile runs, so
+    // #mp-profile-msg would otherwise stay blank and the click look like a no-op. Mirror
+    // the browser's own message into the status line the user is already watching.
+    // 'invalid' does not bubble — the capture phase is required to see it on the form.
+    form.addEventListener('invalid', function (e) {
+      var el = e.target;
+      var status = document.getElementById('mp-profile-msg');
+      if (!status || !el) return;
+      var label = el.id ? form.querySelector('label[for="' + el.id + '"]') : null;
+      var what = (label && label.textContent.trim()) || el.name || 'A field';
+      status.textContent = 'Not saved — ' + what + ': ' + el.validationMessage;
+    }, true);
   })();
 })();
