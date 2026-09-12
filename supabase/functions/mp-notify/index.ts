@@ -1,6 +1,13 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import nodemailer from 'npm:nodemailer@6.9.10';
 import { buildEmailHtml } from '../_shared/gh-email-shell.ts';
+import { escapeHtml, headerSafe } from '../_shared/mail-security.ts';
+
+// Re-exported so index_test.ts (and any other caller importing from this
+// module) keeps working — these are the exact functions used at the call
+// sites below, not stale local copies. See _shared/mail-security.ts for
+// the canonical implementation and why it exists.
+export { escapeHtml, headerSafe };
 
 /*
   mp-notify — fan-out notifications for a partner-marketplace message
@@ -32,28 +39,15 @@ const cors = {
 const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...cors, 'Content-Type': 'application/json' } });
 
-// The one HTML-escaping boundary for this function. `buildNotification`
-// deliberately returns PLAIN text (n.title is also used as the email
-// `subject:` header and is written verbatim to mp_notifications.title, which
-// the in-app bell renders through its own escaping — pre-escaping it there
-// would show the literal "&lt;" to users). Escaping happens only where a
-// value crosses into an HTML document: at the buildEmailHtml call site.
-export function escapeHtml(s: string): string {
-  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-// Header-safe: strip CR/LF/tabs/control chars and cap length (prevents email
-// header injection via attacker-controlled profile full_name / campaign
-// title). Matches notify-interest/index.ts's headerSafe exactly — same
-// replacements, same order, same .trim().slice(0, 120) — so this is one
-// convention, not two. mp_agencies.name is free text from self-serve
-// registration (`String(raw.agency_name ?? '').trim()`, mp-agency-register)
-// reachable while pending_verification; .trim() there only strips leading/
-// trailing whitespace, so an interior CR/LF (e.g. "Acme\r\nBcc: x@evil.com")
-// survives into n.title and would otherwise reach the subject: header raw.
-export function headerSafe(s: string): string {
-  return String(s).replace(/[\r\n\t]+/g, ' ').replace(/[\x00-\x1F\x7F]/g, '').trim().slice(0, 120);
-}
+// `buildNotification` deliberately returns PLAIN text (n.title is also used
+// as the email `subject:` header — see headerSafe() at the sendMail call —
+// and is written verbatim to mp_notifications.title, which the in-app bell
+// renders through its own escaping: pre-escaping it here would show the
+// literal "&lt;" to users). escapeHtml() is applied only where a value
+// crosses into the HTML document, at the buildEmailHtml call site below;
+// headerSafe() only where a value crosses into an SMTP header, at the
+// sendMail call site. Both helpers now live in ../_shared/mail-security.ts
+// (imported above) — do not reintroduce local copies here.
 
 export function buildNotification(side: string, agencyName: string, subject: string, threadId: string) {
   const fromGh = side === 'gh';
