@@ -32,7 +32,13 @@ const cors = {
 const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...cors, 'Content-Type': 'application/json' } });
 
-function esc(s: string): string {
+// The one HTML-escaping boundary for this function. `buildNotification`
+// deliberately returns PLAIN text (n.title is also used as the email
+// `subject:` header and is written verbatim to mp_notifications.title, which
+// the in-app bell renders through its own escaping — pre-escaping it there
+// would show the literal "&lt;" to users). Escaping happens only where a
+// value crosses into an HTML document: at the buildEmailHtml call site.
+export function escapeHtml(s: string): string {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
@@ -96,23 +102,27 @@ Deno.serve(async (req) => {
         host: 'smtp.gmail.com', port: 465, secure: true, auth: { user: smtpUser, pass: smtpPass } });
     }
 
-    // Message body is user-written text from an agency — it must be
-    // HTML-escaped before it goes into an email, or an agency could inject
-    // markup into mail sent to GlobalHire staff.
-    const ctaUrl = `${site}/${n.link}`;
+    // Message body AND the agency-name-derived title are user-controlled
+    // (agency name is free text from self-serve registration, reachable at
+    // pending_verification, before any staff review). Everything that
+    // crosses into this HTML document must be escaped at that boundary —
+    // n.title included, even though buildNotification itself returns it
+    // plain (see escapeHtml's comment above).
+    const ctaUrl = `${site}/${n.link}`; // n.link embeds thread.id, a DB uuid PK — not user text (see report)
     const bodyHtml =
-      '<p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#475569;">' + esc(n.body) + '</p>' +
+      '<p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#475569;">' + escapeHtml(n.body) + '</p>' +
       '<p style="margin:0 0 16px;font-size:14.5px;line-height:1.7;color:#334155;white-space:pre-wrap;">' +
-      esc(msg.body_md) + '</p>';
+      escapeHtml(msg.body_md) + '</p>';
     const html = buildEmailHtml({
-      logoUrl,
-      eyebrow: 'NEW MESSAGE',
-      headline: n.title,
-      greeting: 'Hello,',
-      bodyHtml,
-      ctaLabel: 'Open Thread',
-      ctaUrl,
-      footerSubtitle: 'GlobalHire@eLab — International Healthcare Recruitment',
+      logoUrl,                 // constant: SITE_URL env + fixed asset path — not user data
+      eyebrow: 'NEW MESSAGE',  // constant literal
+      headline: escapeHtml(n.title), // user data (agency name) — must be escaped here
+      greeting: 'Hello,',      // constant literal
+      bodyHtml,                // built above with escapeHtml() on every user-derived piece
+      ctaLabel: 'Open Thread', // constant literal
+      ctaUrl,                  // site (env) + n.link (fixed page name + DB uuid) — not user text
+      footerSubtitle: 'GlobalHire@eLab — International Healthcare Recruitment', // constant literal
+      // closingHtml / footerLine2 not passed — nothing to escape
     });
     const text = `${n.body}\n\n${msg.body_md}\n\nOpen: ${ctaUrl}`;
 

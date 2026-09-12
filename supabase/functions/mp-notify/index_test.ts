@@ -1,5 +1,5 @@
 import { assertEquals, assertStringIncludes } from 'https://deno.land/std@0.208.0/assert/mod.ts';
-import { buildNotification } from './index.ts';
+import { buildNotification, escapeHtml } from './index.ts';
 
 Deno.test('a gh message notifies the agency and links to the partner inbox', () => {
   const n = buildNotification('gh', 'Acme Recruit', 'Licence needed', 't1');
@@ -23,4 +23,26 @@ Deno.test('the subject is carried into the body', () => {
 Deno.test('buildNotification type is exactly new_message for both sides (CHECK constraint safety)', () => {
   assertEquals(buildNotification('gh', 'Acme Recruit', 'Licence needed', 't1').type, 'new_message');
   assertEquals(buildNotification('agency', 'Acme Recruit', 'Licence needed', 't1').type, 'new_message');
+});
+
+// Regression test for the HTML-injection fix: agency_name is free text from
+// self-serve registration (mp-agency-register), reachable while the agency
+// is still pending_verification. buildNotification's title must stay PLAIN
+// (it's also the email subject header and mp_notifications.title, both
+// non-HTML contexts the bell/mail client already escape on their own side),
+// while escapeHtml — the boundary actually used at the buildEmailHtml call
+// site in index.ts — must neutralize it before it reaches the HTML document.
+Deno.test('agency name with HTML stays plain in title but is escaped at the HTML boundary', () => {
+  const evil = '<img src=x onerror="alert(1)">';
+  const n = buildNotification('agency', evil, 'Licence needed', 't1');
+
+  // title is unescaped plain text — correct for subject: header / DB column.
+  assertEquals(n.title, `New message from ${evil}`);
+  assertStringIncludes(n.title, '<img');
+
+  // what index.ts actually passes as `headline` to buildEmailHtml must be
+  // the escaped form — the raw tag must not survive into the HTML document.
+  const headline = escapeHtml(n.title);
+  assertStringIncludes(headline, '&lt;img');
+  assertEquals(headline.includes('<img'), false);
 });
