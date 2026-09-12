@@ -116,7 +116,10 @@
     <div class="dashboard-main">
       <header class="dash-header">
         <div class="breadcrumb"><span>GlobalHire</span><span>/</span><span>Partner Agencies</span></div>
-        <h1 class="page-title">Partner Agency Verification</h1>
+        <div style="display:flex;align-items:center;gap:var(--space-3);">
+          <h1 class="page-title">Partner Agency Verification</h1>
+          <div id="mp-bell"></div>
+        </div>
       </header>
 
       <div class="dash-content">
@@ -169,6 +172,8 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/elab-tracker.js"></script>
   <script src="js/auth-guard.js"></script>
+  <script src="js/mp-core.js"></script>
+  <script src="js/mp-messages.js"></script>
   <script src="js/mp-agencies-admin.js"></script>
 </body>
 </html>
