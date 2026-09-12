@@ -146,6 +146,7 @@
     <div class="mp-main-wrap">
       <header class="mp-topbar">
         <div class="mp-breadcrumb">GlobalHire Partners / <strong>Dashboard</strong></div>
+        <div id="mp-bell"></div>
       </header>
 
       <main class="mp-content">
@@ -161,5 +162,7 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/mp-core.js"></script>
   <script src="js/mp-dashboard.js"></script>
+  <script src="js/mp-bell.js"></script>
+  <script>window.addEventListener('load', function(){ window.MPBell.mount(document.getElementById('mp-bell')); });</script>
 </body>
 </html>

@@ -85,7 +85,10 @@
       <span>Global<span class="accent">Hire</span> Partners</span>
       <span class="mp-badge">Partner Portal</span>
     </div>
-    <a class="mp-signout" href="login.html">Sign out</a>
+    <div style="display:flex;align-items:center;gap:var(--space-4);">
+      <div id="mp-bell"></div>
+      <a class="mp-signout" href="login.html">Sign out</a>
+    </div>
   </header>
 
   <main class="mp-main">
@@ -221,6 +224,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/mp-core.js"></script>
+  <script src="js/mp-bell.js"></script>
+  <script>window.addEventListener('load', function(){ window.MPBell.mount(document.getElementById('mp-bell')); });</script>
   <script src="js/mp-onboarding.js"></script>
 </body>
 </html>

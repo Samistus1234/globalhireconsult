@@ -207,6 +207,7 @@
     <div class="mp-main-wrap">
       <header class="mp-topbar">
         <div class="mp-breadcrumb">GlobalHire Partners / <strong>Messages</strong></div>
+        <div id="mp-bell"></div>
       </header>
 
       <main class="mp-content">
@@ -237,5 +238,7 @@
   <script src="js/mp-core.js"></script>
   <script src="js/mp-messages.js"></script>
   <script src="js/mp-messages-partner.js"></script>
+  <script src="js/mp-bell.js"></script>
+  <script>window.addEventListener('load', function(){ window.MPBell.mount(document.getElementById('mp-bell')); });</script>
 </body>
 </html>
