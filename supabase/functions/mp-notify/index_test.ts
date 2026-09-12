@@ -1,5 +1,5 @@
 import { assertEquals, assertStringIncludes } from 'https://deno.land/std@0.208.0/assert/mod.ts';
-import { buildNotification, escapeHtml } from './index.ts';
+import { buildNotification, escapeHtml, headerSafe } from './index.ts';
 
 Deno.test('a gh message notifies the agency and links to the partner inbox', () => {
   const n = buildNotification('gh', 'Acme Recruit', 'Licence needed', 't1');
@@ -45,4 +45,24 @@ Deno.test('agency name with HTML stays plain in title but is escaped at the HTML
   const headline = escapeHtml(n.title);
   assertStringIncludes(headline, '&lt;img');
   assertEquals(headline.includes('<img'), false);
+});
+
+// Regression test for the header-injection fix: mp-agency-register only
+// trims leading/trailing whitespace off agency_name, so an interior CRLF
+// survives registration and lands in n.title, which reaches the email
+// subject: header. Assert on the ABSENCE of CR/LF, not an exact collapsed
+// string — an exact-string assertion breaks (and teaches nothing) the next
+// time the collapse character changes.
+Deno.test('a title with an embedded CRLF has no CR or LF left after headerSafe', () => {
+  const evilName = 'Acme\r\nBcc: attacker@evil.com';
+  const n = buildNotification('agency', evilName, 'Licence needed', 't1');
+
+  // title itself stays raw (same reasoning as the HTML test above) — the
+  // CRLF is still present here, proving the value IS attacker-reachable.
+  assertStringIncludes(n.title, '\r\n');
+
+  // what index.ts actually passes as subject: must be free of both.
+  const safe = headerSafe(n.title);
+  assertEquals(safe.includes('\r'), false);
+  assertEquals(safe.includes('\n'), false);
 });

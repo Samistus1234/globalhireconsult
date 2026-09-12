@@ -42,6 +42,19 @@ export function escapeHtml(s: string): string {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+// Header-safe: strip CR/LF/tabs/control chars and cap length (prevents email
+// header injection via attacker-controlled profile full_name / campaign
+// title). Matches notify-interest/index.ts's headerSafe exactly — same
+// replacements, same order, same .trim().slice(0, 120) — so this is one
+// convention, not two. mp_agencies.name is free text from self-serve
+// registration (`String(raw.agency_name ?? '').trim()`, mp-agency-register)
+// reachable while pending_verification; .trim() there only strips leading/
+// trailing whitespace, so an interior CR/LF (e.g. "Acme\r\nBcc: x@evil.com")
+// survives into n.title and would otherwise reach the subject: header raw.
+export function headerSafe(s: string): string {
+  return String(s).replace(/[\r\n\t]+/g, ' ').replace(/[\x00-\x1F\x7F]/g, '').trim().slice(0, 120);
+}
+
 export function buildNotification(side: string, agencyName: string, subject: string, threadId: string) {
   const fromGh = side === 'gh';
   return {
@@ -133,8 +146,15 @@ Deno.serve(async (req) => {
           const { data: u } = await svc.auth.admin.getUserById(uid);
           const to = u?.user?.email;
           if (to) {
+            // subject: is a header context — n.title carries the same
+            // attacker-controlled agency name as the HTML headline, so it
+            // must go through headerSafe() here, not escapeHtml(). from: is
+            // built from smtpUser (an env var, not reachable from any
+            // request path). to: comes from Supabase's own auth.users via
+            // getUserById, not from mp-notify's own reachable free-text
+            // inputs. text/html are bodies, not header contexts — untouched.
             await transport.sendMail({
-              from: `"GlobalHire Partners" <${smtpUser}>`, to, subject: n.title,
+              from: `"GlobalHire Partners" <${smtpUser}>`, to, subject: headerSafe(n.title),
               text, html,
             });
             emailed = true;
