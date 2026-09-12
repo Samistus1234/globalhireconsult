@@ -53,7 +53,10 @@
       '<div class="mp-card"><h2>Welcome, ' + window.MP.esc(a.name) + '</h2>' +
       '<p>Your agency is verified. The marketplace sections below open as they ship.</p></div>' +
       '<div class="mp-grid">' +
-      ['Jobs', 'Candidates', 'Nominations', 'Messages', 'Billing'].map(function (s) {
+      // Messages is live (partners-messages.html) — a hardcoded literal link,
+      // not built from any agency/user data, so no escaping is needed for it.
+      '<a class="mp-tile" href="partners-messages.html"><h3>Messages</h3><span>Open inbox</span></a>' +
+      ['Jobs', 'Candidates', 'Nominations', 'Billing'].map(function (s) {
         return '<div class="mp-tile mp-tile--soon"><h3>' + window.MP.esc(s) + '</h3><span>Coming soon</span></div>';
       }).join('') +
       '</div>';
