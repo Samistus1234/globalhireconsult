@@ -15,7 +15,20 @@
      MP.requireAgency(opts)    → false (+ redirect) if no user/membership; false WITHOUT redirect on 'error'
      MP.requireVerified(opts)  → false (+ redirect) unless verified; false WITHOUT redirect on 'error'
      await MP.callFn(name,body) → { ok, status, data } — never rejects
-     MP.esc(str)               HTML-escape helper
+     MP.esc(str)               HTML-escape helper — element TEXT content ONLY.
+     MP.escAttr(str)           HTML-escape helper — HTML ATTRIBUTE values.
+
+     Why both exist: esc() builds a Text node and reads back its parent's
+     .innerHTML. The HTML text-node serialisation algorithm only escapes
+     '&', '<', '>' (and NBSP) — it never touches '"' or '\'', because those
+     characters aren't special between tags. That makes esc() safe for
+     element text content but UNSAFE on its own inside a quoted attribute
+     (e.g. data-path="..."): an untrusted value containing a quote would
+     close the attribute early. escAttr() layers a quote-escape ('"' →
+     &quot;, '\'' → &#39;) on top of esc() so it is safe in single- or
+     double-quoted attributes too. Use esc() for text between tags,
+     escAttr() for anything interpolated into an attribute value — never
+     esc() alone in an attribute position.
    ============================================ */
 
 (function () {
@@ -26,11 +39,19 @@
     return sb.from('gh_mp_' + table);
   }
 
-  // ── XSS escape (copied from js/recruiter.js) ──
+  // ── XSS escape (copied from js/recruiter.js) — element TEXT content only.
+  // See the contract comment above for why this is unsafe inside an
+  // attribute value and why escAttr() exists alongside it.
   function esc(str) {
     var d = document.createElement('div');
     d.appendChild(document.createTextNode(String(str || '')));
     return d.innerHTML;
+  }
+
+  // ── XSS escape for HTML ATTRIBUTE values. esc() + explicit quote escaping,
+  // since the Text-node technique above never escapes quote characters.
+  function escAttr(str) {
+    return esc(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
   var MP = {
@@ -41,6 +62,7 @@
     lastError: null,
     mpFrom: mpFrom,
     esc: esc,
+    escAttr: escAttr,
 
     async init() {
       // Session state first: a logged-out visitor is a NORMAL state, not a failure.

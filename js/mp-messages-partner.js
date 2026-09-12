@@ -12,10 +12,10 @@
      exact conversation that unblocks its own verification.
    - No Realtime. We poll on load, after open(), and after post() (via the
      open()/refreshList() calls already in this file) — nothing subscribes.
-   - Every attribute value derived from agency data goes through escAttr()
-     (MP.esc() + a '"' → '&quot;' pass), not plain esc(), because MP.esc()
+   - Every attribute value derived from agency data goes through
+     MP.escAttr() (js/mp-core.js), not plain MP.esc(), because MP.esc()
      only neutralises text-node content and leaves quote characters intact —
-     safe between tags, unsafe inside a double-quoted attribute.
+     safe between tags, unsafe inside a quoted attribute.
    ============================================ */
 (function () {
   var listEl = document.getElementById('mp-thread-list');
@@ -28,7 +28,7 @@
   var current = null;
 
   function esc(s) { return window.MP.esc(s); }
-  function escAttr(s) { return esc(s).replace(/"/g, '&quot;'); }
+  function escAttr(s) { return window.MP.escAttr(s); }
 
   function renderError() {
     if (bodyEl) bodyEl.hidden = true;
