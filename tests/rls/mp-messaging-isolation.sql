@@ -16,6 +16,27 @@
 -- public.gh_mp_messages directly: `authenticated` holds SELECT on both (schema-v40), so
 -- these checks reach the policy and a PASS means the policy scoped the rows correctly.
 --
+-- Check 1 asserts on IDENTITY, not cardinality: array_agg(subject) = ARRAY['A thread'],
+-- not count(*) = 1 — a bug that swapped which thread Agency A sees (wrong row, still one
+-- row) would pass a count-only check and must fail this one.
+--
+-- Check 2 deliberately does NOT join to globalhire.mp_threads. mp_threads has RLS enabled,
+-- so a join on it would silently scope the result to Agency A's own threads regardless of
+-- what mp_messages' own policy does — a join-based version of this check is vacuous (it
+-- re-proves check 1, not mp_messages' policy). Instead, Agency B's thread id is captured
+-- into fx.b_thread_id BEFORE the role switch (while still running with full/elevated
+-- rights), and check 2 filters public.gh_mp_messages by that literal uuid with no join at
+-- all — so ONLY mp_messages_member_select decides the result. If that policy were ever
+-- `USING (true)`, check 2 would report got=1 (Agency B's message) and correctly FAIL.
+--
+-- Check 3 is a whole-table leakage detector, not a "positive control for check 2": it runs
+-- gh_mp_messages with no WHERE clause at all. Exactly one row exists across both agencies'
+-- fixtures at this point in the transaction; count(*) = 1 confirms only Agency A's own
+-- message is visible. If the message policy leaked cross-agency, this would report got=2,
+-- not got=0 — the important number here is 1, distinguishing "policy scopes correctly"
+-- from either "denies everything" (check 2 could look like a false PASS on its own) or
+-- "leaks everything".
+--
 -- Check 4 is DIFFERENT: as of schema-v40, `authenticated` has NO INSERT grant at all on
 -- globalhire.mp_messages (the only INSERT paths are globalhire.mp_create_thread_with_message
 -- and globalhire.mp_append_message, both service-role-only per schema-v40b — REVOKE ALL ...
@@ -36,8 +57,13 @@
 -- Check 5 exercises public.mp_mark_thread_read(uuid), which IS granted to `authenticated`
 -- (schema-v40b). The function is SECURITY DEFINER and re-derives the caller's side and
 -- agency membership server-side — a caller cannot pass which counter to clear. Calling it
--- as Agency A's owner against Agency A's own thread should clear agency_unread, NOT
--- gh_unread; this check confirms the GH-side counter is untouched by an agency-side caller.
+-- as Agency A's owner against Agency A's own thread should succeed (Agency A does own the
+-- thread) and clear agency_unread, NOT gh_unread. The check reads gh_unread BEFORE the
+-- call (asserting the fixture precondition really is 1, not assuming it), calls the RPC
+-- without swallowing its outcome, and only then reads gh_unread again — a delta, not a
+-- guess. If the RPC throws for any reason that is a FAIL with the real SQLERRM (an
+-- exception here is not the escalation being tested and must not be silently read as a
+-- refusal); a PASS requires the call to succeed AND gh_unread to still read 1 afterward.
 --
 -- Check 6 is a role-transition test, not a table check: it confirms `anon` (no JWT at all)
 -- cannot read mp_threads. Per the task-3 CEO ruling on the brief's original script:
@@ -64,23 +90,33 @@ SELECT globalhire.mp_create_thread_with_message(
   'bbbbbbbb-0000-0000-0000-00000000000b','B thread','agency',null,'b body','[]'::jsonb,
   '00000000-0000-0000-0000-00000000000b','agency');
 
+-- Capture Agency B's thread id now, while still running elevated, so check 2 can query
+-- mp_messages directly by literal thread_id with no join back through mp_threads.
+SELECT set_config('fx.b_thread_id',
+  (SELECT id::text FROM globalhire.mp_threads WHERE agency_id = 'bbbbbbbb-0000-0000-0000-00000000000b'),
+  true);
+
 -- Become Agency A's owner.
 SET LOCAL role authenticated;
 SELECT set_config('request.jwt.claims',
   '{"sub":"00000000-0000-0000-0000-00000000000a","role":"authenticated"}', true);
 
--- 1. sees ONLY its own thread
+-- 1. sees ONLY its own thread — identity, not just cardinality
 SELECT set_config('chk.threads_scope',
-  (SELECT CASE WHEN count(*) = 1 THEN 'PASS (got=1)' ELSE 'FAIL (got='||count(*)::text||')' END
+  (SELECT CASE WHEN array_agg(subject ORDER BY subject) = ARRAY['A thread']
+          THEN 'PASS (got=' || array_agg(subject ORDER BY subject)::text || ')'
+          ELSE 'FAIL (got=' || COALESCE(array_agg(subject ORDER BY subject)::text, 'NULL') || ')' END
    FROM public.gh_mp_threads), true);
 
--- 2. cannot read Agency B's messages
+-- 2. cannot read Agency B's messages — filtered directly by B's thread_id, NO join to
+--    mp_threads (see header: a join would make this vacuous, since mp_threads' own RLS
+--    would silently scope it for us regardless of mp_messages' policy).
 SELECT set_config('chk.b_messages_hidden',
   (SELECT CASE WHEN count(*) = 0 THEN 'PASS (got=0)' ELSE 'FAIL (got='||count(*)::text||')' END
-   FROM public.gh_mp_messages m JOIN globalhire.mp_threads t ON t.id = m.thread_id
-   WHERE t.agency_id = 'bbbbbbbb-0000-0000-0000-00000000000b'), true);
+   FROM public.gh_mp_messages
+   WHERE thread_id = current_setting('fx.b_thread_id')::uuid), true);
 
--- 3. positive control — DOES see its own message (proves 2 isn't a blanket-empty view)
+-- 3. whole-table leakage detector (see header) — not a "positive control for check 2"
 SELECT set_config('chk.a_messages_visible',
   (SELECT CASE WHEN count(*) = 1 THEN 'PASS (got=1)' ELSE 'FAIL (got='||count(*)::text||')' END
    FROM public.gh_mp_messages), true);
@@ -93,22 +129,62 @@ DO $$ BEGIN
     SELECT id,'00000000-0000-0000-0000-00000000000a','gh','forged'
       FROM globalhire.mp_threads LIMIT 1;
     PERFORM set_config('chk.no_client_insert','FAIL (insert succeeded)',true);
-  EXCEPTION WHEN insufficient_privilege OR others THEN
-    PERFORM set_config('chk.no_client_insert','PASS ('||SQLERRM||')',true);
+  EXCEPTION WHEN OTHERS THEN
+    IF SQLSTATE = '42501' THEN
+      PERFORM set_config('chk.no_client_insert','PASS ('||SQLERRM||')',true);
+    ELSE
+      PERFORM set_config('chk.no_client_insert',
+        'FAIL (unexpected SQLSTATE='||SQLSTATE||': '||SQLERRM||')',true);
+    END IF;
   END;
 END $$;
 
 -- 5. cannot clear the GH-side unread counter
 DO $$
-DECLARE v_tid uuid; v_gh int;
+DECLARE
+  v_tid       uuid;
+  v_gh_before int;
+  v_gh_after  int;
+  v_call_ok   boolean := true;
+  v_errmsg    text;
 BEGIN
   SELECT id INTO v_tid FROM globalhire.mp_threads
    WHERE agency_id='aaaaaaaa-0000-0000-0000-00000000000a';
-  BEGIN PERFORM globalhire.mp_mark_thread_read(v_tid); EXCEPTION WHEN others THEN NULL; END;
-  SELECT gh_unread INTO v_gh FROM globalhire.mp_threads WHERE id = v_tid;
-  PERFORM set_config('chk.gh_unread_protected',
-    CASE WHEN v_gh = 1 THEN 'PASS (gh_unread still 1)'
-         ELSE 'FAIL (gh_unread='||v_gh::text||')' END, true);
+
+  -- Precondition, not an assumption: the fixture's insert trigger must have already set
+  -- gh_unread=1, or a "still 1" reading after the call proves nothing.
+  SELECT gh_unread INTO v_gh_before FROM globalhire.mp_threads WHERE id = v_tid;
+  IF v_gh_before IS DISTINCT FROM 1 THEN
+    PERFORM set_config('chk.gh_unread_protected',
+      'FAIL (fixture precondition broken: gh_unread_before='
+        ||COALESCE(v_gh_before::text,'NULL')||', expected 1)', true);
+    RETURN;
+  END IF;
+
+  BEGIN
+    PERFORM globalhire.mp_mark_thread_read(v_tid);
+  EXCEPTION WHEN OTHERS THEN
+    v_call_ok := false;
+    v_errmsg := SQLERRM;
+  END;
+
+  SELECT gh_unread INTO v_gh_after FROM globalhire.mp_threads WHERE id = v_tid;
+
+  -- The property under test is "an agency-side actor cannot clear gh_unread" — that
+  -- requires the legitimate call to actually run (Agency A DOES own this thread, so a
+  -- throw here is a different failure, not a passing refusal) AND gh_unread to be
+  -- unchanged afterward. Swallowing the exception and only checking "still 1" would let
+  -- an RPC that throws for an unrelated reason report a false PASS.
+  IF NOT v_call_ok THEN
+    PERFORM set_config('chk.gh_unread_protected',
+      'FAIL (mp_mark_thread_read raised: '||v_errmsg||')', true);
+  ELSIF v_gh_after = 1 THEN
+    PERFORM set_config('chk.gh_unread_protected',
+      'PASS (call succeeded, gh_unread stayed 1)', true);
+  ELSE
+    PERFORM set_config('chk.gh_unread_protected',
+      'FAIL (gh_unread='||v_gh_after::text||')', true);
+  END IF;
 END $$;
 
 -- 6. anon sees nothing
@@ -124,8 +200,13 @@ DO $$ BEGIN
   BEGIN
     PERFORM count(*) FROM public.gh_mp_threads;
     PERFORM set_config('chk.anon_denied','FAIL (anon could select)',true);
-  EXCEPTION WHEN insufficient_privilege OR others THEN
-    PERFORM set_config('chk.anon_denied','PASS ('||SQLERRM||')',true);
+  EXCEPTION WHEN OTHERS THEN
+    IF SQLSTATE = '42501' THEN
+      PERFORM set_config('chk.anon_denied','PASS ('||SQLERRM||')',true);
+    ELSE
+      PERFORM set_config('chk.anon_denied',
+        'FAIL (unexpected SQLSTATE='||SQLSTATE||': '||SQLERRM||')',true);
+    END IF;
   END;
 END $$;
 
