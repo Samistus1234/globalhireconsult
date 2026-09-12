@@ -17,6 +17,12 @@ Deno.test('accepts a valid body', () => {
   assertEquals(r.value!.attachments.length, 0);
 });
 
+Deno.test('ignores a client-supplied sender_side', () => {
+  const r = validatePostBody({ thread_id: 't', body: 'hi', sender_side: 'gh' });
+  assertEquals(r.ok, true);
+  assertEquals(Object.hasOwn(r.value!, 'sender_side'), false);
+});
+
 Deno.test('accepts an attachment inside the agency prefix', () => {
   assertEquals(attachmentsInsideAgency(
     [{ path: `marketplace/agency/${AG}/thread/m1/licence.pdf` }], AG), true);
@@ -30,4 +36,8 @@ Deno.test('rejects an attachment pointing at another agency', () => {
 Deno.test('rejects a traversal attempt', () => {
   assertEquals(attachmentsInsideAgency(
     [{ path: `marketplace/agency/${AG}/../../recruiter-clients/x/secret.pdf` }], AG), false);
+});
+
+Deno.test('accepts an empty attachments array (text-only message)', () => {
+  assertEquals(attachmentsInsideAgency([], AG), true);
 });
