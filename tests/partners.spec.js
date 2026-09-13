@@ -9,6 +9,36 @@
 
 const { test, expect } = require('@playwright/test');
 
+/* ============================================
+   signInAs — shared login helper for the admin/agency round-trip test below.
+   Fills /login.html (#login-email/#login-password, js/auth.js), submits, and
+   waits for the post-login redirect to leave login.html. js/auth.js redirects
+   by gh_profiles.role (admin -> dashboard.html, recruiter -> recruiter.html,
+   everyone else -> ?redirect= or portal.html) — this helper does not care
+   which page it lands on; callers immediately page.goto() the real target.
+   On a bad credential it surfaces #login-alert's text instead of timing out
+   silently, so a broken E2E_* credential fails loud in this test rather than
+   fifteen seconds of confusion.
+   ============================================ */
+async function signInAs(page, email, password) {
+  if (!email || !password) {
+    throw new Error('signInAs called with a missing email/password (env var not set?)');
+  }
+  await page.goto('/login.html');
+  await page.fill('#login-email', email);
+  await page.fill('#login-password', password);
+  await page.click('#login-form button[type="submit"]');
+  await Promise.race([
+    page.waitForURL((url) => !url.pathname.endsWith('login.html'), { timeout: 15000 }),
+    (async () => {
+      const alertBox = page.locator('#login-alert');
+      await alertBox.waitFor({ state: 'visible', timeout: 15000 });
+      const msg = await alertBox.textContent();
+      throw new Error('signInAs(' + email + ') failed to sign in: ' + msg);
+    })(),
+  ]);
+}
+
 test.describe('partners-signup', () => {
   test('renders #mp-signup-form with the four required inputs, no console errors', async ({ page }) => {
     const errors = [];
@@ -205,5 +235,83 @@ test.describe('partners-onboarding — signed-out invite: token survives the log
     // the redirect is still readable here — proving the token was not simply lost.
     const pending = await page.evaluate(() => sessionStorage.getItem('mp_pending_invite'));
     expect(pending).toBe(token);
+  });
+});
+
+test.describe('partner messaging — admin/agency document-request round trip (Task 15)', () => {
+  // Requires a REAL, already-verified agency + a REAL admin account against
+  // whatever backend `baseURL` points at (this repo's committed
+  // pw.partners.local.config.js points at a local static server with NO
+  // Supabase backend behind it at all, so this spec is meaningless there —
+  // it only makes sense pointed at a config whose baseURL is a deployed
+  // GlobalHire origin backed by the real evzhnsugmvtqgmvzwyix project).
+  // None of E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD / E2E_AGENCY_EMAIL /
+  // E2E_AGENCY_PASSWORD exist in this environment as of Task 15 (2026-09-13),
+  // and this repo does not fabricate them — that would either hammer a real
+  // admin/agency account or require minting one and is not something a test
+  // file should do on every run. So: skip cleanly with a clear reason when
+  // they're absent, rather than failing (wrong signal — nothing is broken)
+  // or silently passing (worse — it would prove nothing).
+  //
+  // The equivalent backend coverage — real live edge functions
+  // (mp-agency-register, mp-thread-create, mp-thread-post, mp-thread-attachment),
+  // a real storage upload + signed-URL fetch as both agency and admin, the
+  // gh_unread assertion, and full cleanup with a zero-leftover proof — was run
+  // directly against the API for this task and is recorded verbatim in
+  // .superpowers/sdd/2026-09-12-partner-messaging/task-15-report.md. That is
+  // NOT a substitute for this UI spec (it never exercises admin-mp-agencies.html,
+  // partners-messages.html, or admin-mp-messages.html) — it demonstrates the
+  // functions and RLS underneath them work; this spec is what proves the pages
+  // wire up to them correctly, once someone supplies credentials.
+  //
+  // Note the two selector corrections vs. the plan's illustrative snippet,
+  // verified against the actual rendered DOM (js/mp-agencies-admin.js,
+  // js/mp-messages-partner.js, js/mp-messages-admin.js) rather than copied
+  // blind: the agency-row click target is `.mp-ag-open` (a per-row "Review"
+  // button), not `.mp-ag-row:first-child` — no `.mp-ag-row` class exists
+  // anywhere in this codebase. Task 8 (the pg_net notification trigger) is
+  // deferred and unapplied, so this spec does not assert any notification or
+  // email arrives — it structurally cannot yet.
+  const creds = {
+    E2E_ADMIN_EMAIL: process.env.E2E_ADMIN_EMAIL,
+    E2E_ADMIN_PASSWORD: process.env.E2E_ADMIN_PASSWORD,
+    E2E_AGENCY_EMAIL: process.env.E2E_AGENCY_EMAIL,
+    E2E_AGENCY_PASSWORD: process.env.E2E_AGENCY_PASSWORD,
+  };
+  const missing = Object.keys(creds).filter((k) => !creds[k]);
+
+  test('admin asks for a document, agency replies with one', async ({ browser }) => {
+    test.skip(missing.length > 0,
+      'Skipped: missing ' + missing.join(', ') + '. This round trip needs a real, ' +
+      'already-verified agency account and a real admin account on the target ' +
+      'backend — set all four E2E_* env vars to run it. See the comment above ' +
+      'this test and task-15-report.md for why this is a clean skip, not a failure.');
+
+    const admin = await browser.newPage();
+    await signInAs(admin, creds.E2E_ADMIN_EMAIL, creds.E2E_ADMIN_PASSWORD);
+    await admin.goto('/admin-mp-agencies.html');
+    await admin.click('table tbody tr:first-child .mp-ag-open');
+    await admin.fill('#mp-drawer-subject', 'Trade licence needed');
+    await admin.fill('#mp-drawer-body', 'Please upload your current trade licence.');
+    await admin.click('#mp-drawer-compose button[type=submit]');
+    await expect(admin.locator('#mp-drawer-msg')).toContainText('Sent');
+
+    const agency = await browser.newPage();
+    await signInAs(agency, creds.E2E_AGENCY_EMAIL, creds.E2E_AGENCY_PASSWORD);
+    await agency.goto('/partners-messages.html');
+    await expect(agency.locator('.mp-thread-item').first()).toContainText('Trade licence needed');
+    await agency.locator('.mp-thread-item').first().click();
+    await agency.fill('#mp-reply-body', 'Attached.');
+    await agency.setInputFiles('#mp-reply-files', 'tests/fixtures/licence.pdf');
+    await agency.click('#mp-reply-form button[type=submit]');
+    await expect(agency.locator('#mp-reply-msg')).toHaveText('Sent.');
+
+    await admin.goto('/admin-mp-messages.html');
+    await expect(admin.locator('.mp-thread-item').first()).toContainText('Trade licence needed');
+    await admin.locator('.mp-thread-item').first().click();
+    await expect(admin.locator('.mp-att')).toContainText('licence.pdf');
+
+    await admin.close();
+    await agency.close();
   });
 });
