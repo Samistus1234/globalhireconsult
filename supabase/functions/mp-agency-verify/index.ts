@@ -68,6 +68,24 @@ Deno.serve(async (req) => {
       } catch (e) { console.warn('verify email failed (non-fatal):', (e as Error).message); }
     }
 
+    const NOTIF_FOR: Record<string, string> = {
+      verified: 'agency_verified', rejected: 'agency_rejected', suspended: 'agency_suspended',
+    };
+    try {
+      await svc.schema('globalhire').from('mp_notifications').insert({
+        user_id: agency.created_by,
+        agency_id: agency.id,
+        type: NOTIF_FOR[status],
+        title: `Agency ${status}`,
+        body: note ?? null,
+        link: 'partners-dashboard.html',
+        email_sent: Boolean(to && smtpPass),
+      });
+    } catch (e) {
+      // Non-fatal, same rule as the email: never roll back a completed status change.
+      console.warn('verify notification insert failed (non-fatal):', (e as Error).message);
+    }
+
     return json({ success: true, status });
   } catch (e) {
     console.error('mp-agency-verify error:', e);

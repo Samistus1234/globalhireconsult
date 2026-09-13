@@ -78,13 +78,22 @@
     var s = window.MP.status;
     var note = (window.MP.agency && window.MP.agency.verification_note) || '';
     var map = {
-      pending_verification: 'Your agency is under review. We’ll email you when it’s verified. You can complete your profile now.',
+      pending_verification: 'Your agency is under review. We’ll email you when it’s verified. ' +
+        'You can complete your profile now — and check Messages if we’ve asked you for anything.',
       verified: 'Your agency is verified.',
       suspended: 'Your agency is suspended. ' + note,
       rejected: 'Your agency application was not approved. ' + note,
       no_agency: 'No agency found for your account.'
     };
     banner.textContent = map[s] || '';
+    if (s === 'pending_verification' || s === 'verified') {
+      var a = document.createElement('a');
+      a.href = 'partners-messages.html';
+      a.className = 'mp-btn';
+      a.textContent = 'Open Messages';
+      banner.appendChild(document.createTextNode(' '));
+      banner.appendChild(a);
+    }
     if (s === 'verified') {
       var a = document.createElement('a');
       a.href = 'partners-dashboard.html';
