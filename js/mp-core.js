@@ -17,18 +17,33 @@
      await MP.callFn(name,body) → { ok, status, data } — never rejects
      MP.esc(str)               HTML-escape helper — element TEXT content ONLY.
      MP.escAttr(str)           HTML-escape helper — HTML ATTRIBUTE values.
+     MP.safeHref(str)          URL-scheme guard for href/src ATTRIBUTE values.
 
-     Why both exist: esc() builds a Text node and reads back its parent's
-     .innerHTML. The HTML text-node serialisation algorithm only escapes
-     '&', '<', '>' (and NBSP) — it never touches '"' or '\'', because those
-     characters aren't special between tags. That makes esc() safe for
-     element text content but UNSAFE on its own inside a quoted attribute
-     (e.g. data-path="..."): an untrusted value containing a quote would
-     close the attribute early. escAttr() layers a quote-escape ('"' →
-     &quot;, '\'' → &#39;) on top of esc() so it is safe in single- or
-     double-quoted attributes too. Use esc() for text between tags,
-     escAttr() for anything interpolated into an attribute value — never
-     esc() alone in an attribute position.
+     Why both esc() and escAttr() exist: esc() builds a Text node and reads
+     back its parent's .innerHTML. The HTML text-node serialisation
+     algorithm only escapes '&', '<', '>' (and NBSP) — it never touches '"'
+     or '\'', because those characters aren't special between tags. That
+     makes esc() safe for element text content but UNSAFE on its own inside
+     a quoted attribute (e.g. data-path="..."): an untrusted value
+     containing a quote would close the attribute early. escAttr() layers a
+     quote-escape ('"' → &quot;, '\'' → &#39;) on top of esc() so it is safe
+     in single- or double-quoted attributes too. Use esc() for text between
+     tags, escAttr() for anything interpolated into an attribute value —
+     never esc() alone in an attribute position.
+
+     Why safeHref() ALSO exists, separately from escAttr(): escAttr()
+     protects the ATTRIBUTE BOUNDARY — it stops a value breaking out of the
+     quotes it's placed in. It does nothing about what the value MEANS once
+     it's safely inside those quotes. 'javascript:alert(1)' and
+     'data:text/html,<script>...' contain no quote characters at all, so
+     they survive escAttr() completely untouched and still execute when the
+     link is clicked. An href or src built from any value that didn't
+     originate as a hardcoded string in your own page needs BOTH helpers:
+     escAttr() so the value can't escape the attribute, and safeHref() so
+     the value can't smuggle in a dangerous scheme once it's inside it.
+     safeHref() accepts only same-origin relative links (everything this
+     app's own hrefs ever are) and returns '#' for anything carrying an
+     explicit URI scheme or a protocol-relative ('//host/...') prefix.
    ============================================ */
 
 (function () {
@@ -54,6 +69,33 @@
     return esc(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
+  // ── URL-scheme guard for href/src ATTRIBUTE values. See the contract
+  // comment above: this protects what the value MEANS, not the attribute
+  // boundary — escAttr() is still required alongside it, not instead of it.
+  //
+  // Only same-origin relative links are accepted (that is all this app's
+  // own hrefs ever are — "partners-messages.html?thread=...",
+  // "admin-mp-messages.html?thread=...", "partners-dashboard.html", etc.).
+  // Anything carrying an explicit URI scheme (javascript:, data:, vbscript:,
+  // even a plain https:) or a protocol-relative "//host/..." prefix is
+  // rejected outright and replaced with '#', rather than pattern-matched
+  // against a blocklist of "known bad" schemes — a blocklist only ever
+  // covers the schemes someone thought of.
+  //
+  // Browsers strip ASCII tab/newline/CR from a URL — anywhere in it, not
+  // just the ends — before parsing its scheme, which is how a filter that
+  // only checks for a literal "javascript:" prefix gets bypassed by
+  // "java\tscript:alert(1)". That normalisation is mirrored here before the
+  // scheme check runs, so a value crafted to dodge a naive regex doesn't
+  // dodge this one too.
+  function safeHref(str) {
+    var s = String(str == null ? '' : str).replace(/[\t\n\r]/g, '').trim();
+    if (!s) return '#';
+    if (/^[a-z][a-z0-9+.-]*:/i.test(s)) return '#'; // any URI scheme, incl. javascript:/data:/vbscript:
+    if (/^\/\//.test(s)) return '#';                 // protocol-relative — still off-origin
+    return s;
+  }
+
   var MP = {
     user: null,
     membership: null,
@@ -63,6 +105,7 @@
     mpFrom: mpFrom,
     esc: esc,
     escAttr: escAttr,
+    safeHref: safeHref,
 
     async init() {
       // Session state first: a logged-out visitor is a NORMAL state, not a failure.

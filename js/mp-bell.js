@@ -17,12 +17,18 @@
    bug. No Realtime: this polls once on mount, matching the rest of the
    messaging feature (Tasks 9-12 poll on load / after send).
 
-   Escaping (see js/mp-core.js MP.esc / MP.escAttr contract comment):
+   Escaping (see js/mp-core.js MP.esc / MP.escAttr / MP.safeHref contract
+   comment):
    - n.title / n.body are rendered as element TEXT content → MP.esc().
-   - n.link / n.id are interpolated into href / data-id ATTRIBUTE values →
-     MP.escAttr(). (MP.esc() alone is NOT safe here: it never escapes
-     quote characters, so a value containing a '"' could close the
-     attribute early.)
+   - n.id is interpolated into a data-id ATTRIBUTE value → MP.escAttr().
+     (MP.esc() alone is NOT safe here: it never escapes quote characters,
+     so a value containing a '"' could close the attribute early.)
+   - n.link is interpolated into an href ATTRIBUTE value and needs BOTH
+     MP.safeHref() (rejects a dangerous scheme — 'javascript:alert(1)' and
+     'data:text/html,...' contain no quotes, so escAttr() alone lets them
+     straight through) and MP.escAttr() (protects the attribute boundary
+     itself). safeHref() runs first so escAttr() only ever escapes a value
+     already confirmed to be a plain same-origin relative link.
    ============================================ */
 (function () {
   var STYLE_ID = 'mp-bell-styles';
@@ -71,9 +77,14 @@
       (rows.length
         ? rows.map(function (n) {
             // n.title / n.body: agency- or system-authored free text as
-            // element TEXT content → MP.esc(). n.link / n.id: interpolated
-            // into ATTRIBUTE values (href, data-id) → MP.escAttr().
-            return '<a href="' + window.MP.escAttr(n.link || '#') + '" data-id="' + window.MP.escAttr(n.id) + '">' +
+            // element TEXT content → MP.esc(). n.id: interpolated into a
+            // data-id ATTRIBUTE → MP.escAttr(). n.link: interpolated into
+            // an href ATTRIBUTE → MP.safeHref() FIRST (rejects a
+            // javascript:/data: scheme, which contains no quotes and so
+            // would sail through escAttr() untouched) THEN MP.escAttr()
+            // (protects the attribute boundary itself) — an href needs
+            // both, they defend different things.
+            return '<a href="' + window.MP.escAttr(window.MP.safeHref(n.link || '#')) + '" data-id="' + window.MP.escAttr(n.id) + '">' +
                    '<strong>' + window.MP.esc(n.title) + '</strong>' +
                    (n.body ? window.MP.esc(n.body) : '') + '</a>';
           }).join('')

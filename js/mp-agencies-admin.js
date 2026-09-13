@@ -78,12 +78,15 @@
     }
     var body = rows.map(function (a) {
       var created = a.created_at ? String(a.created_at).slice(0, 10) : '—';
-      return '<tr data-id="' + esc(a.id) + '">' +
+      // a.id lands in data-* ATTRIBUTE values → MP.escAttr(), not esc()
+      // (esc() never escapes quote characters and is only safe for
+      // element TEXT content — see js/mp-core.js contract comment).
+      return '<tr data-id="' + window.MP.escAttr(a.id) + '">' +
         '<td>' + esc(a.name) + '</td>' +
         '<td>' + esc(a.country || '—') + '</td>' +
         '<td>' + esc(a.status) + '</td>' +
         '<td>' + esc(created) + '</td>' +
-        '<td><button class="btn btn-ghost btn-sm mp-ag-open" data-id="' + esc(a.id) + '">Review</button></td>' +
+        '<td><button class="btn btn-ghost btn-sm mp-ag-open" data-id="' + window.MP.escAttr(a.id) + '">Review</button></td>' +
         '</tr>';
     }).join('');
     return '<div class="panel"><div class="panel-body-flush"><table class="recruiter-table">' + head + '<tbody>' + body + '</tbody></table></div></div>';
@@ -104,7 +107,8 @@
     if (!path) return '';
     var sb = window.ghSupabase;
     var s = await sb.storage.from('gh-applicant-documents').createSignedUrl(path, 600);
-    return (s.data && s.data.signedUrl) ? '<a href="' + esc(s.data.signedUrl) + '" target="_blank" rel="noopener">Open</a>' : '';
+    // s.data.signedUrl lands in an href ATTRIBUTE → MP.escAttr(), not esc().
+    return (s.data && s.data.signedUrl) ? '<a href="' + window.MP.escAttr(s.data.signedUrl) + '" target="_blank" rel="noopener">Open</a>' : '';
   }
 
   // Existing conversations with this agency, so a reviewer can see "have we
@@ -126,9 +130,15 @@
     }
     el.innerHTML = out.rows.map(function (t) {
       // t.subject is agency-or-staff-authored free text rendered as element
-      // TEXT content → esc(). t.id is a server-generated UUID but lands in
-      // an href ATTRIBUTE → escAttr(), per the mp-core.js contract.
-      return '<a href="admin-mp-messages.html?thread=' + window.MP.escAttr(t.id) + '" ' +
+      // TEXT content → esc(). t.id is a server-generated UUID (Postgres'
+      // uuid column type rejects anything that isn't valid UUID shape, so
+      // it can never carry a ':' or a scheme) appended to a hardcoded
+      // relative prefix — not exploitable today, but it's still a
+      // database value landing in an href, so it gets the same
+      // safeHref()+escAttr() treatment as every other one, for
+      // consistency and in case that ever changes.
+      var threadHref = window.MP.safeHref('admin-mp-messages.html?thread=' + t.id);
+      return '<a href="' + window.MP.escAttr(threadHref) + '" ' +
         'style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);' +
         'padding:var(--space-2) 0;font-size:var(--text-sm);color:var(--text-primary);text-decoration:none;' +
         'border-bottom:1px solid var(--border-subtle);">' +
