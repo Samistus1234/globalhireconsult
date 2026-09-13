@@ -53,6 +53,7 @@ Deno.serve(async (req) => {
     const smtpUser = Deno.env.get('GMAIL_USER') || 'support@elabsolution.org';
     const smtpPass = Deno.env.get('GMAIL_APP_PASSWORD');
     const site = Deno.env.get('SITE_URL') || 'https://globalhire.elabsolution.org';
+    let emailSent = false;
     if (to && smtpPass) {
       try {
         const t = nodemailer.createTransport({
@@ -64,6 +65,7 @@ Deno.serve(async (req) => {
           : `Your agency "${agency.name}" has been suspended.${note ? ' Reason: ' + note : ''}`;
         await t.sendMail({ from: `"GlobalHire Partners" <${smtpUser}>`, to,
           subject: `GlobalHire Partner status: ${status}`, text: msg });
+        emailSent = true;
         t.close();
       } catch (e) { console.warn('verify email failed (non-fatal):', (e as Error).message); }
     }
@@ -72,17 +74,22 @@ Deno.serve(async (req) => {
       verified: 'agency_verified', rejected: 'agency_rejected', suspended: 'agency_suspended',
     };
     try {
-      await svc.schema('globalhire').from('mp_notifications').insert({
+      // supabase-js resolves with {error} rather than throwing on a DB-side failure, so the
+      // error return is checked explicitly (same convention as d093dbc) — a bare try/catch
+      // alone would never see a CHECK/NOT NULL violation here. Kept alongside the try/catch,
+      // which still catches genuine throws (network, serialisation). Both non-fatal: never
+      // roll back a completed status change.
+      const { error: notifErr } = await svc.schema('globalhire').from('mp_notifications').insert({
         user_id: agency.created_by,
         agency_id: agency.id,
         type: NOTIF_FOR[status],
         title: `Agency ${status}`,
         body: note ?? null,
         link: 'partners-dashboard.html',
-        email_sent: Boolean(to && smtpPass),
+        email_sent: emailSent,
       });
+      if (notifErr) console.warn('verify notification insert failed (non-fatal):', notifErr.message);
     } catch (e) {
-      // Non-fatal, same rule as the email: never roll back a completed status change.
       console.warn('verify notification insert failed (non-fatal):', (e as Error).message);
     }
 
