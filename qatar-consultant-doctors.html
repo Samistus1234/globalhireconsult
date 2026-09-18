@@ -938,7 +938,7 @@
         </div></div>
         <div class="reveal" style="transition-delay:0.3s"><div class="req-item">
           <div class="req-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
-          <div><div class="label">DataFlow Certificate</div><div class="hint">Optional — transferable from any country</div></div>
+          <div><div class="label">DataFlow Report</div><div class="hint">Optional — transferable from any country</div></div>
         </div></div>
         <div class="reveal" style="transition-delay:0.36s"><div class="req-item">
           <div class="req-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
@@ -1148,7 +1148,7 @@
             What documents do I need to apply?
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
           </button>
-          <div class="faq-answer"><p>You need your CV, MBBS/MD certificate, specialty/fellowship certificate, medical license, experience or reference letters, passport data page, and a professional photo. A DataFlow certificate is optional but helpful if you already have one.</p></div>
+          <div class="faq-answer"><p>You need your CV, MBBS/MD certificate, specialty/fellowship certificate, medical license, experience or reference letters, passport data page, and a professional photo. A DataFlow report is optional but helpful if you already have one.</p></div>
         </div>
         <div class="faq-item reveal" style="transition-delay:0.12s">
           <button class="faq-question" onclick="toggleFaq(this)">
@@ -1238,7 +1238,7 @@
       { key: 'specialty', label: 'Specialty / Fellowship Certificate', hint: 'Dermatology or Plastic Surgery', required: true },
       { key: 'license', label: 'Medical License / Professional Registration', hint: 'MDCN or equivalent', required: true },
       { key: 'reference', label: 'Experience / Reference Letter(s)', hint: 'From employer(s)', required: true },
-      { key: 'dataflow', label: 'DataFlow Certificate', hint: 'Upload if available; can be for another country', required: false },
+      { key: 'dataflow', label: 'DataFlow Report', hint: 'Upload if available; can be for another country', required: false },
       { key: 'passport', label: 'International Passport (Data Page)', hint: 'Valid passport', required: true },
       { key: 'photo', label: 'Professional Photo of Applicant', hint: '', required: true },
     ];
@@ -1365,7 +1365,7 @@
       var requiredFiles = ['cv', 'degree', 'specialty', 'license', 'reference', 'passport', 'photo'];
       for (var i = 0; i < requiredFiles.length; i++) {
         if (!selectedFiles[requiredFiles[i]]) {
-          errorText.textContent = 'Please upload all required documents. DataFlow certificate is optional.';
+          errorText.textContent = 'Please upload all required documents. DataFlow report is optional.';
           errorEl.style.display = 'flex';
           return;
         }
