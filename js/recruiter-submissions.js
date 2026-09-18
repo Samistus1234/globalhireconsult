@@ -16,8 +16,15 @@
   var SUBMISSION_DOC_LABELS = {
     cv: 'CV / Resume',
     license: 'Medical / Professional Licence',
+    scfhs_license: 'Saudi Licence (SCFHS)',
+    scfhs_classification: 'SCFHS / Mumaris Classification',
     dataflow: 'DataFlow Report',
+    dataflow_certificate: 'DataFlow Report',
     passport: 'Passport',
+    iqama: 'Iqama / Residence Permit',
+    prometric_certificate: 'Prometric Result / Certificate',
+    prometric_result: 'Prometric Result / Certificate',
+    specialty_certificate: 'Specialty / Fellowship Certificate',
     fellowship: 'Fellowship / Specialty Certificate'
   };
 

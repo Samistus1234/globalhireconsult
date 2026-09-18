@@ -192,7 +192,28 @@
     // ── Documents overview list ──
     const docsListEl = document.getElementById('dash-docs-list');
     if (docsListEl) {
-      const typeLabels = { license: 'Professional License', degree: 'Degree Certificate', passport: 'Passport', cv: 'CV / Resume', passport_photo: 'Passport Photo', police_report: 'Police Report', travel_insurance: 'Travel Insurance' };
+      const typeLabels = {
+        license: 'Professional License',
+        scfhs_license: 'Saudi Licence (SCFHS)',
+        scfhs_classification: 'SCFHS / Mumaris Classification',
+        degree: 'Degree Certificate',
+        diploma: 'Diploma Certificate',
+        transcript: 'Transcript',
+        passport: 'Passport',
+        cv: 'CV / Resume',
+        passport_photo: 'Passport Photo',
+        prometric_certificate: 'Prometric Result / Certificate',
+        prometric_result: 'Prometric Result / Certificate',
+        dataflow_certificate: 'DataFlow Certificate',
+        specialty_certificate: 'Specialty / Fellowship Certificate',
+        reference_letter: 'Reference Letter',
+        letter_of_work_experience: 'Work Experience Letter',
+        experience_certificate: 'Work Experience Certificate',
+        bls_certificate: 'BLS / Life Support Certificate',
+        iqama: 'Iqama / Residence Permit',
+        police_report: 'Police Report',
+        travel_insurance: 'Travel Insurance'
+      };
       const statusStyles = { verified: { color: 'var(--success, #10b981)', label: 'Verified' }, pending: { color: 'var(--warning, #f59e0b)', label: 'Pending' }, in_review: { color: 'var(--accent-cyan, #0ea5e9)', label: 'In Review' }, rejected: { color: 'var(--error, #ef4444)', label: 'Needs Attention' } };
 
       if (allDocs.length === 0) {
@@ -338,13 +359,16 @@
 
     const docTypes = [
       { type: 'license', label: 'Professional License', icon: 'shield' },
+      { type: 'scfhs_classification', label: 'SCFHS / Mumaris Classification', icon: 'award' },
+      { type: 'scfhs_license', label: 'Saudi Licence (SCFHS)', icon: 'shield' },
       { type: 'degree', label: 'Degree Certificate', icon: 'award' },
       { type: 'passport', label: 'Passport Copy', icon: 'globe' },
       { type: 'cv', label: 'CV / Resume', icon: 'file-text' },
       { type: 'diploma', label: 'Diploma Certificate', icon: 'award' },
       { type: 'transcript', label: 'Transcript', icon: 'file-text' },
       { type: 'passport_photo', label: 'Passport Photo', icon: 'globe' },
-      { type: 'prometric_certificate', label: 'Prometric Certificate', icon: 'shield' },
+      { type: 'prometric_certificate', label: 'Prometric Result / Certificate', icon: 'shield' },
+      { type: 'iqama', label: 'Iqama / Residence Permit', icon: 'globe' },
       { type: 'dataflow_certificate', label: 'DataFlow Certificate', icon: 'shield' }
     ];
 

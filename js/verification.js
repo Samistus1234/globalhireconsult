@@ -15,9 +15,25 @@
 
   var docTypeLabels = {
     license: 'Professional License',
+    scfhs_license: 'Saudi Licence (SCFHS)',
+    scfhs_classification: 'SCFHS / Mumaris Classification',
     degree: 'Degree Certificate',
     passport: 'Passport Copy',
-    cv: 'CV / Resume'
+    cv: 'CV / Resume',
+    passport_photo: 'Passport Photo',
+    diploma: 'Diploma Certificate',
+    transcript: 'Transcript',
+    prometric_certificate: 'Prometric Result / Certificate',
+    prometric_result: 'Prometric Result / Certificate',
+    dataflow_certificate: 'DataFlow Report',
+    specialty_certificate: 'Specialty / Fellowship Certificate',
+    reference_letter: 'Reference Letter',
+    letter_of_work_experience: 'Work Experience Letter',
+    experience_certificate: 'Work Experience Certificate',
+    bls_certificate: 'BLS / Life Support Certificate',
+    iqama: 'Iqama / Residence Permit',
+    police_report: 'Police Character Report',
+    travel_insurance: 'Travel Insurance'
   };
 
   // ── Init ──
