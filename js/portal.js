@@ -204,7 +204,7 @@
         passport_photo: 'Passport Photo',
         prometric_certificate: 'Prometric Result / Certificate',
         prometric_result: 'Prometric Result / Certificate',
-        dataflow_certificate: 'DataFlow Certificate',
+        dataflow_certificate: 'DataFlow Report',
         specialty_certificate: 'Specialty / Fellowship Certificate',
         reference_letter: 'Reference Letter',
         letter_of_work_experience: 'Work Experience Letter',
@@ -369,7 +369,7 @@
       { type: 'passport_photo', label: 'Passport Photo', icon: 'globe' },
       { type: 'prometric_certificate', label: 'Prometric Result / Certificate', icon: 'shield' },
       { type: 'iqama', label: 'Iqama / Residence Permit', icon: 'globe' },
-      { type: 'dataflow_certificate', label: 'DataFlow Certificate', icon: 'shield' }
+      { type: 'dataflow_certificate', label: 'DataFlow Report', icon: 'shield' }
     ];
 
     const { data: docs } = await ghFrom('documents')

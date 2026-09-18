@@ -926,7 +926,7 @@
         </div></div>
         <div class="reveal" style="transition-delay:0.12s"><div class="req-item">
           <div class="req-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
-          <div><div class="label">DataFlow Certificate</div><div class="hint">Optional — any country</div></div>
+          <div><div class="label">DataFlow Report</div><div class="hint">Optional — any country</div></div>
         </div></div>
         <div class="reveal" style="transition-delay:0.18s"><div class="req-item">
           <div class="req-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 10 3 12 0v-5"/></svg></div>
@@ -1235,7 +1235,7 @@
     var fileFields = [
       { key: 'cv', label: 'CV / Resume', hint: 'Remove phone & email from CV', required: true },
       { key: 'prometric', label: 'Prometric Exam Certificate', hint: '', required: true },
-      { key: 'dataflow', label: 'DataFlow Certificate', hint: 'Upload if available; can be for another country', required: false },
+      { key: 'dataflow', label: 'DataFlow Report', hint: 'Upload if available; can be for another country', required: false },
       { key: 'degree', label: 'Degree Certificate', hint: '', required: true },
       { key: 'diploma', label: 'Diploma Certificate', hint: '', required: true },
       { key: 'license', label: 'Nursing License', hint: '', required: true },
@@ -1366,7 +1366,7 @@
       var requiredFiles = ['cv', 'prometric', 'degree', 'diploma', 'license', 'transcript', 'passport', 'photo'];
       for (var i = 0; i < requiredFiles.length; i++) {
         if (!selectedFiles[requiredFiles[i]]) {
-          errorText.textContent = 'Please upload all required documents. DataFlow certificate is optional.';
+          errorText.textContent = 'Please upload all required documents. DataFlow report is optional.';
           errorEl.style.display = 'flex';
           return;
         }
