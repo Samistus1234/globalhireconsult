@@ -216,13 +216,14 @@
           contextType: 'agency',
           body: document.getElementById('mp-drawer-body').value.trim(),
         });
-        // NOTE: do not promise email here. schema-v41-mp-notify-trigger.sql is
-        // deliberately NOT applied yet, so posting a message writes no notification
-        // and sends no email today. Once that migration is applied, this copy can
-        // truthfully say the agency is emailed too — revisit it then.
+        // schema-v41-mp-notify-trigger.sql is applied (2026-09-19), so posting a
+        // message now fires the pg_net fan-out to mp-notify, which writes a
+        // notification row and emails every active member except the sender.
+        // Verified end to end on that date. If that trigger is ever dropped, this
+        // copy becomes a false claim again — keep the two in step.
         status.textContent = out.error
           ? out.error
-          : 'Sent. The agency sees it in their portal — they stay in the queue.';
+          : 'Sent. The agency is emailed and sees it in their portal — they stay in the queue.';
         if (!out.error) {
           compose.reset();
           renderDrawerThreads(id);
