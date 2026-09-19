@@ -1,4 +1,9 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { attachmentsInsideAgency } from '../_shared/mp-attachments.ts';
+
+// Re-exported so this function's own tests can import the check from './index.ts', the
+// same way mp-thread-post's tests do — the single implementation lives in _shared/mp-attachments.ts.
+export { attachmentsInsideAgency };
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -53,6 +58,10 @@ Deno.serve(async (req) => {
       if (!member) return json({ error: 'not a member of this agency' }, 403);
     }
     const side = isAdmin ? 'gh' : 'agency';
+
+    if (!attachmentsInsideAgency(v.attachments as { path?: string }[], v.agency_id)) {
+      return json({ error: 'attachment path outside this agency' }, 400);
+    }
 
     const { data, error } = await svc.schema('globalhire')
       .rpc('mp_create_thread_with_message', {

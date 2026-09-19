@@ -15,7 +15,7 @@
 BEGIN;
 
 CREATE OR REPLACE FUNCTION globalhire.notify_mp_message()
-RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
 BEGIN
   PERFORM net.http_post(
     url     := 'https://evzhnsugmvtqgmvzwyix.supabase.co/functions/v1/mp-notify',

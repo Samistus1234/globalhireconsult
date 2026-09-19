@@ -1,4 +1,9 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { attachmentsInsideAgency } from '../_shared/mp-attachments.ts';
+
+// Re-exported so existing imports of this check from './index.ts' (this function's own
+// tests) keep working — the single implementation now lives in _shared/mp-attachments.ts.
+export { attachmentsInsideAgency };
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -18,16 +23,6 @@ export function validatePostBody(raw: Record<string, unknown>):
   // sender_side is NEVER taken from the client — it is derived below from is_admin().
   return { ok: true, value: { thread_id, body,
     attachments: Array.isArray(raw.attachments) ? raw.attachments as { path: string }[] : [] } };
-}
-
-// An attachment path must sit literally under this agency's prefix. Reject any '..'
-// outright rather than trying to normalise it.
-export function attachmentsInsideAgency(attachments: { path?: string }[], agencyId: string): boolean {
-  const prefix = `marketplace/agency/${agencyId}/`;
-  return attachments.every((a) => {
-    const p = String(a?.path ?? '');
-    return p.startsWith(prefix) && !p.includes('..');
-  });
 }
 
 Deno.serve(async (req) => {
