@@ -6,7 +6,7 @@
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-2R8CT52B7P");</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Partner Dashboard — GlobalHire Partners</title>
+  <title>Messages — GlobalHire Partners</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/tokens.css">
@@ -99,6 +99,7 @@
       background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; text-decoration: none;
     }
     .mp-btn:hover { opacity: 0.92; }
+    .mp-btn:disabled { opacity: 0.5; cursor: default; }
     .mp-link { color: var(--primary-light); text-decoration: none; margin-left: var(--space-3); }
 
     .mp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-4); }
@@ -109,6 +110,66 @@
     .mp-tile h3 { font-size: var(--text-base); font-weight: 700; color: var(--text-primary); margin: 0 0 6px; }
     .mp-tile span { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-tertiary); }
     .mp-tile--soon { opacity: 0.7; cursor: default; }
+
+    /* ── Inbox layout (this page) ── */
+    .mp-inbox {
+      display: flex; gap: var(--space-5);
+      background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-xl);
+      overflow: hidden; min-height: 520px;
+    }
+    .mp-thread-list {
+      width: 280px; flex-shrink: 0;
+      border-right: 1px solid var(--border-subtle);
+      overflow-y: auto; max-height: 72vh;
+      display: flex; flex-direction: column;
+    }
+    .mp-thread-item {
+      display: flex; align-items: center; justify-content: space-between; gap: var(--space-2);
+      width: 100%; text-align: left; background: none; border: none;
+      border-bottom: 1px solid var(--border-subtle);
+      padding: var(--space-4) var(--space-4);
+      font-family: inherit; font-size: var(--text-sm); font-weight: 600; color: var(--text-primary);
+      cursor: pointer;
+    }
+    .mp-thread-item:hover { background: var(--bg-hover); }
+    .mp-thread-item-subject { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mp-badge {
+      flex-shrink: 0; font-size: 11px; font-weight: 800; color: #fff;
+      background: var(--primary); border-radius: var(--radius-full);
+      min-width: 18px; height: 18px; padding: 0 5px;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .mp-empty { padding: var(--space-5); font-size: var(--text-sm); color: var(--text-tertiary); }
+
+    .mp-thread-view { flex: 1; min-width: 0; padding: var(--space-6); display: flex; flex-direction: column; }
+    .mp-thread-view h2 { font-size: var(--text-lg); font-weight: 800; font-family: var(--font-display); margin: 0 0 var(--space-4); }
+
+    #mp-thread-messages { flex: 1; overflow-y: auto; max-height: 52vh; margin-bottom: var(--space-5); }
+    .mp-msg-row {
+      border: 1px solid var(--border-subtle); border-radius: var(--radius-lg);
+      padding: var(--space-3) var(--space-4); margin-bottom: var(--space-3); max-width: 85%;
+    }
+    .mp-msg-row.mp-side-agency { margin-left: auto; background: rgba(0,119,182,0.08); border-color: rgba(0,119,182,0.2); }
+    .mp-msg-row.mp-side-gh { margin-right: auto; background: var(--bg-surface); }
+    .mp-msg-who { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; color: var(--text-tertiary); margin-bottom: 6px; }
+    .mp-msg-body { font-size: var(--text-sm); color: var(--text-primary); line-height: 1.55; white-space: pre-wrap; word-break: break-word; }
+    .mp-msg-files { margin-top: var(--space-2); display: flex; flex-wrap: wrap; gap: var(--space-3); }
+    .mp-att { font-size: var(--text-sm); color: var(--primary-light); text-decoration: underline; cursor: pointer; }
+
+    #mp-reply-form { display: flex; flex-direction: column; gap: var(--space-3); border-top: 1px solid var(--border-subtle); padding-top: var(--space-4); }
+    #mp-reply-body {
+      width: 100%; min-height: 84px; resize: vertical; font-family: inherit; font-size: var(--text-sm);
+      padding: var(--space-3); border-radius: var(--radius-md); border: 1px solid var(--border-default);
+      background: var(--bg-surface); color: var(--text-primary);
+    }
+    #mp-reply-files { font-size: var(--text-sm); color: var(--text-secondary); }
+    #mp-reply-form .mp-btn { align-self: flex-start; }
+    .mp-msg { font-size: var(--text-sm); color: var(--text-tertiary); }
+
+    @media (max-width: 760px) {
+      .mp-inbox { flex-direction: column; }
+      .mp-thread-list { width: 100%; max-height: 240px; border-right: none; border-bottom: 1px solid var(--border-subtle); }
+    }
   </style>
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/brand/favicon-32.png">
@@ -128,11 +189,11 @@
       </div>
 
       <nav id="mp-nav" class="mp-sb-nav">
-        <a class="mp-nav-item active" href="partners-dashboard.html">Dashboard</a>
+        <a class="mp-nav-item" href="partners-dashboard.html">Dashboard</a>
         <a class="mp-nav-item" href="#" aria-disabled="true">Jobs <span class="mp-nav-soon">Soon</span></a>
         <a class="mp-nav-item" href="#" aria-disabled="true">Candidates <span class="mp-nav-soon">Soon</span></a>
         <a class="mp-nav-item" href="#" aria-disabled="true">Nominations <span class="mp-nav-soon">Soon</span></a>
-        <a class="mp-nav-item" href="#" aria-disabled="true">Messages <span class="mp-nav-soon">Soon</span></a>
+        <a class="mp-nav-item active" href="partners-messages.html">Messages</a>
         <a class="mp-nav-item" href="#" aria-disabled="true">Billing <span class="mp-nav-soon">Soon</span></a>
         <a class="mp-nav-item" href="partners-onboarding.html">Team</a>
       </nav>
@@ -145,7 +206,7 @@
     <!-- ═══════════ MAIN ═══════════ -->
     <div class="mp-main-wrap">
       <header class="mp-topbar">
-        <div class="mp-breadcrumb">GlobalHire Partners / <strong>Dashboard</strong></div>
+        <div class="mp-breadcrumb">GlobalHire Partners / <strong>Messages</strong></div>
         <div id="mp-bell"></div>
       </header>
 
@@ -153,7 +214,21 @@
         <!-- error state (contract: MP.status === 'error' — guards do NOT redirect) -->
         <div id="mp-error" hidden></div>
 
-        <div id="mp-dash-main"></div>
+        <div id="mp-messages-body">
+          <div class="mp-inbox">
+            <aside class="mp-thread-list" id="mp-thread-list"></aside>
+            <section class="mp-thread-view">
+              <h2 id="mp-thread-subject">Select a conversation</h2>
+              <div id="mp-thread-messages"></div>
+              <form id="mp-reply-form" hidden>
+                <textarea id="mp-reply-body" required placeholder="Write a reply…"></textarea>
+                <input type="file" id="mp-reply-files" multiple accept=".pdf,.png,.jpg,.jpeg,.webp">
+                <button type="submit" class="mp-btn">Send</button>
+                <div id="mp-reply-msg" class="mp-msg" role="status" aria-live="polite"></div>
+              </form>
+            </section>
+          </div>
+        </div>
       </main>
     </div>
   </div>
@@ -161,7 +236,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/mp-core.js"></script>
-  <script src="js/mp-dashboard.js"></script>
+  <script src="js/mp-messages.js"></script>
+  <script src="js/mp-messages-partner.js"></script>
   <script src="js/mp-bell.js"></script>
   <script>window.addEventListener('load', function(){ window.MPBell.mount(document.getElementById('mp-bell')); });</script>
 </body>

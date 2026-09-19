@@ -78,12 +78,15 @@
     }
     var body = rows.map(function (a) {
       var created = a.created_at ? String(a.created_at).slice(0, 10) : '—';
-      return '<tr data-id="' + esc(a.id) + '">' +
+      // a.id lands in data-* ATTRIBUTE values → MP.escAttr(), not esc()
+      // (esc() never escapes quote characters and is only safe for
+      // element TEXT content — see js/mp-core.js contract comment).
+      return '<tr data-id="' + window.MP.escAttr(a.id) + '">' +
         '<td>' + esc(a.name) + '</td>' +
         '<td>' + esc(a.country || '—') + '</td>' +
         '<td>' + esc(a.status) + '</td>' +
         '<td>' + esc(created) + '</td>' +
-        '<td><button class="btn btn-ghost btn-sm mp-ag-open" data-id="' + esc(a.id) + '">Review</button></td>' +
+        '<td><button class="btn btn-ghost btn-sm mp-ag-open" data-id="' + window.MP.escAttr(a.id) + '">Review</button></td>' +
         '</tr>';
     }).join('');
     return '<div class="panel"><div class="panel-body-flush"><table class="recruiter-table">' + head + '<tbody>' + body + '</tbody></table></div></div>';
@@ -104,7 +107,47 @@
     if (!path) return '';
     var sb = window.ghSupabase;
     var s = await sb.storage.from('gh-applicant-documents').createSignedUrl(path, 600);
-    return (s.data && s.data.signedUrl) ? '<a href="' + esc(s.data.signedUrl) + '" target="_blank" rel="noopener">Open</a>' : '';
+    // s.data.signedUrl lands in an href ATTRIBUTE → MP.escAttr(), not esc().
+    return (s.data && s.data.signedUrl) ? '<a href="' + window.MP.escAttr(s.data.signedUrl) + '" target="_blank" rel="noopener">Open</a>' : '';
+  }
+
+  // Existing conversations with this agency, so a reviewer can see "have we
+  // already asked?" before firing off a duplicate request. Each row links
+  // out to the full admin inbox (admin-mp-messages.html) where MPMsg.post()
+  // handles replying inside an existing thread — this drawer only starts
+  // NEW threads (MPMsg.createThread(), below), it doesn't reply in place.
+  async function renderDrawerThreads(agencyId) {
+    var el = document.getElementById('mp-drawer-threads');
+    if (!el) return;
+    var out = await window.MPMsg.listThreads(agencyId);
+    if (out.error) {
+      el.innerHTML = '<p style="font-size:var(--text-sm);color:var(--text-tertiary);">' + esc(out.error) + '</p>';
+      return;
+    }
+    if (!out.rows.length) {
+      el.innerHTML = '<p style="font-size:var(--text-sm);color:var(--text-tertiary);">No conversations with this agency yet.</p>';
+      return;
+    }
+    el.innerHTML = out.rows.map(function (t) {
+      // t.subject is agency-or-staff-authored free text rendered as element
+      // TEXT content → esc(). t.id is a server-generated UUID (Postgres'
+      // uuid column type rejects anything that isn't valid UUID shape, so
+      // it can never carry a ':' or a scheme) appended to a hardcoded
+      // relative prefix — not exploitable today, but it's still a
+      // database value landing in an href, so it gets the same
+      // safeHref()+escAttr() treatment as every other one, for
+      // consistency and in case that ever changes.
+      var threadHref = window.MP.safeHref('admin-mp-messages.html?thread=' + t.id);
+      return '<a href="' + window.MP.escAttr(threadHref) + '" ' +
+        'style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);' +
+        'padding:var(--space-2) 0;font-size:var(--text-sm);color:var(--text-primary);text-decoration:none;' +
+        'border-bottom:1px solid var(--border-subtle);">' +
+        '<span>' + esc(t.subject) + '</span>' +
+        (t.gh_unread > 0 ? '<span class="mp-badge" style="flex-shrink:0;font-size:11px;font-weight:800;color:#fff;' +
+          'background:var(--primary);border-radius:var(--radius-full);min-width:18px;height:18px;padding:0 5px;' +
+          'display:inline-flex;align-items:center;justify-content:center;">' + esc(t.gh_unread) + '</span>' : '') +
+        '</a>';
+    }).join('');
   }
 
   async function openDrawer(id) {
@@ -142,11 +185,54 @@
       '<button class="btn btn-ghost btn-sm" data-act="suspend">Suspend</button>' +
       '</div>' +
       '<p id="mp-ag-drawer-msg" style="margin-top:var(--space-3);color:var(--text-tertiary);font-size:var(--text-sm);"></p>' +
+      '<div class="mp-drawer-messages" style="margin-top:var(--space-6);padding-top:var(--space-5);border-top:1px solid var(--border-subtle);">' +
+        '<h4 style="margin:0 0 var(--space-3);font-size:var(--text-base);font-weight:700;">Messages</h4>' +
+        '<div id="mp-drawer-threads" style="margin-bottom:var(--space-4);"></div>' +
+        '<form id="mp-drawer-compose" style="display:flex;flex-direction:column;gap:var(--space-3);">' +
+          '<input class="mp-input form-input" id="mp-drawer-subject" placeholder="Subject (e.g. Trade licence needed)" required>' +
+          '<textarea class="mp-input form-input" id="mp-drawer-body" placeholder="What do you need from this agency?" style="min-height:80px;resize:vertical;font-family:inherit;" required></textarea>' +
+          '<button type="submit" class="btn btn-primary btn-sm" style="align-self:flex-start;">Send to agency</button>' +
+          '<div id="mp-drawer-msg" class="mp-msg" style="font-size:var(--text-sm);color:var(--text-tertiary);" role="status" aria-live="polite"></div>' +
+        '</form>' +
+      '</div>' +
       '</div>';
 
     var closeBtn = document.getElementById('mp-ag-drawer-close');
     if (closeBtn) {
       closeBtn.addEventListener('click', function () { drawer.hidden = true; drawer.innerHTML = ''; });
+    }
+
+    renderDrawerThreads(id);
+
+    var compose = document.getElementById('mp-drawer-compose');
+    if (compose) {
+      compose.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var status = document.getElementById('mp-drawer-msg');
+        status.textContent = 'Sending…';
+        var out = await window.MPMsg.createThread({
+          agencyId: id,
+          subject: document.getElementById('mp-drawer-subject').value.trim(),
+          contextType: 'agency',
+          body: document.getElementById('mp-drawer-body').value.trim(),
+        });
+        // schema-v41-mp-notify-trigger.sql is applied (2026-09-19), so posting a
+        // message now fires the pg_net fan-out to mp-notify, which writes a
+        // notification row and emails every active member except the sender.
+        // Verified end to end on that date. If that trigger is ever dropped, this
+        // copy becomes a false claim again — keep the two in step.
+        status.textContent = out.error
+          ? out.error
+          : 'Sent. The agency is emailed and sees it in their portal — they stay in the queue.';
+        if (!out.error) {
+          compose.reset();
+          renderDrawerThreads(id);
+        }
+      });
+      compose.addEventListener('invalid', function (e) {
+        var status = document.getElementById('mp-drawer-msg');
+        if (status && e.target) status.textContent = 'Not sent — ' + e.target.validationMessage;
+      }, true);
     }
 
     drawer.querySelectorAll('.mp-ag-actions button').forEach(function (btn) {
