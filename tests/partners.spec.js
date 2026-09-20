@@ -315,3 +315,109 @@ test.describe('partner messaging — admin/agency document-request round trip (T
     await agency.close();
   });
 });
+
+test.describe('partner job board — publish/visibility round trip (Task 6)', () => {
+  // Same E2E-credential situation as the messaging round trip above (Task 15), unchanged as
+  // of Task 6 (2026-09-20): E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD / E2E_AGENCY_EMAIL /
+  // E2E_AGENCY_PASSWORD are all unset in this environment, and this repo does not fabricate
+  // them — that would mean minting or hammering a real admin/agency account on every run of
+  // this suite. Skip cleanly with a clear reason when they're absent (not a failure — nothing
+  // is broken; not a silent pass — that would prove nothing).
+  //
+  // The equivalent backend coverage — the actual visibility lifecycle this test exists to
+  // prove (draft invisible -> publish -> visible -> the partial-update {id,status:'open'}
+  // guarantee that title/other fields survive -> pause -> invisible again -> confidential
+  // employer_name NULL for a partner, non-null for an admin) — was run directly against the
+  // live mp-job-write edge function and public.gh_mp_jobs for this task, with throwaway
+  // agency+admin actors created and fully deleted afterward (zero leftovers proven). See
+  // .superpowers/sdd/2026-09-20-partner-marketplace-chunk-2a-jobs/task-6-report.md. That is
+  // NOT a substitute for this UI spec — it never exercises admin-mp-jobs.html or
+  // partners-jobs.html — it proves the function and RLS underneath them are correct; this
+  // spec is what proves the pages wire up to them correctly, once someone supplies
+  // credentials.
+  //
+  // Selectors verified against the real rendered DOM (js/mp-jobs-admin.js,
+  // js/mp-jobs-partner.js), not copied blind:
+  // - #mp-job-new opens the create drawer; #jf-title/#jf-status are the drawer's form
+  //   fields (status defaults to the <option value="draft"> — first option in
+  //   #jf-status's <select>, so a create with no explicit status selection saves as draft);
+  //   #mp-job-save submits, #mp-job-form-msg carries "Saved." (js/mp-jobs-admin.js's submit
+  //   handler literally sets statusEl.textContent = 'Saved.', then calls load() and closes
+  //   the drawer — no manual reload needed after a save).
+  // - Each admin table row is `tr[data-id="<job id>"]`; the quick status-change buttons
+  //   inside it are `.mp-job-status[data-status="open"]` ("Publish", shown for
+  //   draft/paused) and `.mp-job-status[data-status="paused"]` ("Pause", shown for open) —
+  //   NOT the edit drawer, per actionButtons() in js/mp-jobs-admin.js. onListClick's status
+  //   branch also calls load() after a successful mp-job-write call, so the table refreshes
+  //   in place with no reload needed.
+  // - Partner job cards are `.mp-job-card` (js/mp-jobs-partner.js renderList()/jobHref()),
+  //   rendered inside #mp-job-list on partners-jobs.html.
+  //
+  // No delete UI exists for a job in this codebase (admin-mp-jobs.html/mp-jobs-admin.js
+  // have no delete button — confirmed by grep, only Publish/Pause/Close status transitions
+  // and Edit) — so if this test is ever run against real E2E_* credentials, the job it
+  // creates will be left in production in a 'closed' state at the end of this test (the
+  // furthest-from-visible status reachable from the UI) rather than being cleaned up. That
+  // is a known, accepted gap of this spec, distinct from the backend round trip in the
+  // report above, which DOES delete everything it creates.
+  const creds = {
+    E2E_ADMIN_EMAIL: process.env.E2E_ADMIN_EMAIL,
+    E2E_ADMIN_PASSWORD: process.env.E2E_ADMIN_PASSWORD,
+    E2E_AGENCY_EMAIL: process.env.E2E_AGENCY_EMAIL,
+    E2E_AGENCY_PASSWORD: process.env.E2E_AGENCY_PASSWORD,
+  };
+  const missing = Object.keys(creds).filter((k) => !creds[k]);
+
+  test('admin creates a draft job, publishes it, partner visibility flips both ways', async ({ browser }) => {
+    test.skip(missing.length > 0,
+      'Skipped: missing ' + missing.join(', ') + '. This round trip needs a real, ' +
+      'already-verified agency account and a real admin account on the target ' +
+      'backend — set all four E2E_* env vars to run it. See the comment above this ' +
+      'test and task-6-report.md for why this is a clean skip, not a failure, and for ' +
+      'the equivalent backend-only proof that already ran without these credentials.');
+
+    const jobTitle = 'Playwright Round Trip Nurse Role ' + Date.now();
+
+    const admin = await browser.newPage();
+    await signInAs(admin, creds.E2E_ADMIN_EMAIL, creds.E2E_ADMIN_PASSWORD);
+    await admin.goto('/admin-mp-jobs.html');
+
+    // Create as draft (leave #jf-status on its default option).
+    await admin.click('#mp-job-new');
+    await admin.fill('#jf-title', jobTitle);
+    await admin.click('#mp-job-save');
+    await expect(admin.locator('#mp-job-form-msg')).toContainText('Saved.');
+
+    const row = admin.locator('tr', { has: admin.locator('td', { hasText: jobTitle }) }).first();
+    await expect(row).toBeVisible();
+    await expect(row.locator('.job-status-pill')).toContainText('draft');
+
+    // Partner: draft is invisible.
+    const agency = await browser.newPage();
+    await signInAs(agency, creds.E2E_AGENCY_EMAIL, creds.E2E_AGENCY_PASSWORD);
+    await agency.goto('/partners-jobs.html');
+    await expect(agency.locator('.mp-job-card', { hasText: jobTitle })).toHaveCount(0);
+
+    // Admin: publish via the row's quick-status "Publish" button (data-status="open") —
+    // this is the {id, status:'open'} partial update the report's assertion 3 is guarding.
+    await row.locator('.mp-job-status[data-status="open"]').click();
+    await expect(row.locator('.job-status-pill')).toContainText('open');
+    // Partial-update guarantee: title survived the status-only change (still the same row).
+    await expect(row.locator('td').first()).toContainText(jobTitle);
+
+    // Partner: now visible.
+    await agency.reload();
+    await expect(agency.locator('.mp-job-card', { hasText: jobTitle })).toHaveCount(1);
+
+    // Admin: pause via the row's quick-status "Pause" button (data-status="paused").
+    await row.locator('.mp-job-status[data-status="paused"]').click();
+    await expect(row.locator('.job-status-pill')).toContainText('paused');
+
+    // Partner: invisible again.
+    await agency.reload();
+    await expect(agency.locator('.mp-job-card', { hasText: jobTitle })).toHaveCount(0);
+
+    await admin.close();
+    await agency.close();
+  });
+});
