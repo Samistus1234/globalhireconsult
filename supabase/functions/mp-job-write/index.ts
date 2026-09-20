@@ -70,8 +70,14 @@ const strArray = (x: unknown): string[] => (Array.isArray(x) ? x.map((v) => Stri
 export function validateJobBody(raw: Record<string, unknown>):
   | { ok: true; value: JobFields; error?: never }
   | { ok: false; value?: never; error: string } {
-  const title = String(raw.title ?? '').trim();
-  if (!title) return { ok: false, error: 'title required' };
+  // `id` present -> this is a partial UPDATE (see buildJobPatch below), so title (and every
+  // other field) is only required to be non-blank if the caller actually sent it. `id` absent
+  // -> this is an INSERT and title is mandatory, same as before.
+  const id = raw.id == null || raw.id === '' ? undefined : String(raw.id);
+  const isUpdate = id !== undefined;
+  const titleProvided = Object.hasOwn(raw, 'title');
+  const title = titleProvided ? String(raw.title ?? '').trim() : '';
+  if ((!isUpdate || titleProvided) && !title) return { ok: false, error: 'title required' };
 
   const contract_type = raw.contract_type == null || raw.contract_type === ''
     ? null : String(raw.contract_type).trim();
@@ -114,7 +120,7 @@ export function validateJobBody(raw: Record<string, unknown>):
   // (posted_by, created_at, updated_at, published_at, or anything else) can never reach the
   // insert. `id` is the one deliberate exception: it names which row to edit, never who wrote it.
   const value: JobFields = {
-    ...(raw.id ? { id: String(raw.id) } : {}),
+    ...(id !== undefined ? { id } : {}),
     title,
     employer_name: strOrNull(raw.employer_name),
     employer_confidential,
@@ -155,6 +161,24 @@ export function validateJobBody(raw: Record<string, unknown>):
   return { ok: true, value };
 }
 
+// This function is the ONLY write path to mp_jobs, so an update must never be built from the
+// full validated value — that would write defaults/nulls over every column a partial body
+// (e.g. `{id, status:'open'}` to publish a job) didn't resend. A patch includes a field ONLY
+// when the key was actually present in the raw request body — driven off `Object.hasOwn(raw,
+// key)`, NEVER off whether the validated value happens to be null. Those are different
+// questions: `{id, salary_min: null}` means "clear the salary" (key present, value null) and
+// must end up in the patch; `{id}` with no salary_min key at all means "leave it alone" and
+// must not. Conflating the two is exactly how this class of bug comes back.
+export function buildJobPatch(raw: Record<string, unknown>, value: JobFields): Record<string, unknown> {
+  const v = value as unknown as Record<string, unknown>;
+  const patch: Record<string, unknown> = {};
+  for (const key of Object.keys(v)) {
+    if (key === 'id') continue; // never part of the SET list — it's the update target
+    if (Object.hasOwn(raw, key)) patch[key] = v[key];
+  }
+  return patch;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
   try {
@@ -166,7 +190,8 @@ Deno.serve(async (req) => {
     const { data: { user } } = await userClient.auth.getUser();
     if (!user) return json({ error: 'unauthorized' }, 401);
 
-    const parsed = validateJobBody(await req.json());
+    const raw = await req.json();
+    const parsed = validateJobBody(raw);
     if (!parsed.ok) return json({ error: parsed.error }, 400);
     const v = parsed.value;
 
@@ -174,32 +199,46 @@ Deno.serve(async (req) => {
     const isAdmin = caller?.role === 'admin';
     if (!isAdmin) return json({ error: 'admin only' }, 403);
 
-    // published_at and posted_by are server-managed: on an edit, preserve the row's existing
-    // values (service role, bypasses RLS) rather than trust anything the client sent — published_at
-    // only ever gets stamped the first time a job transitions to 'open', and posted_by keeps
-    // recording the original author even when a different admin edits the job later.
-    let publishedAt: string | null = null;
-    let postedBy: string = user.id;
     if (v.id) {
-      const { data: existing, error: fetchErr } = await svc.schema('globalhire').from('mp_jobs')
-        .select('published_at, posted_by').eq('id', v.id).maybeSingle();
-      if (fetchErr) return json({ error: fetchErr.message }, 400);
-      publishedAt = (existing?.published_at as string | null | undefined) ?? null;
-      postedBy = (existing?.posted_by as string | undefined) ?? user.id;
-    }
-    if (v.status === 'open' && !publishedAt) {
-      publishedAt = new Date().toISOString();
+      // UPDATE: patch only the keys the caller actually sent (see buildJobPatch) — an
+      // .update() targeted at this one row, never an .upsert() of the full validated value,
+      // so a partial body can't blank out every column it didn't resend.
+      const patch = buildJobPatch(raw, v);
+      // posted_by is deliberately absent from the patch's key set (buildJobPatch only ever
+      // copies fields present in `raw`, and posted_by is never a field validateJobBody exposes
+      // from the body) — it is therefore never overwritten by an edit, so the original poster
+      // stays the poster no matter who edits the job later.
+      patch.updated_at = new Date().toISOString();
+
+      // published_at is only ever stamped, never client-supplied: if this patch is turning the
+      // job 'open' and it has not been published before, stamp it now.
+      if (patch.status === 'open') {
+        const { data: existing, error: fetchErr } = await svc.schema('globalhire').from('mp_jobs')
+          .select('published_at').eq('id', v.id).maybeSingle();
+        if (fetchErr) return json({ error: fetchErr.message }, 400);
+        if (!existing?.published_at) patch.published_at = new Date().toISOString();
+      }
+
+      const { data, error } = await svc.schema('globalhire').from('mp_jobs')
+        .update(patch).eq('id', v.id)
+        .select('id')
+        .single();
+      if (error) return json({ error: error.message }, 400);
+
+      return json({ success: true, id: data.id });
     }
 
+    // INSERT: the full validated value, with posted_by from the verified JWT and published_at
+    // stamped immediately if the job is created already 'open'.
     const row = {
       ...v,
-      posted_by: postedBy,
-      published_at: publishedAt,
+      posted_by: user.id,
+      published_at: v.status === 'open' ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),
     };
 
     const { data, error } = await svc.schema('globalhire').from('mp_jobs')
-      .upsert(row, { onConflict: 'id' })
+      .insert(row)
       .select('id')
       .single();
     if (error) return json({ error: error.message }, 400);
