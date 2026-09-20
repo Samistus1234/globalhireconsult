@@ -54,11 +54,17 @@ const strOrNull = (x: unknown): string | null => {
   const s = String(x).trim();
   return s === '' ? null : s;
 };
-const numOrNull = (x: unknown): number | null => {
-  if (x == null || x === '') return null;
+// "Not supplied" (null/undefined/empty string) is a legitimate optional-field state and must
+// resolve to `null`. Anything else that doesn't parse to a finite number is a validation
+// FAILURE, not a silent null — a typo like "80,000" or "8O000" must come back as a readable
+// 400 naming the field, never a job that silently saves with no salary. Never strip commas or
+// guess: "1,5" means 1.5 in much of the world, so refuse rather than mis-parse.
+function parseNum(x: unknown, field: string): { ok: true; value: number | null } | { ok: false; error: string } {
+  if (x == null || x === '') return { ok: true, value: null };
   const n = Number(x);
-  return Number.isFinite(n) ? n : null;
-};
+  if (!Number.isFinite(n)) return { ok: false, error: `${field} must be a number` };
+  return { ok: true, value: n };
+}
 const strArray = (x: unknown): string[] => (Array.isArray(x) ? x.map((v) => String(v)) : []);
 
 export function validateJobBody(raw: Record<string, unknown>):
@@ -89,6 +95,19 @@ export function validateJobBody(raw: Record<string, unknown>):
     return { ok: false, error: 'partner_split_pct must be between 0 and 100' };
   }
 
+  const salary_min = parseNum(raw.salary_min, 'salary_min');
+  if (!salary_min.ok) return salary_min;
+  const salary_max = parseNum(raw.salary_max, 'salary_max');
+  if (!salary_max.ok) return salary_max;
+  const placement_fee_amount = parseNum(raw.placement_fee_amount, 'placement_fee_amount');
+  if (!placement_fee_amount.ok) return placement_fee_amount;
+  const min_experience_years = parseNum(raw.min_experience_years, 'min_experience_years');
+  if (!min_experience_years.ok) return min_experience_years;
+  const age_min = parseNum(raw.age_min, 'age_min');
+  if (!age_min.ok) return age_min;
+  const age_max = parseNum(raw.age_max, 'age_max');
+  if (!age_max.ok) return age_max;
+
   const employer_confidential = raw.employer_confidential === true || raw.employer_confidential === 'true';
 
   // Built field by field — never spread `raw` — so an unexpected key in the request body
@@ -107,25 +126,25 @@ export function validateJobBody(raw: Record<string, unknown>):
     contract_type,
     facility_type: strOrNull(raw.facility_type),
     positions_count,
-    salary_min: numOrNull(raw.salary_min),
-    salary_max: numOrNull(raw.salary_max),
+    salary_min: salary_min.value,
+    salary_max: salary_max.value,
     salary_currency: strOrNull(raw.salary_currency),
     salary_display: strOrNull(raw.salary_display),
     benefits: strArray(raw.benefits),
     jd_text: strOrNull(raw.jd_text),
     status,
-    placement_fee_amount: numOrNull(raw.placement_fee_amount),
+    placement_fee_amount: placement_fee_amount.value,
     placement_fee_currency: strOrNull(raw.placement_fee_currency),
     partner_split_pct,
     source,
     origin_campaign_id: strOrNull(raw.origin_campaign_id),
-    min_experience_years: numOrNull(raw.min_experience_years),
+    min_experience_years: min_experience_years.value,
     required_licences: strArray(raw.required_licences),
     required_exams: strArray(raw.required_exams),
     nationality_prefs: strArray(raw.nationality_prefs),
     gender_pref: strOrNull(raw.gender_pref),
-    age_min: numOrNull(raw.age_min),
-    age_max: numOrNull(raw.age_max),
+    age_min: age_min.value,
+    age_max: age_max.value,
     language_reqs: strArray(raw.language_reqs),
     extra_criteria: (raw.extra_criteria && typeof raw.extra_criteria === 'object' && !Array.isArray(raw.extra_criteria))
       ? raw.extra_criteria as Record<string, unknown>

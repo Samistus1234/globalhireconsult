@@ -59,3 +59,34 @@ Deno.test('accepts a minimal valid body', () => {
   assertEquals(r.value!.partner_split_pct, 50);
   assertEquals(r.value!.contract_type, null);
 });
+
+// Regression guard for the "80,000" silent-null bug: a typo'd or comma-formatted salary must be
+// REJECTED with a readable 400 naming the field, never silently coerced to null and saved as if
+// nothing was wrong.
+Deno.test('rejects salary_min "80,000" (comma-formatted, not hostile — just how salaries are typed)', () => {
+  const r = validateJobBody({ ...MINIMAL, salary_min: '80,000' });
+  assertEquals(r.ok, false);
+  assertEquals((r as { error: string }).error.includes('salary_min'), true);
+});
+
+Deno.test('rejects salary_min "abc"', () => {
+  const r = validateJobBody({ ...MINIMAL, salary_min: 'abc' });
+  assertEquals(r.ok, false);
+  assertEquals((r as { error: string }).error.includes('salary_min'), true);
+});
+
+Deno.test('salary_min "" and salary_min absent both still produce null and still pass', () => {
+  const withEmpty = validateJobBody({ ...MINIMAL, salary_min: '' });
+  assertEquals(withEmpty.ok, true);
+  assertEquals(withEmpty.value!.salary_min, null);
+
+  const withAbsent = validateJobBody({ ...MINIMAL });
+  assertEquals(withAbsent.ok, true);
+  assertEquals(withAbsent.value!.salary_min, null);
+});
+
+Deno.test('a valid numeric string salary_min "80000" still parses to the number 80000', () => {
+  const r = validateJobBody({ ...MINIMAL, salary_min: '80000' });
+  assertEquals(r.ok, true);
+  assertEquals(r.value!.salary_min, 80000);
+});
