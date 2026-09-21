@@ -330,7 +330,10 @@
               }).catch(function(){});
 
               // best-effort: partner-agency members get a "Partner Dashboard" link
-              ghFrom('gh_mp_agency_members').select('agency_id').eq('user_id', session.user.id).limit(1).then(function(mr) {
+              // ghFrom() already prefixes 'gh_', so passing 'gh_mp_agency_members'
+              // asked for gh_gh_mp_agency_members — a table that has never existed
+              // (HTTP 404 PGRST205) — and the link silently never rendered.
+              ghFrom('mp_agency_members').select('agency_id').eq('user_id', session.user.id).eq('status', 'active').limit(1).then(function(mr) {
                 if (!(mr && mr.data && mr.data.length)) return;
                 var dd = document.getElementById('gnav-dropdown');
                 if (!dd || dd.querySelector('[data-partner-dash]')) return;

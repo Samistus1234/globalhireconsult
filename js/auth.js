@@ -53,7 +53,21 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (redirectParam) {
         window.location.href = redirectParam;
       } else {
-        window.location.href = 'portal.html';
+        // Partner-agency accounts are NOT a profiles.role — the role CHECK allows
+        // only applicant/admin/recruiter, so a partner's profile reads 'applicant'
+        // and would otherwise land on the applicant portal, never seeing the
+        // partner surfaces. Their partner identity is an active mp_agency_members
+        // row instead, so that is what we probe here.
+        var agency = await ghFrom('mp_agency_members')
+          .select('agency_id')
+          .eq('user_id', data.user.id)
+          .eq('status', 'active')
+          .limit(1);
+        if (agency && agency.data && agency.data.length) {
+          window.location.href = 'partners-dashboard.html';
+        } else {
+          window.location.href = 'portal.html';
+        }
       }
     });
   }
