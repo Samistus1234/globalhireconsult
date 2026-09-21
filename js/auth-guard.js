@@ -73,6 +73,33 @@
       return;
     }
 
+    // Partner-agency members must not sit on an applicant-only page.
+    //
+    // The role check above CANNOT catch this: a partner's profiles.role is
+    // 'applicant', because the role CHECK allows only applicant/admin/recruiter —
+    // partner identity lives in an mp_agency_members row, never in a role. So a
+    // partner satisfies data-auth-role="applicant" and the applicant portal renders
+    // for them. Pages that opt in with data-partner-redirect send them to the
+    // partner surface instead.
+    var partnerRedirect = document.body.dataset.partnerRedirect;
+    if (partnerRedirect && profile.role === 'applicant') {
+      try {
+        var m = await ghFrom('mp_agency_members')
+          .select('agency_id')
+          .eq('user_id', session.user.id)
+          .eq('status', 'active')
+          .limit(1);
+        if (m && m.data && m.data.length) {
+          window.location.replace(partnerRedirect);
+          return;
+        }
+      } catch (e) {
+        // Fail open: a transient lookup failure must not lock a genuine applicant
+        // out of their own portal.
+        console.warn('Auth guard: agency membership check failed', e);
+      }
+    }
+
     // All good — dispatch event
     document.body.classList.add('auth-ready');
     window.dispatchEvent(new CustomEvent('gh:auth-ready', {

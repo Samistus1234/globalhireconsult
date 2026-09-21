@@ -245,7 +245,7 @@
     if (isLoggedIn) {
       var initials = (userName || 'U').split(' ').map(function(n) { return n[0]; }).join('').toUpperCase().substring(0, 2);
       actionsEl.innerHTML =
-        '<a href="portal.html" class="btn btn-ghost btn-sm hide-mobile">My Portal</a>' +
+        '<a href="portal.html" data-my-portal="1" class="btn btn-ghost btn-sm hide-mobile">My Portal</a>' +
         '<div class="gnav-user" id="gnav-user">' +
           '<div class="avatar">' + initials + '</div>' +
           '<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>' +
@@ -254,9 +254,9 @@
               '<div class="name">' + (userName || 'User') + '</div>' +
               '<div class="email">' + (userEmail || '') + '</div>' +
             '</div>' +
-            '<a href="portal.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>My Dashboard</a>' +
-            '<a href="portal.html#profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Profile</a>' +
-            '<a href="portal.html#documents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>My Documents</a>' +
+            '<a href="portal.html" data-applicant-link="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>My Dashboard</a>' +
+            '<a href="portal.html#profile" data-applicant-link="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Profile</a>' +
+            '<a href="portal.html#documents" data-applicant-link="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>My Documents</a>' +
             '<div class="divider"></div>' +
             '<a href="#" class="danger" id="gnav-signout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a>' +
           '</div>' +
@@ -329,20 +329,55 @@
                 if (div) dd.insertBefore(a, div); else dd.appendChild(a);
               }).catch(function(){});
 
-              // best-effort: partner-agency members get a "Partner Dashboard" link
-              // ghFrom() already prefixes 'gh_', so passing 'gh_mp_agency_members'
-              // asked for gh_gh_mp_agency_members — a table that has never existed
-              // (HTTP 404 PGRST205) — and the link silently never rendered.
+              // Partner-agency members: swap the applicant chrome for the partner nav.
+              // Two things had to be true for this to render at all:
+              //  1. ghFrom() already prefixes 'gh_', so the old
+              //     'gh_mp_agency_members' asked for gh_gh_mp_agency_members — a table
+              //     that has never existed (HTTP 404 PGRST205). The link never rendered.
+              //  2. A partner's profiles.role is 'applicant' — the role CHECK allows
+              //     only applicant/admin/recruiter, so partner identity is this
+              //     mp_agency_members row and never a role. Without the swap below, a
+              //     partner saw applicant links, which now also bounce back off
+              //     portal.html's partner redirect.
               ghFrom('mp_agency_members').select('agency_id').eq('user_id', session.user.id).eq('status', 'active').limit(1).then(function(mr) {
                 if (!(mr && mr.data && mr.data.length)) return;
                 var dd = document.getElementById('gnav-dropdown');
                 if (!dd || dd.querySelector('[data-partner-dash]')) return;
+
+                // Drop the applicant-only entries (My Dashboard / My Profile / My Documents).
+                Array.prototype.slice.call(dd.querySelectorAll('[data-applicant-link]')).forEach(function(el) {
+                  el.parentNode.removeChild(el);
+                });
+
+                // The header button reads "My Portal" and points at portal.html.
+                var portalBtn = actionsEl.querySelector('[data-my-portal]');
+                if (portalBtn) {
+                  portalBtn.href = 'partners-dashboard.html';
+                  portalBtn.textContent = 'Partner Dashboard';
+                }
+
                 var div = dd.querySelector('.divider');
-                var a = document.createElement('a');
-                a.href = 'partners-dashboard.html';
-                a.setAttribute('data-partner-dash', '1');
-                a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>Partner Dashboard';
-                if (div) dd.insertBefore(a, div); else dd.appendChild(a);
+                var icons = {
+                  dashboard: '<path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/>',
+                  jobs: '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
+                  messages: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+                  team: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'
+                };
+                var partnerLinks = [
+                  ['partners-dashboard.html', 'Partner Dashboard', 'dashboard'],
+                  ['partners-jobs.html', 'Jobs', 'jobs'],
+                  ['partners-messages.html', 'Messages', 'messages'],
+                  ['partners-onboarding.html', 'Team', 'team']
+                ];
+                // Insert in order, each before the divider that precedes Sign Out.
+                var anchor = div;
+                partnerLinks.forEach(function (l) {
+                  var a = document.createElement('a');
+                  a.href = l[0];
+                  a.setAttribute('data-partner-dash', '1');
+                  a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + icons[l[2]] + '</svg>' + l[1];
+                  if (anchor) dd.insertBefore(a, anchor); else dd.appendChild(a);
+                });
               }).catch(function(){});
             }
           } else {
