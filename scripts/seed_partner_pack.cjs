@@ -12,8 +12,8 @@ const PACK = [
   { sort_order: 2, code: "recruiter_licence",   title: "FMLE Recruiter's Licence LAB/EW/001637",       file: "02-recruiter-licence-LAB-EW-001637.pdf", status: "current", attach: true, notes: "Issued 16 Nov 2023, 2-year validity — renewal status to confirm." },
   { sort_order: 3, code: "eapean_membership",   title: "EAPEAN Membership Certificate (EAP 0339)",     file: "03-eapean-membership-certificate-EAP0339.pdf", status: "current", attach: true, notes: "Issued 4 Sept 2026, valid 2 years (to Sept 2028)." },
   { sort_order: 4, code: "company_profile",     title: "Company Profile v2 (Sept 2026)",               file: "04-company-profile.pdf", status: "current", attach: true },
-  { sort_order: 6, code: "ethical_declaration", title: "Ethical Recruitment & No-Fee Declaration",     file: "06-ethical-recruitment-declaration.pdf", status: "current", attach: true, notes: "Unsigned draft until MD signs." },
-  { sort_order: 7, code: "data_protection",     title: "Data Protection Statement",                    file: "07-data-protection-statement.pdf", status: "current", attach: true, notes: "Unsigned draft until MD signs." },
+  { sort_order: 6, code: "ethical_declaration", title: "Ethical Recruitment & No-Fee Declaration",     file: "06-ethical-recruitment-declaration.pdf", status: "current", attach: false, notes: "On request only (GRIA, Alliance-certified US firms, NHS/HSE, Canadian licensed recruiters ask for it). Unsigned until MD signs." },
+  { sort_order: 7, code: "data_protection",     title: "Data Protection Statement",                    file: "07-data-protection-statement.pdf", status: "current", attach: false, notes: "On request only. Unsigned until MD signs." },
 ];
 (async () => {
   for (const p of PACK) {
