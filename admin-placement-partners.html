@@ -40,6 +40,14 @@
     .pp-log li { font-size:var(--text-sm); padding:6px 0; border-bottom:1px dashed var(--border-subtle); }
     .pp-toolbar { display:flex; gap:var(--space-2); flex-wrap:wrap; margin-bottom:var(--space-4); }
     .pp-toolbar .select-input, .pp-toolbar .form-input { width:auto; }
+    .pp-pack-row { display:flex; justify-content:space-between; gap:var(--space-3); padding:6px 0; border-bottom:1px dashed var(--border-subtle); }
+    .pp-pack-row .meta { color:var(--text-tertiary); font-size:11px; }
+    .pp-modal { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:80; display:flex; align-items:center; justify-content:center; padding:var(--space-4); }
+    .pp-modal__box { background:var(--bg-surface); border-radius:12px; width:min(760px,100%); max-height:92vh; overflow:auto; padding:var(--space-5); box-shadow:0 20px 60px rgba(0,0,0,.3); }
+    .pp-modal__box textarea { width:100%; min-height:380px; font-family:inherit; font-size:13px; line-height:1.5; resize:vertical; }
+    .pp-modal__box .row { display:flex; gap:var(--space-2); align-items:center; flex-wrap:wrap; margin:var(--space-2) 0; }
+    .pp-modal__box .row label { font-size:12px; color:var(--text-tertiary); }
+    .pp-attach label { display:inline-flex; gap:6px; align-items:center; margin-right:12px; font-size:12px; }
     .recruiter-table td a { color:inherit; }
   </style>
 </head>
@@ -152,6 +160,11 @@
       <div class="dash-content">
         <div class="pp-stats" id="pp-stats"></div>
 
+        <details class="panel" id="pp-pack" style="margin-bottom:var(--space-4);padding:var(--space-3) var(--space-4);">
+          <summary style="cursor:pointer;font-weight:700;color:var(--text-primary);">Partner Pack — documents attached to intro emails</summary>
+          <div id="pp-pack-list" style="margin-top:var(--space-3);font-size:var(--text-sm);">Loading…</div>
+        </details>
+
         <div class="pp-toolbar">
           <select id="pp-region" class="select-input">
             <option value="">All regions</option>
@@ -202,7 +215,7 @@
   <script src="js/elab-tracker.js"></script>
   <script src="js/auth-guard.js"></script>
   <script src="js/mp-core.js"></script>
-  <script src="js/placement-partners-admin.js?v=pp1"></script>
+  <script src="js/placement-partners-admin.js?v=pp2"></script>
   <script src="js/mp-bell.js"></script>
   <script>window.addEventListener('load', function(){ window.MPBell.mount(document.getElementById('mp-bell')); });</script>
 </body>
