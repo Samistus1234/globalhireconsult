@@ -6,7 +6,7 @@
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-2R8CT52B7P");</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Job Board — GlobalHire@eLab</title>
+  <title>Placement Partners — GlobalHire@eLab</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,37 +17,30 @@
   <link rel="icon" type="image/png" href="assets/brand/favicon-32.png">
   <link rel="apple-touch-icon" href="assets/brand/globalhire-icon-180.png">
   <style>
-    /* ── Toolbar (mirrors admin-mp-messages.html) ── */
-    .page-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); flex-wrap: wrap; }
-    .select-input { padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); border: 1px solid var(--border-default); background: var(--bg-surface); color: var(--text-primary); font-size: var(--text-sm); font-family: inherit; }
-
-    /* ── Job table (mirrors admin-mp-agencies.html .recruiter-table) ── */
-    .job-table { width: 100%; border-collapse: collapse; }
-    .job-table th, .job-table td { padding: var(--space-3) var(--space-4); text-align: left; border-bottom: 1px solid var(--border-subtle); font-size: var(--text-sm); vertical-align: top; }
-    .job-table th { font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; background: var(--bg-surface); }
-    .job-status-pill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
-    .job-status-open { background: rgba(0,232,157,0.12); color: var(--success); }
-    .job-status-draft { background: var(--bg-elevated); color: var(--text-tertiary); }
-    .job-status-paused { background: rgba(245,158,11,0.12); color: #F59E0B; }
-    .job-status-filled { background: rgba(0,119,182,0.12); color: var(--primary); }
-    .job-status-closed { background: rgba(239,68,68,0.1); color: #EF4444; }
-    .job-actions { display: flex; gap: var(--space-2); flex-wrap: wrap; }
-    .job-confidential-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-tertiary); margin-left: 6px; }
-
-    /* ── Create/edit drawer ── */
-    #mp-job-drawer .panel { padding: var(--space-6); margin-top: var(--space-4); }
-    .mp-job-form fieldset { border: none; padding: 0; margin: 0 0 var(--space-5); }
-    .mp-job-form legend { font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); margin-bottom: var(--space-3); padding: 0; }
-    .mp-job-form .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-4); }
-    .mp-job-form .form-group.full-width { grid-column: 1 / -1; }
-    .mp-job-checkbox-row { display: flex; align-items: center; gap: var(--space-2); padding-top: var(--space-5); }
-    .mp-job-checkbox-row label { font-size: var(--text-sm); color: var(--text-secondary); font-weight: 500; text-transform: none; letter-spacing: normal; }
-    #mp-job-form-msg { margin-top: var(--space-3); font-size: var(--text-sm); color: var(--text-tertiary); }
-    #mp-job-form-msg.is-error { color: #EF4444; }
-
-    @media (max-width: 760px) {
-      .mp-job-form .form-row-3 { grid-template-columns: 1fr; }
-    }
+    .recruiter-table th, .recruiter-table td { padding: var(--space-3) var(--space-4); text-align: left; border-bottom: 1px solid var(--border-subtle); font-size: var(--text-sm); }
+    .recruiter-table th { font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; background: var(--bg-surface); }
+    .recruiter-table { width: 100%; border-collapse: collapse; }
+    .status-pending { color: #F59E0B; font-weight: 600; font-size: 11px; }
+    .status-approved { color: var(--success); font-weight: 600; font-size: 11px; }
+      .pp-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:var(--space-3); margin-bottom:var(--space-5); }
+    .pp-stat { background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:10px; padding:var(--space-3) var(--space-4); }
+    .pp-stat__label { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-tertiary); font-weight:700; }
+    .pp-stat__val { font-size:var(--text-lg); font-weight:800; margin-top:2px; }
+    .pp-stat__sub { font-size:11px; color:var(--text-tertiary); }
+    .pp-pri { display:inline-block; min-width:20px; text-align:center; border-radius:6px; font-size:11px; font-weight:800; padding:1px 6px; }
+    .pp-pri--A { background:#DCFCE7; color:#166534; } .pp-pri--B { background:#FEF3C7; color:#92400E; } .pp-pri--C { background:#F1F5F9; color:#475569; }
+    .pp-status { font-size:11px; font-weight:600; text-transform:capitalize; }
+    .pp-status--not_contacted { color:var(--text-tertiary); } .pp-status--contacted { color:#2563EB; } .pp-status--registered,.pp-status--docs_submitted { color:#7C3AED; }
+    .pp-status--agreement_signed { color:#0891B2; } .pp-status--active { color:var(--success); } .pp-status--declined,.pp-status--not_eligible { color:#DC2626; }
+    .pp-drawer { position:fixed; top:0; right:0; height:100vh; width:min(560px,100vw); background:var(--bg-surface); border-left:1px solid var(--border-subtle); box-shadow:-8px 0 24px rgba(0,0,0,.12); z-index:60; overflow-y:auto; padding:var(--space-5); }
+    .pp-drawer h2 { font-size:var(--text-lg); margin:0 0 var(--space-2); }
+    .pp-kv { display:grid; grid-template-columns:150px 1fr; gap:6px 12px; font-size:var(--text-sm); margin:var(--space-3) 0; }
+    .pp-kv dt { color:var(--text-tertiary); font-weight:600; } .pp-kv dd { margin:0; word-break:break-word; }
+    .pp-form { display:flex; flex-direction:column; gap:var(--space-2); border-top:1px solid var(--border-subtle); padding-top:var(--space-4); margin-top:var(--space-4); }
+    .pp-log li { font-size:var(--text-sm); padding:6px 0; border-bottom:1px dashed var(--border-subtle); }
+    .pp-toolbar { display:flex; gap:var(--space-2); flex-wrap:wrap; margin-bottom:var(--space-4); }
+    .pp-toolbar .select-input, .pp-toolbar .form-input { width:auto; }
+    .recruiter-table td a { color:inherit; }
   </style>
 </head>
 <body data-auth-role="admin">
@@ -84,7 +77,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>
           Partner Agencies
         </a>
-        <a class="nav-item" href="admin-placement-partners.html">
+        <a class="nav-item active" href="admin-placement-partners.html">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
           Placement Partners
         </a>
@@ -92,7 +85,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           Partner Messages
         </a>
-        <a class="nav-item active" href="admin-mp-jobs.html">
+        <a class="nav-item" href="admin-mp-jobs.html">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
           Jobs
         </a>
@@ -149,58 +142,55 @@
     <!-- Main -->
     <div class="dashboard-main">
       <header class="dash-header">
-        <div class="breadcrumb"><span>GlobalHire</span><span>/</span><span>Jobs</span></div>
+        <div class="breadcrumb"><span>GlobalHire</span><span>/</span><span>Placement Partners</span></div>
         <div style="display:flex;align-items:center;gap:var(--space-3);">
-          <h1 class="page-title">Job Board</h1>
+          <h1 class="page-title">Placement Partners — Outreach</h1>
           <div id="mp-bell"></div>
         </div>
       </header>
 
       <div class="dash-content">
+        <div class="pp-stats" id="pp-stats"></div>
 
-        <div class="page-head">
-          <p style="margin:0;color:var(--text-tertiary);font-size:var(--text-sm);">Vacancies open to the partner network — create, publish, pause or close a job.</p>
-          <div style="display:flex;align-items:center;gap:var(--space-3);">
-            <select id="mp-job-filter" class="select-input" style="width:170px;">
-              <option value="open" selected>Open</option>
-              <option value="draft">Draft</option>
-              <option value="paused">Paused</option>
-              <option value="filled">Filled</option>
-              <option value="closed">Closed</option>
-              <option value="all">All</option>
-            </select>
-            <button type="button" class="btn btn-primary btn-sm" id="mp-job-new">+ New Job</button>
-          </div>
+        <div class="pp-toolbar">
+          <select id="pp-region" class="select-input">
+            <option value="">All regions</option>
+            <option value="GCC">GCC</option>
+            <option value="USA">USA</option>
+            <option value="Canada">Canada</option>
+            <option value="UK/Ireland">UK/Ireland</option>
+            <option value="Australia/NZ">Australia/NZ</option>
+          </select>
+          <select id="pp-priority" class="select-input">
+            <option value="">All priorities</option>
+            <option value="A">Priority A</option>
+            <option value="B">Priority B</option>
+            <option value="C">Priority C</option>
+          </select>
+          <select id="pp-status" class="select-input">
+            <option value="">All statuses</option>
+            <option value="not_contacted">Not contacted</option>
+            <option value="contacted">Contacted</option>
+            <option value="registered">Registered</option>
+            <option value="docs_submitted">Docs submitted</option>
+            <option value="agreement_signed">Agreement signed</option>
+            <option value="active">Active</option>
+            <option value="declined">Declined</option>
+            <option value="not_eligible">Not eligible</option>
+          </select>
+          <input id="pp-q" class="form-input" type="search" placeholder="Search name, country, email…" style="flex:1;min-width:200px;">
         </div>
 
-        <!-- Job list -->
-        <div id="mp-job-list">
-          <div class="panel">
-            <div class="panel-body-flush">
-              <table class="job-table">
-                <thead>
-                  <tr>
-                    <th>Title</th>
-                    <th>Employer</th>
-                    <th>Location</th>
-                    <th>Specialty</th>
-                    <th>Status</th>
-                    <th>Positions</th>
-                    <th>Updated</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr><td colspan="8" style="text-align:center;padding:var(--space-10);color:var(--text-tertiary);">Loading...</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+        <div id="pp-list">
+          <div class="panel"><div class="panel-body-flush">
+            <table class="recruiter-table">
+              <thead><tr><th>Pri</th><th>Partner</th><th>Region</th><th>Programme</th><th>Status</th><th>Last contact</th><th>Next action</th></tr></thead>
+              <tbody><tr><td colspan="7" style="text-align:center;padding:var(--space-10);color:var(--text-tertiary);">Loading...</td></tr></tbody>
+            </table>
+          </div></div>
         </div>
 
-        <!-- Create/edit drawer -->
-        <div id="mp-job-drawer" hidden></div>
-
+        <div id="pp-drawer" class="pp-drawer" hidden></div>
       </div>
     </div>
   </div>
@@ -212,7 +202,7 @@
   <script src="js/elab-tracker.js"></script>
   <script src="js/auth-guard.js"></script>
   <script src="js/mp-core.js"></script>
-  <script src="js/mp-jobs-admin.js"></script>
+  <script src="js/placement-partners-admin.js?v=pp1"></script>
   <script src="js/mp-bell.js"></script>
   <script>window.addEventListener('load', function(){ window.MPBell.mount(document.getElementById('mp-bell')); });</script>
 </body>
