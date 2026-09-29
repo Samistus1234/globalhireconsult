@@ -73,7 +73,7 @@ Deno.serve(async (req) => {
       escapeHtml(body_text).replace(/\n/g, '<br>') + '</div>';
     const info = await t.sendMail({
       from: `"Samuel Akinjopo — Global Hire Consult" <${smtpUser}>`,
-      replyTo: 'globalhire@elabsolution.org',
+      replyTo: 'headoffice@elabsolution.org',
       to, cc, subject, text: body_text, html,
       attachments: attachments.map(a => ({ filename: a.filename, content: a.content, contentType: a.contentType })),
     });
