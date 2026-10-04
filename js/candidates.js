@@ -313,6 +313,19 @@
     return '<span style="color:var(--text-tertiary);">No</span>';
   }
 
+  // Payload for the DataFlow reference field. The reference IS the evidence: saving one
+  // marks the profile verified, clearing it un-marks it. A claim is never written without
+  // a reference — the DB evidence guard rejects that with 23514 anyway.
+  function dfPayload(rawRef, country) {
+    var ref = String(rawRef || '').trim();
+    var c = String(country || '').trim() || null;
+    if (!ref) return { values: { dataflow_number: null, dataflow_country: c, dataflow_completed: false } };
+    if (ref.length < 5 || !/[0-9]/.test(ref) || !/[A-Za-z0-9]/.test(ref)) {
+      return { error: 'That does not look like a DataFlow report reference — expected something like S003-2601-2890943.' };
+    }
+    return { values: { dataflow_number: ref, dataflow_country: c, dataflow_completed: true } };
+  }
+
   // DataFlow as plain text, for the detail panel and both exports.
   function dfText(p) {
     var d = GHE.dfState(p);
@@ -796,6 +809,26 @@
     html += '</div>';
     html += '</div>';
 
+    // DataFlow block — the report reference is what makes a profile verified.
+    // Saving a reference sets dataflow_completed; clearing it un-sets it. The DB evidence
+    // guard rejects a claim with no reference, so this UI cannot re-create the 2026-10 defect.
+    var DF_COUNTRIES = ['Saudi Arabia', 'Qatar', 'Oman', 'UAE', 'Other'];
+    var dfCur = String(profile.dataflow_country || '').trim().toLowerCase();
+    html += '<div style="margin-top:var(--space-3);padding:var(--space-3);background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-md);">';
+    html += '<div style="font-size:12px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:var(--space-2);">DataFlow Report</div>';
+    html += '<div style="display:flex;gap:var(--space-2);align-items:center;margin-bottom:var(--space-2);">';
+    html += '<input type="text" id="df-ref" value="' + GHE.escapeHtml(profile.dataflow_number || '') + '" placeholder="Report reference S003-2601-2890943" style="flex:1;min-width:0;padding:var(--space-2) var(--space-3);font-size:var(--text-sm);border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-primary);">';
+    html += '<select id="df-country" style="padding:var(--space-2);font-size:var(--text-sm);border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-primary);">';
+    html += '<option value="">Country…</option>';
+    DF_COUNTRIES.forEach(function (c) {
+      html += '<option value="' + c + '"' + (dfCur === c.toLowerCase() ? ' selected' : '') + '>' + c + '</option>';
+    });
+    html += '</select>';
+    html += '<button id="btn-df-save" class="btn btn-secondary btn-sm" style="font-size:11px;white-space:nowrap;">Save</button>';
+    html += '</div>';
+    html += '<div id="df-status" style="font-size:11px;color:var(--text-tertiary);">' + GHE.escapeHtml(dfText(profile)) + ' — clearing the reference un-verifies the profile.</div>';
+    html += '</div>';
+
     html += '</div>';
 
     // ── Recruiter Notes ──
@@ -1000,6 +1033,35 @@
       if (error) { alert('Failed: ' + error.message); return; }
       await loadAllCandidates();
       openCandidatePanel(candidateId);
+    }
+
+    // Bind the DataFlow reference field (single source of truth for the badge)
+    var btnDfSave = document.getElementById('btn-df-save');
+    if (btnDfSave) {
+      btnDfSave.addEventListener('click', async function () {
+        var dfRefEl = document.getElementById('df-ref');
+        var dfCtEl = document.getElementById('df-country');
+        var dfStatEl = document.getElementById('df-status');
+        var payload = dfPayload(dfRefEl.value, dfCtEl.value);
+        if (payload.error) {
+          dfStatEl.textContent = payload.error;
+          dfStatEl.style.color = 'var(--error)';
+          return;
+        }
+        btnDfSave.disabled = true;
+        dfStatEl.textContent = 'Saving…';
+        dfStatEl.style.color = 'var(--text-tertiary)';
+        var res = await ghFrom('profiles').update(payload.values).eq('id', candidateId);
+        btnDfSave.disabled = false;
+        if (res.error) {
+          // e.g. the evidence guard's 23514 — show it rather than a silent failure
+          dfStatEl.textContent = 'Not saved: ' + res.error.message;
+          dfStatEl.style.color = 'var(--error)';
+          return;
+        }
+        await loadAllCandidates();
+        openCandidatePanel(candidateId);
+      });
     }
 
     // Bind "Forward to Applicant" buttons on recruiter notes
