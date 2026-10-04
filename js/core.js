@@ -6,6 +6,21 @@
 'use strict';
 
 const GHE = {
+  // ── DataFlow evidence state ──
+  // A DataFlow claim renders as VERIFIED only when a report reference is on file.
+  // `dataflow_completed` alone is a self-declaration with no owning write path in the
+  // app, so it must never be displayed as verified (2026-10 DataFlow governance audit).
+  //   verified → a report reference exists (the document we can show an employer)
+  //   claimed  → marked completed, no reference on file: never green
+  //   none     → no claim
+  dfState(profile) {
+    const p = profile || {};
+    const ref = String(p.dataflow_number || '').trim();
+    if (ref) return { state: 'verified', ref: ref, country: p.dataflow_country || '', viaElab: !!p.dataflow_via_elab };
+    if (p.dataflow_completed) return { state: 'claimed', ref: '', country: p.dataflow_country || '', viaElab: !!p.dataflow_via_elab };
+    return { state: 'none', ref: '', country: '', viaElab: false };
+  },
+
   // ── Scroll Reveal ──
   initReveal() {
     const observer = new IntersectionObserver((entries) => {

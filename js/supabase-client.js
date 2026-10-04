@@ -28,6 +28,14 @@ window.ghFrom = ghFrom;
 // GHE is defined in core.js with const — provide fallback for pages that don't load core.js
 if (typeof GHE === 'undefined') {
   window.GHE = {
+    // Kept in step with core.js — a DataFlow claim is only "verified" with a reference.
+    dfState(profile) {
+      const p = profile || {};
+      const ref = String(p.dataflow_number || '').trim();
+      if (ref) return { state: 'verified', ref: ref, country: p.dataflow_country || '', viaElab: !!p.dataflow_via_elab };
+      if (p.dataflow_completed) return { state: 'claimed', ref: '', country: p.dataflow_country || '', viaElab: !!p.dataflow_via_elab };
+      return { state: 'none', ref: '', country: '', viaElab: false };
+    },
     avatarColors: [
       ['#0077B6', '#ffffff'],
       ['#D4A84B', '#0A1628'],

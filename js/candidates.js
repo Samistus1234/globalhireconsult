@@ -298,6 +298,29 @@
   }
 
   // ── Render table rows ──
+  // DataFlow rendering — green ONLY when a report reference is on file.
+  // A bare `dataflow_completed` shows as amber "Report needed" so staff see the gap
+  // instead of a false green (2026-10 DataFlow governance audit).
+  function dfBadgeHtml(p) {
+    var d = GHE.dfState(p);
+    if (d.state === 'verified') {
+      var tip = [d.country, d.ref, d.viaElab ? 'via eLab' : ''].filter(Boolean).join(' · ');
+      return '<span class="badge badge-primary badge-dot" title="' + GHE.escapeHtml(tip) + '">' + GHE.escapeHtml(d.country || 'Verified') + '</span>';
+    }
+    if (d.state === 'claimed') {
+      return '<span class="badge badge-dot" style="background:#FEF3C7;color:#92400E;" title="Marked completed, but no DataFlow report reference is on file — not verified">Report needed</span>';
+    }
+    return '<span style="color:var(--text-tertiary);">No</span>';
+  }
+
+  // DataFlow as plain text, for the detail panel and both exports.
+  function dfText(p) {
+    var d = GHE.dfState(p);
+    if (d.state === 'verified') return 'Verified — ' + [d.country, d.ref].filter(Boolean).join(' · ') + (d.viaElab ? ' [via eLab]' : '');
+    if (d.state === 'claimed') return 'Claimed completed — report not on file (not verified)';
+    return 'No';
+  }
+
   function renderTable() {
     var tbody = document.getElementById('candidates-tbody');
     if (!tbody) return;
@@ -384,7 +407,7 @@
         '<td><span class="tag">' + GHE.escapeHtml(a.country_of_origin || '-') + '</span></td>' +
         '<td>' + GHE.escapeHtml((a.preferred_destinations || []).join(', ') || '-') + '</td>' +
         '<td>' + exp + '</td>' +
-        '<td>' + (a.dataflow_completed ? '<span class="badge badge-primary badge-dot" title="' + GHE.escapeHtml((a.dataflow_country || '') + (a.dataflow_via_elab ? ' [eLab]' : '')) + '">' + GHE.escapeHtml(a.dataflow_country || 'Yes') + '</span>' : '<span style="color:var(--text-tertiary);">No</span>') + '</td>' +
+        '<td>' + dfBadgeHtml(a) + '</td>' +
         '<td>' + stageInfo + '</td>' +
         '<td>' + milestoneChips + '</td>' +
         '<td>' + docs + '</td>' +
@@ -551,7 +574,7 @@
       { label: 'Experience', value: profile.years_of_experience != null ? profile.years_of_experience + ' years' : null },
       { label: 'License No.', value: profile.license_number },
       { label: 'Specialty Detail', value: profile.specialty_detail },
-      { label: 'DataFlow', value: profile.dataflow_completed ? ('Yes — ' + (profile.dataflow_country || '') + (profile.dataflow_number ? ' (' + profile.dataflow_number + ')' : '') + (profile.dataflow_via_elab ? ' [via eLab]' : '')) : 'No' },
+      { label: 'DataFlow', value: dfText(profile) },
       { label: 'Availability', value: profile.availability_status || 'active' },
       { label: 'Profile Complete', value: profile.profile_completed ? 'Yes' : 'No' },
       { label: 'Joined', value: profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '-' },
@@ -1330,7 +1353,7 @@
         a.country_of_origin || '',
         (a.preferred_destinations || []).join('; '),
         a.years_of_experience != null ? a.years_of_experience + ' yrs' : '',
-        a.dataflow_completed ? ('Yes' + (a.dataflow_country ? ' — ' + a.dataflow_country : '')) : 'No',
+        dfText(a),
         STAGE_LABELS[a.current_stage] ? STAGE_LABELS[a.current_stage].label : (a.current_stage || ''),
         milestonesAsText(a.migration_status),
         (a.total_docs != null ? a.total_docs : 0) + ' docs',
@@ -1364,7 +1387,7 @@
         a.country_of_origin || '-',
         (a.preferred_destinations || []).join(', ') || '-',
         a.years_of_experience != null ? a.years_of_experience + ' yrs' : '-',
-        a.dataflow_completed ? ('Yes — ' + (a.dataflow_country || '')).trim() : 'No',
+        dfText(a),
         STAGE_LABELS[a.current_stage] ? STAGE_LABELS[a.current_stage].label : (a.current_stage || '-'),
         milestonesAsText(a.migration_status) || '-',
         (a.total_docs != null ? a.total_docs : 0) + ' docs',

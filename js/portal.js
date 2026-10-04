@@ -286,14 +286,19 @@
     // DataFlow status is read-only (verified by the eLab team) — render as text
     const dfStatusEl = document.getElementById('dataflow-status');
     if (dfStatusEl) {
-      if (currentProfile.dataflow_completed) {
+      const df = GHE.dfState(currentProfile);
+      if (df.state === 'verified') {
         var dfBits = [];
-        if (currentProfile.dataflow_number) dfBits.push('Ref: ' + currentProfile.dataflow_number);
-        if (currentProfile.dataflow_country) dfBits.push(currentProfile.dataflow_country);
+        if (df.ref) dfBits.push('Ref: ' + df.ref);
+        if (df.country) dfBits.push(df.country);
         var statusTxt = '✔ Completed' + (dfBits.length ? ' — ' + dfBits.join(' · ') : '');
-        if (currentProfile.dataflow_via_elab) statusTxt += ' (via eLab Solutions)';
+        if (df.viaElab) statusTxt += ' (via eLab Solutions)';
         dfStatusEl.textContent = statusTxt;
         dfStatusEl.style.color = 'var(--success, #10b981)';
+      } else if (df.state === 'claimed') {
+        // Marked completed but no report reference on file — say so, never show green.
+        dfStatusEl.textContent = 'In progress — our team is confirming your DataFlow report. This page updates as soon as it is on file.';
+        dfStatusEl.style.color = 'var(--text-secondary)';
       } else {
         dfStatusEl.textContent = 'Not yet verified — we will update this once your DataFlow report is confirmed.';
         dfStatusEl.style.color = 'var(--text-tertiary)';
