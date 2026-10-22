@@ -5,3 +5,8 @@ project_id = "globalhire-elab"
 # "View Details & Respond" email links return "Invalid Link" at the gateway.
 [functions.gh-respond-token]
 verify_jwt = false
+
+# profile-reminder is called by pg_cron (net.http_post) with x-internal-secret only
+# (no user JWT), same as the other secret-gated internal functions.
+[functions.profile-reminder]
+verify_jwt = false
