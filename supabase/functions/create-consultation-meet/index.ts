@@ -92,7 +92,7 @@ Deno.serve(async (req) => {
       `\uD83D\uDCCD Destination: ${preferred_destination}`,
       `\uD83D\uDD17 Google Meet: ${meet_link}`,
       "",
-      "Please read this part carefully: the date and time above are the ones you asked for, not a slot we have confirmed yet. Our team will confirm the exact date and time with you, usually within one working day. If we cannot make that day, we will offer you the next available date, and you can accept it or move it again.",
+      "Please read this part carefully: the date and time above are the ones you asked for, not a slot we have confirmed yet. Our team will confirm the exact date and time with you within 72 hours. If we cannot make that day, we will offer you the next available date, and you can accept it or move it again.",
       "",
       "During this call, we will:",
       "\u2022 Assess your eligibility for the program",
@@ -149,7 +149,7 @@ Deno.serve(async (req) => {
       '<li>Discuss pricing and enrollment</li>',
       '</ul>',
 
-      '<p style="margin:0 0 14px;font-size:14px;color:#64748B;line-height:1.7;"><strong style="color:#B45309;">The date and time above are your request, not a confirmed slot.</strong> Our team confirms the exact date and time with you, usually within one working day. If we cannot make the day you chose, we will offer you the next available date, and you can accept it or move it again.</p><p style="margin:0;font-size:14px;color:#64748B;line-height:1.7;">If you need to change your request, reply to this email or message us on WhatsApp at <strong>+1 (929) 419-2327</strong>.</p>',
+      '<p style="margin:0 0 14px;font-size:14px;color:#64748B;line-height:1.7;"><strong style="color:#B45309;">The date and time above are your request, not a confirmed slot.</strong> Our team confirms the exact date and time with you within 72 hours. If we cannot make the day you chose, we will offer you the next available date, and you can accept it or move it again.</p><p style="margin:0;font-size:14px;color:#64748B;line-height:1.7;">If you need to change your request, reply to this email or message us on WhatsApp at <strong>+1 (929) 419-2327</strong>.</p>',
 
       '</td></tr>',
 
