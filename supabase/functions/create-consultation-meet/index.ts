@@ -85,12 +85,14 @@ Deno.serve(async (req) => {
     const candidatePlain = [
       `Dear ${full_name},`,
       "",
-      "Thank you for booking a consultation with eLab Solutions for the eLab Complete program.",
+      "Thank you for requesting a consultation with eLab Solutions for the eLab Complete program.",
       "",
-      `\uD83D\uDCC5 Date: ${consultation_date}`,
-      `\uD83D\uDD50 Time: ${consultation_time}`,
+      `\uD83D\uDCC5 Preferred date: ${consultation_date}`,
+      `\uD83D\uDD50 Preferred time: ${consultation_time}`,
       `\uD83D\uDCCD Destination: ${preferred_destination}`,
       `\uD83D\uDD17 Google Meet: ${meet_link}`,
+      "",
+      "Please read this part carefully: the date and time above are the ones you asked for, not a slot we have confirmed yet. Our team will confirm the exact date and time with you, usually within one working day. If we cannot make that day, we will offer you the next available date, and you can accept it or move it again.",
       "",
       "During this call, we will:",
       "\u2022 Assess your eligibility for the program",
@@ -98,7 +100,7 @@ Deno.serve(async (req) => {
       "\u2022 Answer all your questions",
       "\u2022 Discuss pricing and enrollment",
       "",
-      "Please join the Google Meet link at your scheduled time. If you need to reschedule, reply to this email or message us on WhatsApp at +1 (929) 419-2327.",
+      "If you need to change your request, reply to this email or message us on WhatsApp at +1 (929) 419-2327.",
       "",
       "Best regards,",
       "eLab Solutions International",
@@ -118,17 +120,17 @@ Deno.serve(async (req) => {
       '</tr></table></td></tr>',
 
       // Badge
-      '<tr><td style="padding:24px 40px 0;"><span style="display:inline-block;padding:5px 14px;border-radius:50px;font-size:11px;font-weight:700;letter-spacing:1px;color:#2EC4B6;background:#2EC4B615;border:1px solid #2EC4B630;">CONSULTATION CONFIRMED</span></td></tr>',
+      '<tr><td style="padding:24px 40px 0;"><span style="display:inline-block;padding:5px 14px;border-radius:50px;font-size:11px;font-weight:700;letter-spacing:1px;color:#2EC4B6;background:#2EC4B615;border:1px solid #2EC4B630;">CONSULTATION REQUESTED</span></td></tr>',
 
       // Body
       '<tr><td style="padding:20px 40px 32px;">',
       '<p style="margin:0 0 20px;font-size:15px;color:#475569;">Dear <strong style="color:#0F172A;">' + esc(full_name) + '</strong>,</p>',
-      '<p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#475569;">Thank you for booking a consultation with <strong style="color:#0F172A;">eLab Solutions</strong> for the <strong style="color:#0F172A;">eLab Complete</strong> program.</p>',
+      '<p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#475569;">Thank you for requesting a consultation with <strong style="color:#0F172A;">eLab Solutions</strong> for the <strong style="color:#0F172A;">eLab Complete</strong> program.</p>',
 
       // Details card
       '<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:20px 24px;margin:20px 0;">',
-      '<p style="margin:0 0 12px;font-size:14px;color:#475569;"><span style="font-size:16px;">&#128197;</span> <strong style="color:#0F172A;">Date:</strong> ' + esc(consultation_date) + '</p>',
-      '<p style="margin:0 0 12px;font-size:14px;color:#475569;"><span style="font-size:16px;">&#128336;</span> <strong style="color:#0F172A;">Time:</strong> ' + esc(consultation_time) + '</p>',
+      '<p style="margin:0 0 12px;font-size:14px;color:#475569;"><span style="font-size:16px;">&#128197;</span> <strong style="color:#0F172A;">Preferred date:</strong> ' + esc(consultation_date) + '</p>',
+      '<p style="margin:0 0 12px;font-size:14px;color:#475569;"><span style="font-size:16px;">&#128336;</span> <strong style="color:#0F172A;">Preferred time:</strong> ' + esc(consultation_time) + '</p>',
       '<p style="margin:0 0 12px;font-size:14px;color:#475569;"><span style="font-size:16px;">&#128205;</span> <strong style="color:#0F172A;">Destination:</strong> ' + esc(preferred_destination) + '</p>',
       '<p style="margin:0;font-size:14px;color:#475569;"><span style="font-size:16px;">&#128279;</span> <strong style="color:#0F172A;">Google Meet:</strong> <a href="' + meet_link + '" style="color:#0077B6;">' + esc(meet_link) + '</a></p>',
       '</div>',
@@ -147,7 +149,7 @@ Deno.serve(async (req) => {
       '<li>Discuss pricing and enrollment</li>',
       '</ul>',
 
-      '<p style="margin:0;font-size:14px;color:#64748B;line-height:1.7;">Please join the Google Meet link at your scheduled time. If you need to reschedule, reply to this email or message us on WhatsApp at <strong>+1 (929) 419-2327</strong>.</p>',
+      '<p style="margin:0 0 14px;font-size:14px;color:#64748B;line-height:1.7;"><strong style="color:#B45309;">The date and time above are your request, not a confirmed slot.</strong> Our team confirms the exact date and time with you, usually within one working day. If we cannot make the day you chose, we will offer you the next available date, and you can accept it or move it again.</p><p style="margin:0;font-size:14px;color:#64748B;line-height:1.7;">If you need to change your request, reply to this email or message us on WhatsApp at <strong>+1 (929) 419-2327</strong>.</p>',
 
       '</td></tr>',
 
@@ -187,7 +189,7 @@ Deno.serve(async (req) => {
     await transport.sendMail({
       from: '"eLab Solutions" <' + smtpUser + '>',
       to: email,
-      subject: `eLab Complete Consultation Confirmed \u2014 ${consultation_date} at ${consultation_time}`,
+      subject: `eLab Complete consultation request received \u2014 ${consultation_date} at ${consultation_time}`,
       text: candidatePlain,
       html: candidateHtml,
     });

@@ -372,6 +372,21 @@
     }
 
     /* ── Error Banner ──────────────────────────────── */
+    .date-notice {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin: 14px 0 18px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      color: #E2E8F0;
+      font-size: 13.5px;
+      line-height: 1.65;
+    }
+    .date-notice strong { color: #FBBF24; }
+
     .error-banner {
       display: none;
       align-items: center;
@@ -596,7 +611,7 @@
       </h1>
       <p class="body-text" style="font-size: 1.15rem; max-width: 600px; margin: 0 auto;">
         Take the first step towards your guaranteed nursing career in the Middle East.
-        Schedule a free Google Meet consultation with our team.
+        Pick a slot that suits you. We confirm the exact date and time with you before the call.
       </p>
     </div>
   </section>
@@ -757,6 +772,14 @@
           <span class="group-title">Schedule Your Consultation</span>
         </div>
 
+        <div class="date-notice">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div>
+            <strong>The date you pick is a request, not a fixed appointment.</strong>
+            Our team confirms the exact date and time with you, usually within one working day. If we cannot make the day you chose, we will offer you the next available date. You can accept it or move it again. Nothing is lost.
+          </div>
+        </div>
+
         <div class="field-grid">
           <div>
             <label class="field-label" for="consult-date">
@@ -797,11 +820,11 @@
 
         <!-- ── Submit Button ── -->
         <button id="submit-btn" class="submit-btn" onclick="handleSubmit()">
-          Book Consultation
+          Request Consultation
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </button>
 
-        <p class="submit-hint">Your information is secure. We'll send a Google Meet link to your email.</p>
+        <p class="submit-hint">Your information is secure. We reply with the confirmed date and time, and the Meet link.</p>
       </div>
 
       <!-- WhatsApp fallback (under form) -->
@@ -821,23 +844,26 @@
           <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </div>
 
-        <h2 class="h2" style="margin-bottom: 12px;">Consultation Booked!</h2>
+        <h2 class="h2" style="margin-bottom: 12px;">Request received</h2>
 
         <p class="body-text" style="margin-bottom: 16px;">
-          Your consultation is confirmed for
+          You asked for
           <strong id="confirm-date" style="color: #f1f5f9;"></strong>
           at
           <strong id="confirm-time" style="color: #f1f5f9;"></strong>
+          <br>
+          <span style="color: #FBBF24; font-weight: 600;">That date is not locked in yet.</span>
+          Our team will confirm the exact slot with you, usually within one working day. If we cannot make that day, we will offer you the next available date, and you can accept it or move it again.
         </p>
 
         <div class="success-email-box">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          <span>A confirmation email has been sent to <strong id="confirm-email"></strong></span>
+          <span>We have emailed <strong id="confirm-email"></strong> with your request. The confirmation of the exact date and time follows.</span>
         </div>
 
         <!-- Meet link (shown if edge function returns one) -->
         <div id="meet-link-box" class="success-meet-box">
-          <p class="success-meet-label">Your Google Meet Link</p>
+          <p class="success-meet-label">Google Meet link for your preferred slot</p>
           <a id="meet-link-anchor" href="#" target="_blank" rel="noopener noreferrer" class="success-meet-link"></a>
         </div>
 
@@ -960,7 +986,7 @@
       submitBtn.disabled = true;
       submitBtn.innerHTML =
         '<svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>' +
-        'Booking Consultation...';
+        'Sending request...';
 
       // Optional migration milestones (no validation — all fields optional)
       var migrationStatus = collectMigrationStatus();
@@ -1029,7 +1055,7 @@
         // Reset button
         submitBtn.disabled = false;
         submitBtn.innerHTML =
-          'Book Consultation' +
+          'Request Consultation' +
           '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>';
       }
     }
