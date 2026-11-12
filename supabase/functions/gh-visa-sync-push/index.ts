@@ -1,13 +1,15 @@
 // gh-visa-sync-push  (GH: evzhnsugmvtqgmvzwyix). Drains globalhire.visa_sync_outbox -> CC receiver.
 // Tracked in the repo from live v10 on 2026-11-12; case_created now also carries the
 // applicant's passport/nationality/WhatsApp, the sponsor relationship and the travellers.
+// Callers must prove they are the server: either the service-role key as a Bearer token
+// (start-visa-case) or the vault secret gh_visa_sync_push_secret in x-sync-secret (pg_cron).
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-sync-secret",
 };
 const BATCH = 50, MAX_ATTEMPTS = 5;
 function json(b: unknown, s = 200) {
@@ -18,6 +20,18 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const sb = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
     { db: { schema: "globalhire" } });
+
+  // Only the server may trigger a drain.
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+  let allowed = serviceKey.length > 0 && req.headers.get("authorization") === `Bearer ${serviceKey}`;
+  if (!allowed) {
+    const secret = req.headers.get("x-sync-secret") ?? "";
+    if (secret.length >= 32) {
+      const { data: ok } = await sb.rpc("check_visa_sync_secret", { p_secret: secret });
+      allowed = ok === true;
+    }
+  }
+  if (!allowed) return json({ error: "unauthorized" }, 401);
   const ccUrl = Deno.env.get("CC_VISA_SYNC_URL") ?? "";
   const apiKey = Deno.env.get("VISA_SYNC_API_KEY") ?? "";
   if (!ccUrl || !apiKey) return json({ error: "missing CC_VISA_SYNC_URL or VISA_SYNC_API_KEY" }, 500);
