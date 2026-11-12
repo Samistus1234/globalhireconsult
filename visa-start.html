@@ -36,6 +36,16 @@
         <div>
           <div id="visa-start-error" class="v-error" hidden></div>
           <form id="visa-intake-form" novalidate>
+            <fieldset class="v-fieldset">
+              <legend class="v-legend">About you</legend>
+              <p class="v-note" style="margin:-6px 0 14px">As written on your passport. Applying for a family? Use the main applicant's details.</p>
+              <div class="v-form-grid">
+                <div class="v-field"><label for="passport_number">Passport number</label><input id="passport_number" type="text" name="passport_number" autocomplete="off" autocapitalize="characters" maxlength="20" required></div>
+                <div class="v-field"><label for="nationality">Nationality</label><input id="nationality" type="text" name="nationality" autocomplete="country-name" maxlength="60" placeholder="e.g. Nigerian" required></div>
+                <div class="v-field"><label for="whatsapp">WhatsApp number</label><input id="whatsapp" type="tel" name="whatsapp" autocomplete="tel" maxlength="24" placeholder="+234 …"></div>
+              </div>
+            </fieldset>
+
             <fieldset class="v-fieldset" id="sponsor-fieldset">
               <legend class="v-legend">Sponsor in Saudi Arabia</legend>
               <div class="v-form-grid">

@@ -1,51 +1,16 @@
 // POST /start-visa-case — requires authenticated user.
-// Body: { visa_type, sponsor_iqama?, sponsor_name?, travel_dates?, lead_id?, provider: 'paystack'|'stripe' }
+// Body: { visa_type, sponsor_iqama?, sponsor_name?, travel_dates?, lead_id?, provider: 'paystack'|'stripe',
+//         applicant?: { passport_number?, nationality?, whatsapp? }, sponsor_relationship?: string[],
+//         travellers?: { people, currency, total, counts, lines } }
 // Returns: { case_id, invoice_id, payment_url }
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders, handleCors } from '../_shared/cors.ts';
-import type { VisaType } from '../_shared/visa-types.ts';
 
-export interface CaseRequest {
-  visa_type: VisaType;
-  sponsor_iqama: string | null;
-  sponsor_name: string | null;
-  travel_dates: { arrival?: string; stay_days?: number } | null;
-  lead_id: string | null;
-}
-
-const V1_PRICE_USD: Partial<Record<VisaType, number>> = {
-  tourist:          185,
-  umrah:            295,
-  family_visit:     543, // from-price, 1–49 tier (₦814,500 @ ₦1,500/$)
-  family_residence: 283, // from-price, 1–5 tier (₦424,000 @ ₦1,500/$)
-};
-
-const DEPOSIT_USD = 50;
-
-// Paystack charges 3.9% (no cap) on USD/international cards. Gross up the charge so the
-// customer covers the fee and ELAB nets the full deposit. e.g. $50 -> $52.03 charged.
-const PAYSTACK_USD_FEE_RATE = 0.039;
-export function grossUpForPaystack(net: number): number {
-  return Math.round((net / (1 - PAYSTACK_USD_FEE_RATE)) * 100) / 100;
-}
-
-export function computeEstimatedTotal(visa: VisaType): number | null {
-  return V1_PRICE_USD[visa] ?? null;
-}
-
-export function buildCaseRow(req: CaseRequest, candidateId: string) {
-  return {
-    candidate_id:         candidateId,
-    lead_id:              req.lead_id,
-    visa_type:            req.visa_type,
-    status:               'deposit_pending' as const,
-    sponsor_iqama:        req.sponsor_iqama,
-    sponsor_name:         req.sponsor_name,
-    travel_dates:         req.travel_dates,
-    estimated_total_usd:  computeEstimatedTotal(req.visa_type),
-  };
-}
+import {
+  buildCaseRow, sanitizeApplicant, sanitizeRelationship, sanitizeTravellers, DEPOSIT_USD,
+} from './case-row.ts';
+export * from './case-row.ts';
 
 async function paystackCheckout(amountUSD: number, caseId: string, email: string): Promise<string> {
   const PAYSTACK_SECRET = Deno.env.get('PAYSTACK_SECRET_KEY');
@@ -140,6 +105,9 @@ Deno.serve(async (req) => {
     sponsor_name:  body.sponsor_name ?? null,
     travel_dates:  body.travel_dates ?? null,
     lead_id:       body.lead_id ?? null,
+    applicant_details:    sanitizeApplicant(body.applicant),
+    sponsor_relationship: sanitizeRelationship(body.sponsor_relationship),
+    travellers:           sanitizeTravellers(body.travellers),
   }, user.id);
 
   const { data: created, error: caseErr } = await supabase
