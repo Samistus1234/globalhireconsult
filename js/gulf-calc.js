@@ -276,18 +276,8 @@
     }
 
     renderGratuityTable();
-    renderPayGap();
     renderSources($('#sources'), D.salarySourceIds);
     render();
-  }
-
-  function renderPayGap() {
-    var t = $('#gap-table'); if (!t || !D.payGap) return;
-    t.innerHTML = D.payGap.rows.map(function (r) {
-      return '<tr><td>' + esc(r[0]) + '</td><td>SAR ' + r[1].toLocaleString('en-US') + '</td><td>SAR ' + r[2].toLocaleString('en-US') +
-        '</td><td>' + Math.round(r[1] / r[2] * 100) + '%</td></tr>';
-    }).join('');
-    $('#gap-src').innerHTML = srcLink(D.payGap.sourceIds);
   }
 
   function renderGratuityTable() {
