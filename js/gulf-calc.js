@@ -386,7 +386,6 @@
       $('#r-title').textContent = 'From ' + (S.o === 'GH' ? 'Ghana' : 'Nigeria') + ' to ' + mInfo.name;
       $('#t-you').textContent = crange(you[0], you[1], home);
       $('#t-you-usd').textContent = 'about ' + range(convert(you[0], home, 'USD'), convert(you[1], home, 'USD'), 'USD');
-      $('#t-emp').textContent = crange(emp[0], emp[1], home);
       $('#t-weeks').textContent = weeks[1] ? 'Roughly ' + Math.round(weeks[0] / 4.3) + '–' + Math.max(1, Math.round(weeks[1] / 4.3)) + ' months from first document to landing, if nothing stalls.' : '';
 
       // Payback
