@@ -28,7 +28,7 @@
       <span class="calc-eyebrow">Gulf salary calculator</span>
       <h1>See what you'd really take home.</h1>
       <p>Not just a salary range. Your package in naira or cedi, what's left after rent and food, and how every Gulf market compares for someone like you.</p>
-      <div class="calc-hero-meta">Figures checked <span data-asof></span> · every number links to its source</div>
+      <div class="calc-hero-meta">Figures checked <span data-asof></span></div>
     </header>
 
     <section class="calc-band" id="salary-calc" aria-label="Salary calculator">
@@ -125,11 +125,10 @@
 
     <section class="calc-band">
       <div class="calc-wrap">
-        <div class="sec-head">
+        <div class="sec-head" style="margin-bottom:0">
           <h2>How we got these numbers.</h2>
           <p>Ranges blend published pay scales, recruiter salary guides, real job adverts and what nurses and doctors report in their own forums. Where sources disagree we show the spread, not an average. Where we couldn't find enough, we say so rather than guess. Currency conversions use <span data-fx></span>. These are planning figures, not offers.</p>
         </div>
-        <ol class="sources" id="sources"></ol>
       </div>
     </section>
   </main>
@@ -142,6 +141,6 @@
   <script src="js/nav-global.js"></script>
   <script src="data/gulf-calc-data.js"></script>
   <script src="js/gulf-calc.js"></script>
-  <script>document.addEventListener('DOMContentLoaded', function () { if (window.GHNav) GHNav.init('guides'); });</script>
+  <script>document.addEventListener('DOMContentLoaded', function () { if (window.GHNav) GHNav.init('salary-calculator'); });</script>
 </body>
 </html>
