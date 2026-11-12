@@ -67,7 +67,7 @@
     msg.innerHTML =
       '<p><strong>' + outcomeMeta.label + '</strong> visas are coming soon. ' +
       'Tap WhatsApp and our team will help you start now.</p>' +
-      '<a class="visa-cta-primary" href="https://wa.me/9295419232">Chat on WhatsApp</a>';
+      '<a class="visa-cta-primary" href="https://wa.me/19294192327">Chat on WhatsApp</a>';
   }
 
   function init() {

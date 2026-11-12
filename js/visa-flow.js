@@ -9,7 +9,7 @@
 (function () {
   'use strict';
 
-  var WA = 'https://wa.me/9295419232?text=';
+  var WA = 'https://wa.me/19294192327?text=';
   var NGN_PER_USD_QUOTE = 1500; // basis used on the published visa prices (₦814,500 ≈ $543)
   var DEPOSIT_USD = 50;
   var PLAN_KEY = 'gh_visa_plan';
