@@ -27,7 +27,7 @@
     <header class="calc-hero calc-wrap">
       <span class="calc-eyebrow">Relocation cost calculator</span>
       <h1>The real price of the move.</h1>
-      <p>Every step from your first document at home to your first week abroad. What you pay, what your employer is supposed to pay, and how many months of Gulf savings it takes to earn it back.</p>
+      <p>Every step from your first document at home to your first week abroad. What you pay, and how many months of Gulf savings it takes to earn it back.</p>
     </header>
 
     <section class="calc-band" id="reloc-calc" aria-label="Relocation cost calculator">
@@ -59,9 +59,8 @@
         <div class="calc-card calc-result" aria-live="polite">
           <div class="r-label" id="r-title"></div>
           <p class="note" id="market-note" style="margin-top:8px;color:var(--c-red)"></p>
-          <div class="totals">
+          <div class="totals" style="grid-template-columns:1fr">
             <div class="stat you"><div class="s-k">You'll likely pay</div><div class="s-v" id="t-you"></div><div class="s-n" id="t-you-usd"></div></div>
-            <div class="stat"><div class="s-k">Your employer should pay</div><div class="s-v" id="t-emp"></div><div class="s-n">Never pay these yourself to an agent</div></div>
           </div>
           <div class="stat" style="margin-top:8px"><div class="s-k">Paid back in</div><div class="s-v" id="t-payback"></div><div class="s-n" id="t-payback-n"></div></div>
           <p class="note">The low figure assumes your employer covers everything marked "Depends on employer" (flight, first rent, some licence fees); the high figure assumes you pay it all.</p>
