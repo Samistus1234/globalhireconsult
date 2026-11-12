@@ -1,0 +1,204 @@
+/* ============================================
+   GLOBALHIRE — Light theme (Apple-style)
+   Opt in per page with <body class="gh-light">.
+   Re-points the shared design tokens, then flattens
+   the dark-era effects (glows, gradients, hover jumps).
+   Signed-in areas keep the dark theme until converted.
+   ============================================ */
+
+body.gh-light {
+  /* Surfaces */
+  --bg-void: #ffffff;
+  --bg-deep: #ffffff;
+  --bg-base: #ffffff;
+  --bg-surface: #f5f5f7;
+  --bg-elevated: #ffffff;
+  --bg-card: #ffffff;
+  --bg-hover: #f0f0f3;
+  --bg-tertiary: #f5f5f7;
+  --bg-glass: rgba(255, 255, 255, 0.72);
+
+  /* Accent */
+  --primary: #155bd0;
+  --primary-light: #2f74e6;
+  --primary-dark: #0f47a6;
+  --primary-muted: rgba(21, 91, 208, 0.08);
+  --primary-glow: none;
+  --primary-glow-strong: none;
+  --secondary: #1d1d1f;
+  --secondary-light: #3a3a3c;
+  --secondary-dark: #000000;
+  --secondary-muted: rgba(0, 0, 0, 0.05);
+  --secondary-glow: none;
+
+  /* Accents darkened for text on white */
+  --accent-amber: #9a5b00;
+  --accent-teal: #0f766e;
+  --accent-cyan: #0e7490;
+  --accent-coral: #b42318;
+  --accent-rose: #be185d;
+  --success: #1a7f37;
+  --warning: #9a5b00;
+  --error: #b42318;
+  --info: #0e7490;
+
+  /* Text */
+  --text-primary: #1d1d1f;
+  --text-secondary: #515154;
+  --text-tertiary: #6e6e73;
+  --text-inverse: #ffffff;
+
+  /* Lines */
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-default: rgba(0, 0, 0, 0.1);
+  --border-strong: rgba(0, 0, 0, 0.16);
+  --border-accent: rgba(21, 91, 208, 0.35);
+
+  /* Glass + depth */
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-bg-strong: rgba(255, 255, 255, 0.86);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.1);
+  --shadow-glow-primary: none;
+  --shadow-glow-secondary: none;
+
+  /* Type */
+  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Shared extras */
+  --c-green: #1a7f37;
+  --c-green-bg: #e9f6ec;
+  --c-amber: #9a5b00;
+  --c-amber-bg: #fff4e0;
+  --c-red: #b42318;
+  --c-red-bg: #fdecea;
+  --c-radius: 20px;
+  --c-radius-sm: 12px;
+
+  background: #ffffff;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  overflow-x: clip; /* scroll-in animations start off to the side; never let them widen the page */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Type ── */
+body.gh-light h1, body.gh-light h2, body.gh-light h3,
+body.gh-light h4, body.gh-light h5, body.gh-light h6 {
+  font-family: var(--font-display);
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+body.gh-light h1 { font-size: clamp(36px, 6vw, 64px); line-height: 1.05; }
+body.gh-light h2 { font-size: clamp(28px, 4.2vw, 48px); line-height: 1.08; }
+body.gh-light h3 { font-size: clamp(20px, 2.4vw, 28px); line-height: 1.2; }
+body.gh-light p { text-wrap: pretty; }
+body.gh-light .gradient-text,
+body.gh-light .highlight {
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  -webkit-text-fill-color: currentColor;
+  color: inherit;
+}
+body.gh-light .overline,
+body.gh-light .label {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* ── Layout rhythm ── */
+body.gh-light .section { padding: 96px 0; }
+@media (max-width: 640px) { body.gh-light .section { padding: 64px 0; } }
+body.gh-light .container { padding: 0 20px; }
+body.gh-light .section-alt { background: var(--bg-surface); }
+
+/* ── Buttons: pills, no glow, no jump ── */
+body.gh-light .btn {
+  border-radius: 999px;
+  min-height: 44px;
+  font-weight: 600;
+  transition: background-color 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out;
+}
+body.gh-light .btn::before { display: none; }
+body.gh-light .btn:hover,
+body.gh-light .btn:active { transform: none !important; box-shadow: none !important; }
+body.gh-light .btn-primary { background: var(--primary); color: #fff; box-shadow: none; }
+body.gh-light .btn-primary:hover { background: var(--primary-light); }
+body.gh-light .btn-secondary { background: #1d1d1f; color: #fff; box-shadow: none; }
+body.gh-light .btn-secondary:hover { background: #3a3a3c; }
+body.gh-light .btn-ghost { border-color: transparent; color: var(--primary); background: transparent; }
+body.gh-light .btn-ghost:hover { background: var(--primary-muted); color: var(--primary); }
+body.gh-light .btn-outline-primary { border-color: var(--primary); color: var(--primary); }
+body.gh-light .btn-outline-primary:hover { background: var(--primary); color: #fff; }
+body.gh-light .btn:focus-visible,
+body.gh-light a:focus-visible,
+body.gh-light button:focus-visible,
+body.gh-light input:focus-visible,
+body.gh-light select:focus-visible,
+body.gh-light textarea:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* ── Cards: flat white, soft edge, no lift ── */
+body.gh-light .card {
+  background: #fff;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--c-radius);
+  box-shadow: none;
+}
+body.gh-light .card:hover { transform: none; box-shadow: var(--shadow-md); border-color: var(--border-subtle); }
+body.gh-light .section-alt .card,
+body.gh-light .bg-surface .card { background: #fff; }
+
+/* ── Forms ── */
+body.gh-light input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+body.gh-light select,
+body.gh-light textarea {
+  background: var(--bg-surface);
+  border: 1px solid transparent;
+  color: var(--text-primary);
+  border-radius: var(--c-radius-sm);
+  font-size: 16px;
+}
+body.gh-light input::placeholder, body.gh-light textarea::placeholder { color: var(--text-tertiary); }
+
+/* ── Dark-era decoration off ── */
+body.gh-light .hero-gradient,
+body.gh-light .hero-gradient-2,
+body.gh-light .landing-divider,
+body.gh-light .section-divider,
+body.gh-light .page-hero-glow,
+body.gh-light .bg-grid,
+body.gh-light .bg-dots,
+body.gh-light .gradient-blob { display: none !important; }
+body.gh-light [class*="glow"] { box-shadow: none; }
+body.gh-light .icon-wrap { border-radius: 12px; }
+
+/* ── Nav + footer ── */
+body.gh-light .gnav { background: rgba(255, 255, 255, 0.8); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--border-subtle); padding: 8px 0; }
+body.gh-light .gnav.scrolled { padding: 8px 0; background: rgba(255, 255, 255, 0.86); }
+body.gh-light .gnav-group-menu { border-radius: 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-subtle); }
+body.gh-light .gfooter { background: var(--bg-surface); border-top: 1px solid var(--border-subtle); }
+body.gh-light .gfooter h5 { color: var(--text-primary); text-transform: none; letter-spacing: 0; }
+body.gh-light .gfooter a { color: var(--text-secondary); }
+body.gh-light .gfooter a:hover { color: var(--primary); }
+
+/* ── Page-specific leftovers from the dark theme ── */
+body.gh-light .job-badge-featured { background: var(--c-amber-bg); color: var(--c-amber); border-color: transparent; }
+body.gh-light .job-card.featured { background: #fff; border-color: var(--border-default); box-shadow: none; }
+body.gh-light .job-card.featured .btn-featured { background: var(--primary); border-radius: 999px; box-shadow: none; }
+body.gh-light .job-card.featured .btn-featured:hover { background: var(--primary-light); transform: none; box-shadow: none; }
+body.gh-light .job-card.featured .benefit-tag { background: var(--bg-surface); color: var(--text-secondary); border-color: transparent; }
+body.gh-light .job-card.featured .job-salary { color: var(--text-primary) !important; }
+body.gh-light .sch-badge-partial { background: var(--c-amber-bg); color: var(--c-amber); border-color: transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  body.gh-light * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

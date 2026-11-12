@@ -503,7 +503,7 @@
 /* ── Advanced Filter Sidebar ── */
 .jobs-layout {
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 280px minmax(0, 1fr);
   gap: var(--space-8);
   align-items: start;
 }
@@ -657,7 +657,7 @@
 
 /* ── Responsive ── */
 @media (max-width: 1024px) {
-  .jobs-layout { grid-template-columns: 1fr; }
+  .jobs-layout { grid-template-columns: minmax(0, 1fr); }
   .jobs-sidebar { display: none; }
 }
 
@@ -672,7 +672,7 @@
     margin: 0;
   }
   .job-card {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     padding: var(--space-5);
   }
   .job-card-aside {
@@ -688,3 +688,6 @@
     padding-bottom: var(--space-2);
   }
 }
+
+/* Keep long chip rows and cards inside the screen on phones */
+.jobs-layout > *, .jobs-grid, .job-card > * { min-width: 0; }
