@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+
+# Signed-in and staff screens: nothing here is useful in search results.
+Disallow: /admin-
+Disallow: /dashboard
+Disallow: /messages
+Disallow: /documents
+Disallow: /settings
+Disallow: /candidates
+Disallow: /analytics
+Disallow: /recruiter-submissions
+Disallow: /elab-complete-admin
+Disallow: /portal
+Disallow: /partners-dashboard
+Disallow: /partners-jobs
+Disallow: /partners-messages
+Disallow: /partners-onboarding
+
+Sitemap: https://globalhire.elabsolution.org/sitemap.xml
