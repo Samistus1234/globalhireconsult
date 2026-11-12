@@ -69,6 +69,7 @@
     history.replaceState(null, '', location.pathname + (q ? '?' + q : ''));
   }
   function srcLink(ids) {
+    return ''; // source list removed from the public pages (CEO 2026-11-12)
     var links = (ids || []).map(function (id) {
       var i = D.sources.findIndex(function (s) { return s.id === id; });
       return i < 0 ? '' : '<a href="#src-' + esc(id) + '" aria-label="Source ' + (i + 1) + '">' + (i + 1) + '</a>';
@@ -276,7 +277,6 @@
     }
 
     renderGratuityTable();
-    renderSources($('#sources'), D.salarySourceIds);
     render();
   }
 
@@ -411,7 +411,6 @@
 
     var ids = []; Object.keys(R.markets).forEach(function (k) { R.markets[k].items.forEach(function (it) { (it.sourceIds || []).forEach(function (s) { if (ids.indexOf(s) < 0) ids.push(s); }); }); });
     (R.legalSourceIds || []).forEach(function (s) { if (ids.indexOf(s) < 0) ids.push(s); });
-    renderSources($('#sources'), ids);
     var sc = $('#scams'); if (sc && R.scams) sc.innerHTML = R.scams.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
     render();
   }
