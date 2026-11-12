@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2R8CT52B7P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-2R8CT52B7P");</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gulf Salary Calculator for Nurses and Doctors — GlobalHire</title>
+  <meta name="description" content="What a nurse, doctor or allied health worker really takes home in Saudi Arabia, the UAE, Qatar, Kuwait, Oman and Bahrain — in naira or cedi, after living costs, with every figure sourced.">
+  <meta property="og:title" content="What would you really take home in the Gulf?">
+  <meta property="og:description" content="Salary, savings and a two-year contract total for 9 health professions across 8 Gulf markets, shown in naira or cedi.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/nav-global.css">
+  <link rel="stylesheet" href="css/calc.css">
+  <link rel="icon" type="image/png" href="assets/brand/favicon-32.png">
+  <link rel="apple-touch-icon" href="assets/brand/globalhire-icon-180.png">
+</head>
+<body class="gh-light">
+  <div id="gnav-placeholder"></div>
+
+  <main>
+    <header class="calc-hero calc-wrap">
+      <span class="calc-eyebrow">Gulf salary calculator</span>
+      <h1>See what you'd really take home.</h1>
+      <p>Not just a salary range. Your package in naira or cedi, what's left after rent and food, and how every Gulf market compares for someone like you.</p>
+      <div class="calc-hero-meta">Figures checked <span data-asof></span> · every number links to its source</div>
+    </header>
+
+    <section class="calc-band" id="salary-calc" aria-label="Salary calculator">
+      <div class="calc-wrap calc-grid">
+        <form class="calc-card" onsubmit="return false">
+          <div class="field">
+            <label class="field-label" for="f-prof">Your profession</label>
+            <select class="select" id="f-prof"></select>
+          </div>
+          <div class="field">
+            <div class="field-label" id="lbl-market">Where you're going</div>
+            <div class="tiles" id="f-market" role="group" aria-labelledby="lbl-market"></div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="f-years">Experience after qualifying <span class="hint" id="f-years-val"></span></label>
+            <input class="range" type="range" id="f-years" min="1" max="20" step="1">
+            <div class="range-scale" aria-hidden="true"><span>1</span><span>5</span><span>10</span><span>15</span><span>20+</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label" id="lbl-living">You'd live in</div>
+            <div class="seg" id="f-living" role="group" aria-labelledby="lbl-living"></div>
+          </div>
+          <div class="field">
+            <div class="field-label" id="lbl-home">Show money in</div>
+            <div class="seg" id="f-home" role="group" aria-labelledby="lbl-home"></div>
+          </div>
+        </form>
+
+        <div class="calc-card calc-result" aria-live="polite">
+          <div class="r-head">
+            <div class="r-label" id="r-title"></div>
+            <span id="r-conf" class="chip medium"></span>
+          </div>
+          <div id="r-body"></div>
+          <div class="cta-row">
+            <a class="calc-btn" id="to-reloc" href="relocation-cost-calculator.html">What will it cost to get there?</a>
+            <a class="calc-btn ghost" href="jobs.html">See open roles</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="calc-band alt">
+      <div class="calc-wrap">
+        <div class="sec-head">
+          <h2>Your profile, across the whole Gulf.</h2>
+          <p>The bar is the full monthly package; the darker part is what you'd keep. The highest salary isn't always where you save the most. Tap a market to load it above.</p>
+        </div>
+        <p class="note" id="rank-cap" style="margin:0 0 12px"></p>
+        <div class="rank" id="rank"></div>
+      </div>
+    </section>
+
+    <section class="calc-band">
+      <div class="calc-wrap">
+        <div class="sec-head">
+          <h2>Reading a Gulf offer.</h2>
+          <p>Three things decide whether an offer is good, and the headline salary is only one of them.</p>
+        </div>
+        <div class="cards3">
+          <div class="info">
+            <h3>Basic pay is the number that grows</h3>
+            <p>End-of-service gratuity, overtime and some leave pay are worked out on basic salary only. Two offers with the same total can leave you very different amounts after two years.</p>
+          </div>
+          <div class="info">
+            <h3>Housing is cash or a room</h3>
+            <p>Some employers pay a housing allowance, others give you shared staff accommodation. A room saves you rent but you lose the choice; ask which one before you compare.</p>
+          </div>
+          <div class="info">
+            <h3>Ask for the scale, not just the total</h3>
+            <p>Government hospitals pay on fixed grades. Ask which grade and step you're being offered, in writing, then check it against the published scale before you sign.</p>
+          </div>
+        </div>
+        <div class="tbl-wrap" style="margin-top:24px">
+          <table class="tbl">
+            <thead><tr><th>Market</th><th>End-of-service gratuity</th><th>Annual leave</th><th>Flights</th><th>Income tax</th></tr></thead>
+            <tbody id="pkg-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="calc-band alt">
+      <div class="calc-wrap">
+        <div class="next-card">
+          <div>
+            <h3>Know the price of the move, too.</h3>
+            <p>Verification, exams, medicals, flights: what you pay, what your employer must pay, and how fast it pays back.</p>
+          </div>
+          <a class="calc-btn" href="relocation-cost-calculator.html">Open the relocation calculator</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="calc-band">
+      <div class="calc-wrap">
+        <div class="sec-head">
+          <h2>How we got these numbers.</h2>
+          <p>Ranges blend published pay scales, recruiter salary guides, real job adverts and what nurses and doctors report in their own forums. Where sources disagree we show the spread, not an average. Where we couldn't find enough, we say so rather than guess. Currency conversions use <span data-fx></span>. These are planning figures, not offers.</p>
+        </div>
+        <ol class="sources" id="sources"></ol>
+      </div>
+    </section>
+  </main>
+
+  <div id="gfooter-placeholder"></div>
+
+  <script src="js/core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/nav-global.js"></script>
+  <script src="data/gulf-calc-data.js"></script>
+  <script src="js/gulf-calc.js"></script>
+  <script>document.addEventListener('DOMContentLoaded', function () { if (window.GHNav) GHNav.init('guides'); });</script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2R8CT52B7P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-2R8CT52B7P");</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gulf Relocation Cost Calculator from Nigeria and Ghana — GlobalHire</title>
+  <meta name="description" content="Every cost of moving from Nigeria or Ghana to a Gulf healthcare job — verification, exams, medicals, visa, flights — split into what you pay and what your employer must pay, with sources.">
+  <meta property="og:title" content="What does it really cost to move to the Gulf?">
+  <meta property="og:description" content="Step by step, from your first document in Lagos or Accra to your first week abroad. What you pay, what your employer pays, and how fast it pays back.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/nav-global.css">
+  <link rel="stylesheet" href="css/calc.css">
+  <link rel="icon" type="image/png" href="assets/brand/favicon-32.png">
+  <link rel="apple-touch-icon" href="assets/brand/globalhire-icon-180.png">
+</head>
+<body class="gh-light">
+  <div id="gnav-placeholder"></div>
+
+  <main>
+    <header class="calc-hero calc-wrap">
+      <span class="calc-eyebrow">Relocation cost calculator</span>
+      <h1>The real price of the move.</h1>
+      <p>Every step from your first document at home to your first week abroad. What you pay, what your employer is supposed to pay, and how many months of Gulf savings it takes to earn it back.</p>
+      <div class="calc-hero-meta">Fees checked <span data-asof></span> · official fees only, no agency mark-ups</div>
+    </header>
+
+    <section class="calc-band" id="reloc-calc" aria-label="Relocation cost calculator">
+      <div class="calc-wrap calc-grid">
+        <form class="calc-card" onsubmit="return false">
+          <div class="field">
+            <div class="field-label" id="lbl-origin">Moving from</div>
+            <div class="seg" id="f-origin" role="group" aria-labelledby="lbl-origin"></div>
+          </div>
+          <div class="field">
+            <div class="field-label" id="lbl-group">You are a</div>
+            <div class="seg" id="f-group" role="group" aria-labelledby="lbl-group"></div>
+          </div>
+          <div class="field">
+            <div class="field-label" id="lbl-market">Moving to</div>
+            <div class="tiles" id="f-market" role="group" aria-labelledby="lbl-market"></div>
+          </div>
+          <div class="field">
+            <div class="field-label">Already done</div>
+            <label class="check"><input type="checkbox" id="f-have-dataflow"><span class="box"></span><span>I have a verification report for this country<small>DataFlow or equivalent, already issued</small></span></label>
+            <label class="check"><input type="checkbox" id="f-have-exam"><span class="box"></span><span>I've passed the licensing exam<small>Prometric or the regulator's own exam</small></span></label>
+          </div>
+          <div class="field">
+            <div class="field-label">Your offer</div>
+            <label class="check"><input type="checkbox" id="f-housing"><span class="box"></span><span>My employer gives me accommodation<small>Removes the deposit and first month's rent</small></span></label>
+          </div>
+        </form>
+
+        <div class="calc-card calc-result" aria-live="polite">
+          <div class="r-label" id="r-title"></div>
+          <p class="note" id="market-note" style="margin-top:8px;color:var(--c-red)"></p>
+          <div class="totals">
+            <div class="stat you"><div class="s-k">You'll likely pay</div><div class="s-v" id="t-you"></div><div class="s-n" id="t-you-usd"></div></div>
+            <div class="stat"><div class="s-k">Your employer should pay</div><div class="s-v" id="t-emp"></div><div class="s-n">Never pay these yourself to an agent</div></div>
+          </div>
+          <div class="stat" style="margin-top:8px"><div class="s-k">Paid back in</div><div class="s-v" id="t-payback"></div><div class="s-n" id="t-payback-n"></div></div>
+          <p class="note">The low figure assumes your employer covers everything marked "Depends on employer" (flight, first rent, some licence fees); the high figure assumes you pay it all.</p>
+          <p class="note" id="t-weeks" style="margin-top:8px"></p>
+          <div class="cta-row">
+            <a class="calc-btn" href="signup.html">Start with GlobalHire</a>
+            <a class="calc-btn ghost" id="to-salary" href="salary-calculator.html">Check the salary</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="calc-band alt">
+      <div class="calc-wrap">
+        <div class="sec-head">
+          <h2>Step by step.</h2>
+          <p>In the order you'll meet them. Ranges cover the cheapest and dearest realistic case; small numbers link to the source.</p>
+        </div>
+        <div class="calc-card" id="journey"></div>
+      </div>
+    </section>
+
+    <section class="calc-band">
+      <div class="calc-wrap">
+        <div class="warn">
+          <h3>You should never pay for the job itself.</h3>
+          <p id="legal"></p>
+          <ul id="scams"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="calc-band alt">
+      <div class="calc-wrap">
+        <div class="sec-head">
+          <h2>How we got these numbers.</h2>
+          <p>Fees come from regulators, exam providers and embassies wherever they publish them, then from vendor pages and what candidates report. We leave out agency service charges, including our own, so you see the true cost of the process. Currency conversions use <span data-fx></span>. Fees change; check the source before you pay.</p>
+        </div>
+        <ol class="sources" id="sources"></ol>
+      </div>
+    </section>
+  </main>
+
+  <div id="gfooter-placeholder"></div>
+
+  <script src="js/core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/nav-global.js"></script>
+  <script src="data/gulf-calc-data.js"></script>
+  <script src="js/gulf-calc.js"></script>
+  <script>document.addEventListener('DOMContentLoaded', function () { if (window.GHNav) GHNav.init('guides'); });</script>
+</body>
+</html>
