@@ -117,20 +117,47 @@
     REQUIRED_DOCS[visaType].forEach(function (entry) {
       var kind = entry[0], label = entry[1];
       var wrap = document.createElement('div');
-      wrap.style.marginBottom = 'var(--space-3)';
+      wrap.className = 'v-file';
       wrap.innerHTML =
-        '<label style="display:block; font-size:.875rem; margin-bottom:4px;">' + label + '</label>' +
-        '<input type="file" name="' + kind + '" data-kind="' + kind + '" required accept=".jpg,.jpeg,.png,.webp,.pdf">';
+        '<label for="doc-' + kind + '">' + label + '</label>' +
+        '<input id="doc-' + kind + '" type="file" multiple name="' + kind + '" data-kind="' + kind + '" data-label="' + label.replace(/"/g, '&quot;') + '" accept=".jpg,.jpeg,.png,.webp,.pdf">';
       docList.appendChild(wrap);
     });
 
-    // Estimate
-    var est = ESTIMATES[visaType];
-    $('#estimated-balance').textContent = '~$' + est.balance;
-    $('#estimated-total').textContent   = '$' + est.total;
+    var NAMES = { tourist: 'Tourist eVisa', umrah: 'Umrah visa', family_visit: 'Family Visit visa', family_residence: 'Family Residence' };
+    var title = $('#v-start-title');
+    if (title) title.textContent = 'Start your ' + NAMES[visaType] + ' case.';
+
+    // Price summary: the plan saved on the visa page if it matches, else the per-person estimate.
+    var plan = null;
+    try { plan = JSON.parse(localStorage.getItem('gh_visa_plan') || 'null'); } catch (e) {}
+    if (plan && plan.slug === slug && plan.total) {
+      var cur = plan.currency === 'NGN' ? '₦' : '$';
+      var money = function (n) { return cur + Math.round(Number(n) || 0).toLocaleString('en-US'); };
+      $('#v-sum-label').textContent = 'Your price, ' + (Number(plan.people) || 1) + ((Number(plan.people) || 1) === 1 ? ' person' : ' people');
+      $('#estimated-total').textContent = money(plan.total);
+      var lines = $('#v-sum-lines');
+      lines.innerHTML = '';
+      (plan.lines || []).forEach(function (l) {
+        var row = document.createElement('div');
+        row.className = 'v-line';
+        var a = document.createElement('span'); a.textContent = String(l[0]);
+        var b = document.createElement('span'); b.textContent = String(l[1]);
+        row.appendChild(a); row.appendChild(b); lines.appendChild(row);
+      });
+      var dep = document.createElement('div');
+      dep.className = 'v-line start';
+      dep.innerHTML = '<span>You pay today to start</span><span>$' + DEPOSIT_USD + '</span>';
+      lines.appendChild(dep);
+    } else {
+      var est = ESTIMATES[visaType];
+      $('#v-sum-label').textContent = 'From, per person';
+      $('#estimated-balance').textContent = '~$' + est.balance;
+      $('#estimated-total').textContent   = '$' + est.total;
+    }
 
     // No on-site charge — the deposit invoice is emailed after submit (pay online or by transfer).
-    $('#visa-pay-btn').textContent = 'Submit & email my invoice';
+    $('#visa-pay-btn').textContent = 'Submit and email my invoice';
     $('#visa-pay-btn').disabled = false;
 
     $('#visa-intake-form').addEventListener('submit', async function (e) {
@@ -140,6 +167,16 @@
 
       var f = e.target;
       var leadId = sessionStorage.getItem('gh_visa_lead_id');
+
+      var missing = Array.prototype.filter.call(f.querySelectorAll('input[type=file]'), function (fi) { return !(fi.files && fi.files.length); })
+        .map(function (fi) { return fi.dataset.label; });
+      if (missing.length) {
+        showError('Please add: ' + missing.join(', ') + '.');
+        $('#visa-start-error').scrollIntoView({ block: 'center' });
+        btn.disabled = false; btn.textContent = 'Submit and email my invoice';
+        return;
+      }
+      $('#visa-start-error').hidden = true;
 
       try {
         // Step 1: create the case
@@ -164,8 +201,8 @@
         var fileInputs = f.querySelectorAll('input[type=file]');
         for (var i = 0; i < fileInputs.length; i++) {
           var fi = fileInputs[i];
-          if (fi.files && fi.files[0]) {
-            await uploadDoc(fi.files[0], candidateId, created.case_id, fi.dataset.kind);
+          for (var j = 0; fi.files && j < fi.files.length; j++) {
+            await uploadDoc(fi.files[j], candidateId, created.case_id, fi.dataset.kind);
           }
         }
 
@@ -173,20 +210,21 @@
         var main = document.querySelector('main.visa-main');
         if (main) {
           main.innerHTML =
-            '<section class="visa-section visa-section--ivory" style="text-align:center;padding:4rem 1.5rem;">' +
-              '<div style="max-width:560px;margin:0 auto;">' +
-                '<div style="font-size:2.75rem;color:#16a34a;line-height:1;">&#10003;</div>' +
-                '<h1 class="visa-h2" style="margin-top:0.75rem;">Your visa case is created</h1>' +
-                '<p class="visa-lede" style="margin-top:1rem;">We’re emailing your <strong>deposit invoice</strong> now. Open it and pay online or by bank transfer — as soon as your deposit lands we begin processing.</p>' +
-                '<p style="margin-top:1rem;opacity:.7;font-size:.9rem;">Check your inbox (and spam). Your $50 deposit is credited toward your visa total and refunded if you’re not eligible.</p>' +
-                '<a class="visa-btn visa-btn--primary" style="margin-top:1.5rem;" href="dashboard-visas.html">Go to my dashboard &#8594;</a>' +
+            '<section class="v-hero" style="padding-bottom:96px">' +
+              '<div class="v-wrap v-done">' +
+                '<div class="tick" aria-hidden="true">&#10003;</div>' +
+                '<h1 style="font-size:clamp(32px,5vw,48px)">Your visa case is open.</h1>' +
+                '<p class="v-lede" style="margin-top:12px">We are emailing your $50 invoice now. Pay it online or by bank transfer, and we start as soon as it arrives.</p>' +
+                '<p class="v-note">Check your inbox and spam folder. The $50 is credited to your visa total and refunded if you are not eligible.</p>' +
+                '<div class="v-cta"><a class="btn btn-primary btn-lg" href="dashboard-visas.html">Track my case</a></div>' +
               '</div>' +
             '</section>';
+          try { localStorage.removeItem('gh_visa_plan'); } catch (e2) {}
           window.scrollTo(0, 0);
         }
       } catch (err) {
         showError(err.message || 'Something went wrong. Please try again or message us on WhatsApp.');
-        btn.disabled = false; btn.textContent = 'Submit & email my invoice';
+        btn.disabled = false; btn.textContent = 'Submit and email my invoice';
       }
     });
   }

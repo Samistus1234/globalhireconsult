@@ -4,162 +4,143 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Saudi Visa Services — GlobalHire@eLab</title>
-  <meta name="description" content="Apply for Saudi visas — Tourist eVisa, Umrah, Family Visit, Family Residence — submitted by licensed specialists. Pay $50 to start, credited toward your visa total. Refunded if you're not eligible.">
+  <meta name="description" content="Saudi Tourist eVisa, Umrah, Family Visit and Family Residence visas, submitted by a licensed Saudi visa team. See your price in under a minute. $50 to start, credited to your total and refunded if you're not eligible.">
+  <meta property="og:title" content="Saudi visas, handled — GlobalHire">
+  <meta property="og:description" content="Tourist, Umrah and family visas. See the price for your whole family in under a minute.">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="image" href="/assets/visa/img/visa-hub-poster.jpg" fetchpriority="high">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/nav-global.css">
-  <link rel="stylesheet" href="css/visa.css">
+  <link rel="stylesheet" href="css/theme-light.css">
+  <link rel="stylesheet" href="css/visa-light.css">
 
   <link rel="icon" type="image/png" href="assets/brand/favicon-32.png">
   <link rel="apple-touch-icon" href="assets/brand/globalhire-icon-180.png">
 </head>
-<body>
-  <div class="page-bg" aria-hidden="true"></div>
+<body class="gh-light">
   <div id="gnav-placeholder"></div>
 
-  <main class="visa-main">
-
-    <!-- HERO -->
-    <section class="visa-hero visa-hero--hub">
-      <div class="visa-hero__bg"
-           data-poster="/assets/visa/img/visa-hub-poster.jpg">
-        <picture>
-          <source media="(max-width: 750px)" srcset="/assets/visa/img/visa-hub-poster-mobile.jpg">
-          <img src="/assets/visa/img/visa-hub-poster.jpg" alt="" fetchpriority="high">
-        </picture>
-      </div>
-      <div class="visa-hero__overlay"></div>
-      <svg class="visa-hero__silhouette" height="120" viewBox="0 0 400 120" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M0,120 L0,80 Q40,40 80,70 Q120,30 160,60 Q200,20 240,55 Q280,15 320,50 Q360,25 400,60 L400,120 Z" fill="#1a0f05" opacity="0.6"/>
-      </svg>
-      <div class="visa-hero__content">
-        <p class="visa-kicker">— Licensed Saudi visa specialists · ELAB Visa Services —</p>
-        <h1 class="visa-h1">Your Saudi visa,<br><em>handled.</em></h1>
-        <p class="visa-lede">Tourist · Umrah · Family Visit · Family Residence. From $135 all-in. Submitted by a licensed Saudi visa specialist.</p>
-        <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-          <a class="visa-btn visa-btn--primary" href="#wizard">Find my visa →</a>
-          <a class="visa-btn visa-btn--outline" href="visa-about.html">Watch how it works</a>
+  <main>
+    <!-- ── Hero ── -->
+    <section class="v-hero">
+      <div class="v-wrap">
+        <span class="v-eyebrow">ELAB Visa Services</span>
+        <h1>Saudi visas, handled.</h1>
+        <p class="v-lede">Tourist, Umrah and family visas, submitted by a licensed Saudi visa team. See the price for your whole group in under a minute.</p>
+        <div class="v-cta">
+          <a href="#choose" class="btn btn-primary btn-lg">See my price</a>
+          <a href="visa-about.html" class="btn btn-ghost btn-lg">How it works</a>
         </div>
+        <p class="v-note" id="v-resume" hidden style="margin-top:20px"></p>
       </div>
-      <div class="visa-hero__scroll-cue">▼ SCROLL</div>
+      <div class="v-wrap"><div class="v-photo" role="img" aria-label="Sunset through a rock arch in AlUla" style="background-image:url('assets/visa/img/visa-tourist-hero.jpg')"></div></div>
     </section>
 
-    <!-- WIZARD -->
-    <section id="wizard" class="visa-section visa-section--ivory visa-reveal">
-      <p class="visa-kicker">Step 1 of 3</p>
-      <h2 class="visa-h2">Tell us why you're going.</h2>
-      <div class="visa-wizard-grid">
-        <button type="button" class="visa-wizard-chip" data-outcome="visit-saudi">
-          <span class="title">Visit Saudi</span><span class="sub">Tourism · AlUla · events</span>
-        </button>
-        <button type="button" class="visa-wizard-chip" data-outcome="go-for-umrah">
-          <span class="title">Go for Umrah</span><span class="sub">Religious pilgrimage</span>
-        </button>
-        <button type="button" class="visa-wizard-chip" data-outcome="bring-my-family">
-          <span class="title">Bring my family</span><span class="sub">Iqama-holder visit</span>
-        </button>
-        <button type="button" class="visa-wizard-chip" data-outcome="live-with-family">
-          <span class="title">Live with family</span><span class="sub">Family Residence</span>
-        </button>
-        <button type="button" class="visa-wizard-chip visa-wizard-chip--more" data-outcome="more">
-          <span class="title">More options</span><span class="sub">Hajj · Work &amp; Iqama · Domestic Worker · Transit</span>
-        </button>
-      </div>
-      <div id="wizard-deflection" hidden style="margin-top: 1.5rem;"></div>
-    </section>
-
-    <!-- PINNED STORY -->
-    <section class="visa-section visa-section--espresso visa-reveal">
-      <p class="visa-kicker" style="opacity: 0.6;">— Why us —</p>
-      <h2 class="visa-h2" style="max-width: 720px;">A licensed Saudi specialist <em>behind every application</em>, and ELAB on your side from intake to issued.</h2>
-      <div class="visa-stats">
-        <div>
-          <span class="visa-stats__num">Licensed</span>
-          <span class="visa-stats__label">Saudi specialist on every application</span>
+    <!-- ── Choose ── -->
+    <section class="v-band" id="choose">
+      <div class="v-wrap">
+        <div class="v-head">
+          <h2>Which visa do you need?</h2>
+          <p>Pick one to see your price. It takes a few taps and you don't need an account yet.</p>
         </div>
-        <div>
-          <span class="visa-stats__num"><span data-visa-counter="50">$0</span></span>
-          <span class="visa-stats__label">to start — credited toward your visa total</span>
+        <div class="v-cards">
+          <a class="v-card photo" href="visa-tourist-evisa.html" data-visa="tourist" style="background-image:url('assets/visa/img/visa-tourist-hero.jpg')">
+            <span class="v-tag">Tourism</span>
+            <h3>Tourist eVisa</h3>
+            <p>One year, multiple entry. Up to 90 days a visit, for AlUla, the Red Sea and Saudi Season.</p>
+            <span class="v-card-foot"><span class="v-price">From $185 per person</span><span class="v-pill">Get my price</span></span>
+          </a>
+          <a class="v-card photo" href="visa-umrah.html" data-visa="umrah" style="background-image:url('assets/visa/img/visa-umrah-hero.jpg')">
+            <span class="v-tag">Pilgrimage</span>
+            <h3>Umrah</h3>
+            <p>Single entry, up to 30 days, issued through Nusuk. Full packages from Kano if you live in Nigeria.</p>
+            <span class="v-card-foot"><span class="v-price">From $295 per person</span><span class="v-pill">Get my price</span></span>
+          </a>
+          <a class="v-card sand" href="visa-family-visit.html" data-visa="family_visit">
+            <span class="v-tag">For Iqama holders</span>
+            <h3>Family Visit</h3>
+            <p>Bring your spouse, children or parents to Saudi for up to 90 days, extendable in-country.</p>
+            <span class="v-card-foot"><span class="v-price">From ₦814,500 per person</span><span class="v-pill">Get my price</span></span>
+          </a>
+          <a class="v-card mint" href="visa-family-residence.html" data-visa="family_residence">
+            <span class="v-tag">For Iqama holders</span>
+            <h3>Family Residence</h3>
+            <p>Your spouse and children live with you in Saudi, with their own residence.</p>
+            <span class="v-card-foot"><span class="v-price">From ₦424,000 per person</span><span class="v-pill">Get my price</span></span>
+          </a>
         </div>
-        <div>
-          <span class="visa-stats__num">7/7</span>
-          <span class="visa-stats__label">WhatsApp human support</span>
+        <div class="v-more">
+          <span>Coming soon:</span>
+          <a href="https://wa.me/9295419232?text=Hi%2C%20I%27m%20interested%20in%20a%20Hajj%20visa." target="_blank" rel="noopener">Hajj</a>
+          <a href="https://wa.me/9295419232?text=Hi%2C%20I%27m%20interested%20in%20a%20Saudi%20work%20visa%20and%20Iqama." target="_blank" rel="noopener">Work and Iqama</a>
+          <a href="https://wa.me/9295419232?text=Hi%2C%20I%27m%20interested%20in%20a%20domestic%20worker%20visa." target="_blank" rel="noopener">Domestic worker</a>
+          <a href="https://wa.me/9295419232?text=Hi%2C%20I%27m%20interested%20in%20a%20Saudi%20transit%20visa." target="_blank" rel="noopener">Transit</a>
         </div>
       </div>
     </section>
 
-    <!-- CATALOG -->
-    <section class="visa-section visa-section--ivory visa-reveal">
-      <p class="visa-kicker">— Browse —</p>
-      <h2 class="visa-h2">All Saudi visas we issue.</h2>
-      <div class="visa-catalog">
-        <a class="visa-catalog-card visa-catalog-card--tourist" href="visa-tourist-evisa.html">
-          <div class="visa-catalog-card__strip"></div>
-          <div class="visa-catalog-card__body">
-            <h3 class="visa-catalog-card__title">Tourist eVisa</h3>
-            <p class="visa-catalog-card__meta">From <strong>$185</strong></p>
+    <!-- ── Guided flow (opens when a visa is chosen) ── -->
+    <section class="v-band alt" id="price" aria-live="polite">
+      <div class="v-wrap">
+        <div class="v-flow" id="v-flow" hidden>
+          <div class="v-flow-top">
+            <button type="button" class="v-back" id="v-back" hidden>‹ Back</button>
+            <small id="v-flow-label"></small>
           </div>
-        </a>
-        <a class="visa-catalog-card visa-catalog-card--umrah" href="visa-umrah.html">
-          <div class="visa-catalog-card__strip"></div>
-          <div class="visa-catalog-card__body">
-            <h3 class="visa-catalog-card__title">Umrah</h3>
-            <p class="visa-catalog-card__meta">From <strong>$295</strong></p>
-          </div>
-        </a>
-        <a class="visa-catalog-card visa-catalog-card--family" href="visa-family-visit.html">
-          <div class="visa-catalog-card__strip"></div>
-          <div class="visa-catalog-card__body">
-            <h3 class="visa-catalog-card__title">Family Visit</h3>
-            <p class="visa-catalog-card__meta">From <strong>₦814,500</strong> <span style="opacity:.55;">(≈ $543)</span></p>
-          </div>
-        </a>
-        <a class="visa-catalog-card visa-catalog-card--residence" href="visa-family-residence.html">
-          <div class="visa-catalog-card__strip"></div>
-          <div class="visa-catalog-card__body">
-            <h3 class="visa-catalog-card__title">Family Residence</h3>
-            <p class="visa-catalog-card__meta">From <strong>₦424,000</strong> <span style="opacity:.55;">(≈ $283)</span></p>
-          </div>
-        </a>
-        <div class="visa-catalog-card visa-catalog-card--more">
-          <div>
-            <p class="visa-catalog-card__title">+4 more</p>
-            <p class="visa-catalog-card__meta">Hajj · Domestic Worker · Work &amp; Iqama · Transit</p>
-          </div>
+          <div class="v-progress" id="v-progress" aria-hidden="true"></div>
+          <div id="v-flow-body"></div>
+        </div>
+
+        <div class="v-head" style="margin-top:72px">
+          <h2>From question to visa in four steps.</h2>
+        </div>
+        <div class="v-steps">
+          <div><h3>See your price</h3><p>Answer a few questions and get the total for everyone travelling.</p></div>
+          <div><h3>Upload your documents</h3><p>Create an account, add your details and upload passports and papers.</p></div>
+          <div><h3>Pay $50 to start</h3><p>We email the invoice. It's credited to your total and refunded if you're not eligible.</p></div>
+          <div><h3>We submit, you travel</h3><p>A licensed Saudi visa team submits it. Pay the balance on approval and download your visa.</p></div>
         </div>
       </div>
-      <p style="margin-top: 1rem; font-size: 0.8125rem; opacity: 0.6;">Prices are per person. USD figures are indicative; the naira equivalent may vary with the prevailing exchange rate.</p>
     </section>
 
-    <!-- TRUST STRIP -->
-    <section class="visa-section--walnut" style="padding: 1.25rem 0;">
-      <div class="visa-trust">
-        <div class="visa-trust__item"><strong>✓ Licensed Saudi specialists</strong>Submitted by our regulated team</div>
-        <div class="visa-trust__item"><strong>✓ Real-time status</strong>Tracked in your dashboard</div>
-        <div class="visa-trust__item"><strong>✓ $50 to start</strong>Credited to your total · refunded if ineligible</div>
-        <div class="visa-trust__item"><strong>✓ WhatsApp 7 days</strong>Real humans, 7am–10pm</div>
+    <!-- ── Why ── -->
+    <section class="v-band">
+      <div class="v-wrap">
+        <div class="v-why">
+          <div><h3>A licensed team</h3><p>Every application goes through a licensed Saudi visa specialist, not a middleman with a form.</p></div>
+          <div><h3>See it move</h3><p>Follow your case in your dashboard, with updates by WhatsApp and email at each step.</p></div>
+          <div><h3>People who answer</h3><p>Real people on WhatsApp, seven days a week, 7am to 10pm.</p></div>
+        </div>
       </div>
     </section>
 
+    <!-- ── FAQ ── -->
+    <section class="v-band alt">
+      <div class="v-wrap">
+        <div class="v-head"><h2>Questions.</h2></div>
+        <div class="v-faq">
+          <details><summary>What is the $50 to start?</summary><p>It opens your case. It's credited to your visa total, and fully refunded if we find you're not eligible at intake. Government and processing fees can't be refunded once we've submitted.</p></details>
+          <details><summary>How long does it take?</summary><p>It depends on current Saudi processing. We confirm your timeline once we've reviewed your documents, usually within 24 hours of receiving them.</p></details>
+          <details><summary>I live in Nigeria. Can I get a Tourist or Umrah visa?</summary><p>Visa-only applications are for people who already live abroad with residence. From Nigeria we arrange full packages: Umrah from Kano with flights, transport and hotel, and Tourist packages on request.</p></details>
+          <details><summary>Why do family prices change with age?</summary><p>Older visitors need health insurance, and some dependants need a medical exam or police certificate. The price covers those, so there are no surprises later.</p></details>
+        </div>
+        <div class="v-cta" style="margin-top:32px">
+          <a class="btn btn-ghost btn-lg" href="https://wa.me/9295419232" target="_blank" rel="noopener">Chat with us on WhatsApp</a>
+        </div>
+      </div>
+    </section>
   </main>
 
   <div id="gfooter-placeholder"></div>
 
-  <script src="js/nav-global.js" data-active-page="visa"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/supabase-client.js"></script>
-  <script src="js/visa-wizard.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.45/dist/lenis.min.js" defer></script>
-  <script type="module" src="js/visa-motion.js"></script>
-  <script type="module" src="js/visa-hero-video.js"></script>
+  <script src="js/nav-global.js" data-active-page="visa"></script>
+  <script src="js/visa-flow.js"></script>
 </body>
 </html>
