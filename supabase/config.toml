@@ -10,3 +10,7 @@ verify_jwt = false
 # (no user JWT), same as the other secret-gated internal functions.
 [functions.profile-reminder]
 verify_jwt = false
+
+[functions.security-probe]
+# Called only by CC security-watch with the x-security-probe secret; no user JWT.
+verify_jwt = false
