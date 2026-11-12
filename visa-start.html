@@ -4,91 +4,84 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Start your visa case — GlobalHire@eLab</title>
-  <meta name="description" content="Confirm your details, upload documents, and pay $50 to start your Saudi visa case — credited toward your visa total, refunded if ineligible.">
+  <meta name="description" content="Add your travel details, upload documents and start your Saudi visa case. $50 to start, credited to your visa total and refunded if you're not eligible.">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/nav-global.css">
-  <link rel="stylesheet" href="css/visa.css">
-  <link rel="stylesheet" href="css/visa-functional.css">
   <link rel="stylesheet" href="css/theme-light.css">
-  <!-- Favicon -->
+  <link rel="stylesheet" href="css/visa-light.css">
   <link rel="icon" type="image/png" href="assets/brand/favicon-32.png">
   <link rel="apple-touch-icon" href="assets/brand/globalhire-icon-180.png">
 </head>
 <body class="gh-light">
-  <div class="page-bg" aria-hidden="true"></div>
   <div id="gnav-placeholder"></div>
 
   <main class="visa-main">
-    <header class="visa-fn-header">
-      <p class="visa-fn-header__kicker">Step 3 of 3 · Eligibility ✓ · Documents · <strong>Confirm &amp; submit</strong></p>
-      <h1 class="visa-fn-header__title">Start your visa case</h1>
-    </header>
-    <div id="visa-start-error" class="visa-fn-body" hidden style="padding-block: 0.75rem; background: rgba(230,57,70,0.08); border-left: 3px solid var(--visa-error); color: var(--espresso);"></div>
-    <div class="visa-fn-body">
-      <div class="visa-detail-layout">
+    <section class="v-hero" style="padding-bottom:0">
+      <div class="v-wrap" style="text-align:left">
+        <div class="v-crumbs"><a href="visa.html">Visas</a> › Your details</div>
+        <h1 style="margin-left:0;font-size:clamp(34px,5vw,52px)" id="v-start-title">Start your visa case.</h1>
+        <p class="v-lede" style="margin-left:0">Add your travel details and upload your documents. We'll email your $50 invoice as soon as you submit.</p>
+      </div>
+    </section>
+
+    <section class="v-band" style="padding-top:40px">
+      <div class="v-wrap v-detail">
         <div>
-          <form id="visa-intake-form">
-            <fieldset style="border: 0; padding: 0; margin: 0;">
-              <legend class="visa-kicker">Applicant</legend>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
-                <input class="visa-field" type="text"  name="applicant_name"  placeholder="Full name (as on passport)" required>
-                <input class="visa-field" type="text"  name="passport_number" placeholder="Passport number" required>
-                <input class="visa-field" type="text"  name="nationality"     placeholder="Nationality (e.g. NG)" required>
-                <input class="visa-field" type="tel"   name="contact_phone"   placeholder="WhatsApp number">
+          <div id="visa-start-error" class="v-error" hidden></div>
+          <form id="visa-intake-form" novalidate>
+            <fieldset class="v-fieldset" id="sponsor-fieldset">
+              <legend class="v-legend">Sponsor in Saudi Arabia</legend>
+              <div class="v-form-grid">
+                <div class="v-field"><label for="sponsor_name">Sponsor's full name</label><input id="sponsor_name" type="text" name="sponsor_name" autocomplete="name"></div>
+                <div class="v-field"><label for="sponsor_iqama">Sponsor's Iqama number</label><input id="sponsor_iqama" type="text" name="sponsor_iqama" inputmode="numeric"></div>
               </div>
             </fieldset>
-            <fieldset id="sponsor-fieldset" style="border: 0; padding: 0; margin: 1.5rem 0 0;">
-              <legend class="visa-kicker">Sponsor in Saudi</legend>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
-                <input class="visa-field" type="text"  name="sponsor_name"  placeholder="Sponsor full name">
-                <input class="visa-field" type="text"  name="sponsor_iqama" placeholder="Sponsor Iqama number">
-                <select class="visa-field" name="sponsor_relationship">
-                  <option value="">Relationship to sponsor</option>
-                  <option value="spouse">Spouse</option>
-                  <option value="child">Child</option>
-                  <option value="parent">Parent</option>
-                </select>
+
+            <fieldset class="v-fieldset">
+              <legend class="v-legend">Travel</legend>
+              <div class="v-form-grid">
+                <div class="v-field"><label for="arrival">Planned arrival</label><input id="arrival" type="date" name="arrival"></div>
+                <div class="v-field"><label for="stay_days">Length of stay (days)</label><input id="stay_days" type="number" name="stay_days" min="1" max="365" inputmode="numeric"></div>
               </div>
             </fieldset>
-            <fieldset style="border: 0; padding: 0; margin: 1.5rem 0 0;">
-              <legend class="visa-kicker">Travel</legend>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
-                <input class="visa-field" type="date"   name="arrival"   placeholder="Intended arrival">
-                <input class="visa-field" type="number" name="stay_days" min="1" max="365" placeholder="Stay (days)">
-              </div>
-            </fieldset>
-            <fieldset style="border: 0; padding: 0; margin: 1.5rem 0 0;">
-              <legend class="visa-kicker">Documents</legend>
-              <p style="font-size: 0.75rem; opacity: 0.65; margin: 0.25rem 0 0.5rem;">JPG, PNG, WEBP, or PDF — up to 20 MB each.</p>
+
+            <fieldset class="v-fieldset">
+              <legend class="v-legend">Documents</legend>
+              <p class="v-note" style="margin:-6px 0 14px">JPG, PNG, WEBP or PDF, up to 20 MB each. Travelling as a group? Add every person's file to each slot.</p>
               <div id="doc-uploads"></div>
             </fieldset>
-            <button id="visa-pay-btn" class="visa-btn visa-btn--primary" type="submit" style="margin-top: 2rem;" disabled>Submit &amp; email my invoice</button>
-            <p style="margin-top: 0.5rem; font-size: 0.75rem; opacity: 0.65;">After you submit, we email your $50 deposit invoice — pay online or by bank transfer. Credited toward your visa total, refunded if ineligible at intake.</p>
+
+            <button id="visa-pay-btn" class="btn btn-primary btn-lg" type="submit" style="width:100%;justify-content:center" disabled>Submit and email my invoice</button>
+            <p class="v-note">After you submit, we email your $50 invoice to pay online or by bank transfer. It's credited to your visa total and refunded if you're not eligible.</p>
           </form>
         </div>
-        <aside class="visa-price-card">
-          <p style="font-weight: 600;">How payment works</p>
-          <p style="display: flex; justify-content: space-between; margin: 0.5rem 0 0.25rem;"><span>Deposit to start</span><strong>$50</strong></p>
-          <p style="display: flex; justify-content: space-between; opacity: 0.7; margin: 0 0 0.25rem;"><span>Balance after review</span><span id="estimated-balance">~$493</span></p>
-          <p style="display: flex; justify-content: space-between; border-top: 1px solid var(--sand); padding-top: 0.5rem;"><span>Estimated total</span><strong class="visa-price-display" style="font-size: 1.25rem;" id="estimated-total">$543</strong></p>
-          <p style="margin-top: 0.75rem; font-size: 0.75rem; opacity: 0.7; line-height: 1.5;">When you submit, we email your <strong>$50 deposit invoice</strong> — pay online or by bank transfer (Naira). We begin as soon as your deposit lands.</p>
+
+        <aside class="v-price-card" id="v-summary">
+          <div class="from" id="v-sum-label">Estimated total</div>
+          <div class="amt" id="estimated-total">—</div>
+          <div class="v-lines" id="v-sum-lines">
+            <div class="v-line start"><span>You pay today to start</span><span>$50</span></div>
+            <div class="v-line"><span>Balance after review</span><span id="estimated-balance">—</span></div>
+          </div>
+          <p class="v-note" style="margin:0">We start as soon as your $50 deposit arrives. You pay the balance once your documents are approved.</p>
+          <a class="v-link" href="visa.html#choose" style="display:inline-block;margin-top:14px;font-size:15px">Change visa or travellers</a>
           <input type="hidden" id="provider-select" name="provider" value="paystack">
         </aside>
       </div>
-    </div>
+    </section>
   </main>
 
   <div id="gfooter-placeholder"></div>
-  <script src="js/nav-global.js" data-active-page="visa"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/supabase-client.js"></script>
-  <script src="js/visa-intake.js?v=visa3"></script>
+  <script src="js/nav-global.js" data-active-page="visa"></script>
+  <script src="js/visa-intake.js?v=visa4"></script>
 </body>
 </html>
