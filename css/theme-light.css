@@ -193,8 +193,8 @@ body.gh-light .gfooter a:hover { color: var(--primary); }
 /* ── Page-specific leftovers from the dark theme ── */
 body.gh-light .job-badge-featured { background: var(--c-amber-bg); color: var(--c-amber); border-color: transparent; }
 body.gh-light .job-card.featured { background: #fff; border-color: var(--border-default); box-shadow: none; }
-body.gh-light .job-card.featured .btn-featured { background: var(--primary); border-radius: 999px; box-shadow: none; }
-body.gh-light .job-card.featured .btn-featured:hover { background: var(--primary-light); transform: none; box-shadow: none; }
+body.gh-light .job-card.featured .btn-featured { background: #fff; color: var(--primary); border: 1px solid var(--primary); border-radius: 999px; box-shadow: none; }
+body.gh-light .job-card.featured .btn-featured:hover { background: var(--primary-muted); transform: none; box-shadow: none; }
 body.gh-light .job-card.featured .benefit-tag { background: var(--bg-surface); color: var(--text-secondary); border-color: transparent; }
 body.gh-light .job-card.featured .job-salary { color: var(--text-primary) !important; }
 body.gh-light .sch-badge-partial { background: var(--c-amber-bg); color: var(--c-amber); border-color: transparent; }
