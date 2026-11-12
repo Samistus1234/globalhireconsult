@@ -120,7 +120,7 @@
       wrap.className = 'v-file';
       wrap.innerHTML =
         '<label for="doc-' + kind + '">' + label + '</label>' +
-        '<input id="doc-' + kind + '" type="file" multiple name="' + kind + '" data-kind="' + kind + '" data-label="' + label.replace(/"/g, '&quot;') + '" accept=".jpg,.jpeg,.png,.webp,.pdf">';
+        '<input id="doc-' + kind + '" type="file" multiple name="doc_' + kind + '" data-kind="' + kind + '" data-label="' + label.replace(/"/g, '&quot;') + '" accept=".jpg,.jpeg,.png,.webp,.pdf">';
       docList.appendChild(wrap);
     });
 
@@ -170,6 +170,8 @@
 
       var missing = Array.prototype.filter.call(f.querySelectorAll('input[type=file]'), function (fi) { return !(fi.files && fi.files.length); })
         .map(function (fi) { return fi.dataset.label; });
+      if (!f.passport_number.value.trim()) missing.unshift('your passport number');
+      if (!f.nationality.value.trim()) missing.unshift('your nationality');
       if (missing.length) {
         showError('Please add: ' + missing.join(', ') + '.');
         $('#visa-start-error').scrollIntoView({ block: 'center' });
@@ -190,6 +192,13 @@
             travel_dates:         { arrival: f.arrival.value || null, stay_days: f.stay_days.value ? Number(f.stay_days.value) : null },
             lead_id:              leadId,
             provider:             $('#provider-select').value,
+            applicant: {
+              passport_number: f.passport_number.value,
+              nationality:     f.nationality.value,
+              whatsapp:        f.whatsapp.value,
+            },
+            sponsor_relationship: plan && plan.slug === slug ? plan.who : null,
+            travellers:           plan && plan.slug === slug ? { people: plan.people, currency: plan.currency, total: plan.total, counts: plan.counts, lines: plan.lines } : null,
           }),
         });
         if (!createResp.ok) throw new Error('case creation failed');
